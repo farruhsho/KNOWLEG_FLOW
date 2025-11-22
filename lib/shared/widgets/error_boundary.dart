@@ -21,6 +21,21 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
   StackTrace? _stackTrace;
 
   @override
+  void initState() {
+    super.initState();
+    // Set up error handler
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      if (mounted) {
+        setState(() {
+          _error = details.exception;
+          _stackTrace = details.stack;
+        });
+      }
+      return const SizedBox.shrink();
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_error != null) {
       if (widget.errorBuilder != null) {
@@ -37,13 +52,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
       );
     }
 
-    return ErrorWidget.builder = (FlutterErrorDetails details) {
-      setState(() {
-        _error = details.exception;
-        _stackTrace = details.stack;
-      });
-      return const SizedBox.shrink();
-    } as Widget;
+    return widget.child;
   }
 }
 
