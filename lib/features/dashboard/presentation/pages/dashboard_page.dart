@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/widgets/gamification_bar.dart';
 import '../../../../shared/widgets/daily_quests_widget.dart';
+import '../../../../providers/task_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -60,14 +61,14 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-class _DashboardHome extends StatefulWidget {
+class _DashboardHome extends ConsumerStatefulWidget {
   const _DashboardHome();
 
   @override
-  State<_DashboardHome> createState() => _DashboardHomeState();
+  ConsumerState<_DashboardHome> createState() => _DashboardHomeState();
 }
 
-class _DashboardHomeState extends State<_DashboardHome> {
+class _DashboardHomeState extends ConsumerState<_DashboardHome> {
   final _gamificationService = GamificationService();
   UserGamification? _userGamification;
   List<DailyQuest> _dailyQuests = [];
@@ -87,16 +88,12 @@ class _DashboardHomeState extends State<_DashboardHome> {
       // Update streak
       await _gamificationService.updateStreak('current_user');
 
-      if (!mounted) return;
-
       setState(() {
         _userGamification = gamification;
         _dailyQuests = quests;
         _isLoading = false;
       });
     } catch (e) {
-      if (!mounted) return;
-
       setState(() {
         _isLoading = false;
       });
@@ -184,11 +181,12 @@ class _DashboardHomeState extends State<_DashboardHome> {
                 Expanded(
                   child: _buildActionCard(
                     context,
-                    title: 'Урок дня',
-                    icon: Icons.book,
+                    title: 'Задания',
+                    icon: Icons.assignment_turned_in,
                     color: AppColors.primary,
                     onTap: () {
-                      context.go('/lessons/daily');
+                      final taskProviderInstance = ref.read(taskProvider.notifier);
+                      context.go(AppRouter.tasks, extra: taskProviderInstance);
                     },
                   ),
                 ),
@@ -200,7 +198,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     icon: Icons.quiz,
                     color: AppColors.secondary,
                     onTap: () {
-                      context.go('/quiz/quick');
+                      context.go('${AppRouter.quiz}/quick');
                     },
                   ),
                 ),
@@ -526,7 +524,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.go('/mock-test/demo');
+                context.go('${AppRouter.mockTest}/demo');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,
