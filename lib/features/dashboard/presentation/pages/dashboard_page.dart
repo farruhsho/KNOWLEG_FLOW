@@ -129,12 +129,16 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
       // Update streak
       await _gamificationService.updateStreak('current_user');
 
+      if (!mounted) return;
+
       setState(() {
         _userGamification = gamification;
         _dailyQuests = quests;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
       });
