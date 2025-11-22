@@ -13,6 +13,9 @@ import '../../features/quiz/presentation/pages/quiz_results_page.dart';
 import '../../features/mock_test/presentation/pages/mock_test_page.dart';
 import '../../features/lessons/presentation/pages/lesson_page.dart';
 import '../../features/gamification/presentation/pages/achievements_page.dart';
+import '../../features/admin/presentation/pages/admin_login_page.dart';
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
+import '../../features/admin/presentation/pages/admin_generate_questions_page.dart';
 
 class AppRouter {
   // Custom page transition builders
@@ -98,6 +101,9 @@ class AppRouter {
   static const String payments = '/payments';
   static const String settings = '/settings';
   static const String achievements = '/achievements';
+  static const String adminLogin = '/admin/login';
+  static const String adminDashboard = '/admin/dashboard';
+  static const String adminGenerateQuestions = '/admin/generate-questions';
 
   static GoRouter createRouter() {
     return GoRouter(
@@ -208,6 +214,34 @@ class AppRouter {
           pageBuilder: (context, state) {
             return _buildPageWithSlideTransition(
               child: const AchievementsPage(),
+              state: state,
+            );
+          },
+        ),
+        // Admin routes
+        GoRoute(
+          path: adminLogin,
+          pageBuilder: (context, state) {
+            return _buildPageWithFadeTransition(
+              child: const AdminLoginPage(),
+              state: state,
+            );
+          },
+        ),
+        GoRoute(
+          path: adminDashboard,
+          pageBuilder: (context, state) {
+            return _buildPageWithSlideTransition(
+              child: const AdminDashboardPage(),
+              state: state,
+            );
+          },
+        ),
+        GoRoute(
+          path: adminGenerateQuestions,
+          pageBuilder: (context, state) {
+            return _buildPageWithSlideTransition(
+              child: const AdminGenerateQuestionsPage(),
               state: state,
             );
           },
