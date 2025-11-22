@@ -15,9 +15,6 @@ import '../../features/gamification/presentation/pages/achievements_page.dart';
 import '../../features/admin/presentation/pages/admin_login_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_generate_questions_page.dart';
-import '../../screens/task_list_screen.dart';
-import '../../screens/task_detail_screen.dart';
-import '../../providers/task_provider.dart';
 
 class AppRouter {
   // Custom page transition builders
@@ -103,8 +100,6 @@ class AppRouter {
   static const String payments = '/payments';
   static const String settings = '/settings';
   static const String achievements = '/achievements';
-  static const String tasks = '/tasks';
-  static const String taskDetail = '/tasks/:id';
   static const String adminLogin = '/admin/login';
   static const String adminDashboard = '/admin/dashboard';
   static const String adminGenerateQuestions = '/admin/generate-questions';
@@ -218,26 +213,6 @@ class AppRouter {
           pageBuilder: (context, state) {
             return _buildPageWithSlideTransition(
               child: const AchievementsPage(),
-              state: state,
-            );
-          },
-        ),
-        // Task routes
-        GoRoute(
-          path: tasks,
-          pageBuilder: (context, state) {
-            return _buildPageWithSlideTransition(
-              child: const TaskListScreen(),
-              state: state,
-            );
-          },
-        ),
-        GoRoute(
-          path: taskDetail,
-          pageBuilder: (context, state) {
-            final taskId = state.pathParameters['id']!;
-            return _buildPageWithSlideTransition(
-              child: TaskDetailScreen(taskId: taskId),
               state: state,
             );
           },
