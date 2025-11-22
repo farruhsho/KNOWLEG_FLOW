@@ -256,12 +256,17 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
       _answers[_currentQuestion] = _selectedAnswer!;
     }
 
+    final answeredCount = _answers.length;
+    final isComplete = answeredCount == _totalQuestions;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Завершить тест?'),
+        title: Text(isComplete ? 'Завершить тест?' : 'Не все вопросы отвечены'),
         content: Text(
-          'Вы ответили на ${_answers.length} из $_totalQuestions вопросов.',
+          isComplete
+              ? 'Вы ответили на все вопросы. Завершить тест?'
+              : 'Вы ответили на $answeredCount из $_totalQuestions вопросов. Все равно завершить?',
         ),
         actions: [
           TextButton(
@@ -272,8 +277,14 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
-              // TODO: Navigate to results page
+              // In real app, navigate to results page with actual data
+              // context.go('/quiz-results', extra: {...});
             },
+            style: isComplete
+                ? null
+                : ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.warning,
+                  ),
             child: const Text('Завершить'),
           ),
         ],

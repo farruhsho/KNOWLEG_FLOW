@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/lesson_model.dart';
 import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/widgets/error_view.dart';
 
 class LessonPage extends StatefulWidget {
   final String lessonId;
@@ -49,8 +51,12 @@ class _LessonPageState extends State<LessonPage> {
 
     if (lesson == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Урок не найден')),
-        body: const Center(child: Text('Урок не найден')),
+        appBar: AppBar(title: const Text('Урок')),
+        body: EmptyView(
+          message: 'Урок не найден',
+          subtitle: 'Этот урок может быть недоступен или был удален',
+          icon: Icons.menu_book_outlined,
+        ),
       );
     }
 

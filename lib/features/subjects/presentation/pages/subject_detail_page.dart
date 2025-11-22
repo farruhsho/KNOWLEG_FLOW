@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/subject_model.dart';
 import '../../../../shared/models/lesson_model.dart';
 import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/widgets/error_view.dart';
 
 class SubjectDetailPage extends StatelessWidget {
   final String subjectId;
@@ -21,8 +22,23 @@ class SubjectDetailPage extends StatelessWidget {
 
     if (subject == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Предмет не найден')),
-        body: const Center(child: Text('Предмет не найден')),
+        appBar: AppBar(title: const Text('Предмет')),
+        body: ErrorView(
+          message: 'Предмет не найден',
+          icon: Icons.search_off,
+          onRetry: () => context.pop(),
+        ),
+      );
+    }
+
+    if (lessons.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: Text(subject.getTitle('ru'))),
+        body: EmptyView(
+          message: 'Уроки пока не добавлены',
+          subtitle: 'Скоро здесь появятся учебные материалы',
+          icon: Icons.library_books_outlined,
+        ),
       );
     }
 

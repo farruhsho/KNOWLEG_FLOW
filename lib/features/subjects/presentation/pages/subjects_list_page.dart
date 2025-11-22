@@ -4,6 +4,7 @@ import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/subject_model.dart';
 import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/widgets/error_view.dart';
 
 class SubjectsListPage extends StatefulWidget {
   const SubjectsListPage({super.key});
@@ -29,7 +30,13 @@ class _SubjectsListPageState extends State<SubjectsListPage> {
           ),
         ],
       ),
-      body: ListView.builder(
+      body: subjects.isEmpty
+          ? const EmptyView(
+              message: 'Предметы не найдены',
+              subtitle: 'Скоро здесь появятся учебные предметы',
+              icon: Icons.school_outlined,
+            )
+          : ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: subjects.length,
         itemBuilder: (context, index) {
