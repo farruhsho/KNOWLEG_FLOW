@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/services/gamification_service.dart';
+import '../../../../shared/models/gamification_models.dart';
 
 class QuizPage extends StatefulWidget {
   final String quizId;
@@ -251,7 +254,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
     });
   }
 
-  void _finishQuiz() {
+  void _finishQuiz() async {
     if (_selectedAnswer != null) {
       _answers[_currentQuestion] = _selectedAnswer!;
     }
@@ -259,7 +262,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
     final answeredCount = _answers.length;
     final isComplete = answeredCount == _totalQuestions;
 
-    showDialog(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(isComplete ? 'Завершить тест?' : 'Не все вопросы отвечены'),
@@ -270,16 +273,11 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(context, false),
             child: const Text('Отмена'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-              // In real app, navigate to results page with actual data
-              // context.go('/quiz-results', extra: {...});
-            },
+            onPressed: () => Navigator.pop(context, true),
             style: isComplete
                 ? null
                 : ElevatedButton.styleFrom(
@@ -288,6 +286,242 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
             child: const Text('Завершить'),
           ),
         ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    // Award XP for completing quiz
+    final gamificationService = GamificationService();
+
+    // Calculate XP based on answers
+    final correctAnswers = _calculateCorrectAnswers();
+    final baseXP = 50; // Base XP for completing quiz
+    final bonusXP = correctAnswers * 5; // 5 XP per correct answer
+    final totalXP = baseXP + bonusXP;
+
+    // Show loading
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Award XP
+      final reward = await gamificationService.awardXP(
+        'current_user',
+        totalXP,
+        'Quiz completed',
+      );
+
+      // Update statistics
+      await gamificationService.updateStatistic(
+        'current_user',
+        'testsCompleted',
+        1,
+      );
+      await gamificationService.updateStatistic(
+        'current_user',
+        'questionsAnswered',
+        answeredCount,
+      );
+
+      if (correctAnswers == _totalQuestions) {
+        await gamificationService.updateStatistic(
+          'current_user',
+          'perfectScores',
+          1,
+        );
+      }
+
+      // Update daily quests
+      final quests = await gamificationService.getDailyQuests('current_user');
+      for (final quest in quests) {
+        if (quest.type == QuestType.completeTest && !quest.isCompleted) {
+          await gamificationService.updateQuestProgress('current_user', quest.id, 1);
+        } else if (quest.type == QuestType.answerQuestions && !quest.isCompleted) {
+          await gamificationService.updateQuestProgress(
+            'current_user',
+            quest.id,
+            answeredCount,
+          );
+        }
+      }
+
+      // Close loading
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      // Show reward animation
+      await _showRewardDialog(reward, correctAnswers);
+
+      // Navigate back
+      if (!mounted) return;
+      context.pop();
+    } catch (e) {
+      // Close loading
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      // Show error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Не удалось сохранить результаты')),
+      );
+    }
+  }
+
+  int _calculateCorrectAnswers() {
+    // Mock calculation - in real app, compare with correct answers
+    return (_answers.length * 0.7).round(); // 70% correct
+  }
+
+  Future<void> _showRewardDialog(XPReward reward, int correctAnswers) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Success icon with animation
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: child,
+                  );
+                },
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.success,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Text(
+                'Тест завершён!',
+                style: Theme.of(context).textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                'Правильных ответов: $correctAnswers/$_totalQuestions',
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 24),
+
+              // Rewards
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            const Icon(Icons.star, color: AppColors.warning, size: 32),
+                            const SizedBox(height: 8),
+                            Text(
+                              '+${reward.xpGained} XP',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (reward.coinsGained > 0)
+                          Column(
+                            children: [
+                              const Icon(Icons.monetization_on,
+                                  color: Colors.amber, size: 32),
+                              const SizedBox(height: 8),
+                              Text(
+                                '+${reward.coinsGained}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                    if (reward.levelUp) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppColors.success, AppColors.success.withOpacity(0.7)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.arrow_upward, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Уровень ${reward.newLevel}!',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                child: const Text('Отлично!'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

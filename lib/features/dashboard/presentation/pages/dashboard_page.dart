@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../shared/models/gamification_models.dart';
+import '../../../../shared/services/gamification_service.dart';
+import '../../../../shared/widgets/gamification_bar.dart';
+import '../../../../shared/widgets/daily_quests_widget.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -56,42 +60,104 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-class _DashboardHome extends StatelessWidget {
+class _DashboardHome extends StatefulWidget {
   const _DashboardHome();
+
+  @override
+  State<_DashboardHome> createState() => _DashboardHomeState();
+}
+
+class _DashboardHomeState extends State<_DashboardHome> {
+  final _gamificationService = GamificationService();
+  UserGamification? _userGamification;
+  List<DailyQuest> _dailyQuests = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGamificationData();
+  }
+
+  Future<void> _loadGamificationData() async {
+    try {
+      final gamification = await _gamificationService.getUserGamification('current_user');
+      final quests = await _gamificationService.getDailyQuests('current_user');
+
+      // Update streak
+      await _gamificationService.updateStreak('current_user');
+
+      setState(() {
+        _userGamification = gamification;
+        _dailyQuests = quests;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Добрый день!',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    Text(
-                      'Студент',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
-                  onPressed: () {},
-                ),
-              ],
-            ),
+      child: RefreshIndicator(
+        onRefresh: _loadGamificationData,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Добрый день!',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      Text(
+                        'Студент',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
+
+              // Gamification Bar
+              if (_userGamification != null && !_isLoading) ...[
+                GamificationBar(
+                  gamification: _userGamification!,
+                  onTap: () {
+                    // Navigate to gamification details
+                    context.go(AppRouter.profile); // Temporary, will create dedicated page
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              // Daily Quests
+              if (_dailyQuests.isNotEmpty && !_isLoading) ...[
+                CompactDailyQuests(
+                  quests: _dailyQuests,
+                  onViewAll: () {
+                    // Show full quests page
+                    _showDailyQuestsDialog();
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
 
             // Progress card
             _buildProgressCard(context),
@@ -152,6 +218,52 @@ class _DashboardHome extends StatelessWidget {
             // Mock test CTA
             _buildMockTestCard(context),
           ],
+        ),
+      ),
+      ),
+    );
+  }
+
+  void _showDailyQuestsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 600),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    const Icon(Icons.assignment_turned_in, color: AppColors.primary),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Ежедневные задания',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: DailyQuestsWidget(
+                    quests: _dailyQuests,
+                    onQuestTap: (questId) {
+                      // Navigate to relevant content based on quest type
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
