@@ -3,12 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart' as provider;
 import 'core/network/firebase_service.dart';
 import 'core/routes/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
-import 'providers/task_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,11 +29,8 @@ void main() async {
   }
 
   runApp(
-    provider.ChangeNotifierProvider(
-      create: (_) => TaskProvider(),
-      child: const ProviderScope(
-        child: OrtMasterApp(),
-      ),
+    const ProviderScope(
+      child: OrtMasterApp(),
     ),
   );
 }

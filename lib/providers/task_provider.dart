@@ -1,5 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/task.dart';
+
+// Riverpod provider
+final taskProvider = ChangeNotifierProvider<TaskProvider>((ref) {
+  return TaskProvider();
+});
 
 class TaskProvider extends ChangeNotifier {
   final List<Task> _tasks = [

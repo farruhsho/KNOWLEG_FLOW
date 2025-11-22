@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/widgets/gamification_bar.dart';
@@ -62,14 +61,14 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-class _DashboardHome extends StatefulWidget {
+class _DashboardHome extends ConsumerStatefulWidget {
   const _DashboardHome();
 
   @override
-  State<_DashboardHome> createState() => _DashboardHomeState();
+  ConsumerState<_DashboardHome> createState() => _DashboardHomeState();
 }
 
-class _DashboardHomeState extends State<_DashboardHome> {
+class _DashboardHomeState extends ConsumerState<_DashboardHome> {
   final _gamificationService = GamificationService();
   UserGamification? _userGamification;
   List<DailyQuest> _dailyQuests = [];
@@ -186,8 +185,8 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     icon: Icons.assignment_turned_in,
                     color: AppColors.primary,
                     onTap: () {
-                      final taskProvider = context.read<TaskProvider>();
-                      context.go(AppRouter.tasks, extra: taskProvider);
+                      final taskProviderInstance = ref.read(taskProvider.notifier);
+                      context.go(AppRouter.tasks, extra: taskProviderInstance);
                     },
                   ),
                 ),
