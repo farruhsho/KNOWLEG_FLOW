@@ -7,6 +7,8 @@ import '../../features/onboarding/presentation/pages/splash_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/subjects/presentation/pages/subjects_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/quiz/presentation/pages/quiz_page.dart';
+import '../../features/mock_test/presentation/pages/mock_test_page.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -83,20 +85,14 @@ class AppRouter {
           path: quiz,
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return Scaffold(
-              appBar: AppBar(title: const Text('Quiz')),
-              body: Center(child: Text('Quiz Page - $id')),
-            );
+            return QuizPage(quizId: id);
           },
         ),
         GoRoute(
           path: mockTest,
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return Scaffold(
-              appBar: AppBar(title: const Text('Mock Test')),
-              body: Center(child: Text('Mock Test Page - $id')),
-            );
+            return MockTestPage(testId: id);
           },
         ),
         GoRoute(

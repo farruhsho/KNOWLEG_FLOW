@@ -117,7 +117,9 @@ class _DashboardHome extends StatelessWidget {
                     title: 'Урок дня',
                     icon: Icons.book,
                     color: AppColors.primary,
-                    onTap: () {},
+                    onTap: () {
+                      context.go('${AppRouter.lesson}/daily');
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -127,7 +129,9 @@ class _DashboardHome extends StatelessWidget {
                     title: 'Быстрый тест',
                     icon: Icons.quiz,
                     color: AppColors.secondary,
-                    onTap: () {},
+                    onTap: () {
+                      context.go('${AppRouter.quiz}/quick');
+                    },
                   ),
                 ),
               ],
@@ -405,7 +409,9 @@ class _DashboardHome extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.go('${AppRouter.mockTest}/demo');
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,
                 foregroundColor: AppColors.primary,
