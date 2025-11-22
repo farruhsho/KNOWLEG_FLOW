@@ -220,7 +220,7 @@ class _SignupPageState extends State<SignupPage> {
                   children: [
                     const Text('Уже есть аккаунт?'),
                     TextButton(
-                      onPressed: () => context.go(AppRouter.login),
+                      onPressed: () => context.pop(),
                       child: const Text('Войти'),
                     ),
                   ],
