@@ -316,7 +316,7 @@ class _AdminGenerateQuestionsPageState extends State<AdminGenerateQuestionsPage>
         ];
 
       default:
-        return ['Вопрос $number по предмету $subjectId'];
+        return ['Вопрос по предмету $subjectId'];
     }
   }
 
