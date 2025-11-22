@@ -185,8 +185,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
                     icon: Icons.assignment_turned_in,
                     color: AppColors.primary,
                     onTap: () {
-                      final taskProviderInstance = ref.read(taskProvider.notifier);
-                      context.go(AppRouter.tasks, extra: taskProviderInstance);
+                      context.go(AppRouter.tasks);
                     },
                   ),
                 ),
@@ -524,7 +523,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.go('${AppRouter.mockTest}/demo');
+                context.go(AppRouter.mockTest.replaceAll(':id', 'demo'));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:knowledge_flow/models/task.dart';
 import 'package:knowledge_flow/providers/task_provider.dart';
 
-class TaskDetailScreen extends StatefulWidget {
-  final Task task;
-  final TaskProvider taskProvider;
+class TaskDetailScreen extends ConsumerStatefulWidget {
+  final String taskId;
 
   const TaskDetailScreen({
     super.key,
-    required this.task,
-    required this.taskProvider,
+    required this.taskId,
   });
 
   @override
-  State<TaskDetailScreen> createState() => _TaskDetailScreenState();
+  ConsumerState<TaskDetailScreen> createState() => _TaskDetailScreenState();
 }
 
-class _TaskDetailScreenState extends State<TaskDetailScreen> {
+class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
   int currentQuestionIndex = 0;
   Map<int, int> userAnswers = {};
   bool isQuizCompleted = false;
@@ -24,18 +23,28 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.task.isCompleted && !isQuizCompleted) {
-      return _buildCompletedView();
+    final taskProviderInstance = ref.watch(taskProvider);
+    final task = taskProviderInstance.getTaskById(widget.taskId);
+
+    if (task == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Ошибка')),
+        body: const Center(child: Text('Задание не найдено')),
+      );
+    }
+
+    if (task.isCompleted && !isQuizCompleted) {
+      return _buildCompletedView(task);
     }
 
     if (isQuizCompleted) {
-      return _buildResultsView();
+      return _buildResultsView(task);
     }
 
-    return _buildQuizView();
+    return _buildQuizView(task);
   }
 
-  Widget _buildCompletedView() {
+  Widget _buildCompletedView(Task task) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Задание выполнено'),
@@ -54,7 +63,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                widget.task.title,
+                task.title,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -72,7 +81,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Ваш результат: ${widget.task.score}/${widget.task.questions.length * 10}',
+                'Ваш результат: ${task.score}/${task.questions.length * 10}',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -88,7 +97,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     isQuizCompleted = false;
                     showExplanation = false;
                   });
-                  widget.taskProvider.resetTask(widget.task.id);
+                  ref.read(taskProvider.notifier).resetTask(widget.taskId);
                 },
                 icon: const Icon(Icons.refresh),
                 label: const Text('Пройти заново'),
@@ -106,19 +115,19 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  Widget _buildQuizView() {
-    final question = widget.task.questions[currentQuestionIndex];
+  Widget _buildQuizView(Task task) {
+    final question = task.questions[currentQuestionIndex];
     final selectedAnswer = userAnswers[currentQuestionIndex];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.task.title),
+        title: Text(task.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Column(
         children: [
           LinearProgressIndicator(
-            value: (currentQuestionIndex + 1) / widget.task.questions.length,
+            value: (currentQuestionIndex + 1) / task.questions.length,
             minHeight: 6,
           ),
           Expanded(
@@ -128,7 +137,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Вопрос ${currentQuestionIndex + 1} из ${widget.task.questions.length}',
+                    'Вопрос ${currentQuestionIndex + 1} из ${task.questions.length}',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -160,7 +169,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               ),
             ),
           ),
-          _buildNavigationButtons(),
+          _buildNavigationButtons(task),
         ],
       ),
     );
@@ -286,9 +295,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildNavigationButtons(Task task) {
     final selectedAnswer = userAnswers[currentQuestionIndex];
-    final isLastQuestion = currentQuestionIndex == widget.task.questions.length - 1;
+    final isLastQuestion = currentQuestionIndex == task.questions.length - 1;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -352,20 +361,20 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  Widget _buildResultsView() {
+  Widget _buildResultsView(Task task) {
     int correctAnswers = 0;
     int totalScore = 0;
 
-    for (int i = 0; i < widget.task.questions.length; i++) {
+    for (int i = 0; i < task.questions.length; i++) {
       final userAnswer = userAnswers[i];
-      final correctAnswer = widget.task.questions[i].correctAnswerIndex;
+      final correctAnswer = task.questions[i].correctAnswerIndex;
       if (userAnswer == correctAnswer) {
         correctAnswers++;
         totalScore += 10;
       }
     }
 
-    final percentage = (correctAnswers / widget.task.questions.length) * 100;
+    final percentage = (correctAnswers / task.questions.length) * 100;
 
     return Scaffold(
       appBar: AppBar(
@@ -414,7 +423,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '$correctAnswers из ${widget.task.questions.length} правильных',
+                    '$correctAnswers из ${task.questions.length} правильных',
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -422,7 +431,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Ваш результат: $totalScore/${widget.task.questions.length * 10}',
+                    'Ваш результат: $totalScore/${task.questions.length * 10}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -442,8 +451,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             ),
             const SizedBox(height: 16),
             ...List.generate(
-              widget.task.questions.length,
-              (index) => _buildResultCard(index, userAnswers[index] ?? 0),
+              task.questions.length,
+              (index) => _buildResultCard(task, index, userAnswers[index] ?? 0),
             ),
             const SizedBox(height: 24),
             Row(
@@ -480,8 +489,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  Widget _buildResultCard(int questionIndex, int userAnswer) {
-    final question = widget.task.questions[questionIndex];
+  Widget _buildResultCard(Task task, int questionIndex, int userAnswer) {
+    final question = task.questions[questionIndex];
     final isCorrect = userAnswer == question.correctAnswerIndex;
 
     return Card(
@@ -554,17 +563,21 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   }
 
   void _completeQuiz() {
+    final taskProviderInstance = ref.read(taskProvider);
+    final task = taskProviderInstance.getTaskById(widget.taskId);
+    if (task == null) return;
+
     int totalScore = 0;
 
-    for (int i = 0; i < widget.task.questions.length; i++) {
+    for (int i = 0; i < task.questions.length; i++) {
       final userAnswer = userAnswers[i];
-      final correctAnswer = widget.task.questions[i].correctAnswerIndex;
+      final correctAnswer = task.questions[i].correctAnswerIndex;
       if (userAnswer == correctAnswer) {
         totalScore += 10;
       }
     }
 
-    widget.taskProvider.completeTask(widget.task.id, totalScore);
+    ref.read(taskProvider.notifier).completeTask(task.id, totalScore);
 
     setState(() {
       isQuizCompleted = true;
