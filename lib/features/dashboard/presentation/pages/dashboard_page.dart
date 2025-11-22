@@ -188,7 +188,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     icon: Icons.book,
                     color: AppColors.primary,
                     onTap: () {
-                      context.go('${AppRouter.lesson}/daily');
+                      context.go('/lessons/daily');
                     },
                   ),
                 ),
@@ -200,7 +200,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                     icon: Icons.quiz,
                     color: AppColors.secondary,
                     onTap: () {
-                      context.go('${AppRouter.quiz}/quick');
+                      context.go('/quiz/quick');
                     },
                   ),
                 ),
@@ -526,7 +526,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.go('${AppRouter.mockTest}/demo');
+                context.go('/mock-test/demo');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,
