@@ -14,6 +14,73 @@ import '../../features/mock_test/presentation/pages/mock_test_page.dart';
 import '../../features/lessons/presentation/pages/lesson_page.dart';
 
 class AppRouter {
+  // Custom page transition builders
+  static CustomTransitionPage _buildPageWithSlideTransition({
+    required Widget child,
+    required GoRouterState state,
+  }) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOutCubic;
+        final tween = Tween(begin: begin, end: end).chain(
+          CurveTween(curve: curve),
+        );
+        final offsetAnimation = animation.drive(tween);
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+    );
+  }
+
+  static CustomTransitionPage _buildPageWithFadeTransition({
+    required Widget child,
+    required GoRouterState state,
+  }) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+    );
+  }
+
+  static CustomTransitionPage _buildPageWithScaleTransition({
+    required Widget child,
+    required GoRouterState state,
+  }) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const curve = Curves.easeInOutCubic;
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
+        return ScaleTransition(
+          scale: curvedAnimation,
+          child: FadeTransition(
+            opacity: curvedAnimation,
+            child: child,
+          ),
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 400),
+    );
+  }
+
   static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
@@ -65,23 +132,32 @@ class AppRouter {
         ),
         GoRoute(
           path: subjectDetail,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final id = state.pathParameters['id']!;
-            return SubjectDetailPage(subjectId: id);
+            return _buildPageWithSlideTransition(
+              child: SubjectDetailPage(subjectId: id),
+              state: state,
+            );
           },
         ),
         GoRoute(
           path: lesson,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final id = state.pathParameters['id']!;
-            return LessonPage(lessonId: id);
+            return _buildPageWithSlideTransition(
+              child: LessonPage(lessonId: id),
+              state: state,
+            );
           },
         ),
         GoRoute(
           path: quiz,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final id = state.pathParameters['id']!;
-            return QuizPage(quizId: id);
+            return _buildPageWithFadeTransition(
+              child: QuizPage(quizId: id),
+              state: state,
+            );
           },
         ),
         GoRoute(

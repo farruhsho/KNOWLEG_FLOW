@@ -5,9 +5,14 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/subject_model.dart';
 import '../../../../shared/services/mock_data_service.dart';
 
-class SubjectsListPage extends StatelessWidget {
+class SubjectsListPage extends StatefulWidget {
   const SubjectsListPage({super.key});
 
+  @override
+  State<SubjectsListPage> createState() => _SubjectsListPageState();
+}
+
+class _SubjectsListPageState extends State<SubjectsListPage> {
   @override
   Widget build(BuildContext context) {
     final subjects = MockDataService.getSubjects();
@@ -29,7 +34,21 @@ class SubjectsListPage extends StatelessWidget {
         itemCount: subjects.length,
         itemBuilder: (context, index) {
           final subject = subjects[index];
-          return _buildSubjectCard(context, subject);
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: Duration(milliseconds: 300 + (index * 100)),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, 20 * (1 - value)),
+                child: Opacity(
+                  opacity: value,
+                  child: child,
+                ),
+              );
+            },
+            child: _buildSubjectCard(context, subject),
+          );
         },
       ),
     );
@@ -45,7 +64,11 @@ class SubjectsListPage extends StatelessWidget {
           context.go('${AppRouter.subjectDetail.replaceAll(':id', subject.id)}');
         },
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: Hero(
+          tag: 'subject_${subject.id}',
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
@@ -121,6 +144,8 @@ class SubjectsListPage extends StatelessWidget {
 
               const Icon(Icons.arrow_forward_ios, size: 20),
             ],
+          ),
+            ),
           ),
         ),
       ),

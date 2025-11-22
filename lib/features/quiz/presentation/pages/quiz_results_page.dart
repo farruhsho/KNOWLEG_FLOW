@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routes/app_router.dart';
 
-class QuizResultsPage extends StatelessWidget {
+class QuizResultsPage extends StatefulWidget {
   final int totalQuestions;
   final int correctAnswers;
   final int totalTimeSeconds;
@@ -16,10 +16,43 @@ class QuizResultsPage extends StatelessWidget {
   });
 
   @override
+  State<QuizResultsPage> createState() => _QuizResultsPageState();
+}
+
+class _QuizResultsPageState extends State<QuizResultsPage> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final percentage = (correctAnswers / totalQuestions * 100).round();
-    final incorrectAnswers = totalQuestions - correctAnswers;
-    final avgTimePerQuestion = totalTimeSeconds / totalQuestions;
+    final percentage = (widget.correctAnswers / widget.totalQuestions * 100).round();
+    final incorrectAnswers = widget.totalQuestions - widget.correctAnswers;
+    final avgTimePerQuestion = widget.totalTimeSeconds / widget.totalQuestions;
 
     return Scaffold(
       body: SafeArea(
@@ -31,7 +64,10 @@ class QuizResultsPage extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Score circle
-              _buildScoreCircle(context, percentage),
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: _buildScoreCircle(context, percentage),
+              ),
 
               const SizedBox(height: 32),
 
@@ -47,7 +83,7 @@ class QuizResultsPage extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                'Вы ответили правильно на $correctAnswers из $totalQuestions вопросов',
+                'Вы ответили правильно на ${widget.correctAnswers} из ${widget.totalQuestions} вопросов',
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
@@ -55,43 +91,48 @@ class QuizResultsPage extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Stats cards
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      context,
-                      icon: Icons.check_circle,
-                      label: 'Правильно',
-                      value: correctAnswers.toString(),
-                      color: AppColors.success,
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        icon: Icons.check_circle,
+                        label: 'Правильно',
+                        value: widget.correctAnswers.toString(),
+                        color: AppColors.success,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
-                      context,
-                      icon: Icons.cancel,
-                      label: 'Неправильно',
-                      value: incorrectAnswers.toString(),
-                      color: AppColors.error,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        icon: Icons.cancel,
+                        label: 'Неправильно',
+                        value: incorrectAnswers.toString(),
+                        color: AppColors.error,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               const SizedBox(height: 12),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      context,
-                      icon: Icons.access_time,
-                      label: 'Общее время',
-                      value: _formatTime(totalTimeSeconds),
-                      color: AppColors.info,
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        icon: Icons.access_time,
+                        label: 'Общее время',
+                        value: _formatTime(widget.totalTimeSeconds),
+                        color: AppColors.info,
+                      ),
                     ),
-                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
@@ -103,6 +144,7 @@ class QuizResultsPage extends StatelessWidget {
                     ),
                   ),
                 ],
+                ),
               ),
 
               const SizedBox(height: 32),
@@ -122,8 +164,8 @@ class QuizResultsPage extends StatelessWidget {
                       _buildProgressRow(
                         context,
                         'Правильные ответы',
-                        correctAnswers,
-                        totalQuestions,
+                        widget.correctAnswers,
+                        widget.totalQuestions,
                         AppColors.success,
                       ),
                       const SizedBox(height: 12),
@@ -131,7 +173,7 @@ class QuizResultsPage extends StatelessWidget {
                         context,
                         'Неправильные ответы',
                         incorrectAnswers,
-                        totalQuestions,
+                        widget.totalQuestions,
                         AppColors.error,
                       ),
                     ],

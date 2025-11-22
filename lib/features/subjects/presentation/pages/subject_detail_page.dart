@@ -35,22 +35,25 @@ class SubjectDetailPage extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(subject.getTitle('ru')),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(int.parse(subject.color.replaceFirst('#', '0xFF'))),
-                      Color(int.parse(subject.color.replaceFirst('#', '0xFF')))
-                          .withOpacity(0.7),
-                    ],
+              background: Hero(
+                tag: 'subject_${subject.id}',
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(int.parse(subject.color.replaceFirst('#', '0xFF'))),
+                        Color(int.parse(subject.color.replaceFirst('#', '0xFF')))
+                            .withOpacity(0.7),
+                      ],
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Text(
-                    subject.icon,
-                    style: const TextStyle(fontSize: 80),
+                  child: Center(
+                    child: Text(
+                      subject.icon,
+                      style: const TextStyle(fontSize: 80),
+                    ),
                   ),
                 ),
               ),

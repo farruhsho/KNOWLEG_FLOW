@@ -13,11 +13,33 @@ class QuizPage extends StatefulWidget {
   State<QuizPage> createState() => _QuizPageState();
 }
 
-class _QuizPageState extends State<QuizPage> {
+class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin {
   int _currentQuestion = 0;
   final int _totalQuestions = 10;
   String? _selectedAnswer;
   final Map<int, String> _answers = {};
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,13 +69,15 @@ class _QuizPageState extends State<QuizPage> {
             ),
 
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Question
-                    Card(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Question
+                      Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
@@ -88,6 +112,7 @@ class _QuizPageState extends State<QuizPage> {
                     ..._buildOptions(),
                   ],
                 ),
+              ),
               ),
             ),
 
@@ -205,18 +230,24 @@ class _QuizPageState extends State<QuizPage> {
 
   void _nextQuestion() {
     if (_selectedAnswer != null) {
-      setState(() {
-        _answers[_currentQuestion] = _selectedAnswer!;
-        _currentQuestion++;
-        _selectedAnswer = _answers[_currentQuestion];
+      _animationController.reverse().then((_) {
+        setState(() {
+          _answers[_currentQuestion] = _selectedAnswer!;
+          _currentQuestion++;
+          _selectedAnswer = _answers[_currentQuestion];
+        });
+        _animationController.forward();
       });
     }
   }
 
   void _previousQuestion() {
-    setState(() {
-      _currentQuestion--;
-      _selectedAnswer = _answers[_currentQuestion];
+    _animationController.reverse().then((_) {
+      setState(() {
+        _currentQuestion--;
+        _selectedAnswer = _answers[_currentQuestion];
+      });
+      _animationController.forward();
     });
   }
 
