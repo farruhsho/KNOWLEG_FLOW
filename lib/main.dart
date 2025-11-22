@@ -24,7 +24,7 @@ void main() async {
   try {
     await FirebaseService.initialize();
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    debugPrint('Firebase initialization failed: $e');
     // Continue without Firebase for development
   }
 

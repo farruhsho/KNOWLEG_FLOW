@@ -1,7 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'gamification_models.g.dart';
-
 /// Рарность достижения
 enum AchievementRarity {
   common,    // Обычное (серое)
@@ -36,7 +32,6 @@ enum QuestType {
 }
 
 /// Геймификация пользователя
-@JsonSerializable()
 class UserGamification {
   final String userId;
   final int level;
@@ -84,14 +79,39 @@ class UserGamification {
     );
   }
 
-  factory UserGamification.fromJson(Map<String, dynamic> json) =>
-      _$UserGamificationFromJson(json);
+  factory UserGamification.fromJson(Map<String, dynamic> json) {
+    return UserGamification(
+      userId: json['userId'] as String,
+      level: json['level'] as int,
+      xp: json['xp'] as int,
+      xpToNextLevel: json['xpToNextLevel'] as int,
+      coins: json['coins'] as int,
+      streakDays: json['streakDays'] as int? ?? 0,
+      lastActivityDate: json['lastActivityDate'] != null
+          ? DateTime.parse(json['lastActivityDate'] as String)
+          : null,
+      statistics: (json['statistics'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as int),
+          ) ??
+          const {},
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$UserGamificationToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'level': level,
+      'xp': xp,
+      'xpToNextLevel': xpToNextLevel,
+      'coins': coins,
+      'streakDays': streakDays,
+      'lastActivityDate': lastActivityDate?.toIso8601String(),
+      'statistics': statistics,
+    };
+  }
 }
 
 /// Достижение
-@JsonSerializable()
 class Achievement {
   final String id;
   final String title;
@@ -117,14 +137,38 @@ class Achievement {
     this.isSecret = false,
   });
 
-  factory Achievement.fromJson(Map<String, dynamic> json) =>
-      _$AchievementFromJson(json);
+  factory Achievement.fromJson(Map<String, dynamic> json) {
+    return Achievement(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      iconName: json['iconName'] as String,
+      rarity: AchievementRarity.values[json['rarity'] as int],
+      type: AchievementType.values[json['type'] as int],
+      targetValue: json['targetValue'] as int,
+      xpReward: json['xpReward'] as int,
+      coinsReward: json['coinsReward'] as int,
+      isSecret: json['isSecret'] as bool? ?? false,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$AchievementToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'iconName': iconName,
+      'rarity': rarity.index,
+      'type': type.index,
+      'targetValue': targetValue,
+      'xpReward': xpReward,
+      'coinsReward': coinsReward,
+      'isSecret': isSecret,
+    };
+  }
 }
 
 /// Разблокированное достижение пользователя
-@JsonSerializable()
 class UnlockedAchievement {
   final String achievementId;
   final DateTime unlockedAt;
@@ -136,10 +180,21 @@ class UnlockedAchievement {
     required this.currentValue,
   });
 
-  factory UnlockedAchievement.fromJson(Map<String, dynamic> json) =>
-      _$UnlockedAchievementFromJson(json);
+  factory UnlockedAchievement.fromJson(Map<String, dynamic> json) {
+    return UnlockedAchievement(
+      achievementId: json['achievementId'] as String,
+      unlockedAt: DateTime.parse(json['unlockedAt'] as String),
+      currentValue: json['currentValue'] as int,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$UnlockedAchievementToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'achievementId': achievementId,
+      'unlockedAt': unlockedAt.toIso8601String(),
+      'currentValue': currentValue,
+    };
+  }
 }
 
 /// Прогресс достижения
@@ -164,7 +219,6 @@ class AchievementProgress {
 }
 
 /// Ежедневный квест
-@JsonSerializable()
 class DailyQuest {
   final String id;
   final String title;
@@ -224,10 +278,35 @@ class DailyQuest {
     );
   }
 
-  factory DailyQuest.fromJson(Map<String, dynamic> json) =>
-      _$DailyQuestFromJson(json);
+  factory DailyQuest.fromJson(Map<String, dynamic> json) {
+    return DailyQuest(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      type: QuestType.values[json['type'] as int],
+      targetValue: json['targetValue'] as int,
+      currentValue: json['currentValue'] as int? ?? 0,
+      xpReward: json['xpReward'] as int,
+      coinsReward: json['coinsReward'] as int,
+      expiresAt: DateTime.parse(json['expiresAt'] as String),
+      relatedTopicId: json['relatedTopicId'] as String?,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$DailyQuestToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'type': type.index,
+      'targetValue': targetValue,
+      'currentValue': currentValue,
+      'xpReward': xpReward,
+      'coinsReward': coinsReward,
+      'expiresAt': expiresAt.toIso8601String(),
+      'relatedTopicId': relatedTopicId,
+    };
+  }
 }
 
 /// Награда XP

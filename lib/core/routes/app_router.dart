@@ -12,6 +12,7 @@ import '../../features/quiz/presentation/pages/quiz_page.dart';
 import '../../features/quiz/presentation/pages/quiz_results_page.dart';
 import '../../features/mock_test/presentation/pages/mock_test_page.dart';
 import '../../features/lessons/presentation/pages/lesson_page.dart';
+import '../../features/gamification/presentation/pages/achievements_page.dart';
 
 class AppRouter {
   // Custom page transition builders
@@ -96,6 +97,7 @@ class AppRouter {
   static const String flashcards = '/flashcards/:subjectId';
   static const String payments = '/payments';
   static const String settings = '/settings';
+  static const String achievements = '/achievements';
 
   static GoRouter createRouter() {
     return GoRouter(
@@ -200,6 +202,15 @@ class AppRouter {
             appBar: AppBar(title: const Text('Settings')),
             body: const Center(child: Text('Settings Page')),
           ),
+        ),
+        GoRoute(
+          path: achievements,
+          pageBuilder: (context, state) {
+            return _buildPageWithSlideTransition(
+              child: const AchievementsPage(),
+              state: state,
+            );
+          },
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

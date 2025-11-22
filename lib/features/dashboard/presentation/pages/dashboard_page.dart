@@ -140,8 +140,8 @@ class _DashboardHomeState extends State<_DashboardHome> {
                 GamificationBar(
                   gamification: _userGamification!,
                   onTap: () {
-                    // Navigate to gamification details
-                    context.go(AppRouter.profile); // Temporary, will create dedicated page
+                    // Navigate to achievements page
+                    context.go(AppRouter.achievements);
                   },
                 ),
                 const SizedBox(height: 16),
