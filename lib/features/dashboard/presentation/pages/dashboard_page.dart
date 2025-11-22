@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -7,6 +8,7 @@ import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/widgets/gamification_bar.dart';
 import '../../../../shared/widgets/daily_quests_widget.dart';
+import '../../../../providers/task_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -180,11 +182,12 @@ class _DashboardHomeState extends State<_DashboardHome> {
                 Expanded(
                   child: _buildActionCard(
                     context,
-                    title: 'Урок дня',
-                    icon: Icons.book,
+                    title: 'Задания',
+                    icon: Icons.assignment_turned_in,
                     color: AppColors.primary,
                     onTap: () {
-                      context.go('${AppRouter.lesson}/daily');
+                      final taskProvider = context.read<TaskProvider>();
+                      context.go(AppRouter.tasks, extra: taskProvider);
                     },
                   ),
                 ),
