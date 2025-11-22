@@ -28,10 +28,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -45,32 +42,31 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    appId: 'YOUR_WEB_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'ort-master-kg',
-    authDomain: 'ort-master-kg.firebaseapp.com',
-    storageBucket: 'ort-master-kg.appspot.com',
-    measurementId: 'YOUR_MEASUREMENT_ID',
+    apiKey: 'AIzaSyCo680PgxOp4Fwza9UC3aMqiBgtM_ModKw',
+    appId: '1:982498733196:web:1e7bd657b809d1a96f9fa9',
+    messagingSenderId: '982498733196',
+    projectId: 'knowleg-33f36',
+    authDomain: 'knowleg-33f36.firebaseapp.com',
+    storageBucket: 'knowleg-33f36.firebasestorage.app',
+    measurementId: 'G-8VCW7RYGEK',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'ort-master-kg',
-    storageBucket: 'ort-master-kg.appspot.com',
-    androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+    apiKey: 'AIzaSyBwTSXx39yi3sFpX08jHK27M5hdBb5JaFU',
+    appId: '1:982498733196:android:14611368e36393b16f9fa9',
+    messagingSenderId: '982498733196',
+    projectId: 'knowleg-33f36',
+    storageBucket: 'knowleg-33f36.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: 'YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    projectId: 'ort-master-kg',
-    storageBucket: 'ort-master-kg.appspot.com',
-    iosClientId: 'YOUR_IOS_CLIENT_ID',
-    iosBundleId: 'kg.ortmaster.app',
+    apiKey: 'AIzaSyBNGFBekl-DRmMoLhmfIclJByEzE55Re7Q',
+    appId: '1:982498733196:ios:c01cf9c5613360c66f9fa9',
+    messagingSenderId: '982498733196',
+    projectId: 'knowleg-33f36',
+    storageBucket: 'knowleg-33f36.firebasestorage.app',
+    iosClientId: '982498733196-smt24dhid63l5tu4g7gmd8mj5t7qv9dk.apps.googleusercontent.com',
+    iosBundleId: 'com.example.knowledgeFlow',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -81,4 +77,15 @@ class DefaultFirebaseOptions {
     storageBucket: 'ort-master-kg.appspot.com',
     iosBundleId: 'kg.ortmaster.app',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCo680PgxOp4Fwza9UC3aMqiBgtM_ModKw',
+    appId: '1:982498733196:web:5badc392bc7830ad6f9fa9',
+    messagingSenderId: '982498733196',
+    projectId: 'knowleg-33f36',
+    authDomain: 'knowleg-33f36.firebaseapp.com',
+    storageBucket: 'knowleg-33f36.firebasestorage.app',
+    measurementId: 'G-PGP4QS39K5',
+  );
+
 }
