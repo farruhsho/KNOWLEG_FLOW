@@ -19,43 +19,84 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
 
+  Future<bool> _onWillPop() async {
+    // Показываем диалог только на главной вкладке
+    if (_selectedIndex == 0) {
+      final shouldPop = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Выход из приложения'),
+          content: const Text('Вы хотите выйти из приложения?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Нет'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Да'),
+            ),
+          ],
+        ),
+      );
+      return shouldPop ?? false;
+    } else {
+      // На других вкладках просто возвращаемся на главную
+      setState(() {
+        _selectedIndex = 0;
+      });
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: const [
-          _DashboardHome(),
-          _SubjectsTab(),
-          _TestsTab(),
-          _ProfileTab(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Главная',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Предметы',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Тесты',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Профиль',
-          ),
-        ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
+          final shouldPop = await _onWillPop();
+          if (shouldPop && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: const [
+            _DashboardHome(),
+            _SubjectsTab(),
+            _TestsTab(),
+            _ProfileTab(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Главная',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book),
+              label: 'Предметы',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.assignment),
+              label: 'Тесты',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Профиль',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -88,12 +129,16 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
       // Update streak
       await _gamificationService.updateStreak('current_user');
 
+      if (!mounted) return;
+
       setState(() {
         _userGamification = gamification;
         _dailyQuests = quests;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
       });
@@ -185,8 +230,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
                     icon: Icons.assignment_turned_in,
                     color: AppColors.primary,
                     onTap: () {
-                      final taskProviderInstance = ref.read(taskProvider.notifier);
-                      context.go(AppRouter.tasks, extra: taskProviderInstance);
+                      context.go(AppRouter.tasks);
                     },
                   ),
                 ),
@@ -524,7 +568,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.go('${AppRouter.mockTest}/demo');
+                context.go(AppRouter.mockTest.replaceAll(':id', 'demo'));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,
