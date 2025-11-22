@@ -6,9 +6,12 @@ import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/pages/splash_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/subjects/presentation/pages/subjects_page.dart';
+import '../../features/subjects/presentation/pages/subject_detail_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/quiz/presentation/pages/quiz_page.dart';
+import '../../features/quiz/presentation/pages/quiz_results_page.dart';
 import '../../features/mock_test/presentation/pages/mock_test_page.dart';
+import '../../features/lessons/presentation/pages/lesson_page.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -60,25 +63,18 @@ class AppRouter {
           path: profile,
           builder: (context, state) => const ProfilePage(),
         ),
-        // Placeholder routes - will implement later
         GoRoute(
           path: subjectDetail,
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return Scaffold(
-              appBar: AppBar(title: Text('Subject: $id')),
-              body: Center(child: Text('Subject Detail Page - $id')),
-            );
+            return SubjectDetailPage(subjectId: id);
           },
         ),
         GoRoute(
           path: lesson,
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return Scaffold(
-              appBar: AppBar(title: Text('Lesson: $id')),
-              body: Center(child: Text('Lesson Page - $id')),
-            );
+            return LessonPage(lessonId: id);
           },
         ),
         GoRoute(
