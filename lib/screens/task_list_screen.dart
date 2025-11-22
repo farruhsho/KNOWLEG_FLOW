@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_flow/providers/task_provider.dart';
-import 'package:knowledge_flow/screens/task_detail_screen.dart';
 import 'package:knowledge_flow/models/task.dart';
 import 'package:knowledge_flow/core/routes/app_router.dart';
 
