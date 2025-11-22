@@ -68,7 +68,7 @@ class _SubjectsListPageState extends State<SubjectsListPage> {
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: () {
-          context.push('${AppRouter.subjectDetail.replaceAll(':id', subject.id)}');
+          context.go('${AppRouter.subjectDetail.replaceAll(':id', subject.id)}');
         },
         borderRadius: BorderRadius.circular(12),
         child: Hero(

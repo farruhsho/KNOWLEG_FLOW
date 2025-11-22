@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/widgets/gamification_bar.dart';
 import '../../../../shared/widgets/daily_quests_widget.dart';
-import '../../../../providers/task_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -19,97 +18,56 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
 
-  Future<bool> _onWillPop() async {
-    // Показываем диалог только на главной вкладке
-    if (_selectedIndex == 0) {
-      final shouldPop = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Выход из приложения'),
-          content: const Text('Вы хотите выйти из приложения?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Нет'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Да'),
-            ),
-          ],
-        ),
-      );
-      return shouldPop ?? false;
-    } else {
-      // На других вкладках просто возвращаемся на главную
-      setState(() {
-        _selectedIndex = 0;
-      });
-      return false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (didPop) async {
-        if (!didPop) {
-          final shouldPop = await _onWillPop();
-          if (shouldPop && context.mounted) {
-            Navigator.of(context).pop();
-          }
-        }
-      },
-      child: Scaffold(
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: const [
-            _DashboardHome(),
-            _SubjectsTab(),
-            _TestsTab(),
-            _ProfileTab(),
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Главная',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.book),
-              label: 'Предметы',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.assignment),
-              label: 'Тесты',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Профиль',
-            ),
-          ],
-        ),
+    return Scaffold(
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: const [
+          _DashboardHome(),
+          _SubjectsTab(),
+          _TestsTab(),
+          _ProfileTab(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Главная',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book),
+            label: 'Предметы',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Тесты',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Профиль',
+          ),
+        ],
       ),
     );
   }
 }
 
-class _DashboardHome extends ConsumerStatefulWidget {
+class _DashboardHome extends StatefulWidget {
   const _DashboardHome();
 
   @override
-  ConsumerState<_DashboardHome> createState() => _DashboardHomeState();
+  State<_DashboardHome> createState() => _DashboardHomeState();
 }
 
-class _DashboardHomeState extends ConsumerState<_DashboardHome> {
+class _DashboardHomeState extends State<_DashboardHome> {
   final _gamificationService = GamificationService();
   UserGamification? _userGamification;
   List<DailyQuest> _dailyQuests = [];
@@ -187,7 +145,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
                   gamification: _userGamification!,
                   onTap: () {
                     // Navigate to achievements page
-                    context.push(AppRouter.achievements);
+                    context.go(AppRouter.achievements);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -226,11 +184,11 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
                 Expanded(
                   child: _buildActionCard(
                     context,
-                    title: 'Задания',
-                    icon: Icons.assignment_turned_in,
+                    title: 'Урок дня',
+                    icon: Icons.book,
                     color: AppColors.primary,
                     onTap: () {
-                      context.push(AppRouter.tasks);
+                      context.go('${AppRouter.lesson}/daily');
                     },
                   ),
                 ),
@@ -568,7 +526,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.push(AppRouter.mockTest.replaceAll(':id', 'demo'));
+                context.go('${AppRouter.mockTest}/demo');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,
