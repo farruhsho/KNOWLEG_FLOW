@@ -143,7 +143,7 @@ class TaskListScreen extends ConsumerWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.go(AppRouter.taskDetail.replaceAll(':id', task.id));
+          context.push(AppRouter.taskDetail.replaceAll(':id', task.id));
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

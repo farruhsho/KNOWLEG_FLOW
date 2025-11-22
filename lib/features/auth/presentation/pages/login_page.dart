@@ -72,6 +72,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -248,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const Text('Нет аккаунта?'),
                     TextButton(
-                      onPressed: () => context.go(AppRouter.signup),
+                      onPressed: () => context.push(AppRouter.signup),
                       child: const Text('Зарегистрироваться'),
                     ),
                   ],

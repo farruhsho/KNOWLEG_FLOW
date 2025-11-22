@@ -1007,6 +1007,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
   }
 
   Future<void> _generate100SampleQuestions() async {
-    context.go(AppRouter.adminGenerateQuestions);
+    context.push(AppRouter.adminGenerateQuestions);
   }
 }

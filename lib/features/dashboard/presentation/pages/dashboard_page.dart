@@ -146,7 +146,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
                   gamification: _userGamification!,
                   onTap: () {
                     // Navigate to achievements page
-                    context.go(AppRouter.achievements);
+                    context.push(AppRouter.achievements);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -189,7 +189,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
                     icon: Icons.assignment_turned_in,
                     color: AppColors.primary,
                     onTap: () {
-                      context.go(AppRouter.tasks);
+                      context.push(AppRouter.tasks);
                     },
                   ),
                 ),
@@ -527,7 +527,7 @@ class _DashboardHomeState extends ConsumerState<_DashboardHome> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                context.go(AppRouter.mockTest.replaceAll(':id', 'demo'));
+                context.push(AppRouter.mockTest.replaceAll(':id', 'demo'));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.white,
