@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:knowledge_flow/providers/task_provider.dart';
 import 'package:knowledge_flow/models/task.dart';
+import 'package:knowledge_flow/core/routes/app_router.dart';
 
 class TaskListScreen extends StatelessWidget {
   final TaskProvider taskProvider;
@@ -150,14 +152,12 @@ class TaskListScreen extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TaskDetailScreen(
-                task: task,
-                taskProvider: taskProvider,
-              ),
-            ),
+          context.go(
+            AppRouter.taskDetail.replaceAll(':id', task.id),
+            extra: {
+              'task': task,
+              'taskProvider': taskProvider,
+            },
           );
         },
         borderRadius: BorderRadius.circular(12),
