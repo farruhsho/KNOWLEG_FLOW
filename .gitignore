@@ -1,6 +1,6 @@
 # Miscellaneous
 *.class
-<<<<<<< HEAD
+*.lock
 *.log
 *.pyc
 *.swp
@@ -28,11 +28,22 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+**/generated_plugin_registrant.dart
+.packages
+.packages.generated
 .pub-cache/
+.pub-preload-cache/
 .pub/
 /build/
+build/
 /coverage/
+coverage/
+flutter_*.png
+linked_*.ds
+unlinked.ds
+unlinked_spec.ds
 
 # Symbolication related
 app.*.symbols
@@ -44,56 +55,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-=======
-*.lock
-*.log
-*.pyc
-*.swp
-.buildlog/
-.history
-
-
-
-# Flutter repo-specific
-/bin/cache/
-/bin/internal/bootstrap.bat
-/bin/internal/bootstrap.sh
-/bin/mingit/
-/dev/benchmarks/mega_gallery/
-/dev/bots/.recipe_deps
-/dev/bots/android_tools/
-/dev/devicelab/ABresults*.json
-/dev/docs/doc/
-/dev/docs/flutter.docs.zip
-/dev/docs/lib/
-/dev/docs/pubspec.yaml
-/dev/integration_tests/**/xcuserdata
-/dev/integration_tests/**/Pods
-/packages/flutter/coverage/
-version
-analysis_benchmark.json
-
-# packages file containing multi-root paths
-.packages.generated
-
-# Flutter/Dart/Pub related
-**/doc/api/
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-**/generated_plugin_registrant.dart
-.packages
-.pub-preload-cache/
-.pub/
-build/
-flutter_*.png
-linked_*.ds
-unlinked.ds
-unlinked_spec.ds
 
 # Android related
 **/android/**/gradle-wrapper.jar
-.gradle/
+**/android/.gradle
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
@@ -133,10 +98,10 @@ unlinked_spec.ds
 **/ios/Runner/GeneratedPluginRegistrant.*
 
 # macOS
-**/Flutter/ephemeral/
-**/Pods/
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/ephemeral
+**/Flutter/ephemeral/
+**/Pods/
 **/xcuserdata/
 
 # Windows
@@ -149,11 +114,35 @@ unlinked_spec.ds
 **/linux/flutter/generated_plugin_registrant.h
 **/linux/flutter/generated_plugins.cmake
 
-# Coverage
-coverage/
+# Web
+/web/flutter_bootstrap.js
 
-# Symbols
-app.*.symbols
+# Firebase
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/macos/Runner/GoogleService-Info.plist
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.flutterfire
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.config.dart
+**/generated/
+lib/generated_plugin_registrant.dart
+.flutter-plugins-dependencies
+
+# Localization
+.dart_tool/flutter_gen/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
@@ -162,4 +151,3 @@ app.*.symbols
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
->>>>>>> afbfc79b6212833f841646f8838a4786f02903d7

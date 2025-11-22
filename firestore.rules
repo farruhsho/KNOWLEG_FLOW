@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read and write their own data
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Subjects collection (public read)
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Lessons collection
+    match /lessons/{lessonId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Questions collection
+    match /questions/{questionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Mock tests collection
+    match /mock_tests/{testId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // User attempts
+    match /user_attempts/{attemptId} {
+      allow read: if isAuthenticated() &&
+                   resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                     request.resource.data.uid == request.auth.uid;
+      allow update: if false; // Only Cloud Functions can update scores
+      allow delete: if isOwner(resource.data.uid);
+    }
+
+    // Payments
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() &&
+                   resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                     request.resource.data.uid == request.auth.uid;
+      allow update: if false; // Only Cloud Functions can update payment status
+      allow delete: if false;
+    }
+
+    // Flashcards
+    match /flashcards/{flashcardId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // User flashcard progress
+    match /flashcard_progress/{progressId} {
+      allow read: if isAuthenticated() &&
+                   resource.data.uid == request.auth.uid;
+      allow write: if isAuthenticated() &&
+                    request.resource.data.uid == request.auth.uid;
+    }
+
+    // Forum posts (future feature)
+    match /forum_posts/{postId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() &&
+                     resource.data.author_uid == request.auth.uid;
+      allow delete: if (isAuthenticated() &&
+                       resource.data.author_uid == request.auth.uid) ||
+                      isAdmin();
+    }
+  }
+}

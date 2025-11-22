@@ -6,6 +6,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/foundation.dart';
+import '../../firebase_options.dart';
 
 class FirebaseService {
   static FirebaseAuth get auth => FirebaseAuth.instance;
@@ -18,7 +20,9 @@ class FirebaseService {
 
   static Future<void> initialize() async {
     try {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
       // Enable Firestore offline persistence
       firestore.settings = const Settings(

@@ -1,0 +1,77 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isValidImageSize() {
+      return request.resource.size < 5 * 1024 * 1024; // 5MB
+    }
+
+    function isValidVideoSize() {
+      return request.resource.size < 100 * 1024 * 1024; // 100MB
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isVideo() {
+      return request.resource.contentType.matches('video/.*');
+    }
+
+    // User avatars
+    match /user_avatars/{userId}/{fileName} {
+      allow read: if true; // Public read
+      allow write: if isAuthenticated() &&
+                    isOwner(userId) &&
+                    isValidImageSize() &&
+                    isImage();
+    }
+
+    // Lesson media (admin only write, public read for authenticated users)
+    match /lessons/images/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Use Admin SDK
+    }
+
+    match /lessons/videos/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Use Admin SDK
+    }
+
+    // Question media (admin only write, public read for authenticated users)
+    match /questions/images/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Use Admin SDK
+    }
+
+    // Flashcard images
+    match /flashcards/images/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Use Admin SDK
+    }
+
+    // Test media
+    match /tests/{testId}/images/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Use Admin SDK
+    }
+
+    // Temp uploads (will be moved by Cloud Functions)
+    match /temp_uploads/{userId}/{fileName} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() &&
+                    isOwner(userId) &&
+                    (isValidImageSize() || isValidVideoSize());
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+  }
+}
