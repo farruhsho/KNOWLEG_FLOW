@@ -226,11 +226,8 @@ class AppRouter {
         GoRoute(
           path: tasks,
           pageBuilder: (context, state) {
-            final taskProvider = state.extra as TaskProvider?;
             return _buildPageWithSlideTransition(
-              child: TaskListScreen(
-                taskProvider: taskProvider ?? TaskProvider(),
-              ),
+              child: const TaskListScreen(),
               state: state,
             );
           },
@@ -238,11 +235,10 @@ class AppRouter {
         GoRoute(
           path: taskDetail,
           pageBuilder: (context, state) {
-            final params = state.extra as Map<String, dynamic>;
+            final taskId = state.extra as String;
             return _buildPageWithSlideTransition(
               child: TaskDetailScreen(
-                task: params['task'],
-                taskProvider: params['taskProvider'],
+                taskId: taskId,
               ),
               state: state,
             );

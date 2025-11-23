@@ -28,7 +28,7 @@ class FirebaseDataService {
       }
 
       return snapshot.docs
-          .map((doc) => SubjectModel.fromFirestore(doc.data(), doc.id))
+          .map((doc) => SubjectModel.fromFirestore(doc))
           .toList();
     } catch (e) {
       print('❌ Error loading subjects from Firebase: $e');
@@ -49,7 +49,7 @@ class FirebaseDataService {
         );
       }
 
-      return SubjectModel.fromFirestore(doc.data()!, doc.id);
+      return SubjectModel.fromFirestore(doc);
     } catch (e) {
       print('❌ Error loading subject $id: $e');
       return null;
@@ -73,7 +73,7 @@ class FirebaseDataService {
       }
 
       return snapshot.docs
-          .map((doc) => LessonModel.fromFirestore(doc.data(), doc.id))
+          .map((doc) => LessonModel.fromFirestore(doc))
           .toList();
     } catch (e) {
       print('❌ Error loading lessons for $subjectId: $e');
@@ -91,7 +91,7 @@ class FirebaseDataService {
         return null;
       }
 
-      return LessonModel.fromFirestore(doc.data()!, doc.id);
+      return LessonModel.fromFirestore(doc);
     } catch (e) {
       print('❌ Error loading lesson $id: $e');
       return null;
@@ -125,7 +125,7 @@ class FirebaseDataService {
       }
 
       return snapshot.docs
-          .map((doc) => QuestionModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) => QuestionModel.fromFirestore(doc))
           .toList();
     } catch (e) {
       print('❌ Error loading questions: $e');
@@ -143,7 +143,7 @@ class FirebaseDataService {
         return null;
       }
 
-      return QuestionModel.fromFirestore(doc.data()!, doc.id);
+      return QuestionModel.fromFirestore(doc);
     } catch (e) {
       print('❌ Error loading question $id: $e');
       return null;
