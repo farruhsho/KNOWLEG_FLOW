@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../providers/onboarding_provider.dart';
 
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -65,9 +67,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
     _completeOnboarding();
   }
 
-  void _completeOnboarding() {
-    // TODO: Save onboarding completed flag
-    context.go(AppRouter.login);
+  Future<void> _completeOnboarding() async {
+    // Save onboarding completed flag
+    final onboardingService = ref.read(onboardingServiceProvider);
+    await onboardingService.setOnboardingCompleted();
+
+    if (mounted) {
+      context.go(AppRouter.login);
+    }
   }
 
   @override

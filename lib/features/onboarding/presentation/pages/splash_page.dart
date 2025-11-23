@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../providers/auth_provider.dart';
+import '../../../../providers/onboarding_provider.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage>
+class _SplashPageState extends ConsumerState<SplashPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -29,7 +32,7 @@ class _SplashPageState extends State<SplashPage>
 
     _controller.forward();
 
-    // Navigate after 2.5 seconds
+    // Navigate after animation
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         _navigateNext();
@@ -37,10 +40,31 @@ class _SplashPageState extends State<SplashPage>
     });
   }
 
-  void _navigateNext() {
-    // TODO: Check if user is logged in and onboarding completed
-    // For now, navigate to onboarding
-    context.go(AppRouter.onboarding);
+  Future<void> _navigateNext() async {
+    // Check if user is logged in
+    final authService = ref.read(authServiceProvider);
+    final currentUser = authService.currentUser;
+
+    if (currentUser != null) {
+      // User is logged in, go to dashboard
+      if (mounted) {
+        context.go(AppRouter.dashboard);
+      }
+    } else {
+      // Check if onboarding is completed
+      final onboardingService = ref.read(onboardingServiceProvider);
+      final isOnboardingCompleted = await onboardingService.isOnboardingCompleted();
+
+      if (mounted) {
+        if (isOnboardingCompleted) {
+          // Onboarding completed, go to login
+          context.go(AppRouter.login);
+        } else {
+          // First launch, show onboarding
+          context.go(AppRouter.onboarding);
+        }
+      }
+    }
   }
 
   @override

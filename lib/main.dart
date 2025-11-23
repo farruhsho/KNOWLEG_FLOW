@@ -7,26 +7,28 @@ import 'core/network/firebase_service.dart';
 import 'core/routes/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set preferred orientations
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
+  // Run heavy initializations in parallel to reduce startup time
+  await Future.wait([
+    // Set preferred orientations
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]),
+    // Initialize Hive for local storage
+    Hive.initFlutter(),
   ]);
 
-  // Initialize Hive for local storage
-  await Hive.initFlutter();
-
-  // Initialize Firebase
-  try {
-    await FirebaseService.initialize();
-  } catch (e) {
+  // Initialize Firebase in the background after the app starts
+  // This prevents blocking the UI thread
+  FirebaseService.initialize().catchError((e) {
     debugPrint('Firebase initialization failed: $e');
     // Continue without Firebase for development
-  }
+  });
 
   runApp(
     const ProviderScope(
@@ -41,6 +43,7 @@ class OrtMasterApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = AppRouter.createRouter();
+    final locale = ref.watch(localeProvider);
 
     return MaterialApp.router(
       title: 'ORT Master KG',
@@ -63,7 +66,7 @@ class OrtMasterApp extends ConsumerWidget {
         Locale('ru', ''),
         Locale('ky', ''),
       ],
-      locale: const Locale('ru', ''), // Default to Russian
+      locale: locale,
 
       // Routing
       routerConfig: router,

@@ -8,6 +8,7 @@ import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/widgets/gamification_bar.dart';
 import '../../../../shared/widgets/daily_quests_widget.dart';
 import '../../../../providers/task_provider.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -562,119 +563,11 @@ class _TestsTab extends StatelessWidget {
   }
 }
 
-class _ProfileTab extends StatelessWidget {
+class _ProfileTab extends ConsumerWidget {
   const _ProfileTab();
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Профиль',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 24),
-
-            // User info card
-            Card(
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: AppColors.primary,
-                  child: const Icon(Icons.person, color: Colors.white),
-                ),
-                title: const Text('Студент'),
-                subtitle: const Text('student@example.com'),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Settings section
-            Text(
-              'Настройки',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-
-            Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.language),
-                    title: const Text('Язык'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.notifications),
-                    title: const Text('Уведомления'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.help),
-                    title: const Text('Помощь'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Admin section
-            Text(
-              'Администрирование',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-
-            Card(
-              color: Colors.amber[50],
-              child: ListTile(
-                leading: const Icon(Icons.admin_panel_settings, color: Colors.orange),
-                title: const Text(
-                  'Админ Панель',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: const Text('Управление контентом'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  context.go(AppRouter.adminLogin);
-                },
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Logout button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.go(AppRouter.login);
-                },
-                icon: const Icon(Icons.logout),
-                label: const Text('Выйти'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return const ProfilePage();
   }
 }
