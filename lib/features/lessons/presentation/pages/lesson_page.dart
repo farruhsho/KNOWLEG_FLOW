@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/lesson_model.dart';
-import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 
 class LessonPage extends StatefulWidget {
@@ -18,6 +18,9 @@ class LessonPage extends StatefulWidget {
 }
 
 class _LessonPageState extends State<LessonPage> {
+  final _firebaseDataService = FirebaseDataService();
+  LessonModel? _lesson;
+  bool _isLoading = true;
   bool _isCompleted = false;
   double _scrollProgress = 0.0;
   final ScrollController _scrollController = ScrollController();
@@ -26,6 +29,22 @@ class _LessonPageState extends State<LessonPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_updateScrollProgress);
+    _loadLesson();
+  }
+
+  Future<void> _loadLesson() async {
+    try {
+      final lesson = await _firebaseDataService.getLessonById(widget.lessonId);
+      setState(() {
+        _lesson = lesson;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('❌ Error loading lesson: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -47,12 +66,17 @@ class _LessonPageState extends State<LessonPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lesson = MockDataService.getLessonById(widget.lessonId);
-
-    if (lesson == null) {
+    if (_isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Урок')),
-        body: EmptyView(
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_lesson == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Урок')),
+        body: const EmptyView(
           message: 'Урок не найден',
           subtitle: 'Этот урок может быть недоступен или был удален',
           icon: Icons.menu_book_outlined,
@@ -62,7 +86,7 @@ class _LessonPageState extends State<LessonPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(lesson.getTitle('ru')),
+        title: Text(_lesson!.getTitle('ru')),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4),
           child: LinearProgressIndicator(
@@ -96,7 +120,7 @@ class _LessonPageState extends State<LessonPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Урок ${lesson.order}',
+                            'Урок ${_lesson!.order}',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -106,7 +130,7 @@ class _LessonPageState extends State<LessonPage> {
                                 ),
                           ),
                           Text(
-                            '⏱ ${lesson.estimatedTimeMinutes} минут',
+                            '⏱ ${_lesson!.estimatedTimeMinutes} минут',
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
@@ -127,7 +151,7 @@ class _LessonPageState extends State<LessonPage> {
 
             // Content
             Text(
-              lesson.getContent('ru'),
+              _lesson!.getContent('ru'),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     height: 1.6,
                   ),
@@ -136,16 +160,16 @@ class _LessonPageState extends State<LessonPage> {
             const SizedBox(height: 32),
 
             // Media section (if available)
-            if (lesson.mediaUrls.isNotEmpty) ...[
+            if (_lesson!.mediaUrls.isNotEmpty) ...[
               Text(
                 'Дополнительные материалы',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
-              ...lesson.mediaUrls.map((url) => Card(
+              ..._lesson!.mediaUrls.map((url) => Card(
                     child: ListTile(
                       leading: const Icon(Icons.play_circle_outline),
-                      title: Text('Видео ${lesson.mediaUrls.indexOf(url) + 1}'),
+                      title: Text('Видео ${_lesson!.mediaUrls.indexOf(url) + 1}'),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
                         // TODO: Open video player
@@ -156,7 +180,7 @@ class _LessonPageState extends State<LessonPage> {
             ],
 
             // Tags
-            if (lesson.tags.isNotEmpty) ...[
+            if (_lesson!.tags.isNotEmpty) ...[
               Text(
                 'Темы',
                 style: Theme.of(context).textTheme.titleMedium,
@@ -165,7 +189,7 @@ class _LessonPageState extends State<LessonPage> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: lesson.tags
+                children: _lesson!.tags
                     .map((tag) => Chip(
                           label: Text(tag),
                           backgroundColor: AppColors.grey100,

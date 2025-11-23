@@ -4,10 +4,10 @@ import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/subject_model.dart';
 import '../../../../shared/models/lesson_model.dart';
-import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 
-class SubjectDetailPage extends StatelessWidget {
+class SubjectDetailPage extends StatefulWidget {
   final String subjectId;
 
   const SubjectDetailPage({
@@ -16,11 +16,51 @@ class SubjectDetailPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final subject = MockDataService.getSubjectById(subjectId);
-    final lessons = MockDataService.getLessonsBySubject(subjectId);
+  State<SubjectDetailPage> createState() => _SubjectDetailPageState();
+}
 
-    if (subject == null) {
+class _SubjectDetailPageState extends State<SubjectDetailPage> {
+  final _firebaseDataService = FirebaseDataService();
+  SubjectModel? _subject;
+  List<LessonModel> _lessons = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final results = await Future.wait([
+        _firebaseDataService.getSubjectById(widget.subjectId),
+        _firebaseDataService.getLessonsBySubject(widget.subjectId),
+      ]);
+
+      setState(() {
+        _subject = results[0] as SubjectModel?;
+        _lessons = results[1] as List<LessonModel>;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('❌ Error loading subject details: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Предмет')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_subject == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Предмет')),
         body: ErrorView(
@@ -31,10 +71,10 @@ class SubjectDetailPage extends StatelessWidget {
       );
     }
 
-    if (lessons.isEmpty) {
+    if (_lessons.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text(subject.getTitle('ru'))),
-        body: EmptyView(
+        appBar: AppBar(title: Text(_subject!.getTitle('ru'))),
+        body: const EmptyView(
           message: 'Уроки пока не добавлены',
           subtitle: 'Скоро здесь появятся учебные материалы',
           icon: Icons.library_books_outlined,
@@ -50,24 +90,24 @@ class SubjectDetailPage extends StatelessWidget {
             expandedHeight: 200,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(subject.getTitle('ru')),
+              title: Text(_subject!.getTitle('ru')),
               background: Hero(
-                tag: 'subject_${subject.id}',
+                tag: 'subject_${_subject!.id}',
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(int.parse(subject.color.replaceFirst('#', '0xFF'))),
-                        Color(int.parse(subject.color.replaceFirst('#', '0xFF')))
+                        Color(int.parse(_subject!.color.replaceFirst('#', '0xFF'))),
+                        Color(int.parse(_subject!.color.replaceFirst('#', '0xFF')))
                             .withOpacity(0.7),
                       ],
                     ),
                   ),
                   child: Center(
                     child: Text(
-                      subject.icon,
+                      _subject!.icon,
                       style: const TextStyle(fontSize: 80),
                     ),
                   ),
@@ -84,7 +124,7 @@ class SubjectDetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    subject.getDescription('ru'),
+                    _subject!.getDescription('ru'),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 24),
@@ -95,7 +135,7 @@ class SubjectDetailPage extends StatelessWidget {
                           context,
                           icon: Icons.book,
                           label: 'Уроков',
-                          value: subject.totalLessons.toString(),
+                          value: _subject!.totalLessons.toString(),
                           color: AppColors.primary,
                         ),
                       ),
@@ -105,7 +145,7 @@ class SubjectDetailPage extends StatelessWidget {
                           context,
                           icon: Icons.quiz,
                           label: 'Вопросов',
-                          value: subject.totalQuestions.toString(),
+                          value: _subject!.totalQuestions.toString(),
                           color: AppColors.secondary,
                         ),
                       ),
@@ -121,7 +161,7 @@ class SubjectDetailPage extends StatelessWidget {
                       ),
                       TextButton.icon(
                         onPressed: () {
-                          context.go('${AppRouter.quiz}/$subjectId');
+                          context.go('${AppRouter.quiz}/${widget.subjectId}');
                         },
                         icon: const Icon(Icons.quiz),
                         label: const Text('Пройти тест'),
@@ -137,10 +177,10 @@ class SubjectDetailPage extends StatelessWidget {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final lesson = lessons[index];
+                final lesson = _lessons[index];
                 return _buildLessonTile(context, lesson, index);
               },
-              childCount: lessons.length,
+              childCount: _lessons.length,
             ),
           ),
 

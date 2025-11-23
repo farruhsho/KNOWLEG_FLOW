@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/gamification_models.dart';
+import '../../../../shared/models/user_progress_model.dart';
 import '../../../../shared/services/gamification_service.dart';
+import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/widgets/gamification_bar.dart';
 import '../../../../shared/widgets/daily_quests_widget.dart';
 
@@ -69,30 +72,42 @@ class _DashboardHome extends StatefulWidget {
 
 class _DashboardHomeState extends State<_DashboardHome> {
   final _gamificationService = GamificationService();
+  final _firebaseDataService = FirebaseDataService();
   UserGamification? _userGamification;
+  UserProgressModel? _userProgress;
   List<DailyQuest> _dailyQuests = [];
   bool _isLoading = true;
+
+  String get _currentUserId => FirebaseAuth.instance.currentUser?.uid ?? 'current_user';
 
   @override
   void initState() {
     super.initState();
-    _loadGamificationData();
+    _loadData();
   }
 
-  Future<void> _loadGamificationData() async {
+  Future<void> _loadData() async {
     try {
-      final gamification = await _gamificationService.getUserGamification('current_user');
-      final quests = await _gamificationService.getDailyQuests('current_user');
+      final userId = _currentUserId;
+
+      // Загружаем данные параллельно
+      final results = await Future.wait([
+        _gamificationService.getUserGamification(userId),
+        _gamificationService.getDailyQuests(userId),
+        _firebaseDataService.getUserProgress(userId),
+      ]);
 
       // Update streak
-      await _gamificationService.updateStreak('current_user');
+      await _gamificationService.updateStreak(userId);
 
       setState(() {
-        _userGamification = gamification;
-        _dailyQuests = quests;
+        _userGamification = results[0] as UserGamification;
+        _dailyQuests = results[1] as List<DailyQuest>;
+        _userProgress = results[2] as UserProgressModel?;
         _isLoading = false;
       });
     } catch (e) {
+      print('❌ Error loading dashboard data: $e');
       setState(() {
         _isLoading = false;
       });
@@ -287,7 +302,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   child: _buildStatItem(
                     context,
                     label: 'Пройдено тестов',
-                    value: '12',
+                    value: '${_userProgress?.testsCompleted ?? 0}',
                     icon: Icons.check_circle,
                     color: AppColors.success,
                   ),
@@ -297,7 +312,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   child: _buildStatItem(
                     context,
                     label: 'Средний балл',
-                    value: '145',
+                    value: '${_userProgress?.averageScore ?? 0}',
                     icon: Icons.trending_up,
                     color: AppColors.info,
                   ),
@@ -311,7 +326,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   child: _buildStatItem(
                     context,
                     label: 'Дней подряд',
-                    value: '7',
+                    value: '${_userProgress?.streakDays ?? 0}',
                     icon: Icons.local_fire_department,
                     color: AppColors.warning,
                   ),
@@ -321,7 +336,7 @@ class _DashboardHomeState extends State<_DashboardHome> {
                   child: _buildStatItem(
                     context,
                     label: 'Часов обучения',
-                    value: '24',
+                    value: '${_userProgress?.totalStudyHours ?? 0}',
                     icon: Icons.access_time,
                     color: AppColors.accent,
                   ),
@@ -450,37 +465,65 @@ class _DashboardHomeState extends State<_DashboardHome> {
   }
 
   Widget _buildSubjectsList(BuildContext context) {
-    final subjects = [
-      {'name': 'Математика', 'progress': 0.65, 'icon': Icons.calculate},
-      {'name': 'Физика', 'progress': 0.42, 'icon': Icons.science},
-      {'name': 'Химия', 'progress': 0.58, 'icon': Icons.biotech},
-      {'name': 'Биология', 'progress': 0.73, 'icon': Icons.park},
-    ];
+    // Предопределенные иконки для предметов
+    final subjectIcons = {
+      'math': Icons.calculate,
+      'physics': Icons.science,
+      'chemistry': Icons.biotech,
+      'biology': Icons.park,
+      'history': Icons.history_edu,
+    };
+
+    final subjectNames = {
+      'math': 'Математика',
+      'physics': 'Физика',
+      'chemistry': 'Химия',
+      'biology': 'Биология',
+      'history': 'История',
+    };
+
+    if (_userProgress == null || _userProgress!.subjectProgress.isEmpty) {
+      return Center(
+        child: Text(
+          'Начните проходить тесты, чтобы увидеть прогресс',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+      );
+    }
 
     return Column(
-      children: subjects.map((subject) {
+      children: _userProgress!.subjectProgress.entries.map((entry) {
+        final subjectId = entry.key;
+        final progress = entry.value;
+        final icon = subjectIcons[subjectId] ?? Icons.book;
+        final name = subjectNames[subjectId] ?? subjectId;
+
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: AppColors.primary.withOpacity(0.1),
               child: Icon(
-                subject['icon'] as IconData,
+                icon,
                 color: AppColors.primary,
               ),
             ),
-            title: Text(subject['name'] as String),
+            title: Text(name),
             subtitle: LinearProgressIndicator(
-              value: subject['progress'] as double,
+              value: progress,
               backgroundColor: AppColors.grey200,
             ),
             trailing: Text(
-              '${((subject['progress'] as double) * 100).toInt()}%',
+              '${(progress * 100).toInt()}%',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppColors.primary,
                   ),
             ),
-            onTap: () {},
+            onTap: () {
+              context.push('/subjects/$subjectId');
+            },
           ),
         );
       }).toList(),

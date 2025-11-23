@@ -1,40 +1,89 @@
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/gamification_models.dart';
 
-/// Сервис управления геймификацией
-/// Пока использует in-memory хранилище (mock)
-/// TODO: Интегрировать с Firebase после настройки backend
+/// Сервис управления геймификацией с персистентностью в Firebase
 class GamificationService {
   static final GamificationService _instance = GamificationService._internal();
   factory GamificationService() => _instance;
   GamificationService._internal();
 
-  // Mock хранилище (заменится на Firebase)
-  UserGamification? _currentUserGamification;
-  final List<UnlockedAchievement> _unlockedAchievements = [];
-  final List<DailyQuest> _dailyQuests = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Получить текущую геймификацию пользователя
+  // Кэш для быстрого доступа
+  final Map<String, UserGamification> _cache = {};
+  final Map<String, List<UnlockedAchievement>> _achievementsCache = {};
+  final Map<String, List<DailyQuest>> _questsCache = {};
+
+  /// Получить геймификацию пользователя из Firestore
   Future<UserGamification> getUserGamification(String userId) async {
-    await Future.delayed(const Duration(milliseconds: 300)); // Simulate network
+    // Проверяем кэш
+    if (_cache.containsKey(userId)) {
+      return _cache[userId]!;
+    }
 
-    _currentUserGamification ??= UserGamification(
-      userId: userId,
-      level: 1,
-      xp: 0,
-      xpToNextLevel: _calculateXPForLevel(2),
-      coins: 0,
-      streakDays: 0,
-      lastActivityDate: DateTime.now(),
-      statistics: {
-        'testsCompleted': 0,
-        'questionsAnswered': 0,
-        'perfectScores': 0,
-        'totalStudyMinutes': 0,
-      },
-    );
+    try {
+      final doc = await _firestore
+          .collection('user_gamification')
+          .doc(userId)
+          .get();
 
-    return _currentUserGamification!;
+      UserGamification gamification;
+
+      if (doc.exists) {
+        gamification = UserGamification.fromFirestore(doc.data()!, doc.id);
+      } else {
+        // Создаём начальную геймификацию для нового пользователя
+        gamification = UserGamification(
+          userId: userId,
+          level: 1,
+          xp: 0,
+          xpToNextLevel: _calculateXPForLevel(2),
+          coins: 0,
+          streakDays: 0,
+          lastActivityDate: DateTime.now(),
+          statistics: {
+            'testsCompleted': 0,
+            'questionsAnswered': 0,
+            'perfectScores': 0,
+            'totalStudyMinutes': 0,
+          },
+        );
+
+        // Сохраняем в Firebase
+        await _saveUserGamification(gamification);
+      }
+
+      _cache[userId] = gamification;
+      return gamification;
+    } catch (e) {
+      print('❌ Error loading user gamification: $e');
+      // Возвращаем пустую геймификацию при ошибке
+      return UserGamification(
+        userId: userId,
+        level: 1,
+        xp: 0,
+        xpToNextLevel: _calculateXPForLevel(2),
+        coins: 0,
+        streakDays: 0,
+        lastActivityDate: DateTime.now(),
+        statistics: {},
+      );
+    }
+  }
+
+  /// Сохранить геймификацию пользователя в Firestore
+  Future<void> _saveUserGamification(UserGamification gamification) async {
+    try {
+      await _firestore
+          .collection('user_gamification')
+          .doc(gamification.userId)
+          .set(gamification.toFirestore(), SetOptions(merge: true));
+
+      _cache[gamification.userId] = gamification;
+    } catch (e) {
+      print('❌ Error saving user gamification: $e');
+    }
   }
 
   /// Наградить пользователя XP
@@ -58,12 +107,14 @@ class GamificationService {
 
     final leveledUp = newLevel > currentLevel;
 
-    _currentUserGamification = userGam.copyWith(
+    final updatedGamification = userGam.copyWith(
       level: newLevel,
       xp: newXP,
       xpToNextLevel: _calculateXPForLevel(newLevel + 1),
       coins: userGam.coins + bonusCoins,
     );
+
+    await _saveUserGamification(updatedGamification);
 
     return XPReward(
       xpGained: amount,
@@ -82,7 +133,8 @@ class GamificationService {
     final stats = Map<String, int>.from(userGam.statistics);
     stats[key] = (stats[key] ?? 0) + increment;
 
-    _currentUserGamification = userGam.copyWith(statistics: stats);
+    final updatedGamification = userGam.copyWith(statistics: stats);
+    await _saveUserGamification(updatedGamification);
 
     // Проверить достижения после обновления статистики
     await _checkAchievements(userId);
@@ -121,10 +173,12 @@ class GamificationService {
       }
     }
 
-    _currentUserGamification = userGam.copyWith(
+    final updatedGamification = userGam.copyWith(
       streakDays: newStreak,
       lastActivityDate: now,
     );
+
+    await _saveUserGamification(updatedGamification);
 
     // Проверить достижения по streak
     await _checkAchievements(userId);
@@ -173,16 +227,64 @@ class GamificationService {
     }).toList();
   }
 
-  /// Получить ежедневные квесты
+  /// Получить ежедневные квесты из Firestore
   Future<List<DailyQuest>> getDailyQuests(String userId) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-
-    // Если квестов нет или они истекли, генерируем новые
-    if (_dailyQuests.isEmpty || _dailyQuests.first.isExpired) {
-      _generateDailyQuests(userId);
+    // Проверяем кэш
+    if (_questsCache.containsKey(userId)) {
+      final cachedQuests = _questsCache[userId]!;
+      if (cachedQuests.isNotEmpty && !cachedQuests.first.isExpired) {
+        return cachedQuests;
+      }
     }
 
-    return _dailyQuests;
+    try {
+      final today = DateTime.now();
+      final todayKey = '${today.year}-${today.month}-${today.day}';
+
+      final doc = await _firestore
+          .collection('daily_quests')
+          .doc('${userId}_$todayKey')
+          .get();
+
+      List<DailyQuest> quests;
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        quests = (data['quests'] as List)
+            .map((q) => DailyQuest.fromMap(q as Map<String, dynamic>))
+            .toList();
+      } else {
+        // Генерируем новые квесты
+        quests = _generateDailyQuests(userId);
+        await _saveDailyQuests(userId, quests);
+      }
+
+      _questsCache[userId] = quests;
+      return quests;
+    } catch (e) {
+      print('❌ Error loading daily quests: $e');
+      return _generateDailyQuests(userId);
+    }
+  }
+
+  /// Сохранить ежедневные квесты в Firestore
+  Future<void> _saveDailyQuests(String userId, List<DailyQuest> quests) async {
+    try {
+      final today = DateTime.now();
+      final todayKey = '${today.year}-${today.month}-${today.day}';
+
+      await _firestore
+          .collection('daily_quests')
+          .doc('${userId}_$todayKey')
+          .set({
+        'userId': userId,
+        'date': todayKey,
+        'quests': quests.map((q) => q.toMap()).toList(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('❌ Error saving daily quests: $e');
+    }
   }
 
   /// Обновить прогресс квеста
@@ -191,25 +293,26 @@ class GamificationService {
     String questId,
     int increment,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-
-    final questIndex = _dailyQuests.indexWhere((q) => q.id == questId);
+    final quests = await getDailyQuests(userId);
+    final questIndex = quests.indexWhere((q) => q.id == questId);
     if (questIndex == -1) return null;
 
-    final quest = _dailyQuests[questIndex];
+    final quest = quests[questIndex];
     final newValue = (quest.currentValue + increment).clamp(0, quest.targetValue);
     final updatedQuest = quest.copyWith(currentValue: newValue);
 
-    _dailyQuests[questIndex] = updatedQuest;
+    quests[questIndex] = updatedQuest;
+    await _saveDailyQuests(userId, quests);
 
     // Если квест завершён, дать награду
     if (updatedQuest.isCompleted && !quest.isCompleted) {
       await awardXP(userId, updatedQuest.xpReward, 'Daily quest completed');
 
       final userGam = await getUserGamification(userId);
-      _currentUserGamification = userGam.copyWith(
+      final updatedGamification = userGam.copyWith(
         coins: userGam.coins + updatedQuest.coinsReward,
       );
+      await _saveUserGamification(updatedGamification);
     }
 
     return updatedQuest;
@@ -248,9 +351,10 @@ class GamificationService {
         await awardXP(userId, achievement.xpReward, 'Achievement unlocked');
 
         final updatedGam = await getUserGamification(userId);
-        _currentUserGamification = updatedGam.copyWith(
+        final finalGamification = updatedGam.copyWith(
           coins: updatedGam.coins + achievement.coinsReward,
         );
+        await _saveUserGamification(finalGamification);
 
         newlyUnlocked.add(achievement);
       }
@@ -289,13 +393,11 @@ class GamificationService {
   }
 
   /// Генерировать ежедневные квесты
-  void _generateDailyQuests(String userId) {
-    _dailyQuests.clear();
-
+  List<DailyQuest> _generateDailyQuests(String userId) {
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     final expiresAt = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 0, 0);
 
-    _dailyQuests.addAll([
+    return [
       DailyQuest(
         id: 'quest_1_${DateTime.now().day}',
         title: 'Ответь на 20 вопросов',
@@ -326,7 +428,7 @@ class GamificationService {
         coinsReward: 100,
         expiresAt: expiresAt,
       ),
-    ]);
+    ];
   }
 
   // ========== Предопределённые достижения ==========
