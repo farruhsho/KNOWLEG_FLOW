@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/subject_model.dart';
-import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 
 class SubjectsListPage extends StatefulWidget {
@@ -14,9 +14,39 @@ class SubjectsListPage extends StatefulWidget {
 }
 
 class _SubjectsListPageState extends State<SubjectsListPage> {
+  final _firebaseDataService = FirebaseDataService();
+  List<SubjectModel> _subjects = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSubjects();
+  }
+
+  Future<void> _loadSubjects() async {
+    try {
+      final subjects = await _firebaseDataService.getSubjects();
+      setState(() {
+        _subjects = subjects;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('❌ Error loading subjects: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final subjects = MockDataService.getSubjects();
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Предметы')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -30,7 +60,7 @@ class _SubjectsListPageState extends State<SubjectsListPage> {
           ),
         ],
       ),
-      body: subjects.isEmpty
+      body: _subjects.isEmpty
           ? const EmptyView(
               message: 'Предметы не найдены',
               subtitle: 'Скоро здесь появятся учебные предметы',
@@ -38,9 +68,9 @@ class _SubjectsListPageState extends State<SubjectsListPage> {
             )
           : ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: subjects.length,
+        itemCount: _subjects.length,
         itemBuilder: (context, index) {
-          final subject = subjects[index];
+          final subject = _subjects[index];
           return TweenAnimationBuilder<double>(
             tween: Tween(begin: 0.0, end: 1.0),
             duration: Duration(milliseconds: 300 + (index * 100)),
