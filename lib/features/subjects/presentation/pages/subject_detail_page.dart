@@ -121,7 +121,7 @@ class SubjectDetailPage extends StatelessWidget {
                       ),
                       TextButton.icon(
                         onPressed: () {
-                          context.push('${AppRouter.quiz}/$subjectId');
+                          context.go('/quiz/$subjectId');
                         },
                         icon: const Icon(Icons.quiz),
                         label: const Text('Пройти тест'),
@@ -217,7 +217,7 @@ class SubjectDetailPage extends StatelessWidget {
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () {
-          context.push('${AppRouter.lesson}/${lesson.id}');
+          context.go('/lessons/${lesson.id}');
         },
       ),
     );
