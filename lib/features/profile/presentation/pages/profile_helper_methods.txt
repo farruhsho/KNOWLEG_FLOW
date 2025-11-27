@@ -1,0 +1,250 @@
+// Helper methods for profile page - add these at the end of _ProfilePageState class
+
+  String _getLevelName(String level) {
+    switch (level.toLowerCase()) {
+      case 'beginner':
+        return 'Новичок';
+      case 'intermediate':
+        return 'Средний';
+      case 'expert':
+        return 'Эксперт';
+      default:
+        return 'Новичок';
+    }
+  }
+
+  List<MapEntry<String, int>> _getTopWeakAreas() {
+    if (_userProgress == null) return [];
+    
+    final entries = _userProgress!.errorsByTopic.entries.toList();
+    entries.sort((a, b) => b.value.compareTo(a.value));
+    return entries.take(5).toList();
+  }
+
+  Widget _buildInfoCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.grey200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLevelProgressCard(BuildContext context) {
+    final level = _userModel?.level ?? 'beginner';
+    final testsCompleted = _userProgress?.testsCompleted ?? 0;
+    
+    // Calculate progress to next level
+    int testsForNextLevel;
+    String nextLevel;
+    Color levelColor;
+    
+    switch (level.toLowerCase()) {
+      case 'beginner':
+        testsForNextLevel = 20;
+        nextLevel = 'Средний';
+        levelColor = AppColors.success;
+        break;
+      case 'intermediate':
+        testsForNextLevel = 50;
+        nextLevel = 'Эксперт';
+        levelColor = AppColors.warning;
+        break;
+      case 'expert':
+        testsForNextLevel = 100;
+        nextLevel = 'Мастер';
+        levelColor = AppColors.error;
+        break;
+      default:
+        testsForNextLevel = 20;
+        nextLevel = 'Средний';
+        levelColor = AppColors.success;
+    }
+    
+    final progress = (testsCompleted / testsForNextLevel).clamp(0.0, 1.0);
+    final testsRemaining = (testsForNextLevel - testsCompleted).clamp(0, testsForNextLevel);
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            levelColor.withValues(alpha: 0.1),
+            levelColor.withValues(alpha: 0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: levelColor.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Текущий уровень',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: levelColor, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        _getLevelName(level),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: levelColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: levelColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${(progress * 100).toInt()}%',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: levelColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 12,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(levelColor),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'До уровня "$nextLevel"',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                'Еще $testsRemaining тестов',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: levelColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.grey200.withValues(alpha: 0.5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+          ),
+        ],
+      ),
+    );
+  }

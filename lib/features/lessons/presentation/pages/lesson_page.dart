@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/lesson_model.dart';
 import '../../../../shared/services/firebase_data_service.dart';
@@ -40,6 +39,7 @@ class _LessonPageState extends State<LessonPage> {
         _isLoading = false;
       });
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading lesson: $e');
       setState(() {
         _isLoading = false;
@@ -104,7 +104,7 @@ class _LessonPageState extends State<LessonPage> {
           children: [
             // Lesson info card
             Card(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(

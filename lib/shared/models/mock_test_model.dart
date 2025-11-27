@@ -60,11 +60,11 @@ class MockTestModel extends Equatable {
   }
 
   int get totalQuestions {
-    return sections.fold(0, (sum, section) => sum + section.questionIds.length);
+    return sections.fold(0, (total, section) => total + section.questionIds.length);
   }
 
   int get totalTimeMinutes {
-    return sections.fold(0, (sum, section) => sum + section.timeMinutes);
+    return sections.fold(0, (total, section) => total + section.timeMinutes);
   }
 
   @override

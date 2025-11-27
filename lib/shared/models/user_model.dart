@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'region_model.dart';
 
 class UserModel extends Equatable {
   final String uid;
   final String name;
   final String email;
   final String? phone;
+  final String? studentId; // Student identification number
   final int grade;
   final String? school;
   final String preferredLanguage;
@@ -13,6 +15,10 @@ class UserModel extends Equatable {
   final Map<String, double> weakSubjects;
   final SubscriptionModel subscription;
   final LinkedAccounts linkedAccounts;
+  final RegionModel? region; // User's geographic location
+  final DateTime? regionLastUpdated; // Track region update for yearly restriction
+  final String level; // 'beginner', 'intermediate', 'expert'
+  final List<String> aiRecommendations; // Personalized study suggestions
   final DateTime createdAt;
   final DateTime lastActive;
 
@@ -21,6 +27,7 @@ class UserModel extends Equatable {
     required this.name,
     required this.email,
     this.phone,
+    this.studentId,
     required this.grade,
     this.school,
     required this.preferredLanguage,
@@ -28,6 +35,10 @@ class UserModel extends Equatable {
     this.weakSubjects = const {},
     required this.subscription,
     required this.linkedAccounts,
+    this.region,
+    this.regionLastUpdated,
+    this.level = 'beginner',
+    this.aiRecommendations = const [],
     required this.createdAt,
     required this.lastActive,
   });
@@ -39,6 +50,7 @@ class UserModel extends Equatable {
       name: data['name'] ?? '',
       email: data['email'] ?? '',
       phone: data['phone'],
+      studentId: data['student_id'],
       grade: data['grade'] ?? 11,
       school: data['school'],
       preferredLanguage: data['preferred_language'] ?? 'ru',
@@ -46,6 +58,10 @@ class UserModel extends Equatable {
       weakSubjects: Map<String, double>.from(data['weak_subjects'] ?? {}),
       subscription: SubscriptionModel.fromMap(data['subscription'] ?? {}),
       linkedAccounts: LinkedAccounts.fromMap(data['linked_accounts'] ?? {}),
+      region: data['region'] != null ? RegionModel.fromMap(data['region']) : null,
+      regionLastUpdated: (data['region_last_updated'] as Timestamp?)?.toDate(),
+      level: data['level'] ?? 'beginner',
+      aiRecommendations: List<String>.from(data['ai_recommendations'] ?? []),
       createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
       lastActive: (data['last_active'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -56,6 +72,7 @@ class UserModel extends Equatable {
       'name': name,
       'email': email,
       'phone': phone,
+      'student_id': studentId,
       'grade': grade,
       'school': school,
       'preferred_language': preferredLanguage,
@@ -63,6 +80,10 @@ class UserModel extends Equatable {
       'weak_subjects': weakSubjects,
       'subscription': subscription.toMap(),
       'linked_accounts': linkedAccounts.toMap(),
+      'region': region?.toMap(),
+      'region_last_updated': regionLastUpdated != null ? Timestamp.fromDate(regionLastUpdated!) : null,
+      'level': level,
+      'ai_recommendations': aiRecommendations,
       'created_at': Timestamp.fromDate(createdAt),
       'last_active': Timestamp.fromDate(lastActive),
     };
@@ -73,6 +94,7 @@ class UserModel extends Equatable {
     String? name,
     String? email,
     String? phone,
+    String? studentId,
     int? grade,
     String? school,
     String? preferredLanguage,
@@ -80,6 +102,10 @@ class UserModel extends Equatable {
     Map<String, double>? weakSubjects,
     SubscriptionModel? subscription,
     LinkedAccounts? linkedAccounts,
+    RegionModel? region,
+    DateTime? regionLastUpdated,
+    String? level,
+    List<String>? aiRecommendations,
     DateTime? createdAt,
     DateTime? lastActive,
   }) {
@@ -88,6 +114,7 @@ class UserModel extends Equatable {
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      studentId: studentId ?? this.studentId,
       grade: grade ?? this.grade,
       school: school ?? this.school,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
@@ -95,9 +122,20 @@ class UserModel extends Equatable {
       weakSubjects: weakSubjects ?? this.weakSubjects,
       subscription: subscription ?? this.subscription,
       linkedAccounts: linkedAccounts ?? this.linkedAccounts,
+      region: region ?? this.region,
+      regionLastUpdated: regionLastUpdated ?? this.regionLastUpdated,
+      level: level ?? this.level,
+      aiRecommendations: aiRecommendations ?? this.aiRecommendations,
       createdAt: createdAt ?? this.createdAt,
       lastActive: lastActive ?? this.lastActive,
     );
+  }
+
+  /// Check if user can update region (once per year restriction)
+  bool canUpdateRegion() {
+    if (regionLastUpdated == null) return true;
+    final daysSinceUpdate = DateTime.now().difference(regionLastUpdated!).inDays;
+    return daysSinceUpdate >= 365; // 1 year
   }
 
   @override
@@ -106,6 +144,7 @@ class UserModel extends Equatable {
         name,
         email,
         phone,
+        studentId,
         grade,
         school,
         preferredLanguage,
@@ -113,6 +152,10 @@ class UserModel extends Equatable {
         weakSubjects,
         subscription,
         linkedAccounts,
+        region,
+        regionLastUpdated,
+        level,
+        aiRecommendations,
         createdAt,
         lastActive,
       ];

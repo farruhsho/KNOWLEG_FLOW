@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/models/subject_model.dart';
 import '../../../../shared/models/lesson_model.dart';
 import '../../../../shared/services/mock_data_service.dart';
 import '../../../../shared/widgets/error_view.dart';
@@ -61,7 +59,7 @@ class SubjectDetailPage extends StatelessWidget {
                       colors: [
                         Color(int.parse(subject.color.replaceFirst('#', '0xFF'))),
                         Color(int.parse(subject.color.replaceFirst('#', '0xFF')))
-                            .withOpacity(0.7),
+                            .withValues(alpha: 0.7),
                       ],
                     ),
                   ),
@@ -186,7 +184,7 @@ class SubjectDetailPage extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withOpacity(0.1),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
           child: Text(
             '${index + 1}',
             style: const TextStyle(

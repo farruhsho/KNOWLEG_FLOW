@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/models/question_model.dart';
+import '../../../../shared/widgets/glass_container.dart';
 
 class QuizPage extends StatefulWidget {
   final String quizId;
@@ -58,6 +61,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
       });
       _animationController.forward();
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading questions: $e');
       setState(() {
         _isLoading = false;
@@ -75,8 +79,22 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Загрузка теста...')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                'Загрузка теста...',
+                style: GoogleFonts.outfit(
+                  fontSize: 18,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
@@ -92,7 +110,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
               const Text('Вопросы не найдены'),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => context.pop(),
+                onPressed: () => context.go('/dashboard'),
                 child: const Text('Назад'),
               ),
             ],
@@ -104,28 +122,76 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
     final currentQ = _questions[_currentQuestion];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Вопрос ${_currentQuestion + 1} из $_totalQuestions'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: Text(
-                '⏱ 10:00',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          ),
-        ],
-      ),
       body: SafeArea(
         child: Column(
           children: [
-            // Progress bar
-            LinearProgressIndicator(
-              value: (_currentQuestion + 1) / _totalQuestions,
-              backgroundColor: AppColors.grey200,
-              valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+            // Header with Timer and Progress
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.grey200.withValues(alpha: 0.5),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => context.pop(),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.timer_outlined,
+                                size: 18, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              '10:00',
+                              style: GoogleFonts.outfit(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        '${_currentQuestion + 1}/$_totalQuestions',
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: (_currentQuestion + 1) / _totalQuestions,
+                      backgroundColor: AppColors.grey200,
+                      valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                      minHeight: 6,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             Expanded(
@@ -136,76 +202,89 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Question
-                      Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
+                      // Question Card
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.grey200.withValues(alpha: 0.5),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Вопрос ${_currentQuestion + 1}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: AppColors.primary),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              currentQ.getStem('ru'),
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            if (currentQ.difficulty != null) ...[
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.signal_cellular_alt,
-                                    size: 16,
-                                    color: _getDifficultyColor(currentQ.difficulty!),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _getDifficultyText(currentQ.difficulty!),
+                                  decoration: BoxDecoration(
+                                    color: _getDifficultyColor(currentQ.difficulty)
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    _getDifficultyText(currentQ.difficulty),
                                     style: TextStyle(
-                                      color: _getDifficultyColor(currentQ.difficulty!),
-                                      fontWeight: FontWeight.w500,
+                                      color: _getDifficultyColor(currentQ.difficulty),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
                                     ),
                                   ),
-                                ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              currentQ.getStem('ru'),
+                              style: GoogleFonts.outfit(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                height: 1.4,
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Options
-                    Text(
-                      'Выберите ответ:',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
+                      // Options
+                      Text(
+                        'Выберите ответ:',
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
 
-                    ..._buildOptions(),
-                  ],
+                      ..._buildOptions(),
+                    ],
+                  ),
                 ),
-              ),
               ),
             ),
 
             // Navigation buttons
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, -2),
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
                   ),
                 ],
               ),
@@ -215,21 +294,42 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
                     Expanded(
                       child: OutlinedButton(
                         onPressed: _previousQuestion,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          side: const BorderSide(color: AppColors.grey300),
+                        ),
                         child: const Text('Назад'),
                       ),
                     ),
-                  if (_currentQuestion > 0) const SizedBox(width: 12),
+                  if (_currentQuestion > 0) const SizedBox(width: 16),
                   Expanded(
+                    flex: 2,
                     child: ElevatedButton(
                       onPressed: _selectedAnswer != null
                           ? (_currentQuestion < _totalQuestions - 1
                               ? _nextQuestion
                               : _finishQuiz)
                           : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
                       child: Text(
                         _currentQuestion < _totalQuestions - 1
-                            ? 'Следующий'
-                            : 'Завершить',
+                            ? 'Следующий вопрос'
+                            : 'Завершить тест',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -266,22 +366,33 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
         padding: const EdgeInsets.only(bottom: 12),
         child: InkWell(
           onTap: () {
+            HapticFeedback.selectionClick();
             setState(() {
               _selectedAnswer = option.id;
             });
           },
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(16),
+          borderRadius: BorderRadius.circular(16),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.grey300,
+                color: isSelected ? AppColors.primary : AppColors.grey200,
                 width: isSelected ? 2 : 1,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.1)
+                  ? AppColors.primary.withValues(alpha: 0.05)
                   : AppColors.white,
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      )
+                    ]
+                  : [],
             ),
             child: Row(
               children: [
@@ -290,13 +401,16 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected ? AppColors.primary : AppColors.grey200,
+                    color: isSelected ? AppColors.primary : AppColors.grey100,
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.grey300,
+                    ),
                   ),
                   child: Center(
                     child: Text(
                       option.id,
                       style: TextStyle(
-                        color: isSelected ? AppColors.white : AppColors.black,
+                        color: isSelected ? AppColors.white : AppColors.textSecondary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -306,7 +420,11 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
                 Expanded(
                   child: Text(
                     option.getText('ru'),
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
                   ),
                 ),
               ],
@@ -456,9 +574,9 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
       // Show reward animation
       await _showRewardDialog(reward, correctAnswers);
 
-      // Navigate back
+      // Navigate back to dashboard
       if (!mounted) return;
-      context.pop();
+      context.go('/dashboard');
     } catch (e) {
       // Close loading
       if (!mounted) return;
@@ -548,7 +666,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -595,7 +713,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
                         ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.success, AppColors.success.withOpacity(0.7)],
+                            colors: [AppColors.success, AppColors.success.withValues(alpha: 0.7)],
                           ),
                           borderRadius: BorderRadius.circular(20),
                         ),

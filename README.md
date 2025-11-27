@@ -1,274 +1,366 @@
 # ORT Master KG 🎓
 
-**Comprehensive ORT exam preparation app for Kyrgyzstan students**
+> Современное приложение для подготовки к Общереспубликанскому Тестированию в Кыргызстане
 
-ORT Master KG is a Flutter-based mobile application designed to help students in Kyrgyzstan prepare for the ORT (General Republican Testing) exam. The app provides practice tests, mock exams, flashcards, and detailed analytics to maximize students' exam performance.
+[![Flutter](https://img.shields.io/badge/Flutter-3.16+-blue.svg)](https://flutter.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase-Latest-orange.svg)](https://firebase.google.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🌟 Features
+![ORT Master KG Banner](docs/assets/banner.png)
 
-### Free Features
-- ✅ Diagnostic test to identify weak subjects
-- ✅ Subject-based learning modules with lessons
-- ✅ Short practice quizzes (10-20 questions)
-- ✅ Flashcards with SRS (Spaced Repetition System)
-- ✅ Progress tracking and analytics
-- ✅ Heat map of weak topics
-- ✅ Daily goals and streaks
-- ✅ Offline lesson access
-- ✅ Bilingual support (Kyrgyz/Russian/English)
+## 📋 Содержание
 
-### Premium Features
-- 💰 Full ORT mock tests (130 questions, 195 minutes)
-- 💰 Detailed test reports with score breakdown
-- 💰 Unlimited practice quizzes
-- 💰 Advanced analytics and recommendations
-- 💰 Ad-free experience
+- [О Проекте](#о-проекте)
+- [Возможности](#возможности)
+- [Скриншоты](#скриншоты)
+- [Установка](#установка)
+- [Использование](#использование)
+- [Архитектура](#архитектура)
+- [Документация](#документация)
+- [Разработка](#разработка)
+- [Тестирование](#тестирование)
+- [Развертывание](#развертывание)
+- [Вклад](#вклад)
+- [Лицензия](#лицензия)
 
-## 🏗️ Tech Stack
+## 🎯 О Проекте
 
-### Frontend
-- **Flutter 3.9+** - Cross-platform UI framework
-- **Dart 3.0+** - Programming language
-- **Riverpod** - State management
-- **go_router** - Navigation
-- **Hive** - Local storage
-- **fl_chart** - Data visualization
+**ORT Master KG** - это комплексное мобильное приложение для эффективной подготовки к Общереспубликанскому Тестированию (ОРТ) в Кыргызстане. Приложение предоставляет современные инструменты для обучения, аналитики прогресса и персонализированных рекомендаций.
 
-### Backend (Firebase)
-- **Firebase Auth** - Authentication (Email/Google/Phone)
-- **Cloud Firestore** - NoSQL database
-- **Firebase Storage** - Media files
-- **Cloud Functions** - Server-side logic
-- **Firebase Analytics** - User analytics
-- **Crashlytics** - Crash reporting
-- **Remote Config** - Feature flags
-- **Cloud Messaging** - Push notifications
+### Ключевые Особенности
 
-### Architecture
-- **Clean Architecture** - Separation of concerns
-- **MVVM Pattern** - Presentation layer
-- **Repository Pattern** - Data layer
-- **Dependency Injection** - GetIt
+- 🎓 **Соответствие ОРТ**: Полное соответствие формату и требованиям ОРТ
+- 📊 **AI Аналитика**: Умный прогноз баллов и персональные рекомендации
+- 🌐 **Многоязычность**: Поддержка русского, кыргызского и английского языков
+- 📱 **Оффлайн Режим**: Работа без интернета с автоматической синхронизацией
+- 🎮 **Геймификация**: Система уровней, достижений и ежедневных миссий
 
-## 📁 Project Structure
+## ✨ Возможности
 
-```
-lib/
-├── core/
-│   ├── constants/        # App constants
-│   ├── errors/          # Error handling
-│   ├── network/         # Firebase services
-│   ├── routes/          # Navigation
-│   ├── theme/           # App theme and colors
-│   └── utils/           # Utility functions
-├── features/
-│   ├── auth/            # Authentication
-│   │   ├── data/
-│   │   ├── domain/
-│   │   └── presentation/
-│   ├── dashboard/       # Home screen
-│   ├── subjects/        # Subject management
-│   ├── lessons/         # Lesson viewer
-│   ├── quiz/            # Practice quizzes
-│   ├── mock_test/       # Full mock tests
-│   ├── flashcards/      # SRS flashcards
-│   ├── profile/         # User profile
-│   ├── analytics/       # Progress analytics
-│   ├── payments/        # Payment integration
-│   └── onboarding/      # First-time user flow
-├── shared/
-│   ├── models/          # Data models
-│   └── widgets/         # Reusable widgets
-└── main.dart
-```
+### Для Студентов
 
-## 🚀 Getting Started
+#### 📚 Обширная База Вопросов
+- Тысячи вопросов по всем предметам ОРТ
+- Математика, логика, грамматика, чтение
+- Регулярные обновления контента
 
-### Prerequisites
+#### 📊 Умная Аналитика
+- Графики прогресса в реальном времени
+- AI прогноз вашего балла ОРТ
+- Анализ слабых мест
+- Персональные рекомендации
 
-- Flutter SDK 3.9.2 or higher
-- Dart SDK 3.0 or higher
-- Android Studio / VS Code
-- Git
-- Firebase account (for backend setup)
+#### 🎮 Геймификация
+- Система уровней (Новичок → Средний → Эксперт)
+- Ежедневные миссии с наградами
+- Стрики и достижения
+- XP и прогресс
 
-### Installation
+#### 📖 Справочник
+- Математические формулы
+- Правила грамматики
+- Логические приемы
+- Стратегии чтения
+- Полнотекстовый поиск
 
-1. **Clone the repository**
+#### 🌐 Многоязычность
+- Русский интерфейс
+- Кыргызский интерфейс
+- Английский интерфейс
+- Переключение на лету
+
+#### 📱 Оффлайн Режим
+- Работа без интернета
+- Локальное хранилище (Hive)
+- Автоматическая синхронизация
+- Индикаторы статуса
+
+### Для Администраторов
+
+#### 🔐 Контроль Доступа
+- Роли: SuperAdmin, Admin, Moderator
+- 9 гранулярных разрешений
+- AdminGuard для защиты маршрутов
+
+#### 📝 Управление Контентом
+- CRUD для вопросов
+- CRUD для миссий
+- CRUD для уроков
+- CRUD для предметов
+
+#### 🤖 AI Инструменты
+- Обнаружение дубликатов (>85%)
+- Генерация вопросов
+- Анализ сложности
+
+#### 📊 Аналитика
+- Статистика пользователей
+- Отчеты по тестам
+- Мониторинг активности
+
+## 📸 Скриншоты
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/dashboard.png" alt="Dashboard" width="200"/></td>
+    <td><img src="docs/screenshots/quiz.png" alt="Quiz" width="200"/></td>
+    <td><img src="docs/screenshots/profile.png" alt="Profile" width="200"/></td>
+    <td><img src="docs/screenshots/handbook.png" alt="Handbook" width="200"/></td>
+  </tr>
+  <tr>
+    <td align="center">Главная</td>
+    <td align="center">Тестирование</td>
+    <td align="center">Профиль</td>
+    <td align="center">Справочник</td>
+  </tr>
+</table>
+
+## 🚀 Установка
+
+### Предварительные Требования
+
+- Flutter SDK 3.16+
+- Dart SDK 3.0+
+- Firebase проект
+- Android Studio / Xcode
+
+### Шаги Установки
+
+1. **Клонировать репозиторий**
 ```bash
-git clone https://github.com/yourusername/KNOWLEG_FLOW.git
-cd KNOWLEG_FLOW
+git clone https://github.com/yourusername/knowledge_flow.git
+cd knowledge_flow
 ```
 
-2. **Install dependencies**
+2. **Установить зависимости**
 ```bash
 flutter pub get
 ```
 
-3. **Firebase Setup**
+3. **Настроить Firebase**
+- Создайте проект в Firebase Console
+- Скачайте `google-services.json` (Android)
+- Скачайте `GoogleService-Info.plist` (iOS)
+- Поместите файлы в соответствующие директории
 
-Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-
-#### For Android:
-- Download `google-services.json`
-- Place it in `android/app/`
-
-#### For iOS:
-- Download `GoogleService-Info.plist`
-- Place it in `ios/Runner/`
-
-4. **Configure Firebase services**
-
-Enable the following in Firebase Console:
-- Authentication (Email/Password, Google, Phone)
-- Cloud Firestore
-- Storage
-- Cloud Functions
-- Analytics
-- Crashlytics
-- Remote Config
-- Cloud Messaging
-
-5. **Create Firestore indexes**
-
-Run the Firebase CLI to deploy indexes:
-```bash
-firebase deploy --only firestore:indexes
-```
-
-6. **Generate localization files**
-```bash
-flutter gen-l10n
-```
-
-7. **Run the app**
+4. **Запустить приложение**
 ```bash
 flutter run
 ```
 
-## 🔧 Configuration
+## 💻 Использование
 
-### Environment Variables
+### Для Пользователей
 
-Create a `.env` file in the root directory (optional):
+1. **Регистрация**: Создайте аккаунт с email и паролем
+2. **Выбор Региона**: Укажите ваш регион (один раз в год)
+3. **Прохождение Тестов**: Выберите предмет и начните тестирование
+4. **Отслеживание Прогресса**: Просматривайте графики и AI прогноз
+5. **Использование Справочника**: Ищите формулы и правила
+
+### Для Администраторов
+
+1. **Вход**: Используйте admin credentials
+2. **Управление**: Добавляйте/редактируйте вопросы
+3. **Мониторинг**: Просматривайте статистику
+4. **AI Генерация**: Создавайте вопросы с помощью AI
+
+## 🏗️ Архитектура
+
+### Технологический Стек
+
+**Frontend**:
+- Flutter 3.16+
+- Riverpod (State Management)
+- go_router (Navigation)
+- Material Design 3
+
+**Backend**:
+- Firebase Firestore (Database)
+- Firebase Auth (Authentication)
+- Firebase Storage (File Storage)
+- Firebase Analytics
+
+**Локальное Хранилище**:
+- Hive (Offline Database)
+- SharedPreferences (Settings)
+
+**Библиотеки**:
+- `fl_chart` - Графики
+- `google_fonts` - Шрифты
+- `connectivity_plus` - Мониторинг сети
+- `cloud_firestore` - Firestore
+- `firebase_auth` - Аутентификация
+
+### Структура Проекта
+
 ```
-FIREBASE_API_KEY=your_api_key
-PAYMENT_GATEWAY_URL=https://payment.example.com
+lib/
+├── core/                 # Основные утилиты
+│   ├── theme/           # Темы и стили
+│   └── utils/           # Утилиты
+├── features/            # Функциональные модули
+│   ├── auth/           # Аутентификация
+│   ├── dashboard/      # Главная страница
+│   ├── quiz/           # Тестирование
+│   ├── profile/        # Профиль
+│   ├── progress/       # Прогресс
+│   ├── handbook/       # Справочник
+│   ├── admin/          # Админ панель
+│   └── settings/       # Настройки
+├── providers/          # Riverpod провайдеры
+├── shared/             # Общие компоненты
+│   ├── models/        # Модели данных
+│   ├── services/      # Сервисы
+│   └── widgets/       # Виджеты
+└── main.dart          # Точка входа
 ```
 
-### Remote Config Keys
+## 📚 Документация
 
-Configure these in Firebase Remote Config:
-- `next_ort_date` - Next ORT registration date
-- `registration_url` - Testing.kg URL
-- `practice_tests_url` - ORT.kg URL
-- `show_announcement` - Boolean for announcements
-- `announcement_text` - Announcement message
+### Руководства
 
-## 📱 Supported Platforms
+- [Deployment Guide](docs/DEPLOYMENT.md) - Развертывание приложения
+- [Testing Guide](docs/TESTING.md) - Тестирование
+- [Build Optimization](docs/BUILD_OPTIMIZATION.md) - Оптимизация сборки
+- [App Store Guide](docs/APP_STORE_GUIDE.md) - Публикация в магазинах
+- [Project Summary](docs/PROJECT_SUMMARY.md) - Итоговое резюме
 
-- ✅ Android (API 21+)
-- ✅ iOS (13.0+)
-- 🚧 Web (Coming soon)
+### API Документация
 
-## 🌐 Localization
+Документация API доступна в [API.md](docs/API.md)
 
-The app supports three languages:
-- **Kyrgyz (ky)** - Кыргызча
-- **Russian (ru)** - Русский (Default)
-- **English (en)** - English
+## 🛠️ Разработка
 
-Translation files are located in `lib/l10n/`:
-- `app_en.arb`
-- `app_ru.arb`
-- `app_ky.arb`
+### Настройка Окружения
 
-## 💳 Payment Integration
+1. Установите Flutter SDK
+2. Настройте IDE (VS Code / Android Studio)
+3. Установите Firebase CLI
+4. Клонируйте репозиторий
 
-### MBank Integration
+### Запуск в Development
 
-1. Contact MBank for merchant credentials
-2. Configure payment webhook URL in Cloud Functions
-3. Update payment settings in `lib/features/payments/`
+```bash
+# Android
+flutter run -d android
 
-### Pricing (KGS)
-- Single mock test: 100 KGS
-- 5 mock tests pack: 400 KGS
-- Monthly subscription: 500 KGS
+# iOS
+flutter run -d ios
 
-## 📊 ORT Test Structure
+# Web
+flutter run -d chrome
+```
 
-The app simulates the real ORT exam format:
+### Горячая Перезагрузка
 
-### Section 1: Main Test (60 questions, 90 min)
-- Verbal (30q): Analogies, sentence completion, reading comprehension
-- Math (30q): Arithmetic, algebra, geometry, logic
+Нажмите `r` в терминале для hot reload
 
-### Section 2: Subject Test (40 questions, 60 min)
-Choose one: Math, Physics, Chemistry, Biology, History, Geography
+### Анализ Кода
 
-### Section 3: Language Test (30 questions, 45 min)
-Choose one: Kyrgyz, Russian, English
+```bash
+flutter analyze
+```
 
-**Total: 130 questions, 195 minutes, Max score: 200**
+## 🧪 Тестирование
 
-## 🧪 Testing
+### Unit Tests
 
-Run unit tests:
 ```bash
 flutter test
 ```
 
-Run integration tests:
+### Integration Tests
+
 ```bash
-flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+flutter test integration_test/
 ```
 
-## 📦 Building for Release
+### Widget Tests
+
+```bash
+flutter test test/widget_test.dart
+```
+
+### Coverage
+
+```bash
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html
+```
+
+## 🚢 Развертывание
 
 ### Android
+
 ```bash
+# APK
 flutter build apk --release
+
+# App Bundle (рекомендуется)
 flutter build appbundle --release
 ```
 
 ### iOS
+
 ```bash
 flutter build ios --release
 ```
 
-## 🤝 Contributing
+### Web
 
-Contributions are welcome! Please follow these steps:
+```bash
+flutter build web --release
+firebase deploy --only hosting
+```
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## 🤝 Вклад
 
-## 📄 License
+Мы приветствуем вклад в проект! Пожалуйста, следуйте этим шагам:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+1. Fork репозитория
+2. Создайте feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit изменения (`git commit -m 'Add some AmazingFeature'`)
+4. Push в branch (`git push origin feature/AmazingFeature`)
+5. Откройте Pull Request
 
-## 🔗 Official Resources
+### Coding Standards
 
-- [Testing.kg](https://testing.kg) - Official ORT registration
-- [ORT.kg](https://ort.kg) - Practice tests
-- [ЦООМО](https://coomocenter.kg) - Center for Education Assessment
+- Следуйте [Effective Dart](https://dart.dev/guides/language/effective-dart)
+- Используйте `flutter analyze` перед commit
+- Пишите тесты для новых функций
+- Документируйте публичные API
 
-## 📧 Contact
+## 📊 Статистика Проекта
 
-For questions or support, contact:
-- Email: support@ortmaster.kg
-- Website: https://ortmaster.kg
+- **Фазы Завершено**: 9 из 13 (69%)
+- **Файлов Создано**: 22+
+- **Функций**: 50+
+- **Размер Приложения**: ~25-30 MB
+- **Поддерживаемые Платформы**: Android 8+, iOS 12+
 
-## 🙏 Acknowledgments
+## 📝 Лицензия
 
-- ЦООМО for ORT exam standards
-- Flutter team for the amazing framework
-- All contributors and beta testers
+Этот проект лицензирован под MIT License - см. [LICENSE](LICENSE) для деталей.
+
+## 👥 Авторы
+
+- **Разработка**: ORT Master Team
+- **Дизайн**: UI/UX Team
+- **Контент**: Educational Content Team
+
+## 📞 Контакты
+
+- **Email**: support@ortmaster.kg
+- **Website**: https://ortmaster.kg
+- **Telegram**: @ortmaster_kg
+
+## 🙏 Благодарности
+
+- Flutter Team за отличный фреймворк
+- Firebase за backend инфраструктуру
+- Сообщество разработчиков за поддержку
 
 ---
 
-**Made with ❤️ for Kyrgyzstan students**
+**Сделано с ❤️ для студентов Кыргызстана**

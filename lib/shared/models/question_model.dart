@@ -16,6 +16,9 @@ class QuestionModel extends Equatable {
   final String? videoUrl;
   final String createdBy;
   final DateTime createdAt;
+  final String category; // 'main', 'subject', 'language' for ORT sections
+  final List<double>? embedding; // Vector embedding for duplicate detection
+  final String source; // 'ai', 'scraped', 'manual'
 
   const QuestionModel({
     required this.id,
@@ -32,6 +35,9 @@ class QuestionModel extends Equatable {
     this.videoUrl,
     required this.createdBy,
     required this.createdAt,
+    this.category = 'subject', // Default to subject category
+    this.embedding,
+    this.source = 'manual',
   });
 
   factory QuestionModel.fromFirestore(DocumentSnapshot doc) {
@@ -54,6 +60,11 @@ class QuestionModel extends Equatable {
       videoUrl: data['video_url'],
       createdBy: data['created_by'] ?? '',
       createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      category: data['category'] ?? 'subject',
+      embedding: data['embedding'] != null 
+          ? List<double>.from(data['embedding'] as List<dynamic>)
+          : null,
+      source: data['source'] ?? 'manual',
     );
   }
 
@@ -72,6 +83,63 @@ class QuestionModel extends Equatable {
       'video_url': videoUrl,
       'created_by': createdBy,
       'created_at': Timestamp.fromDate(createdAt),
+      'category': category,
+      'embedding': embedding,
+      'source': source,
+    };
+  }
+  
+  // JSON serialization for export/import
+  factory QuestionModel.fromJson(Map<String, dynamic> json) {
+    return QuestionModel(
+      id: json['id'] ?? '',
+      subjectId: json['subjectId'] ?? json['subject_id'] ?? '',
+      lessonId: json['lessonId'] ?? json['lesson_id'],
+      type: json['type'] ?? 'mcq',
+      difficulty: json['difficulty'] ?? 1,
+      stem: Map<String, String>.from(json['stem'] ?? {}),
+      options: (json['options'] as List<dynamic>?)
+              ?.map((e) => OptionModel.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      correctAnswer: json['correctAnswer'] ?? json['correct'] ?? 'A',
+      explanation: Map<String, String>.from(json['explanation'] ?? {}),
+      tags: List<String>.from(json['tags'] ?? []),
+      imageUrl: json['imageUrl'] ?? json['image_url'],
+      videoUrl: json['videoUrl'] ?? json['video_url'],
+      createdBy: json['createdBy'] ?? json['created_by'] ?? '',
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : (json['created_at'] != null
+              ? DateTime.parse(json['created_at'])
+              : DateTime.now()),
+      category: json['category'] ?? 'subject',
+      embedding: json['embedding'] != null
+          ? List<double>.from(json['embedding'] as List<dynamic>)
+          : null,
+      source: json['source'] ?? 'manual',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'subjectId': subjectId,
+      'lessonId': lessonId,
+      'type': type,
+      'difficulty': difficulty,
+      'stem': stem,
+      'options': options.map((e) => e.toMap()).toList(),
+      'correctAnswer': correctAnswer,
+      'explanation': explanation,
+      'tags': tags,
+      'imageUrl': imageUrl,
+      'videoUrl': videoUrl,
+      'createdBy': createdBy,
+      'createdAt': createdAt.toIso8601String(),
+      'category': category,
+      'embedding': embedding,
+      'source': source,
     };
   }
 
@@ -99,6 +167,9 @@ class QuestionModel extends Equatable {
         videoUrl,
         createdBy,
         createdAt,
+        category,
+        embedding,
+        source,
       ];
 }
 

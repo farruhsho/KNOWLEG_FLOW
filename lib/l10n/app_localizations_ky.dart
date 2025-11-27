@@ -346,4 +346,62 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'Бир нерсе туура эмес болду';
+
+  @override
+  String get appearance => 'Тышкы көрүнүш';
+
+  @override
+  String get system => 'Системалык';
+
+  @override
+  String get light => 'Жарык';
+
+  @override
+  String get dark => 'Караңгы';
+
+  @override
+  String get pushNotifications => 'Push-билдирмелер';
+
+  @override
+  String get pushNotificationsDesc => 'Сабактар жөнүндө эстеткичтер';
+
+  @override
+  String get emailNotifications => 'Email-билдирмелер';
+
+  @override
+  String get emailNotificationsDesc => 'Жаңылыктар жана жаңыртуулар';
+
+  @override
+  String get dataAndStorage => 'Маалыматтар жана сактоо';
+
+  @override
+  String get downloadedContent => 'Жүктөлгөн материалдар';
+
+  @override
+  String get clearCache => 'Кэшти тазалоо';
+
+  @override
+  String get clearCacheDesc => 'Орун бошотуу';
+
+  @override
+  String get aboutApp => 'Тиркеме жөнүндө';
+
+  @override
+  String get appVersion => 'Тиркеменин версиясы';
+
+  @override
+  String get privacyPolicy => 'Купуялуулук саясаты';
+
+  @override
+  String get termsOfService => 'Колдонуу шарттары';
+
+  @override
+  String get clearCacheConfirmation => 'Кэшти тазалоо?';
+
+  @override
+  String get clearCacheMessage =>
+      'Бул бардык жүктөлгөн материалдарды өчүрөт. Интернетке туташканда аларды кайра жүктөй аласыз.';
+
+  @override
+  String get clear => 'Тазалоо';
 }

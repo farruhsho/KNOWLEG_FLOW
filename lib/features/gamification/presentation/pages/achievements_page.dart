@@ -77,7 +77,7 @@ class _AchievementsPageState extends State<AchievementsPage>
               // Stats header
               Container(
                 padding: const EdgeInsets.all(20),
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -243,7 +243,7 @@ class _AchievementsPageState extends State<AchievementsPage>
                 width: isUnlocked ? 2 : 1,
               ),
               color: isUnlocked
-                  ? _getColorForRarity(achievement.rarity).withOpacity(0.1)
+                  ? _getColorForRarity(achievement.rarity).withValues(alpha: 0.1)
                   : null,
             ),
             child: Row(
@@ -261,7 +261,7 @@ class _AchievementsPageState extends State<AchievementsPage>
                         ? [
                             BoxShadow(
                               color: _getColorForRarity(achievement.rarity)
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -377,9 +377,9 @@ class _AchievementsPageState extends State<AchievementsPage>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

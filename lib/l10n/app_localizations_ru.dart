@@ -346,4 +346,62 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'Что-то пошло не так';
+
+  @override
+  String get appearance => 'Внешний вид';
+
+  @override
+  String get system => 'Системная';
+
+  @override
+  String get light => 'Светлая';
+
+  @override
+  String get dark => 'Тёмная';
+
+  @override
+  String get pushNotifications => 'Push-уведомления';
+
+  @override
+  String get pushNotificationsDesc => 'Напоминания о занятиях';
+
+  @override
+  String get emailNotifications => 'Email-уведомления';
+
+  @override
+  String get emailNotificationsDesc => 'Новости и обновления';
+
+  @override
+  String get dataAndStorage => 'Данные и хранилище';
+
+  @override
+  String get downloadedContent => 'Загруженные материалы';
+
+  @override
+  String get clearCache => 'Очистить кэш';
+
+  @override
+  String get clearCacheDesc => 'Освободить место';
+
+  @override
+  String get aboutApp => 'О приложении';
+
+  @override
+  String get appVersion => 'Версия приложения';
+
+  @override
+  String get privacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String get termsOfService => 'Условия использования';
+
+  @override
+  String get clearCacheConfirmation => 'Очистить кэш?';
+
+  @override
+  String get clearCacheMessage =>
+      'Это удалит все загруженные материалы. Вы сможете загрузить их снова при подключении к интернету.';
+
+  @override
+  String get clear => 'Очистить';
 }

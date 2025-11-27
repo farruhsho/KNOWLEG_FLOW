@@ -36,6 +36,19 @@ class AdminService {
     return false;
   }
 
+  /// Регистрация нового администратора
+  Future<bool> registerAdmin(String email, String password) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    if (_adminCredentials.containsKey(email)) {
+      return false; // Уже существует
+    }
+    
+    _adminCredentials[email] = password;
+    _currentAdminEmail = email;
+    return true;
+  }
+
   /// Выход администратора
   Future<void> logoutAdmin() async {
     _currentAdminEmail = null;

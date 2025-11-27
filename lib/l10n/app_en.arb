@@ -129,5 +129,25 @@
   "loading": "Loading...",
   "retry": "Retry",
   "noConnection": "No internet connection",
-  "somethingWentWrong": "Something went wrong"
+  "somethingWentWrong": "Something went wrong",
+  
+  "appearance": "Appearance",
+  "system": "System",
+  "light": "Light",
+  "dark": "Dark",
+  "pushNotifications": "Push Notifications",
+  "pushNotificationsDesc": "Study reminders",
+  "emailNotifications": "Email Notifications",
+  "emailNotificationsDesc": "News and updates",
+  "dataAndStorage": "Data & Storage",
+  "downloadedContent": "Downloaded Content",
+  "clearCache": "Clear Cache",
+  "clearCacheDesc": "Free up space",
+  "aboutApp": "About App",
+  "appVersion": "App Version",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "clearCacheConfirmation": "Clear Cache?",
+  "clearCacheMessage": "This will delete all downloaded content. You can download it again when online.",
+  "clear": "Clear"
 }

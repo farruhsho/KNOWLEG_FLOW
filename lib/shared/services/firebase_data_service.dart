@@ -23,14 +23,16 @@ class FirebaseDataService {
           .get();
 
       if (snapshot.docs.isEmpty) {
+        // ignore: avoid_print
         print('⚠️ No subjects found in Firestore. Using fallback data.');
         return _getFallbackSubjects();
       }
 
       return snapshot.docs
-          .map((doc) => SubjectModel.fromFirestore(doc))
+          .map((doc) => SubjectModel.fromFirestore(doc.data()))
           .toList();
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading subjects from Firebase: $e');
       return _getFallbackSubjects();
     }
@@ -42,6 +44,7 @@ class FirebaseDataService {
       final doc = await _firestore.collection('subjects').doc(id).get();
 
       if (!doc.exists) {
+        // ignore: avoid_print
         print('⚠️ Subject $id not found in Firestore');
         return _getFallbackSubjects().firstWhere(
           (s) => s.id == id,
@@ -49,8 +52,9 @@ class FirebaseDataService {
         );
       }
 
-      return SubjectModel.fromFirestore(doc);
+      return SubjectModel.fromFirestore(doc.data()!);
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading subject $id: $e');
       return null;
     }
@@ -68,14 +72,16 @@ class FirebaseDataService {
           .get();
 
       if (snapshot.docs.isEmpty) {
+        // ignore: avoid_print
         print('⚠️ No lessons found for subject $subjectId. Using fallback.');
         return _getFallbackLessons(subjectId);
       }
 
       return snapshot.docs
-          .map((doc) => LessonModel.fromFirestore(doc))
+          .map((doc) => LessonModel.fromFirestore(doc.data()))
           .toList();
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading lessons for $subjectId: $e');
       return _getFallbackLessons(subjectId);
     }
@@ -87,12 +93,14 @@ class FirebaseDataService {
       final doc = await _firestore.collection('lessons').doc(id).get();
 
       if (!doc.exists) {
+        // ignore: avoid_print
         print('⚠️ Lesson $id not found in Firestore');
         return null;
       }
 
-      return LessonModel.fromFirestore(doc);
+      return LessonModel.fromFirestore(doc.data()!);
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading lesson $id: $e');
       return null;
     }
@@ -120,6 +128,7 @@ class FirebaseDataService {
       final snapshot = await query.limit(count).get();
 
       if (snapshot.docs.isEmpty) {
+        // ignore: avoid_print
         print('⚠️ No questions found. Using fallback questions.');
         return _getFallbackQuestions(count: count, subjectId: subjectId);
       }
@@ -128,6 +137,7 @@ class FirebaseDataService {
           .map((doc) => QuestionModel.fromFirestore(doc))
           .toList();
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading questions: $e');
       return _getFallbackQuestions(count: count, subjectId: subjectId);
     }
@@ -139,12 +149,14 @@ class FirebaseDataService {
       final doc = await _firestore.collection('questions').doc(id).get();
 
       if (!doc.exists) {
+        // ignore: avoid_print
         print('⚠️ Question $id not found');
         return null;
       }
 
       return QuestionModel.fromFirestore(doc);
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading question $id: $e');
       return null;
     }
@@ -179,6 +191,7 @@ class FirebaseDataService {
 
       return UserProgressModel.fromFirestore(doc.data()!, doc.id);
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading user progress: $e');
       return null;
     }
@@ -192,6 +205,7 @@ class FirebaseDataService {
           .doc(progress.userId)
           .set(progress.toFirestore(), SetOptions(merge: true));
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error saving user progress: $e');
       rethrow;
     }
@@ -220,6 +234,7 @@ class FirebaseDataService {
 
       await saveUserProgress(updatedProgress);
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error updating test stats: $e');
     }
   }
@@ -243,6 +258,7 @@ class FirebaseDataService {
 
       await saveUserProgress(updatedProgress);
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error updating subject progress: $e');
     }
   }
@@ -260,6 +276,7 @@ class FirebaseDataService {
         await saveUserProgress(updatedProgress);
       }
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error marking lesson completed: $e');
     }
   }
@@ -408,5 +425,70 @@ class FirebaseDataService {
     }
 
     return questions;
+  }
+
+  // ========== ORT TESTS ==========
+
+  /// Get all ORT tests
+  Future<List<dynamic>> getOrtTests() async {
+    try {
+      final snapshot = await _firestore.collection('ort_tests').get();
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      // ignore: avoid_print
+      print('❌ Error loading ORT tests: $e');
+      return [];
+    }
+  }
+
+  // ========== DAILY MISSIONS ==========
+
+  /// Get daily missions
+  Future<List<dynamic>> getDailyMissions() async {
+    try {
+      final snapshot = await _firestore
+          .collection('daily_missions')
+          .where('isActive', isEqualTo: true)
+          .get();
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      // ignore: avoid_print
+      print('❌ Error loading daily missions: $e');
+      return [];
+    }
+  }
+
+  /// Get user mission progress
+  Future<Map<String, dynamic>?> getUserMissionProgress(String userId) async {
+    try {
+      final doc = await _firestore
+          .collection('user_mission_progress')
+          .doc(userId)
+          .get();
+      return doc.data();
+    } catch (e) {
+      // ignore: avoid_print
+      print('❌ Error loading user mission progress: $e');
+      return null;
+    }
+  }
+
+  /// Update mission progress
+  Future<void> updateMissionProgress(
+    String userId,
+    String missionId,
+    int progress,
+  ) async {
+    try {
+      await _firestore
+          .collection('user_mission_progress')
+          .doc(userId)
+          .set({
+        missionId: progress,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      // ignore: avoid_print
+      print('❌ Error updating mission progress: $e');
+    }
   }
 }

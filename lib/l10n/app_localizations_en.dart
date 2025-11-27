@@ -346,4 +346,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'Something went wrong';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get system => 'System';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get pushNotifications => 'Push Notifications';
+
+  @override
+  String get pushNotificationsDesc => 'Study reminders';
+
+  @override
+  String get emailNotifications => 'Email Notifications';
+
+  @override
+  String get emailNotificationsDesc => 'News and updates';
+
+  @override
+  String get dataAndStorage => 'Data & Storage';
+
+  @override
+  String get downloadedContent => 'Downloaded Content';
+
+  @override
+  String get clearCache => 'Clear Cache';
+
+  @override
+  String get clearCacheDesc => 'Free up space';
+
+  @override
+  String get aboutApp => 'About App';
+
+  @override
+  String get appVersion => 'App Version';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get clearCacheConfirmation => 'Clear Cache?';
+
+  @override
+  String get clearCacheMessage =>
+      'This will delete all downloaded content. You can download it again when online.';
+
+  @override
+  String get clear => 'Clear';
 }

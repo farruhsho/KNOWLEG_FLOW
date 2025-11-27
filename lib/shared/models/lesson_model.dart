@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:equatable/equatable.dart';
-
-class LessonModel extends Equatable {
+/// Lesson model for daily lessons and subject lessons
+class LessonModel {
   final String id;
   final String subjectId;
-  final Map<String, String> title;
-  final Map<String, String> content; // Rich text content
+  final Map<String, String> title; // ru, ky, en
+  final Map<String, String> content;
   final List<String> mediaUrls;
   final int estimatedTimeMinutes;
   final List<String> tags;
@@ -13,7 +11,7 @@ class LessonModel extends Equatable {
   final String createdBy;
   final DateTime createdAt;
 
-  const LessonModel({
+  LessonModel({
     required this.id,
     required this.subjectId,
     required this.title,
@@ -21,60 +19,69 @@ class LessonModel extends Equatable {
     this.mediaUrls = const [],
     required this.estimatedTimeMinutes,
     this.tags = const [],
-    this.order = 0,
+    required this.order,
     required this.createdBy,
     required this.createdAt,
   });
 
-  factory LessonModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  String getTitle(String locale) => title[locale] ?? title['ru'] ?? '';
+  String getContent(String locale) => content[locale] ?? content['ru'] ?? '';
+
+  factory LessonModel.fromFirestore(Map<String, dynamic> data) {
     return LessonModel(
-      id: doc.id,
-      subjectId: data['subject_id'] ?? '',
-      title: Map<String, String>.from(data['title'] ?? {}),
-      content: Map<String, String>.from(data['content'] ?? {}),
-      mediaUrls: List<String>.from(data['media_urls'] ?? []),
-      estimatedTimeMinutes: data['estimated_time'] ?? 15,
-      tags: List<String>.from(data['tags'] ?? []),
-      order: data['order'] ?? 0,
-      createdBy: data['created_by'] ?? '',
-      createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      id: data['id'] as String,
+      subjectId: data['subjectId'] as String,
+      title: Map<String, String>.from(data['title'] as Map),
+      content: Map<String, String>.from(data['content'] as Map),
+      mediaUrls: data['mediaUrls'] != null ? List<String>.from(data['mediaUrls'] as List) : [],
+      estimatedTimeMinutes: data['estimatedTimeMinutes'] as int? ?? data['estimatedTime'] as int? ?? 30,
+      tags: data['tags'] != null ? List<String>.from(data['tags'] as List) : [],
+      order: data['order'] as int,
+      createdBy: data['createdBy'] as String? ?? 'admin',
+      createdAt: data['createdAt'] is String
+          ? DateTime.parse(data['createdAt'] as String)
+          : (data['createdAt'] as DateTime? ?? DateTime.now()),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'subject_id': subjectId,
+      'id': id,
+      'subjectId': subjectId,
       'title': title,
       'content': content,
-      'media_urls': mediaUrls,
-      'estimated_time': estimatedTimeMinutes,
+      'mediaUrls': mediaUrls,
+      'estimatedTimeMinutes': estimatedTimeMinutes,
       'tags': tags,
       'order': order,
-      'created_by': createdBy,
-      'created_at': Timestamp.fromDate(createdAt),
+      'createdBy': createdBy,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
-  String getTitle(String locale) {
-    return title[locale] ?? title['en'] ?? title['ru'] ?? '';
+  LessonModel copyWith({
+    String? id,
+    String? subjectId,
+    Map<String, String>? title,
+    Map<String, String>? content,
+    List<String>? mediaUrls,
+    int? estimatedTimeMinutes,
+    List<String>? tags,
+    int? order,
+    String? createdBy,
+    DateTime? createdAt,
+  }) {
+    return LessonModel(
+      id: id ?? this.id,
+      subjectId: subjectId ?? this.subjectId,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      mediaUrls: mediaUrls ?? this.mediaUrls,
+      estimatedTimeMinutes: estimatedTimeMinutes ?? this.estimatedTimeMinutes,
+      tags: tags ?? this.tags,
+      order: order ?? this.order,
+      createdBy: createdBy ?? this.createdBy,
+      createdAt: createdAt ?? this.createdAt,
+    );
   }
-
-  String getContent(String locale) {
-    return content[locale] ?? content['en'] ?? content['ru'] ?? '';
-  }
-
-  @override
-  List<Object?> get props => [
-        id,
-        subjectId,
-        title,
-        content,
-        mediaUrls,
-        estimatedTimeMinutes,
-        tags,
-        order,
-        createdBy,
-        createdAt,
-      ];
 }

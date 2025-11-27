@@ -47,7 +47,7 @@ dependencies:
   # Local Storage
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  shared_preferences: ^2.3.3
+  shared_preferences: ^2.5.3
 
   # Network & API
   dio: ^5.7.0
@@ -64,9 +64,15 @@ dependencies:
   url_launcher: ^6.3.1
   image_picker: ^1.1.2
   permission_handler: ^11.3.1
+  file_picker: ^6.1.1
+  csv: ^5.1.1
 
   # Navigation
   go_router: ^14.6.2
+  google_fonts: ^6.3.2
+  http: ^1.6.0
+  universal_html: ^2.3.0
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_test:
@@ -92,3 +98,4 @@ flutter:
     - assets/icons/
     - assets/videos/
     - assets/animations/
+    - assets/data/

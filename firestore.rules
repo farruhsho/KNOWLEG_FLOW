@@ -16,6 +16,11 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // Rate limiting helper (max 100 reads per minute)
+    function isRateLimited() {
+      return request.time < resource.data.lastRead + duration.value(0, 600); // 600ms = ~100 req/min
+    }
+
     // Users collection
     match /users/{userId} {
       // Users can read and write their own data
@@ -49,14 +54,38 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ORT tests collection
+    match /ort_tests/{testId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // ORT attempts
+    match /ort_attempts/{attemptId} {
+      allow read: if isAuthenticated() &&
+                   resource.data.user_id == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                     request.resource.data.user_id == request.auth.uid;
+      allow update: if isAuthenticated() &&
+                     (resource.data.user_id == request.auth.uid || isAdmin());
+      allow delete: if isOwner(resource.data.user_id) || isAdmin();
+    }
+
     // User attempts
     match /user_attempts/{attemptId} {
       allow read: if isAuthenticated() &&
                    resource.data.uid == request.auth.uid;
       allow create: if isAuthenticated() &&
                      request.resource.data.uid == request.auth.uid;
-      allow update: if false; // Only Cloud Functions can update scores
+      allow update: if isAuthenticated() &&
+                     (resource.data.uid == request.auth.uid || isAdmin());
       allow delete: if isOwner(resource.data.uid);
+    }
+
+    // User progress
+    match /user_progress/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) || isAdmin();
     }
 
     // Payments
@@ -81,6 +110,32 @@ service cloud.firestore {
                    resource.data.uid == request.auth.uid;
       allow write: if isAuthenticated() &&
                     request.resource.data.uid == request.auth.uid;
+    }
+
+    // Daily missions
+    match /daily_missions/{missionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // User mission progress
+    match /user_mission_progress/{progressId} {
+      allow read: if isAuthenticated() &&
+                   resource.data.user_id == request.auth.uid;
+      allow write: if isAuthenticated() &&
+                    request.resource.data.user_id == request.auth.uid;
+    }
+
+    // Rankings (read-only for users, write by Cloud Functions)
+    match /rankings/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin(); // Only admin or Cloud Functions
+    }
+
+    // Analytics (user-specific)
+    match /analytics/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) || isAdmin();
     }
 
     // Forum posts (future feature)

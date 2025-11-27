@@ -12,45 +12,45 @@ abstract class Failure extends Equatable {
 
 // General failures
 class ServerFailure extends Failure {
-  const ServerFailure(String message, {String? code}) : super(message, code: code);
+  const ServerFailure(super.message, {super.code});
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure(String message, {String? code}) : super(message, code: code);
+  const NetworkFailure(super.message, {super.code});
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure(String message, {String? code}) : super(message, code: code);
+  const CacheFailure(super.message, {super.code});
 }
 
 // Auth failures
 class AuthFailure extends Failure {
-  const AuthFailure(String message, {String? code}) : super(message, code: code);
+  const AuthFailure(super.message, {super.code});
 }
 
 class InvalidCredentialsFailure extends AuthFailure {
-  const InvalidCredentialsFailure(String message, {String? code}) : super(message, code: code);
+  const InvalidCredentialsFailure(super.message, {super.code});
 }
 
 class UserNotFoundFailure extends AuthFailure {
-  const UserNotFoundFailure(String message, {String? code}) : super(message, code: code);
+  const UserNotFoundFailure(super.message, {super.code});
 }
 
 // Payment failures
 class PaymentFailure extends Failure {
-  const PaymentFailure(String message, {String? code}) : super(message, code: code);
+  const PaymentFailure(super.message, {super.code});
 }
 
 class InsufficientFundsFailure extends PaymentFailure {
-  const InsufficientFundsFailure(String message, {String? code}) : super(message, code: code);
+  const InsufficientFundsFailure(super.message, {super.code});
 }
 
 // Validation failures
 class ValidationFailure extends Failure {
-  const ValidationFailure(String message, {String? code}) : super(message, code: code);
+  const ValidationFailure(super.message, {super.code});
 }
 
 // Permission failures
 class PermissionFailure extends Failure {
-  const PermissionFailure(String message, {String? code}) : super(message, code: code);
+  const PermissionFailure(super.message, {super.code});
 }

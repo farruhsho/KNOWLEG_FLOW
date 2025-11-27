@@ -66,7 +66,7 @@ class DailyQuestsWidget extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(12),
             color: isCompleted
-                ? AppColors.success.withOpacity(0.1)
+                ? AppColors.success.withValues(alpha: 0.1)
                 : Colors.transparent,
           ),
           child: Column(
@@ -80,8 +80,8 @@ class DailyQuestsWidget extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       color: isCompleted
-                          ? AppColors.success.withOpacity(0.2)
-                          : AppColors.primary.withOpacity(0.1),
+                          ? AppColors.success.withValues(alpha: 0.2)
+                          : AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -250,12 +250,12 @@ class CompactDailyQuests extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.info.withOpacity(0.1),
-              AppColors.info.withOpacity(0.05),
+              AppColors.info.withValues(alpha: 0.1),
+              AppColors.info.withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.info.withOpacity(0.3)),
+          border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [

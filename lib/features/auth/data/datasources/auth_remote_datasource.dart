@@ -151,6 +151,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'last_active': FieldValue.serverTimestamp(),
       });
     } catch (e) {
+      // ignore: avoid_print
       print('Error updating last active: $e');
     }
   }

@@ -57,6 +57,7 @@ class GamificationService {
       _cache[userId] = gamification;
       return gamification;
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading user gamification: $e');
       // Возвращаем пустую геймификацию при ошибке
       return UserGamification(
@@ -82,6 +83,7 @@ class GamificationService {
 
       _cache[gamification.userId] = gamification;
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error saving user gamification: $e');
     }
   }
@@ -216,6 +218,7 @@ class GamificationService {
       _achievementsCache[userId] = unlocked;
       return unlocked;
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading unlocked achievements: $e');
       return [];
     }
@@ -234,6 +237,7 @@ class GamificationService {
 
       _achievementsCache[userId] = achievements;
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error saving unlocked achievements: $e');
     }
   }
@@ -310,6 +314,7 @@ class GamificationService {
       _questsCache[userId] = quests;
       return quests;
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error loading daily quests: $e');
       return _generateDailyQuests(userId);
     }
@@ -331,6 +336,7 @@ class GamificationService {
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
+      // ignore: avoid_print
       print('❌ Error saving daily quests: $e');
     }
   }

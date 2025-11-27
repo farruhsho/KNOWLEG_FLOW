@@ -126,5 +126,25 @@
   "loading": "Жүктөлүүдө...",
   "retry": "Кайталоо",
   "noConnection": "Интернет байланышы жок",
-  "somethingWentWrong": "Бир нерсе туура эмес болду"
+  "somethingWentWrong": "Бир нерсе туура эмес болду",
+
+  "appearance": "Тышкы көрүнүш",
+  "system": "Системалык",
+  "light": "Жарык",
+  "dark": "Караңгы",
+  "pushNotifications": "Push-билдирмелер",
+  "pushNotificationsDesc": "Сабактар жөнүндө эстеткичтер",
+  "emailNotifications": "Email-билдирмелер",
+  "emailNotificationsDesc": "Жаңылыктар жана жаңыртуулар",
+  "dataAndStorage": "Маалыматтар жана сактоо",
+  "downloadedContent": "Жүктөлгөн материалдар",
+  "clearCache": "Кэшти тазалоо",
+  "clearCacheDesc": "Орун бошотуу",
+  "aboutApp": "Тиркеме жөнүндө",
+  "appVersion": "Тиркеменин версиясы",
+  "privacyPolicy": "Купуялуулук саясаты",
+  "termsOfService": "Колдонуу шарттары",
+  "clearCacheConfirmation": "Кэшти тазалоо?",
+  "clearCacheMessage": "Бул бардык жүктөлгөн материалдарды өчүрөт. Интернетке туташканда аларды кайра жүктөй аласыз.",
+  "clear": "Тазалоо"
 }

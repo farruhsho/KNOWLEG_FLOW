@@ -4,20 +4,24 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/onboarding/presentation/pages/splash_page.dart';
-import '../../features/dashboard/presentation/pages/dashboard_page.dart';
-import '../../features/subjects/presentation/pages/subjects_page.dart';
 import '../../features/subjects/presentation/pages/subject_detail_page.dart';
-import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/quiz/presentation/pages/quiz_page.dart';
+import '../../features/quiz/presentation/pages/quiz_results_page.dart';
 import '../../features/mock_test/presentation/pages/mock_test_page.dart';
 import '../../features/lessons/presentation/pages/lesson_page.dart';
 import '../../features/gamification/presentation/pages/achievements_page.dart';
 import '../../features/admin/presentation/pages/admin_login_page.dart';
+import '../../features/admin/presentation/pages/admin_registration_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_generate_questions_page.dart';
+import '../../features/handbook/presentation/pages/handbook_content_page.dart';
 import '../../screens/task_list_screen.dart';
 import '../../screens/task_detail_screen.dart';
-import '../../providers/task_provider.dart';
+import '../../features/quiz/presentation/pages/quick_test_page.dart';
+import '../../features/lessons/presentation/pages/daily_lesson_page.dart';
+import '../../features/progress/presentation/pages/progress_page.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
+import '../navigation/main_scaffold.dart';
 
 class AppRouter {
   // Custom page transition builders
@@ -62,50 +66,33 @@ class AppRouter {
     );
   }
 
-  static CustomTransitionPage _buildPageWithScaleTransition({
-    required Widget child,
-    required GoRouterState state,
-  }) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const curve = Curves.easeInOutCubic;
-        final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: curve,
-        );
-        return ScaleTransition(
-          scale: curvedAnimation,
-          child: FadeTransition(
-            opacity: curvedAnimation,
-            child: child,
-          ),
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 400),
-    );
-  }
 
   static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String signup = '/signup';
-  static const String dashboard = '/dashboard';
+  static const String home = '/home';
+  static const String dashboard = '/home'; // Alias for home
   static const String subjects = '/subjects';
   static const String profile = '/profile';
+  static const String progress = '/progress';
   static const String subjectDetail = '/subjects/:id';
   static const String lesson = '/lessons/:id';
   static const String quiz = '/quiz/:id';
+  static const String quizResults = '/quiz-results';
+  static const String quickTest = '/quick-test';
+  static const String dailyLesson = '/daily-lesson';
   static const String mockTest = '/mock-test/:id';
   static const String testReview = '/test-review/:id';
   static const String flashcards = '/flashcards/:subjectId';
   static const String payments = '/payments';
   static const String settings = '/settings';
   static const String achievements = '/achievements';
+  static const String handbookDetail = '/handbook/:categoryId';
   static const String tasks = '/tasks';
   static const String taskDetail = '/tasks/:id';
   static const String adminLogin = '/admin/login';
+  static const String adminRegister = '/admin/register';
   static const String adminDashboard = '/admin/dashboard';
   static const String adminGenerateQuestions = '/admin/generate-questions';
 
@@ -131,16 +118,23 @@ class AppRouter {
           builder: (context, state) => const SignupPage(),
         ),
         GoRoute(
-          path: dashboard,
-          builder: (context, state) => const DashboardPage(),
+          path: home,
+          builder: (context, state) => const MainScaffold(),
         ),
         GoRoute(
-          path: subjects,
-          builder: (context, state) => const SubjectsPage(),
+          path: progress,
+          builder: (context, state) => const ProgressPage(),
         ),
         GoRoute(
-          path: profile,
-          builder: (context, state) => const ProfilePage(),
+          path: quizResults,
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            return QuizResultsPage(
+              totalQuestions: extra?['totalQuestions'] ?? 0,
+              correctAnswers: extra?['correctAnswers'] ?? 0,
+              totalTimeSeconds: extra?['totalTimeSeconds'] ?? 0,
+            );
+          },
         ),
         GoRoute(
           path: subjectDetail,
@@ -171,6 +165,14 @@ class AppRouter {
               state: state,
             );
           },
+        ),
+        GoRoute(
+          path: quickTest,
+          builder: (context, state) => const QuickTestPage(),
+        ),
+        GoRoute(
+          path: dailyLesson,
+          builder: (context, state) => const DailyLessonPage(),
         ),
         GoRoute(
           path: mockTest,
@@ -208,16 +210,24 @@ class AppRouter {
         ),
         GoRoute(
           path: settings,
-          builder: (context, state) => Scaffold(
-            appBar: AppBar(title: const Text('Settings')),
-            body: const Center(child: Text('Settings Page')),
-          ),
+          builder: (context, state) => const SettingsPage(),
         ),
         GoRoute(
           path: achievements,
           pageBuilder: (context, state) {
             return _buildPageWithSlideTransition(
               child: const AchievementsPage(),
+              state: state,
+            );
+          },
+        ),
+        // Handbook detail route
+        GoRoute(
+          path: handbookDetail,
+          pageBuilder: (context, state) {
+            final categoryId = state.pathParameters['categoryId']!;
+            return _buildPageWithSlideTransition(
+              child: HandbookContentPage(categoryId: categoryId),
               state: state,
             );
           },
@@ -250,6 +260,15 @@ class AppRouter {
           pageBuilder: (context, state) {
             return _buildPageWithFadeTransition(
               child: const AdminLoginPage(),
+              state: state,
+            );
+          },
+        ),
+        GoRoute(
+          path: adminRegister,
+          pageBuilder: (context, state) {
+            return _buildPageWithFadeTransition(
+              child: const AdminRegistrationPage(),
               state: state,
             );
           },

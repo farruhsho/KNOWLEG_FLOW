@@ -126,5 +126,25 @@
   "loading": "Загрузка...",
   "retry": "Повторить",
   "noConnection": "Нет подключения к интернету",
-  "somethingWentWrong": "Что-то пошло не так"
+  "somethingWentWrong": "Что-то пошло не так",
+
+  "appearance": "Внешний вид",
+  "system": "Системная",
+  "light": "Светлая",
+  "dark": "Тёмная",
+  "pushNotifications": "Push-уведомления",
+  "pushNotificationsDesc": "Напоминания о занятиях",
+  "emailNotifications": "Email-уведомления",
+  "emailNotificationsDesc": "Новости и обновления",
+  "dataAndStorage": "Данные и хранилище",
+  "downloadedContent": "Загруженные материалы",
+  "clearCache": "Очистить кэш",
+  "clearCacheDesc": "Освободить место",
+  "aboutApp": "О приложении",
+  "appVersion": "Версия приложения",
+  "privacyPolicy": "Политика конфиденциальности",
+  "termsOfService": "Условия использования",
+  "clearCacheConfirmation": "Очистить кэш?",
+  "clearCacheMessage": "Это удалит все загруженные материалы. Вы сможете загрузить их снова при подключении к интернету.",
+  "clear": "Очистить"
 }

@@ -1,0 +1,131 @@
+{
+  "subjects": [
+    {
+      "id": "math",
+      "name": {
+        "ru": "Математика",
+        "ky": "Математика",
+        "en": "Mathematics"
+      },
+      "description": {
+        "ru": "Математический раздел ОРТ",
+        "ky": "ОРТнын математикалык бөлүмү",
+        "en": "ORT Mathematics Section"
+      },
+      "icon": "calculate",
+      "color": "#2196F3",
+      "order": 1,
+      "isActive": true,
+      "totalQuestions": 30,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "russian",
+      "name": {
+        "ru": "Русский язык",
+        "ky": "Орус тили",
+        "en": "Russian Language"
+      },
+      "description": {
+        "ru": "Русский язык: чтение, грамматика, аналогии",
+        "ky": "Орус тили: окуу, грамматика, аналогиялар",
+        "en": "Russian: reading, grammar, analogies"
+      },
+      "icon": "book",
+      "color": "#F44336",
+      "order": 2,
+      "isActive": true,
+      "totalQuestions": 30,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "kyrgyz",
+      "name": {
+        "ru": "Кыргызский язык",
+        "ky": "Кыргыз тили",
+        "en": "Kyrgyz Language"
+      },
+      "description": {
+        "ru": "Кыргызский язык: чтение, грамматика, аналогии",
+        "ky": "Кыргыз тили: окуу, грамматика, аналогиялар",
+        "en": "Kyrgyz: reading, grammar, analogies"
+      },
+      "icon": "book",
+      "color": "#4CAF50",
+      "order": 3,
+      "isActive": true,
+      "totalQuestions": 30,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "history",
+      "name": {
+        "ru": "История",
+        "ky": "Тарых",
+        "en": "History"
+      },
+      "description": {
+        "ru": "История Кыргызстана и всемирная история",
+        "ky": "Кыргызстандын тарыхы жана дүйнөлүк тарых",
+        "en": "History of Kyrgyzstan and World History"
+      },
+      "icon": "history_edu",
+      "color": "#FF9800",
+      "order": 4,
+      "isActive": true,
+      "totalQuestions": 0,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "english",
+      "name": {
+        "ru": "Английский язык",
+        "ky": "Англис тили",
+        "en": "English Language"
+      },
+      "description": {
+        "ru": "Английский язык: грамматика, лексика, чтение",
+        "ky": "Англис тили: грамматика, лексика, окуу",
+        "en": "English: grammar, vocabulary, reading"
+      },
+      "icon": "language",
+      "color": "#9C27B0",
+      "order": 5,
+      "isActive": true,
+      "totalQuestions": 0,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "daily",
+      "subjectId": "math",
+      "title": {
+        "ru": "Урок дня",
+        "ky": "Күндүн сабагы",
+        "en": "Daily Lesson"
+      },
+      "description": {
+        "ru": "Ежедневный урок математики",
+        "ky": "Күнүмдүк математика сабагы",
+        "en": "Daily mathematics lesson"
+      },
+      "content": {
+        "ru": "Сегодня мы изучим основы алгебры",
+        "ky": "Бүгүн биз алгебранын негиздерин үйрөнөбүз",
+        "en": "Today we will learn algebra basics"
+      },
+      "order": 1,
+      "difficulty": 1,
+      "estimatedTime": 30,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

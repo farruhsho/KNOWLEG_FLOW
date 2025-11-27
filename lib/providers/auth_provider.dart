@@ -49,10 +49,33 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return await _auth.signInWithEmailAndPassword(
+    final credential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+
+    // Create user document if it doesn't exist (for existing users who registered before this feature)
+    if (credential.user != null) {
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(credential.user!.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        await _createUserDocument(
+          uid: credential.user!.uid,
+          email: credential.user!.email ?? email,
+          name: credential.user!.displayName ?? email.split('@').first,
+        );
+      } else {
+        // Update last active timestamp
+        await _firestore.collection('users').doc(credential.user!.uid).update({
+          'last_active': Timestamp.now(),
+        });
+      }
+    }
+
+    return credential;
   }
 
   /// Sign up with email and password

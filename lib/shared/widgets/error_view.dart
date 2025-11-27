@@ -4,12 +4,14 @@ import '../../core/theme/app_colors.dart';
 class ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
+  final String? retryText;
   final IconData? icon;
 
   const ErrorView({
     super.key,
     required this.message,
     this.onRetry,
+    this.retryText,
     this.icon,
   });
 
@@ -31,20 +33,23 @@ class ErrorView extends StatelessWidget {
               'Ошибка',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: AppColors.error,
+                    fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 24),
-              ElevatedButton.icon(
+              FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Повторить'),
+                label: Text(retryText ?? 'Повторить'),
               ),
             ],
           ],

@@ -39,8 +39,11 @@ class FirebaseService {
       // Request notification permissions
       await _requestNotificationPermissions();
 
+      // ignore: avoid_print
+
       print('Firebase initialized successfully');
     } catch (e) {
+      // ignore: avoid_print
       print('Error initializing Firebase: $e');
       rethrow;
     }
@@ -65,6 +68,7 @@ class FirebaseService {
 
       await remoteConfig.fetchAndActivate();
     } catch (e) {
+      // ignore: avoid_print
       print('Error initializing Remote Config: $e');
     }
   }
@@ -82,11 +86,14 @@ class FirebaseService {
       );
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        // ignore: avoid_print
         print('User granted notification permissions');
       } else {
+        // ignore: avoid_print
         print('User declined notification permissions');
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Error requesting notification permissions: $e');
     }
   }
@@ -95,6 +102,7 @@ class FirebaseService {
     try {
       return await messaging.getToken();
     } catch (e) {
+      // ignore: avoid_print
       print('Error getting FCM token: $e');
       return null;
     }

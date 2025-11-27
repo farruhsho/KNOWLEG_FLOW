@@ -202,7 +202,7 @@ class _QuizResultsPageState extends State<QuizResultsPage> with SingleTickerProv
                 child: OutlinedButton.icon(
                   onPressed: () {
                     // TODO: Retry quiz
-                    context.pop();
+                    context.go('/dashboard');
                   },
                   icon: const Icon(Icons.refresh),
                   label: const Text('Пройти еще раз'),
