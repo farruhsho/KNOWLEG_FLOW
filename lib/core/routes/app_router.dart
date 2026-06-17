@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
@@ -15,8 +16,6 @@ import '../../features/admin/presentation/pages/admin_registration_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_generate_questions_page.dart';
 import '../../features/handbook/presentation/pages/handbook_content_page.dart';
-import '../../screens/task_list_screen.dart';
-import '../../screens/task_detail_screen.dart';
 import '../../features/quiz/presentation/pages/quick_test_page.dart';
 import '../../features/lessons/presentation/pages/daily_lesson_page.dart';
 import '../../features/progress/presentation/pages/progress_page.dart';
@@ -89,8 +88,6 @@ class AppRouter {
   static const String settings = '/settings';
   static const String achievements = '/achievements';
   static const String handbookDetail = '/handbook/:categoryId';
-  static const String tasks = '/tasks';
-  static const String taskDetail = '/tasks/:id';
   static const String adminLogin = '/admin/login';
   static const String adminRegister = '/admin/register';
   static const String adminDashboard = '/admin/dashboard';
@@ -100,6 +97,19 @@ class AppRouter {
     return GoRouter(
       initialLocation: splash,
       debugLogDiagnostics: true,
+      // SEC-003: block deep-links into the admin area for unauthenticated users.
+      // Full role-based gating belongs in Firebase Auth custom claims — see
+      // CTO_AUDIT_REPORT.md (§3 SEC-003 / §11.3).
+      redirect: (context, state) {
+        final path = state.uri.path;
+        final goingAdmin = path.startsWith('/admin') &&
+            path != adminLogin &&
+            path != adminRegister;
+        if (goingAdmin && FirebaseAuth.instance.currentUser == null) {
+          return adminLogin;
+        }
+        return null;
+      },
       routes: [
         GoRoute(
           path: splash,
@@ -228,28 +238,6 @@ class AppRouter {
             final categoryId = state.pathParameters['categoryId']!;
             return _buildPageWithSlideTransition(
               child: HandbookContentPage(categoryId: categoryId),
-              state: state,
-            );
-          },
-        ),
-        // Task routes
-        GoRoute(
-          path: tasks,
-          pageBuilder: (context, state) {
-            return _buildPageWithSlideTransition(
-              child: const TaskListScreen(),
-              state: state,
-            );
-          },
-        ),
-        GoRoute(
-          path: taskDetail,
-          pageBuilder: (context, state) {
-            final taskId = state.extra as String;
-            return _buildPageWithSlideTransition(
-              child: TaskDetailScreen(
-                taskId: taskId,
-              ),
               state: state,
             );
           },

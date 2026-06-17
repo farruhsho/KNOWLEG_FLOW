@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/lesson_model.dart';
-import '../../../../shared/services/mock_data_service.dart';
+import '../../../../shared/models/subject_model.dart';
+import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 
-class SubjectDetailPage extends StatelessWidget {
+class SubjectDetailPage extends StatefulWidget {
   final String subjectId;
 
   const SubjectDetailPage({
@@ -14,10 +15,46 @@ class SubjectDetailPage extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final subject = MockDataService.getSubjectById(subjectId);
-    final lessons = MockDataService.getLessonsBySubject(subjectId);
+  State<SubjectDetailPage> createState() => _SubjectDetailPageState();
+}
 
+class _SubjectDetailPageState extends State<SubjectDetailPage> {
+  // Real Firestore-backed data (was MockDataService — hardcoded sample content).
+  final _dataService = FirebaseDataService();
+  SubjectModel? _subject;
+  List<LessonModel> _lessons = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final subject = await _dataService.getSubjectById(widget.subjectId);
+      final lessons = await _dataService.getLessonsBySubject(widget.subjectId);
+      if (!mounted) return;
+      setState(() {
+        _subject = subject;
+        _lessons = lessons;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final subject = _subject;
     if (subject == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Предмет')),
@@ -29,6 +66,7 @@ class SubjectDetailPage extends StatelessWidget {
       );
     }
 
+    final lessons = _lessons;
     if (lessons.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text(subject.getTitle('ru'))),
@@ -119,7 +157,7 @@ class SubjectDetailPage extends StatelessWidget {
                       ),
                       TextButton.icon(
                         onPressed: () {
-                          context.go('/quiz/$subjectId');
+                          context.go('/quiz/${widget.subjectId}');
                         },
                         icon: const Icon(Icons.quiz),
                         label: const Text('Пройти тест'),

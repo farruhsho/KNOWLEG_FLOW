@@ -8,103 +8,118 @@ on:
 
 jobs:
   # Analyze and Test
-  analyze:
+  analyze-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
-      
+          # Use the stable channel (Dart >= 3.9.2) instead of pinning 3.16.0,
+          # which shipped Dart ~3.2 and broke `flutter pub get` against the
+          # pubspec sdk constraint ^3.9.2 (CI-01).
+          channel: stable
+          cache: true
+
       - name: Install dependencies
         run: flutter pub get
-      
+
       - name: Analyze code
         run: flutter analyze
-      
-      - name: Run tests
-        run: flutter test
-  
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info
+        continue-on-error: true
+
+  # Firestore Security Rules tests (guards the SEC-002 escalation fix).
+  # Requires test/firestore/ (a @firebase/rules-unit-testing Node project).
+  # See CTO_AUDIT_REPORT.md §3 (TEST-03). Enable once that harness exists:
+  # rules-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with: { node-version: 20 }
+  #     - run: npm --prefix test/firestore ci
+  #     - run: npx firebase emulators:exec --only firestore "npm --prefix test/firestore test"
+
   # Build Android
   build-android:
-    needs: analyze
+    needs: analyze-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
-      
+          channel: stable
+          cache: true
+
       - name: Install dependencies
         run: flutter pub get
-      
-      - name: Build APK
-        run: flutter build apk --release
-      
+
       - name: Build App Bundle
         run: flutter build appbundle --release
-      
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-      
+
       - name: Upload App Bundle
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-aab
           path: build/app/outputs/bundle/release/app-release.aab
-  
+
   # Build iOS
   build-ios:
-    needs: analyze
+    needs: analyze-test
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
-      
+          channel: stable
+          cache: true
+
       - name: Install dependencies
         run: flutter pub get
-      
+
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
-  
-  # Deploy to Firebase (optional)
+
+  # Deploy to Firebase Hosting (web) on main.
+  # NOTE: requires a `hosting` target in firebase.json (currently absent —
+  # DEPLOY-01) and the FIREBASE_SERVICE_ACCOUNT secret. projectId is the real
+  # project id, not the old `your-firebase-project-id` placeholder.
   deploy-firebase:
     needs: [build-android, build-ios]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
-          channel: 'stable'
-      
+          channel: stable
+          cache: true
+
       - name: Install dependencies
         run: flutter pub get
-      
+
       - name: Build Web
         run: flutter build web --release
-      
+
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           channelId: live
-          projectId: your-firebase-project-id
+          projectId: knowleg-33f36

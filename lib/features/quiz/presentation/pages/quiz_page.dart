@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/models/question_model.dart';
-import '../../../../shared/widgets/glass_container.dart';
 
 class QuizPage extends StatefulWidget {
   final String quizId;
@@ -525,7 +525,12 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
       );
 
       // Update Firebase user progress statistics
-      final scorePercentage = (correctAnswers / _totalQuestions * 240).round();
+      // Normalise to the canonical ORT max score instead of a magic number.
+      // NOTE: maxScore (200) vs OrtConstants.totalMaxScore (220) still needs the
+      // P2 domain-constant reconciliation; AppConstants.maxScore matches the
+      // existing "из 200" progress UI today.
+      final scorePercentage =
+          (correctAnswers / _totalQuestions * AppConstants.maxScore).round();
       await _firebaseDataService.updateTestStats(
         userId,
         scorePercentage,

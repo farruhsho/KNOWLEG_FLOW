@@ -168,33 +168,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
                 const SizedBox(height: 32),
 
-                // Role Selection
-                SegmentedButton<UserRole>(
-                  segments: const [
-                    ButtonSegment<UserRole>(
-                      value: UserRole.client,
-                      label: Text('Ученик'),
-                      icon: Icon(Icons.person),
-                    ),
-                    ButtonSegment<UserRole>(
-                      value: UserRole.admin,
-                      label: Text('Админ'),
-                      icon: Icon(Icons.admin_panel_settings),
-                    ),
-                  ],
-                  selected: {_selectedRole},
-                  onSelectionChanged: (Set<UserRole> newSelection) {
-                    setState(() {
-                      _selectedRole = newSelection.first;
-                    });
-                  },
-                  style: ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-
-                const SizedBox(height: 32),
+                // SECURITY (SEC-004): the public "Админ" self-registration option
+                // was removed. Admin accounts must be provisioned server-side
+                // (Firebase Auth custom claims), never self-selected on the public
+                // signup form. Public signups are always students.
 
                 // Name field (Only for Client)
                 if (_selectedRole == UserRole.client) ...[

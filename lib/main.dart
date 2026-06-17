@@ -29,12 +29,14 @@ void main() async {
     Hive.initFlutter(),
   ]);
 
-  // Initialize Firebase in the background after the app starts
-  // This prevents blocking the UI thread
-  FirebaseService.initialize().catchError((e) {
+  // Initialize Firebase BEFORE running the app so the first frames (and the
+  // SplashPage auth read) cannot race ahead of Firestore/RemoteConfig/Auth.
+  try {
+    await FirebaseService.initialize();
+  } catch (e) {
     debugPrint('Firebase initialization failed: $e');
     // Continue without Firebase for development
-  });
+  }
 
   runApp(
     ProviderScope(

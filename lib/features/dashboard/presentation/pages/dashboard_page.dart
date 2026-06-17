@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/routes/app_router.dart';
@@ -29,11 +30,15 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _loadGamificationData() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
     try {
-      // TODO: Get actual user ID
-      final gamification = await _gamificationService.getUserGamification('current_user');
-      final quests = await _gamificationService.getDailyQuests('current_user');
-      await _gamificationService.updateStreak('current_user');
+      final gamification = await _gamificationService.getUserGamification(uid);
+      final quests = await _gamificationService.getDailyQuests(uid);
+      await _gamificationService.updateStreak(uid);
 
       if (!mounted) return;
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/services/gamification_service.dart';
@@ -32,8 +33,10 @@ class _AchievementsPageState extends State<AchievementsPage>
   }
 
   void _loadAchievements() {
-    _achievementsFuture =
-        _gamificationService.getAchievementsProgress('current_user');
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    _achievementsFuture = uid == null
+        ? Future.value(<AchievementProgress>[])
+        : _gamificationService.getAchievementsProgress(uid);
   }
 
   @override

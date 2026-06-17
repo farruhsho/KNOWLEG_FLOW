@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/handbook_data.dart';
@@ -171,7 +172,7 @@ class HandbookSearchDelegate extends SearchDelegate<String> {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).pushNamed('/handbook/${result.categoryId}');
+          context.push('/handbook/${result.categoryId}');
           close(context, result.categoryId);
         },
         borderRadius: BorderRadius.circular(12),
@@ -245,7 +246,7 @@ class HandbookSearchDelegate extends SearchDelegate<String> {
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () {
-        Navigator.of(context).pushNamed('/handbook/${result.categoryId}');
+        context.push('/handbook/${result.categoryId}');
         close(context, result.categoryId);
       },
     );

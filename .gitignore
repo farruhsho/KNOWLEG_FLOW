@@ -13,6 +13,9 @@
 .swiftpm/
 migrate_working_dir/
 
+# Analyzer / audit output dumps (build artifacts, not source)
+analysis_report*.txt
+
 # IntelliJ related
 *.iml
 *.ipr
