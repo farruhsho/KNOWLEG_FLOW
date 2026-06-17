@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/lesson_model.dart';
 import '../../../../shared/services/firebase_data_service.dart';
+import '../../../../shared/services/gamification_service.dart';
 
 /// Daily Lesson - randomized lesson from admin pool, no repeats until cycle ends
 class DailyLessonPage extends StatefulWidget {
@@ -14,6 +16,7 @@ class DailyLessonPage extends StatefulWidget {
 
 class _DailyLessonPageState extends State<DailyLessonPage> {
   final _dataService = FirebaseDataService();
+  final _gamificationService = GamificationService();
   LessonModel? _lesson;
   bool _isLoading = true;
   bool _isCompleted = false;
@@ -50,17 +53,46 @@ class _DailyLessonPageState extends State<DailyLessonPage> {
     }
   }
 
-  void _markAsCompleted() {
-    setState(() {
-      _isCompleted = true;
-    });
-    // TODO: Award XP and save completion to Firebase
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Урок завершён! +50 XP'),
-        backgroundColor: AppColors.success,
-      ),
-    );
+  Future<void> _markAsCompleted() async {
+    final lesson = _lesson;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (lesson == null || uid == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Войдите в аккаунт, чтобы сохранить прогресс'),
+          ),
+        );
+      }
+      return;
+    }
+    try {
+      // Persist completion and award XP only the FIRST time (idempotent).
+      final progress = await _dataService.getUserProgress(uid);
+      final alreadyDone =
+          progress?.completedLessons.contains(lesson.id) ?? false;
+      await _dataService.markLessonCompleted(uid, lesson.id);
+      if (!alreadyDone) {
+        await _gamificationService.awardXP(uid, 50, 'Lesson completed');
+      }
+      if (!mounted) return;
+      setState(() => _isCompleted = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(alreadyDone ? 'Урок завершён!' : 'Урок завершён! +50 XP'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Не удалось сохранить прогресс. Попробуйте ещё раз.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

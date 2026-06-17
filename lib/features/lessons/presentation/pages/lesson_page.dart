@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/models/lesson_model.dart';
 import '../../../../shared/services/firebase_data_service.dart';
+import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 
 class LessonPage extends StatefulWidget {
@@ -18,6 +20,7 @@ class LessonPage extends StatefulWidget {
 
 class _LessonPageState extends State<LessonPage> {
   final _firebaseDataService = FirebaseDataService();
+  final _gamificationService = GamificationService();
   LessonModel? _lesson;
   bool _isLoading = true;
   bool _isCompleted = false;
@@ -61,6 +64,47 @@ class _LessonPageState extends State<LessonPage> {
       setState(() {
         _scrollProgress = maxScroll > 0 ? currentScroll / maxScroll : 0;
       });
+    }
+  }
+
+  /// Persist completion and award XP exactly once (one-way: no un-marking).
+  Future<void> _markCompleted() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Войдите в аккаунт, чтобы сохранить прогресс'),
+          ),
+        );
+      }
+      return;
+    }
+    try {
+      final progress = await _firebaseDataService.getUserProgress(uid);
+      final alreadyDone =
+          progress?.completedLessons.contains(widget.lessonId) ?? false;
+      await _firebaseDataService.markLessonCompleted(uid, widget.lessonId);
+      if (!alreadyDone) {
+        await _gamificationService.awardXP(uid, 50, 'Lesson completed');
+      }
+      if (!mounted) return;
+      setState(() => _isCompleted = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(alreadyDone ? 'Урок пройден!' : 'Урок пройден! +50 XP'),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Не удалось сохранить прогресс. Попробуйте ещё раз.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -243,22 +287,7 @@ class _LessonPageState extends State<LessonPage> {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _isCompleted = !_isCompleted;
-                  });
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        _isCompleted
-                            ? 'Урок отмечен как пройденный!'
-                            : 'Урок снят с отметки',
-                      ),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
+                onPressed: _isCompleted ? null : _markCompleted,
                 icon: Icon(
                   _isCompleted ? Icons.check_circle : Icons.circle_outlined,
                 ),

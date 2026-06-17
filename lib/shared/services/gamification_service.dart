@@ -90,8 +90,6 @@ class GamificationService {
 
   /// Наградить пользователя XP
   Future<XPReward> awardXP(String userId, int amount, String reason) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-
     final userGam = await getUserGamification(userId);
 
     int currentXP = userGam.xp;
@@ -129,8 +127,6 @@ class GamificationService {
 
   /// Обновить статистику
   Future<void> updateStatistic(String userId, String key, int increment) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-
     final userGam = await getUserGamification(userId);
     final stats = Map<String, int>.from(userGam.statistics);
     stats[key] = (stats[key] ?? 0) + increment;
@@ -144,8 +140,6 @@ class GamificationService {
 
   /// Обновить streak
   Future<StreakUpdate> updateStreak(String userId) async {
-    await Future.delayed(const Duration(milliseconds: 200));
-
     final userGam = await getUserGamification(userId);
     final lastActivity = userGam.lastActivityDate;
     final currentStreak = userGam.streakDays;
@@ -244,14 +238,11 @@ class GamificationService {
 
   /// Получить все достижения
   Future<List<Achievement>> getAllAchievements() async {
-    await Future.delayed(const Duration(milliseconds: 200));
     return _predefinedAchievements;
   }
 
   /// Получить прогресс достижений
   Future<List<AchievementProgress>> getAchievementsProgress(String userId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-
     final achievements = await getAllAchievements();
     final userGam = await getUserGamification(userId);
     final unlockedAchievements = await _getUnlockedAchievements(userId);

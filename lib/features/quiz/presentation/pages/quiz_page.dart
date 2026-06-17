@@ -55,6 +55,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
         count: 10,
         subjectId: widget.quizId,
       );
+      if (!mounted) return;
       setState(() {
         _questions = questions;
         _isLoading = false;
@@ -63,6 +64,7 @@ class _QuizPageState extends State<QuizPage> with SingleTickerProviderStateMixin
     } catch (e) {
       // ignore: avoid_print
       print('❌ Error loading questions: $e');
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
