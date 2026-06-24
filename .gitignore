@@ -128,15 +128,24 @@ firebase-debug.*.log
 
 # Environment variables
 .env
+*.env
 .env.local
 .env.*.local
+
+# Signing keys / keystores
+*.keystore
+*.jks
+
+# Junk / local tooling (do not commit)
+.tmp.driveupload/
+nuget.exe
+nul
 
 # Generated files
 *.g.dart
 *.freezed.dart
 *.config.dart
 **/generated/
-lib/generated_plugin_registrant.dart
 .flutter-plugins-dependencies
 
 # Localization

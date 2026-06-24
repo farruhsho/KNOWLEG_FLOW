@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/components.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -19,22 +20,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
       title: 'Подготовка к ОРТ',
       description:
           'Проходите практические тесты и осваивайте все предметы для экзамена ОРТ',
-      icon: Icons.school,
-      color: AppColors.primary,
+      icon: Icons.menu_book_outlined,
     ),
     OnboardingContent(
       title: 'Отслеживайте прогресс',
       description:
           'Следите за своими результатами и выявляйте слабые места для улучшения',
-      icon: Icons.analytics,
-      color: AppColors.secondary,
+      icon: Icons.insights_outlined,
     ),
     OnboardingContent(
       title: 'Пробные экзамены',
       description:
           'Проходите полные симуляции с реальным форматом и временем ОРТ',
-      icon: Icons.assignment,
-      color: AppColors.accent,
+      icon: Icons.assignment_outlined,
     ),
   ];
 
@@ -109,19 +107,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
 
             // Next/Done button
             Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _nextPage,
-                  child: Text(
-                    _currentPage == _pages.length - 1 ? 'Начать' : 'Далее',
-                  ),
-                ),
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+              child: AppButton(
+                label: _currentPage == _pages.length - 1 ? 'Начать' : 'Далее',
+                icon: _currentPage == _pages.length - 1
+                    ? null
+                    : Icons.arrow_forward,
+                onPressed: _nextPage,
               ),
             ),
           ],
@@ -131,37 +127,33 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   Widget _buildPage(OnboardingContent content) {
+    final t = context.tokens;
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 200,
-            height: 200,
+            width: 160,
+            height: 160,
             decoration: BoxDecoration(
-              color: content.color.withOpacity(0.1),
+              color: t.section,
               shape: BoxShape.circle,
+              border: Border.all(color: t.border),
             ),
-            child: Icon(
-              content.icon,
-              size: 100,
-              color: content.color,
-            ),
+            child: Icon(content.icon, size: 64, color: t.accent),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 40),
           Text(
             content.title,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(context).textTheme.displaySmall,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             content.description,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: t.textSecondary,
                 ),
             textAlign: TextAlign.center,
           ),
@@ -171,12 +163,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   Widget _buildDot(int index) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      width: _currentPage == index ? 24 : 8,
+    final t = context.tokens;
+    final selected = _currentPage == index;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      width: selected ? 22 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: _currentPage == index ? AppColors.primary : AppColors.grey300,
+        color: selected ? t.accent : t.border,
         borderRadius: BorderRadius.circular(4),
       ),
     );
@@ -187,12 +183,10 @@ class OnboardingContent {
   final String title;
   final String description;
   final IconData icon;
-  final Color color;
 
   OnboardingContent({
     required this.title,
     required this.description,
     required this.icon,
-    required this.color,
   });
 }

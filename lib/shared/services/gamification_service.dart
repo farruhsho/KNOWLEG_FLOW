@@ -31,7 +31,7 @@ class GamificationService {
       UserGamification gamification;
 
       if (doc.exists) {
-        gamification = UserGamification.fromFirestore(doc.data()!, doc.id);
+        gamification = UserGamification.fromJson(doc.data()!);
       } else {
         // Создаём начальную геймификацию для нового пользователя
         gamification = UserGamification(
@@ -78,7 +78,7 @@ class GamificationService {
       await _firestore
           .collection('user_gamification')
           .doc(gamification.userId)
-          .set(gamification.toFirestore(), SetOptions(merge: true));
+          .set(gamification.toJson(), SetOptions(merge: true));
 
       _cache[gamification.userId] = gamification;
     } catch (e) {
@@ -203,10 +203,11 @@ class GamificationService {
 
     final achievements = await getAllAchievements();
     final userGam = await getUserGamification(userId);
+    final unlockedAchievements = _unlockedAchievementsFor(userId);
 
     return achievements.map((achievement) {
       final currentValue = _getCurrentValueForAchievement(achievement, userGam);
-      final unlocked = _unlockedAchievements.firstWhere(
+      final unlocked = unlockedAchievements.firstWhere(
         (ua) => ua.achievementId == achievement.id,
         orElse: () => UnlockedAchievement(
           achievementId: achievement.id,
@@ -216,7 +217,7 @@ class GamificationService {
       );
 
       final isUnlocked = currentValue >= achievement.targetValue ||
-          _unlockedAchievements.any((ua) => ua.achievementId == achievement.id);
+          unlockedAchievements.any((ua) => ua.achievementId == achievement.id);
 
       return AchievementProgress(
         achievement: achievement,
@@ -251,7 +252,7 @@ class GamificationService {
       if (doc.exists && doc.data() != null) {
         final data = doc.data()!;
         quests = (data['quests'] as List)
-            .map((q) => DailyQuest.fromMap(q as Map<String, dynamic>))
+            .map((q) => DailyQuest.fromJson(q as Map<String, dynamic>))
             .toList();
       } else {
         // Генерируем новые квесты
@@ -279,7 +280,7 @@ class GamificationService {
           .set({
         'userId': userId,
         'date': todayKey,
-        'quests': quests.map((q) => q.toMap()).toList(),
+        'quests': quests.map((q) => q.toJson()).toList(),
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -320,6 +321,11 @@ class GamificationService {
 
   // ========== Приватные методы ==========
 
+  /// Список разблокированных достижений пользователя (из кэша в памяти)
+  List<UnlockedAchievement> _unlockedAchievementsFor(String userId) {
+    return _achievementsCache.putIfAbsent(userId, () => <UnlockedAchievement>[]);
+  }
+
   /// Расчёт XP для уровня
   int _calculateXPForLevel(int level) {
     // Экспоненциальная формула: 100 * 1.5^(level-1)
@@ -330,18 +336,19 @@ class GamificationService {
   Future<List<Achievement>> _checkAchievements(String userId) async {
     final userGam = await getUserGamification(userId);
     final achievements = await getAllAchievements();
+    final unlockedAchievements = _unlockedAchievementsFor(userId);
     final newlyUnlocked = <Achievement>[];
 
     for (final achievement in achievements) {
       // Пропустить уже разблокированные
-      if (_unlockedAchievements.any((ua) => ua.achievementId == achievement.id)) {
+      if (unlockedAchievements.any((ua) => ua.achievementId == achievement.id)) {
         continue;
       }
 
       final currentValue = _getCurrentValueForAchievement(achievement, userGam);
 
       if (currentValue >= achievement.targetValue) {
-        _unlockedAchievements.add(UnlockedAchievement(
+        unlockedAchievements.add(UnlockedAchievement(
           achievementId: achievement.id,
           unlockedAt: DateTime.now(),
           currentValue: currentValue,

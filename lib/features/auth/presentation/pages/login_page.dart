@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/theme/components.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -71,54 +73,56 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 48),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 40),
 
-                // Logo
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.school,
-                    size: 50,
-                    color: AppColors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Title
-                Text(
-                  'Добро пожаловать',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    // Logo
+                    Center(
+                      child: Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: t.accent,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Icon(
+                          Icons.school_outlined,
+                          size: 36,
+                          color: AppColors.white,
+                        ),
                       ),
-                  textAlign: TextAlign.center,
-                ),
+                    ),
 
-                const SizedBox(height: 8),
+                    const SizedBox(height: 28),
 
-                Text(
-                  'Войдите в свой аккаунт',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
+                    // Title
+                    Text(
+                      'С возвращением',
+                      style: Theme.of(context).textTheme.displaySmall,
+                      textAlign: TextAlign.center,
+                    ),
 
-                const SizedBox(height: 48),
+                    const SizedBox(height: 6),
+
+                    Text(
+                      'Войдите, чтобы продолжить подготовку',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: 36),
 
                 // Email field
                 TextFormField(
@@ -190,15 +194,10 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 24),
 
                 // Login button
-                ElevatedButton(
+                AppButton(
+                  label: 'Войти',
+                  isLoading: _isLoading,
                   onPressed: _isLoading ? null : _handleLogin,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Войти'),
                 ),
 
                 const SizedBox(height: 24),
@@ -206,54 +205,61 @@ class _LoginPageState extends State<LoginPage> {
                 // Divider
                 Row(
                   children: [
-                    const Expanded(child: Divider()),
+                    Expanded(child: Divider(color: t.border)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'или',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
-                    const Expanded(child: Divider()),
+                    Expanded(child: Divider(color: t.border)),
                   ],
                 ),
 
                 const SizedBox(height: 24),
 
                 // Google sign in
-                OutlinedButton.icon(
+                AppButton(
+                  label: 'Войти через Google',
+                  icon: Icons.g_mobiledata,
+                  variant: AppButtonVariant.secondary,
                   onPressed: _isLoading ? null : _handleGoogleSignIn,
-                  icon: const Icon(Icons.g_mobiledata, size: 28),
-                  label: const Text('Войти через Google'),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Phone sign in
-                OutlinedButton.icon(
+                AppButton(
+                  label: 'Войти через телефон',
+                  icon: Icons.phone_outlined,
+                  variant: AppButtonVariant.secondary,
                   onPressed: _isLoading
                       ? null
                       : () {
                           // TODO: Implement phone sign in
                         },
-                  icon: const Icon(Icons.phone),
-                  label: const Text('Войти через телефон'),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
 
                 // Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Нет аккаунта?'),
+                    Text(
+                      'Нет аккаунта?',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                     TextButton(
                       onPressed: () => context.go(AppRouter.signup),
                       child: const Text('Зарегистрироваться'),
                     ),
                   ],
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),
