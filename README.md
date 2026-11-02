@@ -1,366 +1,184 @@
-# ORT Master KG 🎓
+# ORT Master KG
 
-> Современное приложение для подготовки к Общереспубликанскому Тестированию в Кыргызстане
+Приложение для подготовки к **Общереспубликанскому тестированию (ОРТ / ЖРТ)**
+в Кыргызстане: пробные тесты в официальной структуре ОРТ, разбор ошибок,
+практика по темам, уроки, AI-репетитор и геймификация. Интерфейс и контент —
+на кыргызском и русском (английский интерфейс — для разработки).
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.16+-blue.svg)](https://flutter.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-Latest-orange.svg)](https://firebase.google.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+> **Статус (2026-11-02):** проект в активной модернизации, в Google Play не
+> опубликован. Технический аудит текущего кода и список того, что сломано и
+> что исправляется, — в [`docs/modernization/AUDIT_REPORT.md`](docs/modernization/AUDIT_REPORT.md).
+> Результат приложения — **учебный**, это не официальный балл ОРТ;
+> приложение не связано с ЦООМО и не гарантирует поступление.
 
-![ORT Master KG Banner](docs/assets/banner.png)
+## Что делает продукт
 
-## 📋 Содержание
+- **Пробные экзамены по версионируемым blueprints** — основной тест (150
+  заданий, 215 минут: математика, аналогии и дополнение предложений, чтение и
+  понимание, практическая грамматика), 8 предметных тестов и тест по
+  государственному языку; разделы только вперёд, время раздела задаёт сервер.
+  Структура сверена с брошюрой ЦООМО 2026 — [`ORT_SPEC.md`](docs/modernization/ORT_SPEC.md).
+- **Монетизация кредитами:** первый полный пробник бесплатно (один раз на
+  аккаунт, проверяет сервер), каждый следующий — 1 кредит. Режим сборки
+  `BILLING_MODE=play|external` — см. [`BUSINESS_MODEL.md`](docs/modernization/BUSINESS_MODEL.md).
+- **Разбор и повторение:** результат по разделам и темам, очередь «Ошибки и
+  повторение» (интервалы 1 → 3 → 7 → 14 → 30 дней).
+- **AI-репетитор** через серверную функцию: объясняет ход решения, дневной
+  лимит, недоступен по вопросам активной попытки.
+- **Геймификация:** серверные XP, уровни, серии (по времени Бишкека),
+  достижения, рейтинги.
+- **Админка с ролями** (`super_admin`, `content_manager`, `methodologist`,
+  `moderator`, `support`) и CMS вопросов и вариантов со статусами проверки.
 
-- [О Проекте](#о-проекте)
-- [Возможности](#возможности)
-- [Скриншоты](#скриншоты)
-- [Установка](#установка)
-- [Использование](#использование)
-- [Архитектура](#архитектура)
-- [Документация](#документация)
-- [Разработка](#разработка)
-- [Тестирование](#тестирование)
-- [Развертывание](#развертывание)
-- [Вклад](#вклад)
-- [Лицензия](#лицензия)
+Перечисленное — целевое состояние, которое **реализуется в ветке
+модернизации**; что уже работает в коде, а что нет, — в аудите.
 
-## 🎯 О Проекте
+## Архитектура
 
-**ORT Master KG** - это комплексное мобильное приложение для эффективной подготовки к Общереспубликанскому Тестированию (ОРТ) в Кыргызстане. Приложение предоставляет современные инструменты для обучения, аналитики прогресса и персонализированных рекомендаций.
-
-### Ключевые Особенности
-
-- 🎓 **Соответствие ОРТ**: Полное соответствие формату и требованиям ОРТ
-- 📊 **AI Аналитика**: Умный прогноз баллов и персональные рекомендации
-- 🌐 **Многоязычность**: Поддержка русского, кыргызского и английского языков
-- 📱 **Оффлайн Режим**: Работа без интернета с автоматической синхронизацией
-- 🎮 **Геймификация**: Система уровней, достижений и ежедневных миссий
-
-## ✨ Возможности
-
-### Для Студентов
-
-#### 📚 Обширная База Вопросов
-- Тысячи вопросов по всем предметам ОРТ
-- Математика, логика, грамматика, чтение
-- Регулярные обновления контента
-
-#### 📊 Умная Аналитика
-- Графики прогресса в реальном времени
-- AI прогноз вашего балла ОРТ
-- Анализ слабых мест
-- Персональные рекомендации
-
-#### 🎮 Геймификация
-- Система уровней (Новичок → Средний → Эксперт)
-- Ежедневные миссии с наградами
-- Стрики и достижения
-- XP и прогресс
-
-#### 📖 Справочник
-- Математические формулы
-- Правила грамматики
-- Логические приемы
-- Стратегии чтения
-- Полнотекстовый поиск
-
-#### 🌐 Многоязычность
-- Русский интерфейс
-- Кыргызский интерфейс
-- Английский интерфейс
-- Переключение на лету
-
-#### 📱 Оффлайн Режим
-- Работа без интернета
-- Локальное хранилище (Hive)
-- Автоматическая синхронизация
-- Индикаторы статуса
-
-### Для Администраторов
-
-#### 🔐 Контроль Доступа
-- Роли: SuperAdmin, Admin, Moderator
-- 9 гранулярных разрешений
-- AdminGuard для защиты маршрутов
-
-#### 📝 Управление Контентом
-- CRUD для вопросов
-- CRUD для миссий
-- CRUD для уроков
-- CRUD для предметов
-
-#### 🤖 AI Инструменты
-- Обнаружение дубликатов (>85%)
-- Генерация вопросов
-- Анализ сложности
-
-#### 📊 Аналитика
-- Статистика пользователей
-- Отчеты по тестам
-- Мониторинг активности
-
-## 📸 Скриншоты
-
-<table>
-  <tr>
-    <td><img src="docs/screenshots/dashboard.png" alt="Dashboard" width="200"/></td>
-    <td><img src="docs/screenshots/quiz.png" alt="Quiz" width="200"/></td>
-    <td><img src="docs/screenshots/profile.png" alt="Profile" width="200"/></td>
-    <td><img src="docs/screenshots/handbook.png" alt="Handbook" width="200"/></td>
-  </tr>
-  <tr>
-    <td align="center">Главная</td>
-    <td align="center">Тестирование</td>
-    <td align="center">Профиль</td>
-    <td align="center">Справочник</td>
-  </tr>
-</table>
-
-## 🚀 Установка
-
-### Предварительные Требования
-
-- Flutter SDK 3.16+
-- Dart SDK 3.0+
-- Firebase проект
-- Android Studio / Xcode
-
-### Шаги Установки
-
-1. **Клонировать репозиторий**
-```bash
-git clone https://github.com/yourusername/knowledge_flow.git
-cd knowledge_flow
+```text
+Flutter-клиент (Android)                 Cloud Functions (доверенный слой)        Firestore / Storage
+ Riverpod, go_router, Material 3   ──►    examStart / examGetState /          ──►   exam_blueprints, exam_variants
+ tokens.dart + app_theme.dart     callable examSubmitSection / examGetReview          exam_questions*, exam_question_keys*
+ Hive: локальное сохранение       + App   billingVerifyPurchase, billingRtdn,         exam_attempts (+answers, drafts)
+ ответов экзамена                  Check  billingSweepVoided                          entitlements (+ledger), purchases
+ in_app_purchase (режим play)             aiTutor ──► Anthropic API (ключ-секрет)     user_stats, leaderboards, ai_usage
+                                          recordActivity, accountDelete               user_mistakes, config, admin_logs
+                                          admin*: роли, кредиты, публикация,          + существующие: users, subjects,
+                                          цены, AI-черновики вопросов                 lessons, questions, user_progress…
+                                                                                       (* — клиенту недоступны)
 ```
 
-2. **Установить зависимости**
-```bash
-flutter pub get
-```
+- **Сервер — источник истины** для результатов экзаменов, правильных ответов,
+  прав доступа (кредиты), покупок, XP, рейтингов, лимитов AI и ролей.
+  Клиент получает вопросы только текущего раздела и никогда — ответы до
+  завершения попытки.
+- **Структура экзамена — данные:** `assets/data/exam_blueprints.json`
+  (офлайн-резерв) и коллекция `exam_blueprints`; новый год — новый документ.
+- **Ничего не удаляется:** новые коллекции добавляются рядом со старыми,
+  существующие поля и коллекции не переименовываются.
+- **Проект Firebase** — `knowleg-33f36`; регион функций — `europe-west1`
+  (должен совпадать с регионом Firestore).
+- **Ключей и секретов в приложении нет** (ключ Anthropic — секрет функции).
 
-3. **Настроить Firebase**
-- Создайте проект в Firebase Console
-- Скачайте `google-services.json` (Android)
-- Скачайте `GoogleService-Info.plist` (iOS)
-- Поместите файлы в соответствующие директории
+Контракт (коллекции, роли, callable-функции, правила экзамена, оплата, AI):
+[`docs/modernization/ARCHITECTURE.md`](docs/modernization/ARCHITECTURE.md).
+Имена в клиенте: `lib/core/backend/backend_contract.dart`,
+`lib/core/routes/route_paths.dart`.
 
-4. **Запустить приложение**
-```bash
-flutter run
-```
+### Структура репозитория
 
-## 💻 Использование
-
-### Для Пользователей
-
-1. **Регистрация**: Создайте аккаунт с email и паролем
-2. **Выбор Региона**: Укажите ваш регион (один раз в год)
-3. **Прохождение Тестов**: Выберите предмет и начните тестирование
-4. **Отслеживание Прогресса**: Просматривайте графики и AI прогноз
-5. **Использование Справочника**: Ищите формулы и правила
-
-### Для Администраторов
-
-1. **Вход**: Используйте admin credentials
-2. **Управление**: Добавляйте/редактируйте вопросы
-3. **Мониторинг**: Просматривайте статистику
-4. **AI Генерация**: Создавайте вопросы с помощью AI
-
-## 🏗️ Архитектура
-
-### Технологический Стек
-
-**Frontend**:
-- Flutter 3.16+
-- Riverpod (State Management)
-- go_router (Navigation)
-- Material Design 3
-
-**Backend**:
-- Firebase Firestore (Database)
-- Firebase Auth (Authentication)
-- Firebase Storage (File Storage)
-- Firebase Analytics
-
-**Локальное Хранилище**:
-- Hive (Offline Database)
-- SharedPreferences (Settings)
-
-**Библиотеки**:
-- `fl_chart` - Графики
-- `google_fonts` - Шрифты
-- `connectivity_plus` - Мониторинг сети
-- `cloud_firestore` - Firestore
-- `firebase_auth` - Аутентификация
-
-### Структура Проекта
-
-```
+```text
 lib/
-├── core/                 # Основные утилиты
-│   ├── theme/           # Темы и стили
-│   └── utils/           # Утилиты
-├── features/            # Функциональные модули
-│   ├── auth/           # Аутентификация
-│   ├── dashboard/      # Главная страница
-│   ├── quiz/           # Тестирование
-│   ├── profile/        # Профиль
-│   ├── progress/       # Прогресс
-│   ├── handbook/       # Справочник
-│   ├── admin/          # Админ панель
-│   └── settings/       # Настройки
-├── providers/          # Riverpod провайдеры
-├── shared/             # Общие компоненты
-│   ├── models/        # Модели данных
-│   ├── services/      # Сервисы
-│   └── widgets/       # Виджеты
-└── main.dart          # Точка входа
+  core/        backend (контракт), design (токены), theme, routes, network, constants
+  features/    auth, onboarding, dashboard, subjects, lessons, quiz, handbook, progress,
+               profile, settings, gamification, exam, billing, tutor, account, admin, mock_test
+  shared/      модели, сервисы, общие виджеты
+  l10n/        app_en.arb (шаблон), app_ru.arb, app_ky.arb + сгенерированные классы
+assets/data/   exam_blueprints.json, kg_regions.json
+functions/     Cloud Functions (TypeScript, Node.js 22) — см. functions/README.md
+tools/content_pipeline/   генерация blueprints и пайплайн контента
+docs/modernization/       архитектура, аудит, продукт, бизнес, релиз
+docs/legal/               черновики политики конфиденциальности и условий
 ```
 
-## 📚 Документация
+## Запуск для разработки
 
-### Руководства
+**Требования:** Flutter stable с Dart ≥ 3.9.2 (FlutterFire BoM 5.1 требует
+Flutter ≥ 3.27), JDK 17 для сборки Android, Android SDK 36. Для функций —
+Node.js 22; для эмуляторов Firebase — firebase-tools 15+ и JDK 21.
 
-- [Deployment Guide](docs/DEPLOYMENT.md) - Развертывание приложения
-- [Testing Guide](docs/TESTING.md) - Тестирование
-- [Build Optimization](docs/BUILD_OPTIMIZATION.md) - Оптимизация сборки
-- [App Store Guide](docs/APP_STORE_GUIDE.md) - Публикация в магазинах
-- [Project Summary](docs/PROJECT_SUMMARY.md) - Итоговое резюме
+1. Получить `android/app/google-services.json` для проекта `knowleg-33f36`
+   у владельца (файл в `.gitignore`, в git не коммитится).
+2. Установить зависимости и сгенерировать локализацию:
 
-### API Документация
+   ```bash
+   flutter pub get
+   flutter gen-l10n
+   ```
 
-Документация API доступна в [API.md](docs/API.md)
+3. Запустить:
 
-## 🛠️ Разработка
+   ```bash
+   # без покупок в приложении (кредиты покупаются вне приложения)
+   flutter run --dart-define=BILLING_MODE=external
 
-### Настройка Окружения
+   # с Google Play Billing (нужен продавец в Play Console, лицензионный тестировщик)
+   flutter run --dart-define=BILLING_MODE=play
+   ```
 
-1. Установите Flutter SDK
-2. Настройте IDE (VS Code / Android Studio)
-3. Установите Firebase CLI
-4. Клонируйте репозиторий
+4. **App Check в debug-сборке.** Функции требуют App Check
+   (`enforceAppCheck`). В debug приложение использует debug-провайдер: при
+   первом запуске в logcat появится строка `DebugAppCheckProvider` с
+   debug-секретом — добавьте его в Firebase Console → App Check → Приложения →
+   «Управление debug-токенами». Можно задать фиксированный токен через
+   `--dart-define=APP_CHECK_DEBUG_TOKEN=<uuid>` (имя параметра сверить с
+   `lib/main.dart` после слияния ветки). Debug-токены и debug-сборки в магазин
+   не попадают.
 
-### Запуск в Development
-
-```bash
-# Android
-flutter run -d android
-
-# iOS
-flutter run -d ios
-
-# Web
-flutter run -d chrome
-```
-
-### Горячая Перезагрузка
-
-Нажмите `r` в терминале для hot reload
-
-### Анализ Кода
+Проверки:
 
 ```bash
-flutter analyze
-```
-
-## 🧪 Тестирование
-
-### Unit Tests
-
-```bash
+dart analyze lib test
 flutter test
 ```
 
-### Integration Tests
+## Бэкенд, контент, релиз
 
-```bash
-flutter test integration_test/
-```
+- **Cloud Functions и правила:** [`functions/README.md`](functions/README.md) —
+  локальная разработка, эмуляторы, секреты (`ANTHROPIC_API_KEY`), деплой.
+  Деплой выполняет только владелец проекта.
+- **Контент-пайплайн:** [`docs/modernization/CONTENT_PIPELINE.md`](docs/modernization/CONTENT_PIPELINE.md)
+  и `tools/content_pipeline/`. Вариант публикуется, только если все его
+  вопросы одобрены методистом.
+- **Выпуск в Google Play:** [`docs/modernization/PLAY_RELEASE_CHECKLIST.md`](docs/modernization/PLAY_RELEASE_CHECKLIST.md).
+  Сборка AAB:
 
-### Widget Tests
+  ```bash
+  flutter build appbundle --release --build-number=<N> \
+    --dart-define=BILLING_MODE=external \
+    --obfuscate --split-debug-info=build/symbols
+  ```
 
-```bash
-flutter test test/widget_test.dart
-```
+  Без `android/key.properties` release подписывается debug-ключом — такую
+  сборку загружать нельзя. `applicationId` пока шаблонный
+  (`com.example.knowledge_flow`) и должен быть изменён до первой загрузки.
 
-### Coverage
+## Доступ администратора
 
-```bash
-flutter test --coverage
-genhtml coverage/lcov.info -o coverage/html
-```
+Сейчас вход в админку проверяет `users/{uid}.role == 'admin'` (гейт роутера
+`adminVerified`). По контракту модернизации (реализуется в ветке) права
+определяются custom claim `role` в Firebase Auth, а старое `role == 'admin'`
+считается `super_admin`; роли назначает `super_admin` через функцию
+`adminSetRole`. В обоих случаях клиент никогда не пишет роль, и
+самостоятельной регистрации администраторов нет.
 
-## 🚢 Развертывание
+## Документация
 
-### Android
+| Документ | О чём |
+|---|---|
+| [ARCHITECTURE.md](docs/modernization/ARCHITECTURE.md) | контракт: коллекции, роли, функции, экзамен, оплата, AI |
+| [AUDIT_REPORT.md](docs/modernization/AUDIT_REPORT.md) | технический аудит: карта проекта, статус функций, 187 находок, что сохраняем, что исправляется |
+| [ORT_SPEC.md](docs/modernization/ORT_SPEC.md) | официальная структура ОРТ 2026, баллы, пороги, календарь, модель в приложении |
+| [CONTENT_PIPELINE.md](docs/modernization/CONTENT_PIPELINE.md) | производство и проверка контента |
+| [COMPETITORS.md](docs/modernization/COMPETITORS.md) | конкуренты и наше отличие |
+| [BUSINESS_MODEL.md](docs/modernization/BUSINESS_MODEL.md) | монетизация, блокер продавца Google Play, юнит-экономика |
+| [GO_TO_MARKET.md](docs/modernization/GO_TO_MARKET.md) | каналы, сезонность, рефералы, метрики, честный маркетинг |
+| [ASO_LISTING.md](docs/modernization/ASO_LISTING.md) | тексты листинга Google Play на ru и ky, скриншоты |
+| [PLAY_RELEASE_CHECKLIST.md](docs/modernization/PLAY_RELEASE_CHECKLIST.md) | всё для выпуска в Google Play |
+| [DATA_SAFETY.md](docs/modernization/DATA_SAFETY.md) | ответы для формы Data safety |
+| [UX_DESIGN_SYSTEM.md](docs/modernization/UX_DESIGN_SYSTEM.md) | дизайн-система, карта 23 экранов, этика геймификации |
+| [ROADMAP.md](docs/modernization/ROADMAP.md) | фазы после ветки, риски, решения владельца |
+| [docs/legal/](docs/legal/) | черновики политики конфиденциальности (ru, ky), условий использования и страницы удаления аккаунта — требуют проверки юристом |
+| [CTO_AUDIT_REPORT.md](CTO_AUDIT_REPORT.md) | предыдущий аудит (2026-06-17) |
 
-```bash
-# APK
-flutter build apk --release
+Документы в корне `docs/` (`PRODUCT_VISION.md`, `TECHNICAL_SPEC.md`,
+`PROJECT_SUMMARY.md`, `TESTING_REPORT.md`, `BUILD_OPTIMIZATION.md`,
+`NEXT_STEPS.md`, `PHASE_9_LEGAL_GUIDE.md` и др.) — **устаревшие**: часть
+утверждений в них не соответствует коду (DOC-01). Актуальная документация —
+в `docs/modernization/`.
 
-# App Bundle (рекомендуется)
-flutter build appbundle --release
-```
+## Лицензия и контакты
 
-### iOS
-
-```bash
-flutter build ios --release
-```
-
-### Web
-
-```bash
-flutter build web --release
-firebase deploy --only hosting
-```
-
-## 🤝 Вклад
-
-Мы приветствуем вклад в проект! Пожалуйста, следуйте этим шагам:
-
-1. Fork репозитория
-2. Создайте feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit изменения (`git commit -m 'Add some AmazingFeature'`)
-4. Push в branch (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
-
-### Coding Standards
-
-- Следуйте [Effective Dart](https://dart.dev/guides/language/effective-dart)
-- Используйте `flutter analyze` перед commit
-- Пишите тесты для новых функций
-- Документируйте публичные API
-
-## 📊 Статистика Проекта
-
-- **Фазы Завершено**: 9 из 13 (69%)
-- **Файлов Создано**: 22+
-- **Функций**: 50+
-- **Размер Приложения**: ~25-30 MB
-- **Поддерживаемые Платформы**: Android 8+, iOS 12+
-
-## 📝 Лицензия
-
-Этот проект лицензирован под MIT License - см. [LICENSE](LICENSE) для деталей.
-
-## 👥 Авторы
-
-- **Разработка**: ORT Master Team
-- **Дизайн**: UI/UX Team
-- **Контент**: Educational Content Team
-
-## 📞 Контакты
-
-- **Email**: support@ortmaster.kg
-- **Website**: https://ortmaster.kg
-- **Telegram**: @ortmaster_kg
-
-## 🙏 Благодарности
-
-- Flutter Team за отличный фреймворк
-- Firebase за backend инфраструктуру
-- Сообщество разработчиков за поддержку
-
----
-
-**Сделано с ❤️ для студентов Кыргызстана**
+Файла лицензии в репозитории нет; условия использования кода определяет
+владелец проекта. Контакты поддержки будут указаны при публикации
+(`[support@домен]`).
