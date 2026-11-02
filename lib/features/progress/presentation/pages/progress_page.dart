@@ -22,8 +22,6 @@ class _ProgressPageState extends ConsumerState<ProgressPage>
   UserProgressModel? _progress;
   bool _isLoading = true;
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
 
   @override
   void initState() {
@@ -31,18 +29,6 @@ class _ProgressPageState extends ConsumerState<ProgressPage>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
-    );
-    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
-      ),
     );
     _loadProgress();
   }

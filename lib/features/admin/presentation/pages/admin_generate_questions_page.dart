@@ -213,7 +213,8 @@ class _AdminGenerateQuestionsPageState extends State<AdminGenerateQuestionsPage>
       final question = QuestionModel(
         id: '${subject.id}_q${i + 1}_${createdAt.millisecondsSinceEpoch}',
         subjectId: subject.id,
-        type: 'mcq',
+        sectionId: 'general',
+        type: QuestionType.singleChoice,
         difficulty: difficulty,
         stem: _generateQuestionStem(subject.id, i + 1),
         options: _generateOptions(subject.id, i + 1),
@@ -225,6 +226,7 @@ class _AdminGenerateQuestionsPageState extends State<AdminGenerateQuestionsPage>
         tags: [subject.id, 'sample', 'difficulty_$difficulty'],
         createdBy: _adminService.currentAdminEmail ?? 'admin',
         createdAt: createdAt,
+        updatedAt: createdAt,
       );
 
       questions.add(question);

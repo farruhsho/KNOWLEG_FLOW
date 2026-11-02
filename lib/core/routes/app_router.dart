@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'admin_session.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
@@ -12,7 +13,6 @@ import '../../features/mock_test/presentation/pages/mock_test_page.dart';
 import '../../features/lessons/presentation/pages/lesson_page.dart';
 import '../../features/gamification/presentation/pages/achievements_page.dart';
 import '../../features/admin/presentation/pages/admin_login_page.dart';
-import '../../features/admin/presentation/pages/admin_registration_page.dart';
 import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../../features/admin/presentation/pages/admin_generate_questions_page.dart';
 import '../../features/handbook/presentation/pages/handbook_content_page.dart';
@@ -89,7 +89,6 @@ class AppRouter {
   static const String achievements = '/achievements';
   static const String handbookDetail = '/handbook/:categoryId';
   static const String adminLogin = '/admin/login';
-  static const String adminRegister = '/admin/register';
   static const String adminDashboard = '/admin/dashboard';
   static const String adminGenerateQuestions = '/admin/generate-questions';
 
@@ -97,15 +96,20 @@ class AppRouter {
     return GoRouter(
       initialLocation: splash,
       debugLogDiagnostics: true,
-      // SEC-003: block deep-links into the admin area for unauthenticated users.
-      // Full role-based gating belongs in Firebase Auth custom claims — see
-      // CTO_AUDIT_REPORT.md (§3 SEC-003 / §11.3).
+      // Re-evaluate redirects whenever the verified-admin session changes
+      // (set on admin login, cleared on sign-out).
+      refreshListenable: adminVerified,
+      // SEC-003: gate the entire admin area. A user may enter /admin/* only when
+      // signed in AND verified as an admin (role == 'admin', checked against
+      // /users/{uid} in AdminLoginPage and cached in [adminVerified]). Deep-links
+      // by unauthenticated or non-admin users are bounced to the admin login.
+      // Long-term target is Firebase Auth custom claims — CTO_AUDIT_REPORT §11.3.
       redirect: (context, state) {
         final path = state.uri.path;
-        final goingAdmin = path.startsWith('/admin') &&
-            path != adminLogin &&
-            path != adminRegister;
-        if (goingAdmin && FirebaseAuth.instance.currentUser == null) {
+        final goingAdmin = path.startsWith('/admin') && path != adminLogin;
+        if (!goingAdmin) return null;
+        final isAuthed = FirebaseAuth.instance.currentUser != null;
+        if (!isAuthed || !adminVerified.value) {
           return adminLogin;
         }
         return null;
@@ -248,15 +252,6 @@ class AppRouter {
           pageBuilder: (context, state) {
             return _buildPageWithFadeTransition(
               child: const AdminLoginPage(),
-              state: state,
-            );
-          },
-        ),
-        GoRoute(
-          path: adminRegister,
-          pageBuilder: (context, state) {
-            return _buildPageWithFadeTransition(
-              child: const AdminRegistrationPage(),
               state: state,
             );
           },

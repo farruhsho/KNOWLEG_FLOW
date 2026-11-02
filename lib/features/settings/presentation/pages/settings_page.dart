@@ -228,7 +228,7 @@ class SettingsPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.done ?? 'Готово'),
+            child: Text(l10n.done),
           ),
         ],
       ),

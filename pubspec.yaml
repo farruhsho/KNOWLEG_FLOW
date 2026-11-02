@@ -64,7 +64,7 @@ dependencies:
   url_launcher: ^6.3.1
   image_picker: ^1.1.2
   permission_handler: ^11.3.1
-  file_picker: ^6.1.1
+  file_picker: ^8.0.0
   csv: ^5.1.1
 
   # Navigation

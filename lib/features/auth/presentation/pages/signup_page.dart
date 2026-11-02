@@ -5,9 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../providers/auth_provider.dart';
-import '../../../../shared/services/admin_service.dart';
-
-enum UserRole { client, admin }
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
@@ -22,12 +19,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _adminService = AdminService();
   
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
-  UserRole _selectedRole = UserRole.client;
 
   @override
   void dispose() {
@@ -44,49 +39,24 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     setState(() => _isLoading = true);
 
     try {
-      if (_selectedRole == UserRole.admin) {
-        // Admin Registration
-        final success = await _adminService.registerAdmin(
-          _emailController.text.trim(),
-          _passwordController.text,
-        );
+      // Public signups are always students. Admin accounts are provisioned
+      // server-side (role written in Firestore), never self-registered here
+      // (SEC-004 — see CTO_AUDIT_REPORT.md §3).
+      final authService = ref.read(authServiceProvider);
+      await authService.signUpWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        name: _nameController.text.trim(),
+      );
 
-        if (mounted) {
-          if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Администратор успешно зарегистрирован!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            context.go(AppRouter.adminDashboard);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Администратор с таким email уже существует'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      } else {
-        // Client Registration
-        final authService = ref.read(authServiceProvider);
-        await authService.signUpWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-          name: _nameController.text.trim(),
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Регистрация успешна!'),
+            backgroundColor: Colors.green,
+          ),
         );
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Регистрация успешна!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          context.go(AppRouter.dashboard);
-        }
+        context.go(AppRouter.dashboard);
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -173,24 +143,22 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 // (Firebase Auth custom claims), never self-selected on the public
                 // signup form. Public signups are always students.
 
-                // Name field (Only for Client)
-                if (_selectedRole == UserRole.client) ...[
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Имя',
-                      hintText: 'Иван Иванов',
-                      prefixIcon: Icon(Icons.person_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Введите имя';
-                      }
-                      return null;
-                    },
+                // Name field
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Имя',
+                    hintText: 'Иван Иванов',
+                    prefixIcon: Icon(Icons.person_outlined),
                   ),
-                  const SizedBox(height: 16),
-                ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Введите имя';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
 
                 // Email field
                 TextFormField(
@@ -292,9 +260,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(_selectedRole == UserRole.admin 
-                          ? 'Зарегистрировать админа' 
-                          : 'Зарегистрироваться'),
+                      : const Text('Зарегистрироваться'),
                 ),
 
                 const SizedBox(height: 32),

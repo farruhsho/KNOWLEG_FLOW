@@ -18,6 +18,11 @@ class UserModel extends Equatable {
   final RegionModel? region; // User's geographic location
   final DateTime? regionLastUpdated; // Track region update for yearly restriction
   final String level; // 'beginner', 'intermediate', 'expert'
+  // Authorization role: 'student' (default) | 'admin'. Provisioned server-side
+  // (Firestore console / admin tooling); the client NEVER writes this field — it
+  // is intentionally excluded from toFirestore(). firestore.rules `isAdmin()` and
+  // the router admin-gate both trust this value. See CTO_AUDIT_REPORT.md §3.
+  final String role;
   final List<String> aiRecommendations; // Personalized study suggestions
   final DateTime createdAt;
   final DateTime lastActive;
@@ -38,6 +43,7 @@ class UserModel extends Equatable {
     this.region,
     this.regionLastUpdated,
     this.level = 'beginner',
+    this.role = 'student',
     this.aiRecommendations = const [],
     required this.createdAt,
     required this.lastActive,
@@ -61,6 +67,7 @@ class UserModel extends Equatable {
       region: data['region'] != null ? RegionModel.fromMap(data['region']) : null,
       regionLastUpdated: (data['region_last_updated'] as Timestamp?)?.toDate(),
       level: data['level'] ?? 'beginner',
+      role: data['role'] ?? 'student',
       aiRecommendations: List<String>.from(data['ai_recommendations'] ?? []),
       createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
       lastActive: (data['last_active'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -105,6 +112,7 @@ class UserModel extends Equatable {
     RegionModel? region,
     DateTime? regionLastUpdated,
     String? level,
+    String? role,
     List<String>? aiRecommendations,
     DateTime? createdAt,
     DateTime? lastActive,
@@ -125,6 +133,7 @@ class UserModel extends Equatable {
       region: region ?? this.region,
       regionLastUpdated: regionLastUpdated ?? this.regionLastUpdated,
       level: level ?? this.level,
+      role: role ?? this.role,
       aiRecommendations: aiRecommendations ?? this.aiRecommendations,
       createdAt: createdAt ?? this.createdAt,
       lastActive: lastActive ?? this.lastActive,
@@ -155,6 +164,7 @@ class UserModel extends Equatable {
         region,
         regionLastUpdated,
         level,
+        role,
         aiRecommendations,
         createdAt,
         lastActive,

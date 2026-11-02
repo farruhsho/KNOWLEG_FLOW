@@ -370,7 +370,8 @@ class FirebaseDataService {
         QuestionModel(
           id: 'question-${i + 1}',
           subjectId: subjectId ?? 'math',
-          type: 'mcq',
+          sectionId: 'general',
+          type: QuestionType.singleChoice,
           difficulty: (i % 5) + 1,
           stem: {
             'ru': 'Вопрос ${i + 1}: Сколько будет ${i + 1} + ${i + 1}?',
@@ -420,6 +421,7 @@ class FirebaseDataService {
           tags: ['arithmetic', 'basic'],
           createdBy: 'admin',
           createdAt: now,
+          updatedAt: now,
         ),
       );
     }

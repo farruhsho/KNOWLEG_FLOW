@@ -1,58 +1,37 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/subject_model.dart';
 import '../models/question_model.dart';
 import '../models/mock_test_model.dart';
 
-/// Сервис управления для администраторов
+/// In-memory content scratchpad used by the admin "generate questions" screen.
+///
+/// SECURITY (CQ-01): this class previously held hard-coded plaintext admin
+/// passwords (`admin@ort.kg / admin123`) and a `registerAdmin` self-service that
+/// let anyone mint an admin at runtime. All of that was removed. Admin
+/// authentication now goes exclusively through Firebase Auth, and authorization
+/// (the admin role) is enforced by the router role-gate ([adminVerified] /
+/// AdminLoginPage) and by `firestore.rules` `isAdmin()`.
+///
+/// NOTE: the create/update/delete methods below still mutate in-memory maps and
+/// do NOT persist to Firestore — they are dev tooling. Wiring the admin UI to the
+/// real Firestore `AdminService` (features/admin/services) is tracked separately.
 class AdminService {
   static final AdminService _instance = AdminService._internal();
   factory AdminService() => _instance;
   AdminService._internal();
 
-  // Простая авторизация админа (в продакшн использовать Firebase Auth с custom claims)
-  final Map<String, String> _adminCredentials = {
-    'admin@ort.kg': 'admin123',
-    'superadmin@ort.kg': 'super123',
-  };
-
-  String? _currentAdminEmail;
-
-  // Временное хранилище данных
+  // In-memory data store (non-persistent — see class doc).
   final Map<String, SubjectModel> _subjects = {};
   final Map<String, QuestionModel> _questions = {};
   final Map<String, MockTestModel> _mockTests = {};
 
-  bool get isAdminLoggedIn => _currentAdminEmail != null;
-  String? get currentAdminEmail => _currentAdminEmail;
+  /// True when a Firebase user is signed in. Authorization (admin role) is
+  /// enforced by the router redirect, not here.
+  bool get isAdminLoggedIn => FirebaseAuth.instance.currentUser != null;
 
-  /// Вход администратора
-  Future<bool> loginAdmin(String email, String password) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    if (_adminCredentials[email] == password) {
-      _currentAdminEmail = email;
-      return true;
-    }
-    return false;
-  }
-
-  /// Регистрация нового администратора
-  Future<bool> registerAdmin(String email, String password) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    if (_adminCredentials.containsKey(email)) {
-      return false; // Уже существует
-    }
-    
-    _adminCredentials[email] = password;
-    _currentAdminEmail = email;
-    return true;
-  }
-
-  /// Выход администратора
-  Future<void> logoutAdmin() async {
-    _currentAdminEmail = null;
-  }
+  /// Email of the signed-in Firebase user (used for `createdBy` attribution).
+  String? get currentAdminEmail => FirebaseAuth.instance.currentUser?.email;
 
   // ==================== УПРАВЛЕНИЕ ПРЕДМЕТАМИ ====================
 

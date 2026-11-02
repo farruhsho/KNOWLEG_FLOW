@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../core/network/firebase_service.dart';
+import '../core/routes/admin_session.dart';
 import '../shared/models/user_model.dart';
 
 /// Provider for the current Firebase user
@@ -186,6 +187,8 @@ class AuthService {
 
   /// Sign out
   Future<void> signOut() async {
+    // Drop any verified-admin session so /admin/* re-gates after sign-out.
+    adminVerified.value = false;
     await _googleSignIn.signOut();
     await _auth.signOut();
   }

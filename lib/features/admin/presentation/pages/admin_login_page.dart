@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/routes/admin_session.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/admin_colors.dart';
 import '../../../../core/theme/admin_typography.dart';
@@ -76,13 +78,31 @@ class _AdminLoginPageState extends ConsumerState<AdminLoginPage>
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.signInWithEmailAndPassword(
+      final credential = await authService.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      // TODO: Check if user has admin role
-      // For now, redirect to admin dashboard
+      // SEC-003: only grant admin access if the account actually carries the
+      // admin role. Role lives in /users/{uid}.role — the same field
+      // firestore.rules trusts. No custom-claims backend yet (CTO_AUDIT §11.3),
+      // so we verify here and cache the result in [adminVerified] for the router.
+      final uid = credential.user?.uid;
+      final doc = uid == null
+          ? null
+          : await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final role = (doc?.data()?['role'] ?? 'student') as String;
+
+      if (role != 'admin') {
+        await authService.signOut();
+        adminVerified.value = false;
+        if (mounted) {
+          _showError('Доступ запрещён: этот аккаунт не является администратором');
+        }
+        return;
+      }
+
+      adminVerified.value = true;
       if (mounted) {
         context.go(AppRouter.adminDashboard);
       }

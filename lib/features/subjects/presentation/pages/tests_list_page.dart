@@ -420,14 +420,6 @@ class _TestsListPageState extends State<TestsListPage> {
     );
   }
 
-  Color _getDifficultyColor(String? difficulty) {
-    // OrtTestModel doesn't have difficulty field, use default color
-    return AppColors.primary;
-  }
 
-  String _getDifficultyText(String? difficulty) {
-    // OrtTestModel doesn't have difficulty field, return empty string
-    return '';
-  }
 }
 

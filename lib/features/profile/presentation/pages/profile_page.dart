@@ -8,13 +8,11 @@ import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/locale_provider.dart';
-import '../../../../providers/language_provider.dart';
 import '../../../../shared/services/gamification_service.dart';
 import '../../../../shared/models/gamification_models.dart';
 import '../../../../shared/models/user_model.dart';
 import '../../../../shared/models/user_progress_model.dart';
 import '../../../../shared/services/firebase_data_service.dart';
-import '../../../../shared/widgets/glass_container.dart';
 import '../../../../shared/widgets/language_toggle_widget.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
