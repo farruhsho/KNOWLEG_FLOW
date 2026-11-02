@@ -43,6 +43,21 @@
 | `config/pricing` | любой вошедший | нет | super_admin (через функцию) |
 | `config/ai_tutor` | нет | нет | super_admin (через функцию) |
 | `admin_logs/{logId}` | super_admin, support | нет | функции |
+| `user_mistakes/{uid}/items/{questionId}` | владелец | владелец (только practice-записи) | клиент (практика), функции (экзамен) |
+
+`user_mistakes/{uid}/items/{questionId}` — очередь «Ошибки и повторение»:
+`{question_id, source: practice|exam, subject_id, section_id, topic_id,
+wrong_count, last_wrong_at, next_review_at, interval_days, resolved: bool,
+attempt_id?}`. Клиент может писать только документы с `source == 'practice'`
+(id вопроса из коллекции `questions`); записи `source == 'exam'` пишет
+`examSubmitSection` при завершении попытки (без правильного ответа — его клиент
+получает через `examGetReview`). Повторение по интервалам 1 → 3 → 7 → 14 → 30
+дней (`AppConstants.srsIntervals`).
+
+Storage: `exam_media/{questionId}/{file}` и `lesson_media/{lessonId}/{file}` —
+запись только для контент-ролей (custom claim `role` ∈ super_admin,
+content_manager, methodologist), изображения ≤ 5 МБ, PDF ≤ 20 МБ, видео ≤ 200 МБ;
+чтение — вошедшим пользователям.
 
 ### 1.1 `exam_blueprints/{blueprintId}`
 

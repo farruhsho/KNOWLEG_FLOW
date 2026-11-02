@@ -72,6 +72,8 @@ abstract final class Collections {
   static const aiUsage = 'ai_usage';
   static const config = 'config';
   static const adminLogs = 'admin_logs';
+  static const userMistakes = 'user_mistakes';
+  static const userMistakeItems = 'items'; // sub-collection of user_mistakes
 }
 
 /// Google Play product ids (consumables). Credits per product live
