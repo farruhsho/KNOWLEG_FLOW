@@ -54,12 +54,17 @@ void main() async {
   );
 }
 
+/// The router must be created exactly once. Re-creating it inside build()
+/// (as before) reset the whole navigation stack to the splash screen every
+/// time the locale or theme changed.
+final appRouterProvider = Provider((ref) => AppRouter.createRouter());
+
 class OrtMasterApp extends ConsumerWidget {
   const OrtMasterApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = AppRouter.createRouter();
+    final router = ref.watch(appRouterProvider);
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeProvider);
 
