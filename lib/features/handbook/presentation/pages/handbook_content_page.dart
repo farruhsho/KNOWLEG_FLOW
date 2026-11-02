@@ -1,321 +1,141 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../data/handbook_data.dart';
 
-/// Handbook content viewer page
-class HandbookContentPage extends StatelessWidget {
+import '../../../../core/design/tokens.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../core/utils/content_locale.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/widgets/error_view.dart';
+import '../../../../shared/widgets/math_markdown.dart';
+import '../../data/handbook_data.dart';
+import '../../data/ort_structure.dart';
+
+/// Handbook content viewer. Markdown + LaTeX is rendered properly (CMS-27);
+/// the ORT structure and scoring sections come from the verified blueprint
+/// asset (CMS-08). The fake bookmark button is gone.
+class HandbookContentPage extends StatefulWidget {
   final String categoryId;
-  
+
   const HandbookContentPage({
     super.key,
     required this.categoryId,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final content = HandbookData.getContentForCategory(categoryId);
-    final categoryColor = _getCategoryColor(categoryId);
-    
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 200.0,
-            floating: false,
-            pinned: true,
-            backgroundColor: categoryColor,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                content['title'] as String,
-                style: GoogleFonts.outfit(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      categoryColor,
-                      categoryColor.withValues(alpha: 0.7),
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: -50,
-                      top: -50,
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: -30,
-                      bottom: -30,
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.bookmark_border, color: Colors.white),
-                onPressed: () {
-                  // TODO: Implement bookmark
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Закладка добавлена'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(20),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                ...(content['sections'] as List<Map<String, dynamic>>).map((section) {
-                  return _buildSectionCard(
-                    context,
-                    section['title'] as String,
-                    section['content'] as String,
-                    categoryColor,
-                  );
-                }),
-                const SizedBox(height: 20),
-                _buildQuickNavigationCard(context, categoryColor),
-                const SizedBox(height: 80),
-              ]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<HandbookContentPage> createState() => _HandbookContentPageState();
+}
 
-  Widget _buildSectionCard(
-    BuildContext context,
-    String title,
-    String content,
-    Color categoryColor,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.grey200.withValues(alpha: 0.5),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: categoryColor.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: categoryColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.lightbulb_outline,
-                    color: categoryColor,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              content,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                height: 1.6,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+class _HandbookContentPageState extends State<HandbookContentPage> {
+  Future<OrtStructureFacts>? _facts;
 
-  Widget _buildQuickNavigationCard(BuildContext context, Color categoryColor) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            categoryColor.withValues(alpha: 0.1),
-            categoryColor.withValues(alpha: 0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: categoryColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.rocket_launch, color: categoryColor, size: 28),
-              const SizedBox(width: 12),
-              Text(
-                'Быстрые действия',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildQuickActionButton(
-            context,
-            'Пройти быстрый тест',
-            Icons.flash_on,
-            categoryColor,
-            '/quick-test',
-          ),
-          const SizedBox(height: 12),
-          _buildQuickActionButton(
-            context,
-            'Вернуться к справочнику',
-            Icons.menu_book,
-            categoryColor,
-            '/home',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButton(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color color,
-    String route,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          // go_router app: Navigator.pushNamed has no route generator and crashes.
-          context.push(route);
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withValues(alpha: 0.2),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: color,
-                size: 16,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _getCategoryColor(String id) {
-    switch (id) {
-      case 'ort_guide':
-        return AppColors.primary;
-      case 'math_formulas':
-        return AppColors.secondary;
-      case 'grammar':
-        return AppColors.success;
-      case 'logic':
-        return AppColors.info;
-      case 'reading':
-        return AppColors.warning;
-      case 'common_errors':
-        return AppColors.error;
-      default:
-        return AppColors.primary;
+  @override
+  void initState() {
+    super.initState();
+    final c = HandbookData.byId(widget.categoryId);
+    if (c != null && c.sections.any((s) => s.generated != null)) {
+      _facts = OrtStructureFacts.load();
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final lang = contentLanguageOf(context);
+    final category = HandbookData.byId(widget.categoryId);
+    if (category == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l.learnHandbookTitle)),
+        body: EmptyView(
+          icon: Icons.menu_book_outlined,
+          message: l.learnHandbookNotFound,
+          action: FilledButton(
+            onPressed: () => context.go(RoutePaths.home),
+            child: Text(l.learnBackHome),
+          ),
+        ),
+      );
+    }
+    final gutter = AppSpacing.gutter(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(pickLocalized(category.title, lang), maxLines: 1, overflow: TextOverflow.ellipsis)),
+      body: FutureBuilder<OrtStructureFacts>(
+        future: _facts,
+        builder: (context, snap) {
+          return ListView(
+            padding: EdgeInsets.fromLTRB(gutter, AppSpacing.lg, gutter, AppSpacing.huge),
+            children: [
+              if (lang == 'ky' && category.sections.every((s) => !s.body.containsKey('ky') && s.generated == null))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                  child: Text(l.learnHandbookRussianOnly, style: Theme.of(context).textTheme.bodySmall),
+                ),
+              for (final s in category.sections) ...[
+                _SectionCard(title: pickLocalized(s.title, lang), child: _sectionBody(context, l, lang, s, snap)),
+                const SizedBox(height: AppSpacing.md),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              OutlinedButton.icon(
+                onPressed: () => context.push(RoutePaths.quickTest),
+                icon: const Icon(Icons.bolt_outlined),
+                label: Text(l.learnQuickPracticeTitle),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _sectionBody(
+    BuildContext context,
+    AppLocalizations l,
+    String lang,
+    HandbookSection s,
+    AsyncSnapshot<OrtStructureFacts> snap,
+  ) {
+    final style = Theme.of(context).textTheme.bodyMedium;
+    final gen = s.generated;
+    if (gen == null) return MathMarkdown(pickLocalized(s.body, lang), style: style);
+    if (snap.connectionState != ConnectionState.done) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.md),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final facts = snap.data;
+    if (facts == null) {
+      return Text(l.learnHandbookFactsUnavailable, style: style);
+    }
+    final md = gen == HandbookGenerated.ortStructure
+        ? facts.structureMarkdown(l, lang)
+        : facts.scoringMarkdown(l, lang);
+    return MathMarkdown(md, style: style);
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+  const _SectionCard({required this.title, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: AppRadii.mdAll,
+        border: Border.all(color: context.tokens.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(title, style: theme.textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
+          child,
+        ],
+      ),
+    );
   }
 }

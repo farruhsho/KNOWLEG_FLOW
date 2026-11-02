@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 /// Text similarity and duplicate detection service
 class TextSimilarityService {
   /// Calculate Levenshtein distance between two strings
@@ -100,7 +102,7 @@ class TextSimilarityService {
     
     if (magnitude1 == 0 || magnitude2 == 0) return 0.0;
     
-    return (dotProduct / (sqrt(magnitude1) * sqrt(magnitude2))) * 100;
+    return (dotProduct / (math.sqrt(magnitude1) * math.sqrt(magnitude2))) * 100;
   }
 
   /// Combined similarity score (weighted average of multiple methods)
@@ -147,7 +149,9 @@ class TextSimilarityService {
   static String normalizeText(String text) {
     return text
         .toLowerCase()
-        .replaceAll(RegExp(r'[^\w\s]'), '') // Remove punctuation
+        // Keep letters and digits of every script (Dart's \w is ASCII-only,
+        // which erased all Cyrillic — CMS-25).
+        .replaceAll(RegExp(r'[^\p{L}\p{N}\s]', unicode: true), '')
         .replaceAll(RegExp(r'\s+'), ' ') // Normalize spaces
         .trim();
   }
@@ -167,19 +171,4 @@ class SimilarityMatch {
 
   @override
   String toString() => 'SimilarityMatch(index: $index, similarity: ${similarity.toStringAsFixed(2)}%)';
-}
-
-// Helper function for square root
-double sqrt(double x) {
-  if (x < 0) return 0;
-  if (x == 0) return 0;
-  
-  double guess = x / 2;
-  double epsilon = 0.00001;
-  
-  while ((guess * guess - x).abs() > epsilon) {
-    guess = (guess + x / guess) / 2;
-  }
-  
-  return guess;
 }

@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+
+import '../../core/design/tokens.dart';
+import '../../core/utils/bishkek_time.dart';
+import '../../l10n/app_localizations.dart';
 import '../models/gamification_models.dart';
 
-/// Виджет отображения ежедневных квестов
+/// Localized quest title by type (stored titles are legacy Russian text).
+String questTitle(AppLocalizations l, DailyQuest q) {
+  switch (q.type) {
+    case QuestType.answerQuestions:
+      return l.learnQuestAnswer(q.targetValue);
+    case QuestType.completeTest:
+      return l.learnQuestCompleteSet;
+    case QuestType.perfectAnswers:
+      return l.learnQuestRun(q.targetValue);
+    case QuestType.studyMinutes:
+    case QuestType.specificTopic:
+      return q.title;
+  }
+}
+
+/// Today's cosmetic quests. Rewards are coins only; XP is server-owned.
 class DailyQuestsWidget extends StatelessWidget {
   final List<DailyQuest> quests;
-  final Function(String questId)? onQuestTap;
+  final void Function(String questId)? onQuestTap;
 
   const DailyQuestsWidget({
     super.key,
@@ -13,221 +31,108 @@ class DailyQuestsWidget extends StatelessWidget {
     this.onQuestTap,
   });
 
+  /// Time left until midnight in Bishkek (when quests reset).
+  static Duration untilReset(DateTime now) {
+    final w = BishkekTime.wallClock(now);
+    final reset = DateTime.utc(w.year, w.month, w.day + 1).subtract(BishkekTime.offset);
+    return reset.difference(now.toUtc());
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (quests.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
+    if (quests.isEmpty) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final left = untilReset(DateTime.now());
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                const Icon(Icons.assignment_turned_in, color: AppColors.primary),
-                const SizedBox(width: 12),
-                Text(
-                  'Ежедневные задания',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
+            Text(l.learnQuestsTitle, style: theme.textTheme.titleMedium),
+            const SizedBox(height: AppSpacing.xxs),
             Text(
-              'Обновление через ${_getTimeUntilMidnight()}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              l.learnQuestsReset(left.inHours, left.inMinutes.remainder(60)),
+              style: theme.textTheme.bodySmall,
             ),
-            const SizedBox(height: 16),
-            ...quests.map((quest) => _buildQuestTile(context, quest)),
+            const SizedBox(height: AppSpacing.md),
+            for (final q in quests) _QuestTile(quest: q, onTap: onQuestTap),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuestTile extends StatelessWidget {
+  final DailyQuest quest;
+  final void Function(String questId)? onTap;
+  const _QuestTile({required this.quest, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final done = quest.isCompleted;
+    return InkWell(
+      onTap: done || onTap == null ? null : () => onTap!(quest.id),
+      borderRadius: AppRadii.smAll,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        child: Row(
+          children: [
+            Icon(done ? Icons.check_circle : _icon(quest.type), color: done ? t.success : theme.colorScheme.primary),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(questTitle(l, quest), style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: AppSpacing.xs),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppRadii.pill),
+                    child: LinearProgressIndicator(
+                      value: quest.progress,
+                      minHeight: 4,
+                      color: done ? t.success : theme.colorScheme.primary,
+                      backgroundColor: t.surfaceMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Text('${quest.currentValue}/${quest.targetValue}', style: theme.textTheme.labelSmall),
+            if (quest.coinsReward > 0) ...[
+              const SizedBox(width: AppSpacing.sm),
+              Icon(Icons.toll_outlined, size: 14, color: t.xp),
+              Text('${quest.coinsReward}', style: theme.textTheme.labelSmall),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuestTile(BuildContext context, DailyQuest quest) {
-    final isCompleted = quest.isCompleted;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: isCompleted ? null : () => onQuestTap?.call(quest.id),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isCompleted ? AppColors.success : AppColors.grey300,
-            ),
-            borderRadius: BorderRadius.circular(12),
-            color: isCompleted
-                ? AppColors.success.withValues(alpha: 0.1)
-                : Colors.transparent,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // Icon
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isCompleted
-                          ? AppColors.success.withValues(alpha: 0.2)
-                          : AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      isCompleted ? Icons.check_circle : _getIconForQuestType(quest.type),
-                      color: isCompleted ? AppColors.success : AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  // Title and description
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          quest.title,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                decoration: isCompleted
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                              ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          quest.description,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Rewards
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.star, size: 16, color: AppColors.warning),
-                          const SizedBox(width: 4),
-                          Text(
-                            '+${quest.xpReward}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.monetization_on, size: 16, color: Colors.amber),
-                          const SizedBox(width: 4),
-                          Text(
-                            '+${quest.coinsReward}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Progress
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Прогресс: ${quest.currentValue}/${quest.targetValue}',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      Text(
-                        '${(quest.progress * 100).toInt()}%',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isCompleted ? AppColors.success : AppColors.primary,
-                            ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: quest.progress,
-                      backgroundColor: AppColors.grey200,
-                      valueColor: AlwaysStoppedAnimation(
-                        isCompleted ? AppColors.success : AppColors.primary,
-                      ),
-                      minHeight: 8,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  IconData _getIconForQuestType(QuestType type) {
+  static IconData _icon(QuestType type) {
     switch (type) {
       case QuestType.answerQuestions:
-        return Icons.quiz;
+        return Icons.quiz_outlined;
       case QuestType.completeTest:
-        return Icons.assignment_turned_in;
+        return Icons.assignment_turned_in_outlined;
       case QuestType.studyMinutes:
         return Icons.schedule;
       case QuestType.perfectAnswers:
-        return Icons.emoji_events;
+        return Icons.emoji_events_outlined;
       case QuestType.specificTopic:
         return Icons.subject;
     }
   }
-
-  String _getTimeUntilMidnight() {
-    final now = DateTime.now();
-    final tomorrow = DateTime(now.year, now.month, now.day + 1);
-    final difference = tomorrow.difference(now);
-
-    final hours = difference.inHours;
-    final minutes = difference.inMinutes % 60;
-
-    if (hours > 0) {
-      return '$hours ч $minutes мин';
-    } else {
-      return '$minutes мин';
-    }
-  }
 }
 
-/// Компактный виджет квестов для показа на главной
+/// Compact summary card for the home screen.
 class CompactDailyQuests extends StatelessWidget {
   final List<DailyQuest> quests;
   final VoidCallback? onViewAll;
@@ -240,65 +145,35 @@ class CompactDailyQuests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completedCount = quests.where((q) => q.isCompleted).length;
-
-    return InkWell(
-      onTap: onViewAll,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.info.withValues(alpha: 0.1),
-              AppColors.info.withValues(alpha: 0.05),
+    final l = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final completed = quests.where((q) => q.isCompleted).length;
+    final all = quests.isNotEmpty && completed == quests.length;
+    return Material(
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.mdAll, side: BorderSide(color: t.border)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onViewAll,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Icon(Icons.assignment_turned_in_outlined, color: theme.colorScheme.primary),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l.learnQuestsTitle, style: theme.textTheme.titleSmall),
+                    Text(l.learnQuestsDone(completed, quests.length), style: theme.textTheme.bodySmall),
+                  ],
+                ),
+              ),
+              Icon(all ? Icons.check_circle : Icons.chevron_right, color: all ? t.success : t.textTertiary),
             ],
           ),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.info,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.assignment_turned_in,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Ежедневные задания',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Выполнено: $completedCount/${quests.length}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              completedCount == quests.length
-                  ? Icons.check_circle
-                  : Icons.arrow_forward_ios,
-              color: completedCount == quests.length
-                  ? AppColors.success
-                  : AppColors.textSecondary,
-            ),
-          ],
         ),
       ),
     );

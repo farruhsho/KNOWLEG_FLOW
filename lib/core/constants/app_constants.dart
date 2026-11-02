@@ -17,6 +17,12 @@ class AppConstants {
 
   static const int totalQuestions = 130;
   static const int totalTimeMinutes = 195;
+
+  /// Legacy 0–200 scale of `user_progress.averageScore`. It is NOT an ORT
+  /// scale (the official conversion is unpublished, see
+  /// assets/data/exam_blueprints.json `scoring.official_scale_known`), so
+  /// never label a value on it as an "ORT score". Practice results are shown
+  /// as a percentage only.
   static const int maxScore = 200;
 
   // Question Types
@@ -95,8 +101,19 @@ class AppConstants {
   static const int scoreAverage = 120;
   static const int scorePassable = 90;
 
-  // SRS Algorithm (Flashcards)
-  static const List<int> srsIntervals = [1, 3, 7, 14, 30, 90];
+  // Spaced repetition for the mistakes queue (ARCHITECTURE.md §1 note):
+  // 1 → 3 → 7 → 14 → 30 days, then the item counts as resolved.
+  static const List<int> srsIntervals = [1, 3, 7, 14, 30];
+
+  // Practice sessions
+  static const int practiceSessionSize = 10;
+  static const int practiceCandidatePool = 40;
+
+  // Firestore collections used by the learning feature
+  static const String collectionUserProgress = 'user_progress';
+  static const String collectionUserGamification = 'user_gamification';
+  static const String collectionUserAchievements = 'user_achievements';
+  static const String collectionDailyQuests = 'daily_quests';
 
   // Pagination
   static const int lessonsPerPage = 10;

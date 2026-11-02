@@ -1,4 +1,12 @@
+import '../../core/utils/content_locale.dart';
+import '../../core/utils/json_read.dart';
+
 /// Subject model for ORT exam subjects
+///
+/// Parsing tolerates missing description/icon/color, `name` instead of
+/// `title`, plain-string titles and numeric fields stored as doubles
+/// (CMS-21). [icon] may be a Material icon name ("calculate") or an emoji;
+/// render it with `SubjectIcon`.
 class SubjectModel {
   final String id;
   final Map<String, String> title; // ru, ky, en
@@ -9,6 +17,8 @@ class SubjectModel {
   final List<String>? difficultyTags;
   final int totalLessons;
   final int totalQuestions;
+  final int order;
+  final bool isActive;
 
   SubjectModel({
     required this.id,
@@ -20,22 +30,37 @@ class SubjectModel {
     this.difficultyTags,
     this.totalLessons = 0,
     this.totalQuestions = 0,
+    this.order = 0,
+    this.isActive = true,
   });
 
-  String getTitle(String locale) => title[locale] ?? title['ru'] ?? '';
-  String getDescription(String locale) => description[locale] ?? description['ru'] ?? '';
+  String getTitle(String locale) {
+    final t = pickLocalized(title, locale);
+    return t.isEmpty ? id : t;
+  }
 
-  factory SubjectModel.fromFirestore(Map<String, dynamic> data) {
+  String getDescription(String locale) => pickLocalized(description, locale);
+
+  /// [id] is the document id and wins over a missing `id` field.
+  factory SubjectModel.fromFirestore(Map<String, dynamic> data, {String? id}) {
+    final dataId = JsonRead.string(data, ['id']);
+    List<String>? optList(List<String> keys) {
+      final l = JsonRead.stringList(data, keys);
+      return l.isEmpty ? null : l;
+    }
+
     return SubjectModel(
-      id: data['id'] as String,
-      title: Map<String, String>.from(data['title'] as Map? ?? data['name'] as Map),
-      description: Map<String, String>.from(data['description'] as Map),
-      icon: data['icon'] as String,
-      color: data['color'] as String,
-      moduleIds: data['moduleIds'] != null ? List<String>.from(data['moduleIds'] as List) : null,
-      difficultyTags: data['difficultyTags'] != null ? List<String>.from(data['difficultyTags'] as List) : null,
-      totalLessons: data['totalLessons'] as int? ?? 0,
-      totalQuestions: data['totalQuestions'] as int? ?? 0,
+      id: (dataId == null || dataId.isEmpty) ? (id ?? '') : dataId,
+      title: JsonRead.localized(JsonRead.any(data, ['title', 'name'])),
+      description: JsonRead.localized(JsonRead.any(data, ['description', 'subtitle'])),
+      icon: JsonRead.stringOr(data, ['icon', 'icon_name', 'iconName']),
+      color: JsonRead.stringOr(data, ['color', 'colour']),
+      moduleIds: optList(['moduleIds', 'module_ids']),
+      difficultyTags: optList(['difficultyTags', 'difficulty_tags']),
+      totalLessons: JsonRead.intOr(data, ['totalLessons', 'total_lessons', 'lessons_count'], 0),
+      totalQuestions: JsonRead.intOr(data, ['totalQuestions', 'total_questions', 'questions_count'], 0),
+      order: JsonRead.intOr(data, ['order', 'position'], 0),
+      isActive: JsonRead.boolean(data, ['isActive', 'is_active']) ?? true,
     );
   }
 
@@ -63,6 +88,8 @@ class SubjectModel {
     List<String>? difficultyTags,
     int? totalLessons,
     int? totalQuestions,
+    int? order,
+    bool? isActive,
   }) {
     return SubjectModel(
       id: id ?? this.id,
@@ -74,6 +101,8 @@ class SubjectModel {
       difficultyTags: difficultyTags ?? this.difficultyTags,
       totalLessons: totalLessons ?? this.totalLessons,
       totalQuestions: totalQuestions ?? this.totalQuestions,
+      order: order ?? this.order,
+      isActive: isActive ?? this.isActive,
     );
   }
 }

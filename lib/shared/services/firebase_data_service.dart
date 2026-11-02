@@ -1,496 +1,306 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/subject_model.dart';
+
+import '../../core/constants/app_constants.dart';
+import '../../core/utils/app_log.dart';
 import '../models/lesson_model.dart';
 import '../models/question_model.dart';
+import '../models/subject_model.dart';
 import '../models/user_progress_model.dart';
+import 'data_exception.dart';
+import 'question_pool.dart';
 
-/// Сервис для работы с реальными данными из Firebase Firestore
+/// Real Firestore data for the learning feature.
+///
+/// There is **no fabricated fallback content** any more (FB-15, CMS-09):
+/// reads either return real documents, an empty list/null (genuinely no
+/// data), or throw a [DataException] the UI turns into an error state with a
+/// retry. Individual malformed documents are skipped and reported instead of
+/// replacing the whole list.
 class FirebaseDataService {
   static final FirebaseDataService _instance = FirebaseDataService._internal();
   factory FirebaseDataService() => _instance;
   FirebaseDataService._internal();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
+  final Random _random = Random();
 
   // ========== SUBJECTS ==========
 
-  /// Получить все предметы из Firestore
+  /// All active subjects, ordered by `order`. Throws [DataException].
   Future<List<SubjectModel>> getSubjects() async {
     try {
-      final snapshot = await _firestore
-          .collection('subjects')
-          .orderBy('order', descending: false)
-          .get();
-
-      if (snapshot.docs.isEmpty) {
-        // ignore: avoid_print
-        print('⚠️ No subjects found in Firestore. Using fallback data.');
-        return _getFallbackSubjects();
-      }
-
-      return snapshot.docs
-          .map((doc) => SubjectModel.fromFirestore(doc.data()))
-          .toList();
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading subjects from Firebase: $e');
-      return _getFallbackSubjects();
+      final snapshot = await _firestore.collection(AppConstants.collectionSubjects).get();
+      final subjects = _parseAll(snapshot.docs, (d) => SubjectModel.fromFirestore(d.data(), id: d.id), 'subject')
+          .where((s) => s.isActive)
+          .toList()
+        ..sort((a, b) => a.order != b.order ? a.order.compareTo(b.order) : a.id.compareTo(b.id));
+      return subjects;
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getSubjects');
+      throw DataException.from(e);
     }
   }
 
-  /// Получить предмет по ID
+  /// A subject by id, or null when it does not exist. Throws [DataException].
   Future<SubjectModel?> getSubjectById(String id) async {
     try {
-      final doc = await _firestore.collection('subjects').doc(id).get();
-
-      if (!doc.exists) {
-        // ignore: avoid_print
-        print('⚠️ Subject $id not found in Firestore');
-        return _getFallbackSubjects().firstWhere(
-          (s) => s.id == id,
-          orElse: () => _getFallbackSubjects().first,
-        );
-      }
-
-      return SubjectModel.fromFirestore(doc.data()!);
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading subject $id: $e');
-      return null;
+      final doc = await _firestore.collection(AppConstants.collectionSubjects).doc(id).get();
+      final data = doc.data();
+      if (!doc.exists || data == null) return null;
+      return SubjectModel.fromFirestore(data, id: doc.id);
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getSubjectById');
+      throw DataException.from(e);
     }
   }
 
   // ========== LESSONS ==========
 
-  /// Получить все уроки для предмета
+  /// Lessons of a subject ordered by `order`. Reads both `subject_id`
+  /// (canonical) and `subjectId` (seed/legacy) and merges them, without an
+  /// orderBy so no composite index is required. Throws [DataException].
   Future<List<LessonModel>> getLessonsBySubject(String subjectId) async {
     try {
-      final snapshot = await _firestore
-          .collection('lessons')
-          .where('subjectId', isEqualTo: subjectId)
-          .orderBy('order', descending: false)
-          .get();
-
-      if (snapshot.docs.isEmpty) {
-        // ignore: avoid_print
-        print('⚠️ No lessons found for subject $subjectId. Using fallback.');
-        return _getFallbackLessons(subjectId);
+      final col = _firestore.collection(AppConstants.collectionLessons);
+      final snaps = await Future.wait([
+        col.where('subject_id', isEqualTo: subjectId).get(),
+        col.where('subjectId', isEqualTo: subjectId).get(),
+      ]);
+      final byId = <String, LessonModel>{};
+      for (final snap in snaps) {
+        for (final l in _parseAll(snap.docs, (d) => LessonModel.fromFirestore(d.data(), id: d.id), 'lesson')) {
+          if (l.isActive) byId[l.id] = l;
+        }
       }
-
-      return snapshot.docs
-          .map((doc) => LessonModel.fromFirestore(doc.data()))
-          .toList();
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading lessons for $subjectId: $e');
-      return _getFallbackLessons(subjectId);
+      return byId.values.toList()..sort(_lessonOrder);
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getLessonsBySubject');
+      throw DataException.from(e);
     }
   }
 
-  /// Получить урок по ID
+  /// Up to [limit] active lessons across all subjects, in a stable order
+  /// (subject, order, id). Used by the daily lesson rotation.
+  Future<List<LessonModel>> getAllLessons({int limit = 300}) async {
+    try {
+      final snap = await _firestore.collection(AppConstants.collectionLessons).limit(limit).get();
+      return _parseAll(snap.docs, (d) => LessonModel.fromFirestore(d.data(), id: d.id), 'lesson')
+          .where((l) => l.isActive)
+          .toList()
+        ..sort((a, b) {
+          final s = a.subjectId.compareTo(b.subjectId);
+          return s != 0 ? s : _lessonOrder(a, b);
+        });
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getAllLessons');
+      throw DataException.from(e);
+    }
+  }
+
+  /// A lesson by id, or null when it does not exist. Throws [DataException].
   Future<LessonModel?> getLessonById(String id) async {
     try {
-      final doc = await _firestore.collection('lessons').doc(id).get();
+      final doc = await _firestore.collection(AppConstants.collectionLessons).doc(id).get();
+      final data = doc.data();
+      if (!doc.exists || data == null) return null;
+      return LessonModel.fromFirestore(data, id: doc.id);
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getLessonById');
+      throw DataException.from(e);
+    }
+  }
 
-      if (!doc.exists) {
-        // ignore: avoid_print
-        print('⚠️ Lesson $id not found in Firestore');
-        return null;
-      }
-
-      return LessonModel.fromFirestore(doc.data()!);
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading lesson $id: $e');
+  /// Lesson id assigned for [dayKey] in `daily_lessons/{YYYY-MM-DD}` by the
+  /// content team, or null (then the client rotation decides).
+  Future<String?> getAssignedDailyLessonId(String dayKey) async {
+    try {
+      final doc = await _firestore.collection('daily_lessons').doc(dayKey).get();
+      final data = doc.data();
+      if (data == null) return null;
+      final id = data['lesson_id'] ?? data['lessonId'];
+      return id is String && id.isNotEmpty ? id : null;
+    } catch (e, st) {
+      // Optional collection: missing rules/doc must not block the lesson.
+      reportError(e, st, reason: 'learn.getAssignedDailyLessonId');
       return null;
     }
   }
 
+  static int _lessonOrder(LessonModel a, LessonModel b) =>
+      a.order != b.order ? a.order.compareTo(b.order) : a.id.compareTo(b.id);
+
   // ========== QUESTIONS ==========
 
-  /// Получить вопросы для теста
+  /// Random practice questions, paginated from a random document-id pivot.
+  ///
+  /// * filters by subject on both `subject_id` and `subjectId` (FB-04);
+  /// * skips inactive / unverified-AI / draft questions (FB-18, EXAM-12);
+  /// * skips questions without a valid answer key (FB-05);
+  /// * returns fewer than [count] (possibly none) when the bank is small —
+  ///   never fabricated items. Throws [DataException].
   Future<List<QuestionModel>> getQuestions({
-    int count = 10,
+    int count = AppConstants.practiceSessionSize,
     String? subjectId,
     int? difficulty,
   }) async {
     try {
-      Query query = _firestore.collection('questions');
+      final col = _firestore.collection(AppConstants.collectionQuestions);
+      final bases = <Query<Map<String, dynamic>>>[
+        if (subjectId == null) col,
+        if (subjectId != null) col.where('subject_id', isEqualTo: subjectId),
+        if (subjectId != null) col.where('subjectId', isEqualTo: subjectId),
+      ].map((q) => difficulty == null ? q : q.where('difficulty', isEqualTo: difficulty)).toList();
 
-      if (subjectId != null) {
-        query = query.where('subjectId', isEqualTo: subjectId);
-      }
-
-      if (difficulty != null) {
-        query = query.where('difficulty', isEqualTo: difficulty);
-      }
-
-      final snapshot = await query.limit(count).get();
-
-      if (snapshot.docs.isEmpty) {
-        // ignore: avoid_print
-        print('⚠️ No questions found. Using fallback questions.');
-        return _getFallbackQuestions(count: count, subjectId: subjectId);
-      }
-
-      return snapshot.docs
-          .map((doc) => QuestionModel.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading questions: $e');
-      return _getFallbackQuestions(count: count, subjectId: subjectId);
+      final pivot = QuestionPool.randomPivot(_random);
+      final pageSize = max(count * 4, AppConstants.practiceCandidatePool);
+      final pools = await Future.wait(bases.map((q) => _collectFrom(q, pivot, pageSize, count)));
+      final pool = pools.expand((p) => p);
+      return QuestionPool.sample(pool, count, _random, idOf: (q) => q.id);
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getQuestions');
+      throw DataException.from(e);
     }
   }
 
-  /// Получить вопрос по ID
-  Future<QuestionModel?> getQuestionById(String id) async {
-    try {
-      final doc = await _firestore.collection('questions').doc(id).get();
+  /// Walks the id-ordered index from [pivot], wrapping around once, until
+  /// enough servable questions are collected or the range is exhausted.
+  Future<List<QuestionModel>> _collectFrom(
+    Query<Map<String, dynamic>> base,
+    String pivot,
+    int pageSize,
+    int wanted,
+  ) async {
+    final out = <QuestionModel>[];
+    final ordered = base.orderBy(FieldPath.documentId);
+    const maxPages = 3;
 
-      if (!doc.exists) {
-        // ignore: avoid_print
-        print('⚠️ Question $id not found');
-        return null;
+    Future<void> walk(Query<Map<String, dynamic>> start, {String? endBefore}) async {
+      var query = start;
+      for (var page = 0; page < maxPages && out.length < wanted * 2; page++) {
+        var q = query.limit(pageSize);
+        if (endBefore != null) q = q.endBefore([endBefore]);
+        final snap = await q.get();
+        for (final d in snap.docs) {
+          if (!QuestionPool.isServable(d.data())) continue;
+          final question = QuestionModel.tryFromFirestore(d);
+          if (question != null) out.add(question);
+        }
+        if (snap.docs.length < pageSize) return;
+        query = ordered.startAfterDocument(snap.docs.last);
       }
-
-      return QuestionModel.fromFirestore(doc);
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading question $id: $e');
-      return null;
     }
+
+    await walk(ordered.startAt([pivot]));
+    if (out.length < wanted * 2) {
+      await walk(ordered, endBefore: pivot);
+    }
+    return out;
+  }
+
+  /// Questions by id in the given order; missing, inactive or ungradable
+  /// ones are dropped. Throws [DataException].
+  Future<List<QuestionModel>> getQuestionsByIds(List<String> ids) async {
+    if (ids.isEmpty) return const [];
+    try {
+      final col = _firestore.collection(AppConstants.collectionQuestions);
+      final docs = await Future.wait(ids.toSet().map((id) => col.doc(id).get()));
+      final byId = <String, QuestionModel>{};
+      for (final d in docs) {
+        final data = d.data();
+        if (data == null || !QuestionPool.isServable(data)) continue;
+        final q = QuestionModel.tryFromFirestore(d);
+        if (q != null) byId[q.id] = q;
+      }
+      return [for (final id in ids) if (byId[id] != null) byId[id]!];
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getQuestionsByIds');
+      throw DataException.from(e);
+    }
+  }
+
+  /// A question by id, or null. Throws [DataException].
+  Future<QuestionModel?> getQuestionById(String id) async {
+    final list = await getQuestionsByIds([id]);
+    return list.isEmpty ? null : list.first;
   }
 
   // ========== USER PROGRESS ==========
 
-  /// Получить прогресс пользователя
+  /// Practice aggregates of a user. A missing document reads as empty
+  /// progress (nothing is written). Returns null only on read errors
+  /// (reported), so legacy callers keep working.
   Future<UserProgressModel?> getUserProgress(String userId) async {
     try {
-      final doc = await _firestore
-          .collection('user_progress')
-          .doc(userId)
-          .get();
-
-      if (!doc.exists) {
-        // Создаём начальный прогресс для нового пользователя
-        final initialProgress = UserProgressModel(
-          userId: userId,
-          testsCompleted: 0,
-          averageScore: 0,
-          streakDays: 0,
-          totalStudyHours: 0,
-          subjectProgress: {},
-          completedLessons: [],
-          lastActivityDate: DateTime.now(),
-        );
-
-        await saveUserProgress(initialProgress);
-        return initialProgress;
-      }
-
-      return UserProgressModel.fromFirestore(doc.data()!, doc.id);
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading user progress: $e');
+      final doc = await _firestore.collection(AppConstants.collectionUserProgress).doc(userId).get();
+      final data = doc.data();
+      if (!doc.exists || data == null) return UserProgressModel.empty(userId);
+      return UserProgressModel.fromFirestore(data, doc.id);
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getUserProgress');
       return null;
     }
   }
 
-  /// Сохранить прогресс пользователя
-  Future<void> saveUserProgress(UserProgressModel progress) async {
-    try {
-      await _firestore
-          .collection('user_progress')
-          .doc(progress.userId)
-          .set(progress.toFirestore(), SetOptions(merge: true));
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error saving user progress: $e');
-      rethrow;
-    }
-  }
-
-  /// Обновить статистику после прохождения теста
-  Future<void> updateTestStats(
-    String userId,
-    int score,
-    int totalQuestions,
-    String subjectId,
-  ) async {
-    try {
-      final progress = await getUserProgress(userId);
-      if (progress == null) return;
-
-      final newTestsCompleted = progress.testsCompleted + 1;
-      final newAverageScore =
-          ((progress.averageScore * progress.testsCompleted) + score) / newTestsCompleted;
-
-      final updatedProgress = progress.copyWith(
-        testsCompleted: newTestsCompleted,
-        averageScore: newAverageScore.round(),
-        lastActivityDate: DateTime.now(),
-      );
-
-      await saveUserProgress(updatedProgress);
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error updating test stats: $e');
-    }
-  }
-
-  /// Обновить прогресс по предмету
-  Future<void> updateSubjectProgress(
-    String userId,
-    String subjectId,
-    double progress,
-  ) async {
-    try {
-      final userProgress = await getUserProgress(userId);
-      if (userProgress == null) return;
-
-      final subjectProgress = Map<String, double>.from(userProgress.subjectProgress);
-      subjectProgress[subjectId] = progress;
-
-      final updatedProgress = userProgress.copyWith(
-        subjectProgress: subjectProgress,
-      );
-
-      await saveUserProgress(updatedProgress);
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error updating subject progress: $e');
-    }
-  }
-
-  /// Отметить урок как пройденный
-  Future<void> markLessonCompleted(String userId, String lessonId) async {
-    try {
-      final progress = await getUserProgress(userId);
-      if (progress == null) return;
-
-      if (!progress.completedLessons.contains(lessonId)) {
-        final updatedProgress = progress.copyWith(
-          completedLessons: [...progress.completedLessons, lessonId],
-        );
-        await saveUserProgress(updatedProgress);
-      }
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error marking lesson completed: $e');
-    }
-  }
-
-  // ========== FALLBACK DATA (when Firebase is empty) ==========
-
-  List<SubjectModel> _getFallbackSubjects() {
-    return [
-      SubjectModel(
-        id: 'math',
-        title: {'ru': 'Математика', 'ky': 'Математика', 'en': 'Mathematics'},
-        description: {'ru': 'Алгебра, геометрия, тригонометрия', 'ky': 'Алгебра, геометрия, тригонометрия', 'en': 'Algebra, geometry, trigonometry'},
-        icon: '📐',
-        color: '#8B5CF6',
-        moduleIds: ['math-1', 'math-2'],
-        difficultyTags: ['basic', 'intermediate', 'advanced'],
-        totalLessons: 24,
-        totalQuestions: 240,
-      ),
-      SubjectModel(
-        id: 'physics',
-        title: {'ru': 'Физика', 'ky': 'Физика', 'en': 'Physics'},
-        description: {'ru': 'Механика, электричество, оптика', 'ky': 'Механика, электр, оптика', 'en': 'Mechanics, electricity, optics'},
-        icon: '⚡',
-        color: '#3B82F6',
-        totalLessons: 18,
-        totalQuestions: 180,
-      ),
-      SubjectModel(
-        id: 'chemistry',
-        title: {'ru': 'Химия', 'ky': 'Химия', 'en': 'Chemistry'},
-        description: {'ru': 'Органическая и неорганическая химия', 'ky': 'Органикалык жана органикалык эмес химия', 'en': 'Organic and inorganic chemistry'},
-        icon: '🧪',
-        color: '#10B981',
-        totalLessons: 20,
-        totalQuestions: 200,
-      ),
-      SubjectModel(
-        id: 'biology',
-        title: {'ru': 'Биология', 'ky': 'Биология', 'en': 'Biology'},
-        description: {'ru': 'Анатомия, ботаника, генетика', 'ky': 'Анатомия, ботаника, генетика', 'en': 'Anatomy, botany, genetics'},
-        icon: '🧬',
-        color: '#06B6D4',
-        totalLessons: 22,
-        totalQuestions: 220,
-      ),
-      SubjectModel(
-        id: 'history',
-        title: {'ru': 'История Кыргызстана', 'ky': 'Кыргызстандын тарыхы', 'en': 'History of Kyrgyzstan'},
-        description: {'ru': 'От древности до современности', 'ky': 'Байыркы мезгилден азыркы учурга чейин', 'en': 'From ancient times to present'},
-        icon: '📜',
-        color: '#EF4444',
-        totalLessons: 16,
-        totalQuestions: 160,
-      ),
-    ];
-  }
-
-  List<LessonModel> _getFallbackLessons(String subjectId) {
-    final now = DateTime.now();
-    return List.generate(5, (index) {
-      return LessonModel(
-        id: '$subjectId-lesson-${index + 1}',
-        subjectId: subjectId,
-        title: {
-          'ru': 'Урок ${index + 1}',
-          'ky': 'Сабак ${index + 1}',
-          'en': 'Lesson ${index + 1}',
-        },
-        content: {
-          'ru': 'Содержание урока ${index + 1} по предмету $subjectId',
-          'ky': '$subjectId предмети боюнча ${index + 1} сабактын мазмуну',
-          'en': 'Content of lesson ${index + 1} for subject $subjectId',
-        },
-        mediaUrls: [],
-        estimatedTimeMinutes: 15 + (index * 5),
-        tags: ['topic-${index + 1}'],
-        order: index + 1,
-        createdBy: 'admin',
-        createdAt: now,
-      );
+  /// Live practice aggregates (cache first, then server).
+  Stream<UserProgressModel> watchUserProgress(String userId) {
+    return _firestore
+        .collection(AppConstants.collectionUserProgress)
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+      final data = doc.data();
+      return data == null ? UserProgressModel.empty(userId) : UserProgressModel.fromFirestore(data, doc.id);
     });
   }
 
-  List<QuestionModel> _getFallbackQuestions({int count = 10, String? subjectId}) {
-    final now = DateTime.now();
-    final questions = <QuestionModel>[];
-
-    for (int i = 0; i < count; i++) {
-      questions.add(
-        QuestionModel(
-          id: 'question-${i + 1}',
-          subjectId: subjectId ?? 'math',
-          sectionId: 'general',
-          type: QuestionType.singleChoice,
-          difficulty: (i % 5) + 1,
-          stem: {
-            'ru': 'Вопрос ${i + 1}: Сколько будет ${i + 1} + ${i + 1}?',
-            'ky': 'Суроо ${i + 1}: ${i + 1} + ${i + 1} канча болот?',
-            'en': 'Question ${i + 1}: What is ${i + 1} + ${i + 1}?',
-          },
-          options: [
-            OptionModel(
-              id: 'A',
-              text: {
-                'ru': '${(i + 1) * 2 - 1}',
-                'ky': '${(i + 1) * 2 - 1}',
-                'en': '${(i + 1) * 2 - 1}',
-              },
-            ),
-            OptionModel(
-              id: 'B',
-              text: {
-                'ru': '${(i + 1) * 2}',
-                'ky': '${(i + 1) * 2}',
-                'en': '${(i + 1) * 2}',
-              },
-            ),
-            OptionModel(
-              id: 'C',
-              text: {
-                'ru': '${(i + 1) * 2 + 1}',
-                'ky': '${(i + 1) * 2 + 1}',
-                'en': '${(i + 1) * 2 + 1}',
-              },
-            ),
-            OptionModel(
-              id: 'D',
-              text: {
-                'ru': '${(i + 1) * 2 + 2}',
-                'ky': '${(i + 1) * 2 + 2}',
-                'en': '${(i + 1) * 2 + 2}',
-              },
-            ),
-          ],
-          correctAnswer: 'B',
-          explanation: {
-            'ru': '${i + 1} + ${i + 1} = ${(i + 1) * 2}',
-            'ky': '${i + 1} + ${i + 1} = ${(i + 1) * 2}',
-            'en': '${i + 1} + ${i + 1} = ${(i + 1) * 2}',
-          },
-          tags: ['arithmetic', 'basic'],
-          createdBy: 'admin',
-          createdAt: now,
-          updatedAt: now,
-        ),
-      );
-    }
-
-    return questions;
+  /// Сохранить прогресс пользователя (legacy full-document merge).
+  Future<void> saveUserProgress(UserProgressModel progress) async {
+    await _firestore
+        .collection(AppConstants.collectionUserProgress)
+        .doc(progress.userId)
+        .set(progress.toFirestore(), SetOptions(merge: true));
   }
 
-  // ========== ORT TESTS ==========
+  /// Marks a lesson completed with an atomic arrayUnion (no read-modify-write).
+  /// The returned future completes when the server acknowledges; callers on
+  /// the UI path should not await it (the local cache updates immediately).
+  Future<void> markLessonCompleted(String userId, String lessonId) {
+    return _firestore.collection(AppConstants.collectionUserProgress).doc(userId).set({
+      'completedLessons': FieldValue.arrayUnion([lessonId]),
+      'lastActivityDate': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  // ========== ORT TESTS (legacy admin) ==========
 
   /// Get all ORT tests
-  Future<List<dynamic>> getOrtTests() async {
+  Future<List<Map<String, dynamic>>> getOrtTests() async {
     try {
       final snapshot = await _firestore.collection('ort_tests').get();
-      return snapshot.docs.map((doc) => doc.data()).toList();
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading ORT tests: $e');
+      return snapshot.docs.map((doc) => {...doc.data(), 'id': doc.data()['id'] ?? doc.id}).toList();
+    } catch (e, st) {
+      reportError(e, st, reason: 'learn.getOrtTests');
       return [];
     }
   }
 
-  // ========== DAILY MISSIONS ==========
+  // ========== helpers ==========
 
-  /// Get daily missions
-  Future<List<dynamic>> getDailyMissions() async {
-    try {
-      final snapshot = await _firestore
-          .collection('daily_missions')
-          .where('isActive', isEqualTo: true)
-          .get();
-      return snapshot.docs.map((doc) => doc.data()).toList();
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading daily missions: $e');
-      return [];
+  List<T> _parseAll<T>(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+    T Function(QueryDocumentSnapshot<Map<String, dynamic>>) parse,
+    String kind,
+  ) {
+    final out = <T>[];
+    for (final d in docs) {
+      try {
+        out.add(parse(d));
+      } catch (e, st) {
+        reportError(e, st, reason: 'learn.parse.$kind:${d.id}');
+      }
     }
-  }
-
-  /// Get user mission progress
-  Future<Map<String, dynamic>?> getUserMissionProgress(String userId) async {
-    try {
-      final doc = await _firestore
-          .collection('user_mission_progress')
-          .doc(userId)
-          .get();
-      return doc.data();
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error loading user mission progress: $e');
-      return null;
-    }
-  }
-
-  /// Update mission progress
-  Future<void> updateMissionProgress(
-    String userId,
-    String missionId,
-    int progress,
-  ) async {
-    try {
-      await _firestore
-          .collection('user_mission_progress')
-          .doc(userId)
-          .set({
-        missionId: progress,
-      }, SetOptions(merge: true));
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Error updating mission progress: $e');
-    }
+    return out;
   }
 }
