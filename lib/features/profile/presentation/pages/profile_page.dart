@@ -373,6 +373,12 @@ class _AccountLinks extends ConsumerWidget {
               tile(Icons.emoji_events_outlined, l.shellProfileAchievements,
                   () => context.push(RoutePaths.achievements)),
               const Divider(height: 1),
+              tile(Icons.person_add_alt_outlined, l.socialInviteTitle,
+                  () => context.push(RoutePaths.invite)),
+              const Divider(height: 1),
+              tile(Icons.groups_outlined, l.socialProfileGroups,
+                  () => context.push(RoutePaths.groups)),
+              const Divider(height: 1),
               // BILLING_MODE=external: the same page is a neutral credit
               // history, so the entry must not say "Purchases" (BILL-EXT-01).
               tile(

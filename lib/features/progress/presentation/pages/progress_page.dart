@@ -14,8 +14,10 @@ import '../../../../shared/models/user_progress_model.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
 import '../../../gamification/gamification_routes.dart';
+import '../../../social/presentation/social_messages.dart';
 import '../../data/progress_repository.dart';
 import '../../domain/recommendations.dart';
+import '../widgets/motivation_risk_card.dart';
 
 /// Progress built only from real data (GAM-08/09): server stats, practice
 /// aggregates, completed exam attempts and the mistakes queue. No invented
@@ -131,8 +133,13 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
     final recs = RecommendationEngine.build(progress: p, attempts: s.attempts ?? const [], dueMistakes: s.dueMistakes);
     final practiceAcc = p?.practiceAccuracy;
     final minutes = ((p?.practiceSeconds ?? 0) / 60).round();
+    final risk = s.motivationRisk(DateTime.now());
 
     final children = <Widget>[
+      if (risk != null) ...[
+        MotivationRiskCard(risk: risk),
+        const SizedBox(height: AppSpacing.lg),
+      ],
       _Grid(items: [
         (l.learnStatLevel, stats == null ? '—' : '${stats.level}', l.learnXpTotal(stats?.xp ?? 0)),
         (l.learnStatStreak, '${stats?.liveStreak(DateTime.now()) ?? 0}', l.learnStatBestStreak(stats?.bestStreak ?? 0)),
@@ -192,6 +199,12 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
       const SizedBox(height: AppSpacing.xl),
       _Heading(l.learnWeakTopicsTitle),
       ..._weakTopics(context, l, p, labels),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.socialFrequentMistakesTitle),
+      ..._frequentMistakes(context, l, s.frequentMistakes, labels),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.socialTopicTimeTitle),
+      ..._topicTimes(context, l, s.topicTime, labels),
     ];
 
     return ListView(
@@ -253,6 +266,104 @@ class _ProgressPageState extends ConsumerState<ProgressPage> {
     return [
       for (final e in topics.take(5)) _AccuracyBar(label: labels.topic(e.key), tally: e.value),
       TextButton(onPressed: () => context.push(kMistakesPath), child: Text(l.learnOpenMistakes)),
+    ];
+  }
+
+  /// "Частые ошибки": top topics by wrong answers in the mistakes queue.
+  List<Widget> _frequentMistakes(
+    BuildContext context,
+    AppLocalizations l,
+    List<TopicMistakes>? items,
+    ProgressLabels labels,
+  ) {
+    if (items == null) return [_Muted(l.learnErrorGeneric)];
+    if (items.isEmpty) return [_Muted(l.socialFrequentMistakesEmpty)];
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final max = items.first.wrongCount;
+    return [
+      for (final m in items)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(labels.topic(m.topicId),
+                        style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(l.socialMistakesCount(m.wrongCount), style: theme.textTheme.labelSmall),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+                child: LinearProgressIndicator(
+                  value: max <= 0 ? 0 : m.wrongCount / max,
+                  minHeight: 6,
+                  color: t.danger,
+                  backgroundColor: t.surfaceMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      TextButton(onPressed: () => context.push(kMistakesPath), child: Text(l.learnOpenMistakes)),
+    ];
+  }
+
+  /// "Время по темам": average seconds per question by topic in the latest
+  /// completed exam that has timings; slow topics are marked.
+  List<Widget> _topicTimes(
+    BuildContext context,
+    AppLocalizations l,
+    TopicTimeSnapshot? snap,
+    ProgressLabels labels,
+  ) {
+    if (snap == null || snap.avgSeconds.isEmpty) return [_Muted(l.socialTopicTimeEmpty)];
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final rows = snap.avgSeconds.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return [
+      if (snap.completedAt != null) _Muted(l.socialTopicTimeCaption(_date(context, snap.completedAt))),
+      const SizedBox(height: AppSpacing.xs),
+      for (final e in rows.take(8))
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(labels.topic(e.key),
+                  style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: AppSpacing.xxs),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xxs,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(l.socialTimePerQuestion(e.value),
+                      style: theme.textTheme.labelSmall?.copyWith(color: t.textSecondary)),
+                  if (snap.slowTopics.contains(e.key))
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+                      decoration: BoxDecoration(
+                        color: t.warningContainer,
+                        borderRadius: BorderRadius.circular(AppRadii.pill),
+                      ),
+                      child: Text(l.socialSlowBadge, style: theme.textTheme.labelSmall?.copyWith(color: t.warning)),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      TextButton(
+        onPressed: () => context.push(RoutePaths.examResultFor(snap.attemptId)),
+        child: Text(l.examResultTitle),
+      ),
     ];
   }
 

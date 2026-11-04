@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
+import '../../../social/presentation/social_messages.dart';
 import '../../domain/exam_blueprint.dart';
 import '../../domain/exam_payload.dart';
 import '../../domain/localized_text.dart';
@@ -253,6 +254,25 @@ class _ResultBody extends StatelessWidget {
             ],
           ),
         ],
+        if (r.slowTopics.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.xl),
+          Text(l.socialSlowTopicsTitle, style: theme.textTheme.titleMedium),
+          const SizedBox(height: AppSpacing.xs),
+          Text(l.socialSlowTopicsBody, style: theme.textTheme.bodySmall),
+          const SizedBox(height: AppSpacing.sm),
+          ExamCard(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            child: Column(
+              children: [
+                for (final t in r.slowTopics.take(6))
+                  _SlowTopicRow(
+                    label: examTopicLabel(t, r, bp, ui, names: names),
+                    seconds: r.topicTimeAvg[t],
+                  ),
+              ],
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpacing.xxl),
         FilledButton.icon(
           onPressed: () => context.push(RoutePaths.examReviewFor(data.attemptId)),
@@ -350,6 +370,43 @@ class _SectionBar extends StatelessWidget {
               minHeight: 8,
               color: color,
               backgroundColor: tokens.surfaceMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One "Медленные темы" row: topic name and its average time per question.
+class _SlowTopicRow extends StatelessWidget {
+  final String label;
+  final double? seconds;
+  const _SlowTopicRow({required this.label, required this.seconds});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final theme = Theme.of(context);
+    final tokens = context.tokens;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.hourglass_bottom_rounded, size: 20, color: tokens.warning),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: theme.textTheme.bodyMedium),
+                if (seconds != null)
+                  Text(
+                    l.socialTimePerQuestion(seconds!),
+                    style: theme.textTheme.labelMedium?.copyWith(color: tokens.textSecondary),
+                  ),
+              ],
             ),
           ),
         ],

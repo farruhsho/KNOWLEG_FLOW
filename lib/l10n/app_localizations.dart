@@ -7696,6 +7696,1044 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get skip;
 
+  /// No description provided for @socialAnonymousStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get socialAnonymousStudent;
+
+  /// No description provided for @socialAssignmentAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add assignment'**
+  String get socialAssignmentAdd;
+
+  /// No description provided for @socialAssignmentCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignment added'**
+  String get socialAssignmentCreated;
+
+  /// No description provided for @socialAssignmentDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete assignment'**
+  String get socialAssignmentDelete;
+
+  /// No description provided for @socialAssignmentDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the assignment «{title}»?'**
+  String socialAssignmentDeleteConfirm(String title);
+
+  /// No description provided for @socialAssignmentDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignment deleted'**
+  String get socialAssignmentDeleted;
+
+  /// No description provided for @socialAssignmentDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get socialAssignmentDone;
+
+  /// No description provided for @socialAssignmentDoneOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Done {date}'**
+  String socialAssignmentDoneOn(String date);
+
+  /// No description provided for @socialAssignmentDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String socialAssignmentDue(String date);
+
+  /// No description provided for @socialAssignmentDueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Due date'**
+  String get socialAssignmentDueLabel;
+
+  /// No description provided for @socialAssignmentKindExam.
+  ///
+  /// In en, this message translates to:
+  /// **'Mock exam'**
+  String get socialAssignmentKindExam;
+
+  /// No description provided for @socialAssignmentKindLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson'**
+  String get socialAssignmentKindLesson;
+
+  /// No description provided for @socialAssignmentKindPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get socialAssignmentKindPractice;
+
+  /// No description provided for @socialAssignmentMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as done'**
+  String get socialAssignmentMarkDone;
+
+  /// No description provided for @socialAssignmentMarkedDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as done'**
+  String get socialAssignmentMarkedDone;
+
+  /// No description provided for @socialAssignmentNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New assignment'**
+  String get socialAssignmentNewTitle;
+
+  /// No description provided for @socialAssignmentNotDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not done'**
+  String get socialAssignmentNotDone;
+
+  /// No description provided for @socialAssignmentNothingFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found'**
+  String get socialAssignmentNothingFound;
+
+  /// No description provided for @socialAssignmentOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get socialAssignmentOpen;
+
+  /// No description provided for @socialAssignmentOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get socialAssignmentOverdue;
+
+  /// No description provided for @socialAssignmentPickLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a lesson'**
+  String get socialAssignmentPickLesson;
+
+  /// No description provided for @socialAssignmentPickRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what to assign.'**
+  String get socialAssignmentPickRequired;
+
+  /// No description provided for @socialAssignmentPickSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a subject'**
+  String get socialAssignmentPickSubject;
+
+  /// No description provided for @socialAssignmentPickVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a variant'**
+  String get socialAssignmentPickVariant;
+
+  /// No description provided for @socialAssignmentProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Done: {done} of {total}'**
+  String socialAssignmentProgress(int done, int total);
+
+  /// No description provided for @socialAssignmentQuickPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick practice (any subject)'**
+  String get socialAssignmentQuickPractice;
+
+  /// No description provided for @socialAssignmentSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by title or id'**
+  String get socialAssignmentSearch;
+
+  /// No description provided for @socialAssignmentStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Members\' progress'**
+  String get socialAssignmentStatusTitle;
+
+  /// No description provided for @socialAssignmentTitleInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a title of up to 100 characters.'**
+  String get socialAssignmentTitleInvalid;
+
+  /// No description provided for @socialAssignmentTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get socialAssignmentTitleLabel;
+
+  /// No description provided for @socialAssignmentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No homework yet.'**
+  String get socialAssignmentsEmpty;
+
+  /// No description provided for @socialAssignmentsEmptyOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the first assignment: a lesson, practice or a mock exam variant.'**
+  String get socialAssignmentsEmptyOwner;
+
+  /// No description provided for @socialCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get socialCancel;
+
+  /// No description provided for @socialCodeFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get socialCodeFieldLabel;
+
+  /// No description provided for @socialCodeLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get your code.'**
+  String get socialCodeLoadError;
+
+  /// No description provided for @socialCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get socialCreate;
+
+  /// No description provided for @socialDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get socialDone;
+
+  /// No description provided for @socialErrorAlreadyDone.
+  ///
+  /// In en, this message translates to:
+  /// **'This has already been done.'**
+  String get socialErrorAlreadyDone;
+
+  /// No description provided for @socialErrorBanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is restricted. Contact support.'**
+  String get socialErrorBanned;
+
+  /// No description provided for @socialErrorCodeExhausted.
+  ///
+  /// In en, this message translates to:
+  /// **'This promo code has run out: all activations are used.'**
+  String get socialErrorCodeExhausted;
+
+  /// No description provided for @socialErrorCodeExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This promo code has expired.'**
+  String get socialErrorCodeExpired;
+
+  /// No description provided for @socialErrorCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no such code. Check it and try again.'**
+  String get socialErrorCodeInvalid;
+
+  /// No description provided for @socialErrorFriendAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'This friend is already on your list.'**
+  String get socialErrorFriendAlready;
+
+  /// No description provided for @socialErrorFriendLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You can have at most 50 friends.'**
+  String get socialErrorFriendLimit;
+
+  /// No description provided for @socialErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get socialErrorGeneric;
+
+  /// No description provided for @socialErrorGroupAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already in this group.'**
+  String get socialErrorGroupAlreadyMember;
+
+  /// No description provided for @socialErrorGroupCodeFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'A group code is 4 to 12 Latin letters and digits.'**
+  String get socialErrorGroupCodeFormat;
+
+  /// No description provided for @socialErrorGroupLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit reached: at most 5 groups.'**
+  String get socialErrorGroupLimit;
+
+  /// No description provided for @socialErrorLimitGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit reached.'**
+  String get socialErrorLimitGeneric;
+
+  /// No description provided for @socialErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not found: it may have been deleted.'**
+  String get socialErrorNotFound;
+
+  /// No description provided for @socialErrorNotGroupOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the group owner can do this.'**
+  String get socialErrorNotGroupOwner;
+
+  /// No description provided for @socialErrorNotSignedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to continue.'**
+  String get socialErrorNotSignedIn;
+
+  /// No description provided for @socialErrorOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check the internet and try again.'**
+  String get socialErrorOffline;
+
+  /// No description provided for @socialErrorOwnCode.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your own code. Enter your friend\'s code.'**
+  String get socialErrorOwnCode;
+
+  /// No description provided for @socialErrorPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'No access. Sign in again.'**
+  String get socialErrorPermission;
+
+  /// No description provided for @socialErrorPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available on this platform. Use the Android app.'**
+  String get socialErrorPlatform;
+
+  /// No description provided for @socialErrorPromoAlreadyRedeemed.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already used this promo code.'**
+  String get socialErrorPromoAlreadyRedeemed;
+
+  /// No description provided for @socialErrorPromoFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'A promo code is 4 to 20 Latin letters and digits.'**
+  String get socialErrorPromoFormat;
+
+  /// No description provided for @socialErrorRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts today. Try again tomorrow.'**
+  String get socialErrorRateLimited;
+
+  /// No description provided for @socialErrorReferralAlreadyApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'You have already entered a friend\'s code. It can be done only once.'**
+  String get socialErrorReferralAlreadyApplied;
+
+  /// No description provided for @socialErrorReferralFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'A friend\'s code is 6 letters and digits, e.g. K7M2QX.'**
+  String get socialErrorReferralFormat;
+
+  /// No description provided for @socialErrorReferralNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'A friend\'s code can only be entered by a new account: before your first completed mock exam or credits being added.'**
+  String get socialErrorReferralNotAllowed;
+
+  /// No description provided for @socialErrorValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not accept the data. Check it and try again.'**
+  String get socialErrorValidation;
+
+  /// No description provided for @socialFrequentMistakesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No repeated mistakes by topic yet.'**
+  String get socialFrequentMistakesEmpty;
+
+  /// No description provided for @socialFrequentMistakesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequent mistakes'**
+  String get socialFrequentMistakesTitle;
+
+  /// No description provided for @socialFriendsAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add friend'**
+  String get socialFriendsAdd;
+
+  /// No description provided for @socialFriendsAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask your friend for the invite code from their profile.'**
+  String get socialFriendsAddHint;
+
+  /// No description provided for @socialFriendsAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a friend by code'**
+  String get socialFriendsAddTitle;
+
+  /// No description provided for @socialFriendsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is now your friend'**
+  String socialFriendsAdded(String name);
+
+  /// No description provided for @socialFriendsAddedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend added'**
+  String get socialFriendsAddedGeneric;
+
+  /// No description provided for @socialFriendsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a friend by their invite code and compare this week\'s XP.'**
+  String get socialFriendsEmptyBody;
+
+  /// No description provided for @socialFriendsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends yet'**
+  String get socialFriendsEmptyTitle;
+
+  /// No description provided for @socialFriendsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s XP of you and your friends (lessons, practice and mock exams).'**
+  String get socialFriendsHint;
+
+  /// No description provided for @socialFriendsLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your friends.'**
+  String get socialFriendsLoadError;
+
+  /// No description provided for @socialFriendsRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from friends'**
+  String get socialFriendsRemove;
+
+  /// No description provided for @socialFriendsRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from friends?'**
+  String socialFriendsRemoveConfirm(String name);
+
+  /// No description provided for @socialGroupCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get socialGroupCreateTitle;
+
+  /// No description provided for @socialGroupCreatedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Send this code to your students so they can join:'**
+  String get socialGroupCreatedBody;
+
+  /// No description provided for @socialGroupCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Group created'**
+  String get socialGroupCreatedTitle;
+
+  /// No description provided for @socialGroupJoinCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Join code: {code}'**
+  String socialGroupJoinCode(String code);
+
+  /// No description provided for @socialGroupJoinHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The teacher or the group owner gives you the code.'**
+  String get socialGroupJoinHint;
+
+  /// No description provided for @socialGroupJoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a group'**
+  String get socialGroupJoinTitle;
+
+  /// No description provided for @socialGroupJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined the group'**
+  String get socialGroupJoined;
+
+  /// No description provided for @socialGroupLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave group'**
+  String get socialGroupLeave;
+
+  /// No description provided for @socialGroupLeaveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave «{name}»? You can rejoin with the code.'**
+  String socialGroupLeaveConfirm(String name);
+
+  /// No description provided for @socialGroupLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'You left the group'**
+  String get socialGroupLeft;
+
+  /// No description provided for @socialGroupMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get socialGroupMore;
+
+  /// No description provided for @socialGroupNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 11 B, school No. 5'**
+  String get socialGroupNameHint;
+
+  /// No description provided for @socialGroupNameInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name of up to 60 characters.'**
+  String get socialGroupNameInvalid;
+
+  /// No description provided for @socialGroupNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get socialGroupNameLabel;
+
+  /// No description provided for @socialGroupNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This group is no longer available to you.'**
+  String get socialGroupNotFound;
+
+  /// No description provided for @socialGroupOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open group'**
+  String get socialGroupOpen;
+
+  /// No description provided for @socialGroupOwnerCannotLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'The owner can leave only when no other members are left.'**
+  String get socialGroupOwnerCannotLeave;
+
+  /// No description provided for @socialGroupRatingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No XP in this group this week yet.'**
+  String get socialGroupRatingEmpty;
+
+  /// No description provided for @socialGroupRatingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s XP of group members (lessons, practice and mock exams).'**
+  String get socialGroupRatingHint;
+
+  /// No description provided for @socialGroupRatingNotRanked.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no XP in this group this week yet.'**
+  String get socialGroupRatingNotRanked;
+
+  /// No description provided for @socialGroupTabAssignments.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework'**
+  String get socialGroupTabAssignments;
+
+  /// No description provided for @socialGroupTabMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get socialGroupTabMembers;
+
+  /// No description provided for @socialGroupTabRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get socialGroupTabRating;
+
+  /// No description provided for @socialGroupsCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create group'**
+  String get socialGroupsCreate;
+
+  /// No description provided for @socialGroupsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A group is a class or a study centre: a shared weekly rating and homework from the teacher. Join with a code or create your own.'**
+  String get socialGroupsEmptyBody;
+
+  /// No description provided for @socialGroupsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not in any group yet'**
+  String get socialGroupsEmptyTitle;
+
+  /// No description provided for @socialGroupsJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join by code'**
+  String get socialGroupsJoin;
+
+  /// No description provided for @socialGroupsLimitNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You can be in up to 5 groups.'**
+  String get socialGroupsLimitNote;
+
+  /// No description provided for @socialGroupsMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 member} other{{count} members}}'**
+  String socialGroupsMembers(int count);
+
+  /// No description provided for @socialGroupsOwnerBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get socialGroupsOwnerBadge;
+
+  /// No description provided for @socialGroupsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get socialGroupsTitle;
+
+  /// No description provided for @socialInviteAlreadyReferred.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined with a friend\'s code.'**
+  String get socialInviteAlreadyReferred;
+
+  /// No description provided for @socialInviteApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend\'s code applied. When you pay for a mock exam for the first time, you both get +1 credit.'**
+  String get socialInviteApplied;
+
+  /// No description provided for @socialInviteApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get socialInviteApply;
+
+  /// No description provided for @socialInviteCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied'**
+  String get socialInviteCopied;
+
+  /// No description provided for @socialInviteCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get socialInviteCopy;
+
+  /// No description provided for @socialInviteCopyText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy invitation'**
+  String get socialInviteCopyText;
+
+  /// No description provided for @socialInviteEnterCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'It can be entered once, while your account is new.'**
+  String get socialInviteEnterCodeHint;
+
+  /// No description provided for @socialInviteEnterCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Have a friend\'s code?'**
+  String get socialInviteEnterCodeTitle;
+
+  /// No description provided for @socialInviteMyCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends enter it in the app: Profile → Invite friends. It also adds you as friends.'**
+  String get socialInviteMyCodeHint;
+
+  /// No description provided for @socialInviteMyCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invite code'**
+  String get socialInviteMyCodeTitle;
+
+  /// No description provided for @socialInviteReferralsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has joined with your code yet.'**
+  String get socialInviteReferralsEmpty;
+
+  /// No description provided for @socialInviteReferralsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the list of invited friends.'**
+  String get socialInviteReferralsError;
+
+  /// No description provided for @socialInviteReferralsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited friends'**
+  String get socialInviteReferralsTitle;
+
+  /// No description provided for @socialInviteRewardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'When a friend who joined with your code pays for a mock exam for the first time, you both get +1 credit (1 credit = 1 full mock exam). Signing up alone gives no reward. At most 20 rewards a month.'**
+  String get socialInviteRewardBody;
+
+  /// No description provided for @socialInviteRewardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How the reward works'**
+  String get socialInviteRewardTitle;
+
+  /// No description provided for @socialInviteShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m preparing for the ORT in the ORT Master KG app. Install it and enter my code {code} (Profile → Invite friends). When you pay for a mock exam for the first time, we both get +1 credit.'**
+  String socialInviteShareText(String code);
+
+  /// No description provided for @socialInviteTextCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation copied. Paste it into a chat with your friend.'**
+  String get socialInviteTextCopied;
+
+  /// No description provided for @socialInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite friends'**
+  String get socialInviteTitle;
+
+  /// No description provided for @socialJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get socialJoin;
+
+  /// No description provided for @socialLeagueFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get socialLeagueFriends;
+
+  /// No description provided for @socialLeagueRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get socialLeagueRegion;
+
+  /// No description provided for @socialMemberRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from group'**
+  String get socialMemberRemove;
+
+  /// No description provided for @socialMemberRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from the group?'**
+  String socialMemberRemoveConfirm(String name);
+
+  /// No description provided for @socialMemberRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Member removed'**
+  String get socialMemberRemoved;
+
+  /// No description provided for @socialMinSecPerQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'{min} min {sec} s per question'**
+  String socialMinSecPerQuestion(int min, int sec);
+
+  /// No description provided for @socialMistakesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 mistake} other{{count} mistakes}}'**
+  String socialMistakesCount(int count);
+
+  /// No description provided for @socialOnbCodeHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. We\'ll apply it after you sign in.'**
+  String get socialOnbCodeHelper;
+
+  /// No description provided for @socialOnbHaveCode.
+  ///
+  /// In en, this message translates to:
+  /// **'I have a friend\'s code'**
+  String get socialOnbHaveCode;
+
+  /// No description provided for @socialPendingReferralBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You entered it during setup. Apply it to your account?'**
+  String get socialPendingReferralBody;
+
+  /// No description provided for @socialPendingReferralDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t apply'**
+  String get socialPendingReferralDiscard;
+
+  /// No description provided for @socialPendingReferralTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend\'s code {code}'**
+  String socialPendingReferralTitle(String code);
+
+  /// No description provided for @socialProfileGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups and homework'**
+  String get socialProfileGroups;
+
+  /// No description provided for @socialPromoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Promo code'**
+  String get socialPromoAction;
+
+  /// No description provided for @socialPromoBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits on your account: {balance}'**
+  String socialPromoBalance(int balance);
+
+  /// No description provided for @socialPromoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A promo code adds mock exam credits to your account.'**
+  String get socialPromoBody;
+
+  /// No description provided for @socialPromoRedeem.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate'**
+  String get socialPromoRedeem;
+
+  /// No description provided for @socialPromoSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{+1 credit added} other{+{count} credits added}}'**
+  String socialPromoSuccess(int count);
+
+  /// No description provided for @socialPromoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a promo code'**
+  String get socialPromoTitle;
+
+  /// No description provided for @socialReferralJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined. Reward after their first paid mock exam'**
+  String get socialReferralJoined;
+
+  /// No description provided for @socialReferralRewarded.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward received: +1 credit'**
+  String get socialReferralRewarded;
+
+  /// No description provided for @socialReferralSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined: {joined} · rewards: {rewarded}'**
+  String socialReferralSummary(int joined, int rewarded);
+
+  /// No description provided for @socialRegionEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The regional league shows this week\'s XP of students from your oblast. Choose your region in the profile.'**
+  String get socialRegionEmptyBody;
+
+  /// No description provided for @socialRegionEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your region'**
+  String get socialRegionEmptyTitle;
+
+  /// No description provided for @socialRegionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{region}: this week\'s XP (lessons, practice and mock exams).'**
+  String socialRegionHint(String region);
+
+  /// No description provided for @socialRegionOpenProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Open profile'**
+  String get socialRegionOpenProfile;
+
+  /// No description provided for @socialRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get socialRemove;
+
+  /// No description provided for @socialRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get socialRetry;
+
+  /// No description provided for @socialRiskActionPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick practice'**
+  String get socialRiskActionPractice;
+
+  /// No description provided for @socialRiskActionReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review mistakes'**
+  String get socialRiskActionReview;
+
+  /// No description provided for @socialRiskDeclining.
+  ///
+  /// In en, this message translates to:
+  /// **'Your latest mock exam result dropped: {prev}% before, {last}% now.'**
+  String socialRiskDeclining(String prev, String last);
+
+  /// No description provided for @socialRiskDecliningWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'A dip is normal, but it is a signal to go over the mistakes before the next attempt.'**
+  String get socialRiskDecliningWhy;
+
+  /// No description provided for @socialRiskInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, other{You haven\'t studied for {days} days.}}'**
+  String socialRiskInactive(int days);
+
+  /// No description provided for @socialRiskInactiveWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'After a break of 3 days or more it is harder to get back, and what you learned fades faster.'**
+  String get socialRiskInactiveWhy;
+
+  /// No description provided for @socialRiskStepPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Next step: 10 quick questions today, about 5 minutes.'**
+  String get socialRiskStepPractice;
+
+  /// No description provided for @socialRiskStepReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Next step: go over the mistakes of your latest exam.'**
+  String get socialRiskStepReview;
+
+  /// No description provided for @socialRiskTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your pace'**
+  String get socialRiskTitle;
+
+  /// No description provided for @socialSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get socialSave;
+
+  /// No description provided for @socialSecondsPerQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s per question'**
+  String socialSecondsPerQuestion(int seconds);
+
+  /// No description provided for @socialSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get socialSignIn;
+
+  /// No description provided for @socialSignInRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to invite friends and join groups.'**
+  String get socialSignInRequired;
+
+  /// No description provided for @socialSlowBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'slow'**
+  String get socialSlowBadge;
+
+  /// No description provided for @socialSlowTopicsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'On these topics a question took you much longer than usual in this exam. Practise them to answer faster.'**
+  String get socialSlowTopicsBody;
+
+  /// No description provided for @socialSlowTopicsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow topics'**
+  String get socialSlowTopicsTitle;
+
+  /// No description provided for @socialTopicTimeCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Average time per question in the mock exam of {date}.'**
+  String socialTopicTimeCaption(String date);
+
+  /// No description provided for @socialTopicTimeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Appears after a mock exam: we measure how long questions of each topic take you.'**
+  String get socialTopicTimeEmpty;
+
+  /// No description provided for @socialTopicTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time per topic'**
+  String get socialTopicTimeTitle;
+
   /// No description provided for @somethingWentWrong.
   ///
   /// In en, this message translates to:

@@ -211,6 +211,13 @@ class ExamResult {
   final bool leaderboardEligible;
   final String disclaimerKey;
 
+  /// Average seconds per question by topic (ARCHITECTURE §9.5). Empty for
+  /// attempts without client timings.
+  final Map<String, double> topicTimeAvg;
+
+  /// Topics whose average time is above 1.5 × the attempt's median.
+  final List<String> slowTopics;
+
   const ExamResult({
     required this.correct,
     required this.total,
@@ -225,6 +232,8 @@ class ExamResult {
     this.xpAwarded = 0,
     this.leaderboardEligible = true,
     this.disclaimerKey = 'exam_result_unofficial',
+    this.topicTimeAvg = const {},
+    this.slowTopics = const [],
   });
 
   factory ExamResult.fromJson(Object? json) {
@@ -253,6 +262,13 @@ class ExamResult {
           fallback: true),
       disclaimerKey: asString(pick(m, const ['disclaimer_key', 'disclaimerKey'])) ??
           'exam_result_unofficial',
+      topicTimeAvg: Map.unmodifiable(<String, double>{
+        for (final e in asJsonMap(pick(m, const ['topic_time_avg', 'topicTimeAvg'])).entries)
+          if (asDouble(e.value) case final v? when v >= 0 && e.key.isNotEmpty) e.key: v,
+      }),
+      slowTopics: asStringList(pick(m, const ['slow_topics', 'slowTopics']))
+          .where((t) => t.isNotEmpty)
+          .toList(growable: false),
     );
   }
 
@@ -270,6 +286,8 @@ class ExamResult {
         'xp_awarded': xpAwarded,
         'leaderboard_eligible': leaderboardEligible,
         'disclaimer_key': disclaimerKey,
+        if (topicTimeAvg.isNotEmpty) 'topic_time_avg': topicTimeAvg,
+        if (slowTopics.isNotEmpty) 'slow_topics': slowTopics,
       };
 
   /// Wrong answers: the server's `incorrect`, else (older results) the

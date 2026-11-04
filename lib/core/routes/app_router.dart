@@ -24,6 +24,7 @@ import '../../features/quiz/presentation/pages/quick_test_page.dart';
 import '../../features/quiz/presentation/pages/quiz_page.dart';
 import '../../features/quiz/presentation/pages/quiz_results_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/social/social_routes.dart';
 import '../../features/subjects/presentation/pages/subject_detail_page.dart';
 import '../../features/subjects/presentation/pages/subjects_list_page.dart';
 import '../../features/tutor/tutor_routes.dart';
@@ -265,6 +266,7 @@ class AppRouter {
         ...tutorRoutes,
         ...accountRoutes,
         ...gamificationRoutes,
+        ...socialRoutes,
         ...adminRoutes,
       ],
       errorBuilder: (context, state) => const _NotFoundPage(),

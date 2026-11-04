@@ -10,6 +10,7 @@ import '../../../core/backend/backend_contract.dart';
 import '../../../core/network/firebase_service.dart';
 import '../../../providers/auth_provider.dart';
 import '../../exam/exam_routes.dart';
+import '../../progress/domain/motivation_risk.dart';
 import '../domain/dashboard_models.dart';
 
 /// "Now", overridable in tests.
@@ -135,6 +136,59 @@ final nextStepProvider = Provider<AsyncValue<NextStep>>((ref) {
     examsCompleted: stats.valueOrNull?.examsCompleted ?? 0,
     latest: latest.valueOrNull,
   ));
+});
+
+/// The last completed exams (newest first, up to 10) for the motivation
+/// rule. One read on open / pull-to-refresh, not a live listener.
+final recentExamPointsProvider = FutureProvider<List<ExamPoint>>((ref) async {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return const [];
+  final attempts = FirebaseService.firestore.collection(Collections.examAttempts);
+  QuerySnapshot<Map<String, dynamic>> snap;
+  try {
+    // Composite index (uid ASC, status ASC, completed_at DESC).
+    snap = await attempts
+        .where('uid', isEqualTo: uid)
+        .where('status', isEqualTo: 'completed')
+        .orderBy('completed_at', descending: true)
+        .limit(10)
+        .get();
+  } on FirebaseException catch (e) {
+    if (!_missingIndex(e)) rethrow;
+    snap = await attempts.where('uid', isEqualTo: uid).limit(50).get();
+  }
+  return examPointsFrom([for (final d in snap.docs) (id: d.id, data: d.data())]);
+});
+
+/// Completed attempts of [docs] as [ExamPoint]s, newest first.
+List<ExamPoint> examPointsFrom(Iterable<AttemptDoc> docs) {
+  final points = <ExamPoint>[];
+  for (final d in docs) {
+    final s = LatestExamSummary.fromDoc(d.id, d.data);
+    if (s == null || s.percent == null) continue;
+    points.add(ExamPoint(
+      attemptId: s.attemptId,
+      direction: ExamPoint.directionOf(s.blueprintId ?? ''),
+      percent: s.percent!,
+      completedAt: s.completedAt,
+    ));
+  }
+  points.sort((a, b) => (b.completedAt?.millisecondsSinceEpoch ?? 0)
+      .compareTo(a.completedAt?.millisecondsSinceEpoch ?? 0));
+  return points;
+}
+
+/// Home-screen nudge: no activity for 3+ days or a falling exam result
+/// (ARCHITECTURE §9.5). Null while loading, on errors or when all is well.
+final motivationRiskProvider = Provider<MotivationRisk?>((ref) {
+  final stats = ref.watch(userStatsProvider).valueOrNull;
+  final exams = ref.watch(recentExamPointsProvider).valueOrNull ?? const <ExamPoint>[];
+  if (stats == null && exams.isEmpty) return null;
+  return MotivationRules.evaluate(
+    lastActiveDay: stats?.lastActiveDay,
+    exams: exams,
+    now: ref.watch(dashboardClockProvider)(),
+  );
 });
 
 /// Section/subject titles from the bundled ORT blueprints, keyed by section

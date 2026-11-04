@@ -4526,6 +4526,648 @@ class AppLocalizationsRu extends AppLocalizations {
   String get skip => 'Пропустить';
 
   @override
+  String get socialAnonymousStudent => 'Ученик';
+
+  @override
+  String get socialAssignmentAdd => 'Добавить задание';
+
+  @override
+  String get socialAssignmentCreated => 'Задание добавлено';
+
+  @override
+  String get socialAssignmentDelete => 'Удалить задание';
+
+  @override
+  String socialAssignmentDeleteConfirm(String title) {
+    return 'Удалить задание «$title»?';
+  }
+
+  @override
+  String get socialAssignmentDeleted => 'Задание удалено';
+
+  @override
+  String get socialAssignmentDone => 'Выполнено';
+
+  @override
+  String socialAssignmentDoneOn(String date) {
+    return 'Выполнено $date';
+  }
+
+  @override
+  String socialAssignmentDue(String date) {
+    return 'Срок: $date';
+  }
+
+  @override
+  String get socialAssignmentDueLabel => 'Срок';
+
+  @override
+  String get socialAssignmentKindExam => 'Пробный экзамен';
+
+  @override
+  String get socialAssignmentKindLesson => 'Урок';
+
+  @override
+  String get socialAssignmentKindPractice => 'Практика';
+
+  @override
+  String get socialAssignmentMarkDone => 'Отметить выполненным';
+
+  @override
+  String get socialAssignmentMarkedDone => 'Отмечено как выполненное';
+
+  @override
+  String get socialAssignmentNewTitle => 'Новое задание';
+
+  @override
+  String get socialAssignmentNotDone => 'Не выполнено';
+
+  @override
+  String get socialAssignmentNothingFound => 'Ничего не найдено';
+
+  @override
+  String get socialAssignmentOpen => 'Открыть';
+
+  @override
+  String get socialAssignmentOverdue => 'Просрочено';
+
+  @override
+  String get socialAssignmentPickLesson => 'Выберите урок';
+
+  @override
+  String get socialAssignmentPickRequired => 'Выберите, что задать.';
+
+  @override
+  String get socialAssignmentPickSubject => 'Выберите предмет';
+
+  @override
+  String get socialAssignmentPickVariant => 'Выберите вариант';
+
+  @override
+  String socialAssignmentProgress(int done, int total) {
+    return 'Выполнили: $done из $total';
+  }
+
+  @override
+  String get socialAssignmentQuickPractice =>
+      'Быстрая практика (любой предмет)';
+
+  @override
+  String get socialAssignmentSearch => 'Поиск по названию или id';
+
+  @override
+  String get socialAssignmentStatusTitle => 'Статус участников';
+
+  @override
+  String get socialAssignmentTitleInvalid =>
+      'Введите название до 100 символов.';
+
+  @override
+  String get socialAssignmentTitleLabel => 'Название';
+
+  @override
+  String get socialAssignmentsEmpty => 'Заданий пока нет.';
+
+  @override
+  String get socialAssignmentsEmptyOwner =>
+      'Добавьте первое задание: урок, практику или вариант пробного экзамена.';
+
+  @override
+  String get socialCancel => 'Отмена';
+
+  @override
+  String get socialCodeFieldLabel => 'Код';
+
+  @override
+  String get socialCodeLoadError => 'Не удалось получить ваш код.';
+
+  @override
+  String get socialCreate => 'Создать';
+
+  @override
+  String get socialDone => 'Готово';
+
+  @override
+  String get socialErrorAlreadyDone => 'Это уже сделано.';
+
+  @override
+  String get socialErrorBanned =>
+      'Ваш аккаунт ограничен. Обратитесь в поддержку.';
+
+  @override
+  String get socialErrorCodeExhausted =>
+      'Промокод закончился: все активации уже использованы.';
+
+  @override
+  String get socialErrorCodeExpired => 'Срок действия промокода истёк.';
+
+  @override
+  String get socialErrorCodeInvalid =>
+      'Такого кода нет. Проверьте его и попробуйте ещё раз.';
+
+  @override
+  String get socialErrorFriendAlready => 'Этот друг уже в списке.';
+
+  @override
+  String get socialErrorFriendLimit => 'Можно добавить не больше 50 друзей.';
+
+  @override
+  String get socialErrorGeneric => 'Не получилось. Попробуйте ещё раз.';
+
+  @override
+  String get socialErrorGroupAlreadyMember => 'Вы уже состоите в этой группе.';
+
+  @override
+  String get socialErrorGroupCodeFormat =>
+      'Код группы — от 4 до 12 латинских букв и цифр.';
+
+  @override
+  String get socialErrorGroupLimit => 'Достигнут лимит: не больше 5 групп.';
+
+  @override
+  String get socialErrorLimitGeneric => 'Достигнут лимит.';
+
+  @override
+  String get socialErrorNotFound => 'Не найдено: возможно, уже удалено.';
+
+  @override
+  String get socialErrorNotGroupOwner =>
+      'Это может сделать только владелец группы.';
+
+  @override
+  String get socialErrorNotSignedIn => 'Войдите в аккаунт, чтобы продолжить.';
+
+  @override
+  String get socialErrorOffline =>
+      'Нет соединения. Проверьте интернет и попробуйте ещё раз.';
+
+  @override
+  String get socialErrorOwnCode =>
+      'Это ваш собственный код. Введите код друга.';
+
+  @override
+  String get socialErrorPermission => 'Нет доступа. Войдите в аккаунт ещё раз.';
+
+  @override
+  String get socialErrorPlatform =>
+      'Недоступно на этой платформе. Используйте приложение для Android.';
+
+  @override
+  String get socialErrorPromoAlreadyRedeemed =>
+      'Вы уже использовали этот промокод.';
+
+  @override
+  String get socialErrorPromoFormat =>
+      'Промокод — от 4 до 20 латинских букв и цифр.';
+
+  @override
+  String get socialErrorRateLimited =>
+      'Слишком много попыток за сегодня. Попробуйте завтра.';
+
+  @override
+  String get socialErrorReferralAlreadyApplied =>
+      'Вы уже вводили код друга. Это можно сделать только один раз.';
+
+  @override
+  String get socialErrorReferralFormat =>
+      'Код друга — 6 букв и цифр, например K7M2QX.';
+
+  @override
+  String get socialErrorReferralNotAllowed =>
+      'Код друга можно ввести только в новом аккаунте: до первого завершённого пробного экзамена или зачисления кредитов.';
+
+  @override
+  String get socialErrorValidation =>
+      'Сервер не принял данные. Проверьте их и попробуйте ещё раз.';
+
+  @override
+  String get socialFrequentMistakesEmpty =>
+      'Повторяющихся ошибок по темам пока нет.';
+
+  @override
+  String get socialFrequentMistakesTitle => 'Частые ошибки';
+
+  @override
+  String get socialFriendsAdd => 'Добавить друга';
+
+  @override
+  String get socialFriendsAddHint =>
+      'Попросите у друга код приглашения из его профиля.';
+
+  @override
+  String get socialFriendsAddTitle => 'Добавить друга по коду';
+
+  @override
+  String socialFriendsAdded(String name) {
+    return '$name теперь в друзьях';
+  }
+
+  @override
+  String get socialFriendsAddedGeneric => 'Друг добавлен';
+
+  @override
+  String get socialFriendsEmptyBody =>
+      'Добавьте друга по его коду приглашения и сравнивайте XP за неделю.';
+
+  @override
+  String get socialFriendsEmptyTitle => 'Друзей пока нет';
+
+  @override
+  String get socialFriendsHint =>
+      'XP за эту неделю — ваш и друзей (уроки, практика и пробные экзамены).';
+
+  @override
+  String get socialFriendsLoadError => 'Не удалось загрузить друзей.';
+
+  @override
+  String get socialFriendsRemove => 'Удалить из друзей';
+
+  @override
+  String socialFriendsRemoveConfirm(String name) {
+    return 'Удалить $name из друзей?';
+  }
+
+  @override
+  String get socialGroupCreateTitle => 'Новая группа';
+
+  @override
+  String get socialGroupCreatedBody =>
+      'Отправьте этот код ученикам, чтобы они вступили:';
+
+  @override
+  String get socialGroupCreatedTitle => 'Группа создана';
+
+  @override
+  String socialGroupJoinCode(String code) {
+    return 'Код для вступления: $code';
+  }
+
+  @override
+  String get socialGroupJoinHint => 'Код даёт учитель или владелец группы.';
+
+  @override
+  String get socialGroupJoinTitle => 'Вступить в группу';
+
+  @override
+  String get socialGroupJoined => 'Вы вступили в группу';
+
+  @override
+  String get socialGroupLeave => 'Выйти из группы';
+
+  @override
+  String socialGroupLeaveConfirm(String name) {
+    return 'Выйти из группы «$name»? Вернуться можно по коду.';
+  }
+
+  @override
+  String get socialGroupLeft => 'Вы вышли из группы';
+
+  @override
+  String get socialGroupMore => 'Ещё';
+
+  @override
+  String get socialGroupNameHint => 'Например, 11 «Б», школа № 5';
+
+  @override
+  String get socialGroupNameInvalid => 'Введите название до 60 символов.';
+
+  @override
+  String get socialGroupNameLabel => 'Название группы';
+
+  @override
+  String get socialGroupNotFound => 'Эта группа вам больше недоступна.';
+
+  @override
+  String get socialGroupOpen => 'Открыть группу';
+
+  @override
+  String get socialGroupOwnerCannotLeave =>
+      'Владелец может выйти, только когда в группе не останется других участников.';
+
+  @override
+  String get socialGroupRatingEmpty => 'На этой неделе в группе ещё нет XP.';
+
+  @override
+  String get socialGroupRatingHint =>
+      'XP участников группы за эту неделю (уроки, практика и пробные экзамены).';
+
+  @override
+  String get socialGroupRatingNotRanked =>
+      'У вас пока нет XP в этой группе за эту неделю.';
+
+  @override
+  String get socialGroupTabAssignments => 'Задания';
+
+  @override
+  String get socialGroupTabMembers => 'Участники';
+
+  @override
+  String get socialGroupTabRating => 'Рейтинг';
+
+  @override
+  String get socialGroupsCreate => 'Создать группу';
+
+  @override
+  String get socialGroupsEmptyBody =>
+      'Группа — это класс или учебный центр: общий рейтинг за неделю и домашние задания от учителя. Вступите по коду или создайте свою.';
+
+  @override
+  String get socialGroupsEmptyTitle => 'Вы пока не состоите в группах';
+
+  @override
+  String get socialGroupsJoin => 'Вступить по коду';
+
+  @override
+  String get socialGroupsLimitNote =>
+      'Можно состоять не больше чем в 5 группах.';
+
+  @override
+  String socialGroupsMembers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count участника',
+      many: '$count участников',
+      few: '$count участника',
+      one: '$count участник',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialGroupsOwnerBadge => 'Владелец';
+
+  @override
+  String get socialGroupsTitle => 'Группы';
+
+  @override
+  String get socialInviteAlreadyReferred => 'Вы присоединились по коду друга.';
+
+  @override
+  String get socialInviteApplied =>
+      'Код друга применён. Когда вы впервые оплатите пробный экзамен, вы оба получите +1 кредит.';
+
+  @override
+  String get socialInviteApply => 'Применить';
+
+  @override
+  String get socialInviteCopied => 'Код скопирован';
+
+  @override
+  String get socialInviteCopy => 'Скопировать код';
+
+  @override
+  String get socialInviteCopyText => 'Скопировать приглашение';
+
+  @override
+  String get socialInviteEnterCodeHint =>
+      'Его можно ввести один раз, пока аккаунт новый.';
+
+  @override
+  String get socialInviteEnterCodeTitle => 'Есть код друга?';
+
+  @override
+  String get socialInviteMyCodeHint =>
+      'Друзья вводят его в приложении: Профиль → Пригласить друзей. По нему же вас можно добавить в друзья.';
+
+  @override
+  String get socialInviteMyCodeTitle => 'Ваш код приглашения';
+
+  @override
+  String get socialInviteReferralsEmpty =>
+      'По вашему коду пока никто не присоединился.';
+
+  @override
+  String get socialInviteReferralsError =>
+      'Не удалось загрузить список приглашённых.';
+
+  @override
+  String get socialInviteReferralsTitle => 'Приглашённые друзья';
+
+  @override
+  String get socialInviteRewardBody =>
+      'Когда друг, пришедший по вашему коду, впервые оплатит пробный экзамен, вы оба получите +1 кредит (1 кредит = 1 полный пробный экзамен). Одна регистрация награды не даёт. Не больше 20 наград в месяц.';
+
+  @override
+  String get socialInviteRewardTitle => 'Как работает награда';
+
+  @override
+  String socialInviteShareText(String code) {
+    return 'Готовлюсь к ОРТ в приложении ORT Master KG. Установи его и введи мой код $code (Профиль → Пригласить друзей). Когда ты впервые оплатишь пробный экзамен, мы оба получим +1 кредит.';
+  }
+
+  @override
+  String get socialInviteTextCopied =>
+      'Приглашение скопировано. Вставьте его в чат с другом.';
+
+  @override
+  String get socialInviteTitle => 'Пригласить друзей';
+
+  @override
+  String get socialJoin => 'Вступить';
+
+  @override
+  String get socialLeagueFriends => 'Друзья';
+
+  @override
+  String get socialLeagueRegion => 'Регион';
+
+  @override
+  String get socialMemberRemove => 'Удалить из группы';
+
+  @override
+  String socialMemberRemoveConfirm(String name) {
+    return 'Удалить $name из группы?';
+  }
+
+  @override
+  String get socialMemberRemoved => 'Участник удалён';
+
+  @override
+  String socialMinSecPerQuestion(int min, int sec) {
+    return '$min мин $sec с на вопрос';
+  }
+
+  @override
+  String socialMistakesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ошибки',
+      many: '$count ошибок',
+      few: '$count ошибки',
+      one: '$count ошибка',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialOnbCodeHelper =>
+      'Необязательно. Применим его после входа в аккаунт.';
+
+  @override
+  String get socialOnbHaveCode => 'У меня есть код друга';
+
+  @override
+  String get socialPendingReferralBody =>
+      'Вы ввели его при настройке. Применить к аккаунту?';
+
+  @override
+  String get socialPendingReferralDiscard => 'Не применять';
+
+  @override
+  String socialPendingReferralTitle(String code) {
+    return 'Код друга $code';
+  }
+
+  @override
+  String get socialProfileGroups => 'Группы и задания';
+
+  @override
+  String get socialPromoAction => 'Промокод';
+
+  @override
+  String socialPromoBalance(int balance) {
+    return 'Кредитов на аккаунте: $balance';
+  }
+
+  @override
+  String get socialPromoBody =>
+      'Промокод добавляет на аккаунт кредиты для пробных экзаменов.';
+
+  @override
+  String get socialPromoRedeem => 'Активировать';
+
+  @override
+  String socialPromoSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Зачислено $count кредита',
+      many: 'Зачислено $count кредитов',
+      few: 'Зачислено $count кредита',
+      one: 'Зачислен $count кредит',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialPromoTitle => 'Ввести промокод';
+
+  @override
+  String get socialReferralJoined =>
+      'Присоединился. Награда — после его первого оплаченного экзамена';
+
+  @override
+  String get socialReferralRewarded => 'Награда получена: +1 кредит';
+
+  @override
+  String socialReferralSummary(int joined, int rewarded) {
+    return 'Присоединились: $joined · наград: $rewarded';
+  }
+
+  @override
+  String get socialRegionEmptyBody =>
+      'В региональной лиге — XP за эту неделю учеников из вашей области. Укажите регион в профиле.';
+
+  @override
+  String get socialRegionEmptyTitle => 'Укажите регион';
+
+  @override
+  String socialRegionHint(String region) {
+    return '$region: XP за эту неделю (уроки, практика и пробные экзамены).';
+  }
+
+  @override
+  String get socialRegionOpenProfile => 'Открыть профиль';
+
+  @override
+  String get socialRemove => 'Удалить';
+
+  @override
+  String get socialRetry => 'Повторить';
+
+  @override
+  String get socialRiskActionPractice => 'Быстрая практика';
+
+  @override
+  String get socialRiskActionReview => 'Разобрать ошибки';
+
+  @override
+  String socialRiskDeclining(String prev, String last) {
+    return 'Результат последнего пробного экзамена снизился: было $prev%, стало $last%.';
+  }
+
+  @override
+  String get socialRiskDecliningWhy =>
+      'Спад — это нормально, но это сигнал разобрать ошибки перед следующей попыткой.';
+
+  @override
+  String socialRiskInactive(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Вы не занимались $days дня.',
+      many: 'Вы не занимались $days дней.',
+      few: 'Вы не занимались $days дня.',
+      one: 'Вы не занимались $days день.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialRiskInactiveWhy =>
+      'После перерыва от 3 дней сложнее вернуться, а выученное быстрее забывается.';
+
+  @override
+  String get socialRiskStepPractice =>
+      'Следующий шаг: 10 быстрых вопросов сегодня — около 5 минут.';
+
+  @override
+  String get socialRiskStepReview =>
+      'Следующий шаг: разберите ошибки последнего экзамена.';
+
+  @override
+  String get socialRiskTitle => 'Не теряйте темп';
+
+  @override
+  String get socialSave => 'Сохранить';
+
+  @override
+  String socialSecondsPerQuestion(int seconds) {
+    return '$seconds с на вопрос';
+  }
+
+  @override
+  String get socialSignIn => 'Войти';
+
+  @override
+  String get socialSignInRequired =>
+      'Войдите, чтобы приглашать друзей и вступать в группы.';
+
+  @override
+  String get socialSlowBadge => 'медленно';
+
+  @override
+  String get socialSlowTopicsBody =>
+      'На вопросы этих тем у вас ушло заметно больше времени, чем обычно в этом экзамене. Потренируйте их, чтобы отвечать быстрее.';
+
+  @override
+  String get socialSlowTopicsTitle => 'Медленные темы';
+
+  @override
+  String socialTopicTimeCaption(String date) {
+    return 'Среднее время на вопрос в пробном экзамене от $date.';
+  }
+
+  @override
+  String get socialTopicTimeEmpty =>
+      'Появится после пробного экзамена: мы измеряем, сколько времени у вас уходит на вопросы каждой темы.';
+
+  @override
+  String get socialTopicTimeTitle => 'Время по темам';
+
+  @override
   String get somethingWentWrong => 'Что-то пошло не так';
 
   @override

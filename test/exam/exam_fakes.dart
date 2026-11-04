@@ -4,6 +4,7 @@ import 'package:knowledge_flow/features/exam/data/exam_remote_datasource.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_failure.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_payload.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_session.dart';
+import 'package:knowledge_flow/features/exam/domain/question_timing.dart';
 
 import 'exam_test_fixtures.dart';
 
@@ -78,10 +79,27 @@ class MemoryExamStore implements ExamLocalStore {
   int prunes = 0;
 
   @override
-  Future<void> pruneContent(String attemptId) async => prunes++;
+  Future<void> pruneContent(String attemptId) async {
+    prunes++;
+    timings = null;
+  }
 
   @override
-  Future<void> remove(String attemptId) async => saved = null;
+  Future<void> remove(String attemptId) async {
+    saved = null;
+    timings = null;
+  }
+
+  /// Last saved per-question timings (`toJson` form).
+  Map<String, dynamic>? timings;
+
+  @override
+  Future<void> saveTimings(String attemptId, QuestionTimer timer, DateTime now) async =>
+      timings = timer.toJson(now);
+
+  @override
+  Future<QuestionTimer?> loadTimings(String attemptId) async =>
+      timings == null ? null : QuestionTimer.fromJson(timings);
 }
 
 /// Draft sink whose first [failTimes] writes fail (e.g. PERMISSION_DENIED).

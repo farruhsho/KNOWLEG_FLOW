@@ -1,25 +1,36 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
+import '../../../../core/routes/route_paths.dart';
 import '../../../../core/utils/bishkek_time.dart';
 import '../../../../core/utils/content_locale.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/leaderboard_model.dart';
+import '../../../../shared/models/region_model.dart';
 import '../../../../shared/services/leaderboard_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
+import '../../../onboarding/data/kg_regions_provider.dart';
+import '../../../social/application/social_providers.dart';
+import '../../../social/domain/league_boards.dart';
+import '../../../social/presentation/widgets/friends_league.dart';
 import '../../domain/subject_boards.dart';
 
 /// Leaderboards precomputed by the server (GAM-17): weekly (ISO week in
-/// Asia/Bishkek), all time, and weekly per subject. Top 50 by XP plus the
-/// viewer's own position.
+/// Asia/Bishkek), all time, the student's region this week, friends this
+/// week, and weekly per subject. Top 50 by XP plus the viewer's own
+/// position.
 ///
-/// What counts (D10): weekly and all-time boards get all server-awarded XP
-/// (mock exams plus the capped lesson/practice XP); subject boards get mock
-/// exam XP only, keyed by the blueprint subject id ([SubjectBoards]).
+/// What counts (D10): weekly, all-time, region and friends boards get all
+/// server-awarded XP (mock exams plus the capped lesson/practice XP); subject
+/// boards get mock exam XP only, keyed by the blueprint subject id
+/// ([SubjectBoards]). Region boards (`region_{id}_weekly_*`, ARCHITECTURE
+/// §9.3) exist for students with `users/{uid}.region`; the friends league is
+/// assembled on the client from the friends' weekly entries.
 class LeaderboardPage extends StatelessWidget {
   const LeaderboardPage({super.key});
 
@@ -27,7 +38,7 @@ class LeaderboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     return DefaultTabController(
-      length: 3,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: Text(l.learnLeaderboardTitle),
@@ -37,6 +48,8 @@ class LeaderboardPage extends StatelessWidget {
             tabs: [
               Tab(text: l.learnLeaderboardWeekly),
               Tab(text: l.learnLeaderboardAllTime),
+              Tab(text: l.socialLeagueRegion),
+              Tab(text: l.socialLeagueFriends),
               Tab(text: l.learnLeaderboardBySubject),
             ],
           ),
@@ -45,8 +58,76 @@ class LeaderboardPage extends StatelessWidget {
           children: [
             _BoardView(boardId: BishkekTime.weeklyBoardId(DateTime.now())),
             const _BoardView(boardId: BishkekTime.allTimeBoardId),
+            const _RegionBoard(),
+            const _KeepAlive(child: FriendsLeagueView()),
             const _SubjectBoards(),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Keeps a tab's state (and its loaded data) while switching tabs.
+class _KeepAlive extends StatefulWidget {
+  const _KeepAlive({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_KeepAlive> createState() => _KeepAliveState();
+}
+
+class _KeepAliveState extends State<_KeepAlive> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+}
+
+/// This week's board of the student's oblast, or an explanation of how to
+/// set a region.
+class _RegionBoard extends ConsumerWidget {
+  const _RegionBoard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
+    final profile = ref.watch(socialProfileProvider);
+    final regions = ref.watch(kgRegionsProvider);
+    if ((profile.isLoading && !profile.hasValue) || (regions.isLoading && !regions.hasValue)) {
+      return LoadingView(message: l.loading);
+    }
+    if (profile.hasError && !profile.hasValue) {
+      return ErrorView.forError(context, profile.error, onRetry: () => ref.invalidate(socialProfileProvider));
+    }
+    final list = regions.valueOrNull ?? const <RegionData>[];
+    final stored = profile.valueOrNull?.regionOblast;
+    final regionId = LeagueBoards.regionIdFor(stored, list);
+    if (regionId == null) {
+      return EmptyView(
+        icon: Icons.place_outlined,
+        message: l.socialRegionEmptyTitle,
+        subtitle: l.socialRegionEmptyBody,
+        action: OutlinedButton(
+          onPressed: () => context.go(RoutePaths.profile),
+          child: Text(l.socialRegionOpenProfile),
+        ),
+      );
+    }
+    final name = list.firstWhere((r) => r.id == regionId).label(contentLanguageOf(context));
+    return _BoardView(
+      key: ValueKey('region-$regionId'),
+      boardId: LeagueBoards.regionWeeklyBoardId(regionId, DateTime.now()),
+      header: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+        child: Text(
+          l.socialRegionHint(name),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: context.tokens.textSecondary),
         ),
       ),
     );
