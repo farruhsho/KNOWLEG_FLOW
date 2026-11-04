@@ -1,11 +1,32 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 
+import '../../core/design/tokens.dart';
+import '../../l10n/app_localizations.dart';
+import '../services/data_exception.dart';
+
+/// Human message for a failed load (never the raw exception text).
+String dataErrorMessage(BuildContext context, Object? error) {
+  final l = AppLocalizations.of(context);
+  final failure = error is DataException ? error.failure : DataException.from(error ?? 'unknown').failure;
+  switch (failure) {
+    case DataFailure.offline:
+      return l?.learnErrorOffline ?? 'Нет соединения. Проверьте интернет и попробуйте ещё раз.';
+    case DataFailure.permissionDenied:
+      return l?.learnErrorPermission ?? 'Нет доступа к данным. Войдите в аккаунт ещё раз.';
+    case DataFailure.notFound:
+      return l?.learnErrorNotFound ?? 'Материал не найден.';
+    case DataFailure.unknown:
+      return l?.learnErrorGeneric ?? 'Не удалось загрузить данные. Попробуйте ещё раз.';
+  }
+}
+
+/// Error state with a human message and a retry button.
 class ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback? onRetry;
   final String? retryText;
   final IconData? icon;
+  final String? title;
 
   const ErrorView({
     super.key,
@@ -13,43 +34,42 @@ class ErrorView extends StatelessWidget {
     this.onRetry,
     this.retryText,
     this.icon,
+    this.title,
   });
+
+  /// Error view for a load failure; picks the message from [error].
+  factory ErrorView.forError(BuildContext context, Object? error, {VoidCallback? onRetry}) =>
+      ErrorView(message: dataErrorMessage(context, error), onRetry: onRetry);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon ?? Icons.error_outline,
-              size: 64,
-              color: AppColors.error,
-            ),
-            const SizedBox(height: 16),
+            Icon(icon ?? Icons.cloud_off_outlined, size: 48, color: context.tokens.danger),
+            const SizedBox(height: AppSpacing.lg),
             Text(
-              'Ошибка',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.error,
-                    fontWeight: FontWeight.bold,
-                  ),
+              title ?? l?.error ?? 'Ошибка',
+              style: theme.textTheme.titleLarge,
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.bodyMedium?.copyWith(color: context.tokens.textSecondary),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: Text(retryText ?? 'Повторить'),
+                label: Text(retryText ?? l?.retry ?? 'Повторить'),
               ),
             ],
           ],
@@ -59,6 +79,7 @@ class ErrorView extends StatelessWidget {
   }
 }
 
+/// Empty state: nothing to show yet, with an optional action.
 class EmptyView extends StatelessWidget {
   final String message;
   final String? subtitle;
@@ -75,37 +96,30 @@ class EmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon ?? Icons.inbox_outlined,
-              size: 64,
-              color: AppColors.grey400,
-            ),
-            const SizedBox(height: 16),
+            Icon(icon ?? Icons.inbox_outlined, size: 48, color: context.tokens.textTertiary),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               message,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 subtitle!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textTertiary,
-                    ),
+                style: theme.textTheme.bodyMedium?.copyWith(color: context.tokens.textSecondary),
                 textAlign: TextAlign.center,
               ),
             ],
             if (action != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
               action!,
             ],
           ],

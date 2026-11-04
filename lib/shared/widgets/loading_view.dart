@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+
+import '../../core/design/tokens.dart';
 
 class LoadingView extends StatelessWidget {
   final String? message;
@@ -13,30 +14,30 @@ class LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final content = Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-          if (message != null) ...[
-            const SizedBox(height: 16),
-            Text(
-              message!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-              textAlign: TextAlign.center,
-            ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xxl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            if (message != null) ...[
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                message!,
+                style: theme.textTheme.bodyMedium?.copyWith(color: context.tokens.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
 
     if (isOverlay) {
-      return Container(
-        color: Colors.black.withValues(alpha: 0.3),
+      return ColoredBox(
+        color: theme.colorScheme.scrim.withValues(alpha: 0.3),
         child: content,
       );
     }

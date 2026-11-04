@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/routes/app_router.dart';
 
-class QuizResultsPage extends StatefulWidget {
+import '../../../../core/design/tokens.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/practice_session_model.dart';
+import '../../../../shared/services/activity_reporter.dart';
+import '../../../../shared/widgets/elapsed_timer.dart';
+import '../../../../shared/widgets/error_view.dart';
+import '../../../gamification/gamification_routes.dart';
+import '../../data/practice_session_store.dart';
+import '../../domain/practice_score.dart';
+import 'practice_review_page.dart';
+
+/// Practice results. Shows a **practice percentage only** — never an ORT
+/// score (EXAM-03). Works without route `extra` (EXAM-15): falls back to the
+/// last session kept in memory, or an empty state.
+class QuizResultsPage extends StatelessWidget {
   final int totalQuestions;
   final int correctAnswers;
   final int totalTimeSeconds;
@@ -16,348 +29,259 @@ class QuizResultsPage extends StatefulWidget {
   });
 
   @override
-  State<QuizResultsPage> createState() => _QuizResultsPageState();
-}
-
-class _QuizResultsPageState extends State<QuizResultsPage> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _scaleAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    );
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final percentage = (widget.correctAnswers / widget.totalQuestions * 100).round();
-    final incorrectAnswers = widget.totalQuestions - widget.correctAnswers;
-    final avgTimePerQuestion = widget.totalTimeSeconds / widget.totalQuestions;
+    final l = AppLocalizations.of(context)!;
+    final store = PracticeSessionStore.instance;
+    final session = store.matching(total: totalQuestions, correct: correctAnswers);
+    final total = session?.total ?? totalQuestions;
+    final correct = session?.correct ?? correctAnswers;
+    final seconds = session?.elapsedSeconds ?? totalTimeSeconds;
+
+    if (total <= 0) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l.learnResultsTitle)),
+        body: EmptyView(
+          icon: Icons.assignment_outlined,
+          message: l.learnResultsEmptyTitle,
+          subtitle: l.learnResultsEmptyBody,
+          action: FilledButton(
+            onPressed: () => context.pushReplacement(RoutePaths.quickTest),
+            child: Text(l.learnQuickPracticeTitle),
+          ),
+        ),
+      );
+    }
+
+    final score = PracticeScore(correct: correct, total: total);
+    final wrong = session?.wrong ?? (total - correct);
+    final skipped = session?.skipped ?? 0;
+    final answered = total - skipped;
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final gutter = AppSpacing.gutter(context);
+    final color = switch (score.band) {
+      PracticeBand.excellent || PracticeBand.good => t.success,
+      PracticeBand.fair => t.warning,
+      _ => t.danger,
+    };
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(l.learnResultsTitle),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+          onPressed: () => context.go(RoutePaths.home),
+        ),
+      ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-
-              // Score circle
-              ScaleTransition(
-                scale: _scaleAnimation,
-                child: _buildScoreCircle(context, percentage),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Result message
-              Text(
-                _getResultMessage(percentage),
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(gutter, AppSpacing.lg, gutter, AppSpacing.xxxl),
+          children: [
+            // Score: a practice percentage, explicitly not an ORT score.
+            Semantics(
+              label: '${score.headline(l)}. ${score.summary(l)}',
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 148,
+                    height: 148,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CircularProgressIndicator(
+                          value: score.percent / 100,
+                          strokeWidth: 10,
+                          backgroundColor: t.surfaceMuted,
+                          valueColor: AlwaysStoppedAnimation(color),
+                        ),
+                        Center(
+                          child: Text(
+                            '${score.percent}%',
+                            style: theme.textTheme.displaySmall?.copyWith(color: color),
+                          ),
+                        ),
+                      ],
                     ),
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                'Вы ответили правильно на ${widget.correctAnswers} из ${widget.totalQuestions} вопросов',
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: 40),
-
-              // Stats cards
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        context,
-                        icon: Icons.check_circle,
-                        label: 'Правильно',
-                        value: widget.correctAnswers.toString(),
-                        color: AppColors.success,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildStatCard(
-                        context,
-                        icon: Icons.cancel,
-                        label: 'Неправильно',
-                        value: incorrectAnswers.toString(),
-                        color: AppColors.error,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        context,
-                        icon: Icons.access_time,
-                        label: 'Общее время',
-                        value: _formatTime(widget.totalTimeSeconds),
-                        color: AppColors.info,
-                      ),
-                    ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
-                      context,
-                      icon: Icons.timer,
-                      label: 'Среднее время',
-                      value: '${avgTimePerQuestion.toStringAsFixed(1)}с',
-                      color: AppColors.warning,
-                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(score.headline(l), style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(score.summary(l), style: theme.textTheme.bodyLarge, textAlign: TextAlign.center),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    score.verdict(l),
+                    style: theme.textTheme.bodyMedium?.copyWith(color: t.textSecondary),
+                    textAlign: TextAlign.center,
                   ),
                 ],
-                ),
               ),
-
-              const SizedBox(height: 32),
-
-              // Performance breakdown
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Детальная статистика',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildProgressRow(
-                        context,
-                        'Правильные ответы',
-                        widget.correctAnswers,
-                        widget.totalQuestions,
-                        AppColors.success,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildProgressRow(
-                        context,
-                        'Неправильные ответы',
-                        incorrectAnswers,
-                        widget.totalQuestions,
-                        AppColors.error,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Action buttons
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Show detailed review
-                  },
-                  icon: const Icon(Icons.preview),
-                  label: const Text('Посмотреть разбор'),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    // TODO: Retry quiz
-                    context.go('/dashboard');
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Пройти еще раз'),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              SizedBox(
-                width: double.infinity,
-                child: TextButton(
-                  onPressed: () {
-                    context.go(AppRouter.dashboard);
-                  },
-                  child: const Text('Вернуться на главную'),
-                ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            _Note(text: l.learnPracticeNotOrtNote),
+            const SizedBox(height: AppSpacing.lg),
+            _StatsGrid(items: [
+              (Icons.check_circle_outline, l.learnStatCorrect, '$correct', t.success),
+              (Icons.cancel_outlined, l.learnStatWrong, '$wrong', t.danger),
+              (Icons.skip_next_outlined, l.learnStatSkipped, '$skipped', t.textSecondary),
+              (Icons.schedule, l.learnStatTime, ElapsedTimer.format(Duration(seconds: seconds)), theme.colorScheme.primary),
+            ]),
+            if (answered > 0) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                l.learnAvgPerQuestion((seconds / total).round()),
+                style: theme.textTheme.bodySmall,
+                textAlign: TextAlign.center,
               ),
             ],
-          ),
+            const SizedBox(height: AppSpacing.lg),
+            if (session != null && answered > 0) _XpLine(future: store.lastXp),
+            const SizedBox(height: AppSpacing.xl),
+            if (session != null && session.answers.isNotEmpty)
+              FilledButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => PracticeReviewPage(result: session)),
+                ),
+                icon: const Icon(Icons.fact_check_outlined),
+                label: Text(l.learnReviewAnswers),
+              ),
+            if (wrong > 0) ...[
+              const SizedBox(height: AppSpacing.sm),
+              OutlinedButton.icon(
+                onPressed: () => context.push(kMistakesPath),
+                icon: const Icon(Icons.replay_outlined),
+                label: Text(l.learnOpenMistakes),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.sm),
+            OutlinedButton.icon(
+              onPressed: () => _retry(context, session),
+              icon: const Icon(Icons.refresh),
+              label: Text(l.learnPracticeAgain),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            TextButton(
+              onPressed: () => context.go(RoutePaths.home),
+              child: Text(l.learnBackHome),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildScoreCircle(BuildContext context, int percentage) {
-    return SizedBox(
-      width: 180,
-      height: 180,
-      child: Stack(
+  void _retry(BuildContext context, PracticeSessionResult? s) {
+    final subject = s?.subjectId;
+    if (s != null && s.kind == PracticeKind.subject && subject != null && subject.isNotEmpty) {
+      context.pushReplacement(RoutePaths.quizById(subject));
+    } else {
+      context.pushReplacement(RoutePaths.quickTest);
+    }
+  }
+}
+
+class _Note extends StatelessWidget {
+  final String text;
+  const _Note({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: t.surfaceMuted,
+        borderRadius: AppRadii.mdAll,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Background circle
-          Center(
-            child: SizedBox(
-              width: 180,
-              height: 180,
-              child: CircularProgressIndicator(
-                value: percentage / 100,
-                strokeWidth: 12,
-                backgroundColor: AppColors.grey200,
-                valueColor: AlwaysStoppedAnimation(
-                  _getScoreColor(percentage),
-                ),
-              ),
-            ),
-          ),
-          // Score text
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$percentage%',
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                        color: _getScoreColor(percentage),
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Text(
-                  'Результат',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ),
+          Icon(Icons.info_outline, size: 18, color: t.textSecondary),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodySmall)),
         ],
       ),
     );
   }
+}
 
-  Widget _buildStatCard(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
+class _StatsGrid extends StatelessWidget {
+  final List<(IconData, String, String, Color)> items;
+  const _StatsGrid({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    return LayoutBuilder(builder: (context, c) {
+      final perRow = c.maxWidth < 340 ? 2 : 4;
+      final w = (c.maxWidth - AppSpacing.sm * (perRow - 1)) / perRow;
+      return Wrap(
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        children: [
+          for (final (icon, label, value, color) in items)
+            Container(
+              width: w,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.xs),
+              decoration: BoxDecoration(
+                borderRadius: AppRadii.mdAll,
+                border: Border.all(color: t.border),
+              ),
+              child: Column(
+                children: [
+                  Icon(icon, color: color, size: 20),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(value, style: theme.textTheme.titleMedium, maxLines: 1),
+                  Text(
+                    label,
+                    style: theme.textTheme.labelSmall,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ],
+              ),
             ),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+        ],
+      );
+    });
   }
+}
 
-  Widget _buildProgressRow(
-    BuildContext context,
-    String label,
-    int value,
-    int total,
-    Color color,
-  ) {
-    final percentage = value / total;
+/// Server XP for the session, shown when the callable answers. Never blocks.
+class _XpLine extends StatelessWidget {
+  final Future<ActivityResult?>? future;
+  const _XpLine({required this.future});
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final t = context.tokens;
+    final style = Theme.of(context).textTheme.bodyMedium;
+    if (future == null) return const SizedBox.shrink();
+    return FutureBuilder<ActivityResult?>(
+      future: future,
+      builder: (context, snap) {
+        final String text;
+        if (snap.connectionState != ConnectionState.done) {
+          text = l.learnXpPending;
+        } else if (snap.data == null) {
+          text = l.learnXpQueued;
+        } else if (snap.data!.xpAwarded > 0) {
+          text = l.learnXpAwarded(snap.data!.xpAwarded);
+        } else {
+          text = l.learnXpNone;
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(label, style: Theme.of(context).textTheme.bodyMedium),
-            Text(
-              '$value/$total',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: color,
-                  ),
-            ),
+            Icon(Icons.bolt, color: t.xp, size: 20),
+            const SizedBox(width: AppSpacing.xs),
+            Flexible(child: Text(text, style: style, textAlign: TextAlign.center)),
           ],
-        ),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: percentage,
-          backgroundColor: AppColors.grey200,
-          valueColor: AlwaysStoppedAnimation(color),
-        ),
-      ],
+        );
+      },
     );
-  }
-
-  Color _getScoreColor(int percentage) {
-    if (percentage >= 80) return AppColors.success;
-    if (percentage >= 60) return AppColors.info;
-    if (percentage >= 40) return AppColors.warning;
-    return AppColors.error;
-  }
-
-  String _getResultMessage(int percentage) {
-    if (percentage >= 90) return 'Отлично!';
-    if (percentage >= 70) return 'Хорошо!';
-    if (percentage >= 50) return 'Неплохо!';
-    return 'Нужно больше практики';
-  }
-
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    if (minutes > 0) {
-      return '${minutes}м ${secs}с';
-    }
-    return '${secs}с';
   }
 }

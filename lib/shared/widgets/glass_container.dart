@@ -1,7 +1,12 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 
+import '../../core/design/tokens.dart';
+
+/// Formerly a blurred "glass" panel. The design system has no
+/// glassmorphism and BackdropFilter is expensive on low-end phones, so this
+/// is now a flat surface with a 1px border. The constructor is unchanged for
+/// existing callers; [blur] is ignored, an explicit [color]/[gradient] is
+/// still honoured so callers' foreground colours keep their contrast.
 class GlassContainer extends StatelessWidget {
   final Widget child;
   final double blur;
@@ -28,27 +33,20 @@ class GlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = borderRadius ?? AppRadii.lgAll;
+    final bg = color == null
+        ? Theme.of(context).colorScheme.surface
+        : color!.withValues(alpha: opacity.clamp(0.0, 1.0) < 0.5 ? 1 : opacity);
     return Container(
       margin: margin,
-      child: ClipRRect(
-        borderRadius: borderRadius ?? BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: (color ?? AppColors.white).withValues(alpha: opacity),
-              borderRadius: borderRadius ?? BorderRadius.circular(20),
-              border: border ?? Border.all(
-                color: AppColors.white.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
-              gradient: gradient,
-            ),
-            child: child,
-          ),
-        ),
+      padding: padding,
+      decoration: BoxDecoration(
+        color: gradient == null ? bg : null,
+        gradient: gradient,
+        borderRadius: radius,
+        border: border ?? Border.all(color: context.tokens.border),
       ),
+      child: child,
     );
   }
 }

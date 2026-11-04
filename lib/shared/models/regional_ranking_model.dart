@@ -179,7 +179,7 @@ class KyrgyzstanRegion extends Equatable {
 /// Static data for Kyrgyzstan regions (7 oblasts + 2 cities)
 class KyrgyzstanGeoData {
   static final List<KyrgyzstanRegion> regions = [
-    KyrgyzstanRegion(
+    const KyrgyzstanRegion(
       oblast: 'Бишкек',
       districts: ['Ленинский', 'Октябрьский', 'Первомайский', 'Свердловский'],
       villages: {
@@ -189,7 +189,7 @@ class KyrgyzstanGeoData {
         'Свердловский': ['Центр', 'Север'],
       },
     ),
-    KyrgyzstanRegion(
+    const KyrgyzstanRegion(
       oblast: 'Ош',
       districts: ['Центральный', 'Северный', 'Южный'],
       villages: {
@@ -198,7 +198,7 @@ class KyrgyzstanGeoData {
         'Южный': ['Юг'],
       },
     ),
-    KyrgyzstanRegion(
+    const KyrgyzstanRegion(
       oblast: 'Чуйская область',
       districts: ['Аламединский', 'Жайылский', 'Кеминский', 'Московский', 'Панфиловский', 'Сокулукский'],
       villages: {

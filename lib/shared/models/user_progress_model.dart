@@ -1,6 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Модель прогресса пользователя
+import '../../core/utils/json_read.dart';
+
+/// Answered/correct counters for one subject or topic.
+class PracticeTally {
+  final int answered;
+  final int correct;
+  const PracticeTally({this.answered = 0, this.correct = 0});
+
+  factory PracticeTally.fromMap(Map<String, dynamic> m) => PracticeTally(
+        answered: JsonRead.intOr(m, ['answered'], 0),
+        correct: JsonRead.intOr(m, ['correct'], 0),
+      );
+
+  /// Accuracy in 0..1, or null when nothing was answered.
+  double? get accuracy => answered > 0 ? (correct / answered).clamp(0.0, 1.0) : null;
+}
+
+/// Firestore keys cannot contain '.', but topic ids do ("math.algebra").
+abstract final class ProgressKeys {
+  static String encode(String key) => key.replaceAll('.', '|');
+  static String decode(String key) => key.replaceAll('|', '.');
+}
+
+/// Legacy per-user aggregates in `user_progress/{uid}` (owner read/write).
+///
+/// These are *practice* aggregates only; authoritative XP, level, streak and
+/// exam results live in server-owned `user_stats` / `exam_attempts`. The
+/// legacy `averageScore` (0–200) and `streakDays` fields are still parsed for
+/// old documents but are no longer written or shown as an ORT score.
 class UserProgressModel {
   final String userId;
   final int testsCompleted;
@@ -10,12 +38,21 @@ class UserProgressModel {
   final Map<String, double> subjectProgress; // subjectId -> progress (0.0 - 1.0)
   final List<String> completedLessons;
   final DateTime? lastActivityDate;
-  final DateTime? lastStreakUpdate; // For proper streak calculation
-  final Map<String, int> weeklyTrends; // week -> average score
-  final Map<String, int> monthlyTrends; // month -> average score
+  final DateTime? lastStreakUpdate;
+  final Map<String, int> weeklyTrends;
+  final Map<String, int> monthlyTrends;
   final Map<String, int> errorsByTopic; // topic -> error count
-  final int aiPredictedScore; // AI-predicted ORT score (0-200)
-  final String level; // 'beginner', 'intermediate', 'expert'
+  final int aiPredictedScore; // legacy, never written
+  final String level;
+
+  // Practice aggregates (written with FieldValue.increment at session end).
+  final int practiceSessions;
+  final int practiceAnswered;
+  final int practiceCorrect;
+  final int practiceSkipped;
+  final int practiceSeconds;
+  final Map<String, PracticeTally> practiceBySubject;
+  final Map<String, PracticeTally> practiceByTopic;
 
   UserProgressModel({
     required this.userId,
@@ -32,33 +69,74 @@ class UserProgressModel {
     this.errorsByTopic = const {},
     this.aiPredictedScore = 0,
     this.level = 'beginner',
+    this.practiceSessions = 0,
+    this.practiceAnswered = 0,
+    this.practiceCorrect = 0,
+    this.practiceSkipped = 0,
+    this.practiceSeconds = 0,
+    this.practiceBySubject = const {},
+    this.practiceByTopic = const {},
   });
 
-  /// Создать из Firestore
+  factory UserProgressModel.empty(String userId) => UserProgressModel(
+        userId: userId,
+        testsCompleted: 0,
+        averageScore: 0,
+        streakDays: 0,
+        totalStudyHours: 0,
+        subjectProgress: const {},
+        completedLessons: const [],
+      );
+
+  /// Создать из Firestore (tolerant of ints/doubles and missing fields).
   factory UserProgressModel.fromFirestore(Map<String, dynamic> data, String id) {
+    Map<String, int> intMap(List<String> keys) {
+      final m = JsonRead.map(data, keys) ?? const {};
+      return {
+        for (final e in m.entries)
+          if (JsonRead.toInt(e.value) != null) ProgressKeys.decode(e.key): JsonRead.toInt(e.value)!,
+      };
+    }
+
+    Map<String, PracticeTally> tallies(List<String> keys) {
+      final m = JsonRead.map(data, keys) ?? const {};
+      return {
+        for (final e in m.entries)
+          if (JsonRead.asMap(e.value) != null)
+            ProgressKeys.decode(e.key): PracticeTally.fromMap(JsonRead.asMap(e.value)!),
+      };
+    }
+
+    final sp = JsonRead.map(data, ['subjectProgress']) ?? const {};
     return UserProgressModel(
       userId: id,
-      testsCompleted: data['testsCompleted'] ?? 0,
-      averageScore: data['averageScore'] ?? 0,
-      streakDays: data['streakDays'] ?? 0,
-      totalStudyHours: data['totalStudyHours'] ?? 0,
-      subjectProgress: Map<String, double>.from(data['subjectProgress'] ?? {}),
-      completedLessons: List<String>.from(data['completedLessons'] ?? []),
-      lastActivityDate: data['lastActivityDate'] != null
-          ? (data['lastActivityDate'] as Timestamp).toDate()
-          : null,
-      lastStreakUpdate: data['lastStreakUpdate'] != null
-          ? (data['lastStreakUpdate'] as Timestamp).toDate()
-          : null,
-      weeklyTrends: Map<String, int>.from(data['weeklyTrends'] ?? {}),
-      monthlyTrends: Map<String, int>.from(data['monthlyTrends'] ?? {}),
-      errorsByTopic: Map<String, int>.from(data['errorsByTopic'] ?? {}),
-      aiPredictedScore: data['aiPredictedScore'] ?? 0,
-      level: data['level'] ?? 'beginner',
+      testsCompleted: JsonRead.intOr(data, ['testsCompleted'], 0),
+      averageScore: JsonRead.intOr(data, ['averageScore'], 0),
+      streakDays: JsonRead.intOr(data, ['streakDays'], 0),
+      totalStudyHours: JsonRead.intOr(data, ['totalStudyHours'], 0),
+      subjectProgress: {
+        for (final e in sp.entries)
+          if (e.value is num) e.key: (e.value as num).toDouble(),
+      },
+      completedLessons: JsonRead.stringList(data, ['completedLessons', 'completed_lessons']),
+      lastActivityDate: JsonRead.date(data, ['lastActivityDate']),
+      lastStreakUpdate: JsonRead.date(data, ['lastStreakUpdate']),
+      weeklyTrends: intMap(['weeklyTrends']),
+      monthlyTrends: intMap(['monthlyTrends']),
+      errorsByTopic: intMap(['errorsByTopic']),
+      aiPredictedScore: JsonRead.intOr(data, ['aiPredictedScore'], 0),
+      level: JsonRead.stringOr(data, ['level'], 'beginner'),
+      practiceSessions: JsonRead.intOr(data, ['practice_sessions'], 0),
+      practiceAnswered: JsonRead.intOr(data, ['practice_answered'], 0),
+      practiceCorrect: JsonRead.intOr(data, ['practice_correct'], 0),
+      practiceSkipped: JsonRead.intOr(data, ['practice_skipped'], 0),
+      practiceSeconds: JsonRead.intOr(data, ['practice_seconds'], 0),
+      practiceBySubject: tallies(['practice_by_subject']),
+      practiceByTopic: tallies(['practice_by_topic']),
     );
   }
 
-  /// Конвертировать в Firestore
+  /// Конвертировать в Firestore (legacy full-document shape).
   Map<String, dynamic> toFirestore() {
     return {
       'testsCompleted': testsCompleted,
@@ -70,16 +148,21 @@ class UserProgressModel {
       'lastActivityDate': lastActivityDate != null
           ? Timestamp.fromDate(lastActivityDate!)
           : FieldValue.serverTimestamp(),
-      'lastStreakUpdate': lastStreakUpdate != null
-          ? Timestamp.fromDate(lastStreakUpdate!)
-          : null,
+      'lastStreakUpdate':
+          lastStreakUpdate != null ? Timestamp.fromDate(lastStreakUpdate!) : null,
       'weeklyTrends': weeklyTrends,
       'monthlyTrends': monthlyTrends,
-      'errorsByTopic': errorsByTopic,
+      'errorsByTopic': {
+        for (final e in errorsByTopic.entries) ProgressKeys.encode(e.key): e.value,
+      },
       'aiPredictedScore': aiPredictedScore,
       'level': level,
     };
   }
+
+  /// Practice accuracy 0..1, or null when nothing was answered yet.
+  double? get practiceAccuracy =>
+      PracticeTally(answered: practiceAnswered, correct: practiceCorrect).accuracy;
 
   /// Копировать с изменениями
   UserProgressModel copyWith({
@@ -113,30 +196,22 @@ class UserProgressModel {
       errorsByTopic: errorsByTopic ?? this.errorsByTopic,
       aiPredictedScore: aiPredictedScore ?? this.aiPredictedScore,
       level: level ?? this.level,
+      practiceSessions: practiceSessions,
+      practiceAnswered: practiceAnswered,
+      practiceCorrect: practiceCorrect,
+      practiceSkipped: practiceSkipped,
+      practiceSeconds: practiceSeconds,
+      practiceBySubject: practiceBySubject,
+      practiceByTopic: practiceByTopic,
     );
   }
 
-  /// Calculate user level based on average score
+  /// Level label derived from practice accuracy (not from an ORT scale).
   String calculateLevel() {
-    if (averageScore >= 160) return 'expert'; // 80%+ of max ORT score (200)
-    if (averageScore >= 120) return 'intermediate'; // 60-80%
-    return 'beginner'; // <60%
-  }
-
-  /// Check if streak should be incremented
-  bool shouldIncrementStreak() {
-    if (lastStreakUpdate == null) return true;
-    final now = DateTime.now();
-    final lastUpdate = lastStreakUpdate!;
-    final daysSinceUpdate = now.difference(lastUpdate).inDays;
-    return daysSinceUpdate >= 1 && daysSinceUpdate <= 1; // Exactly 1 day
-  }
-
-  /// Check if streak should be reset
-  bool shouldResetStreak() {
-    if (lastStreakUpdate == null) return false;
-    final now = DateTime.now();
-    final daysSinceUpdate = now.difference(lastStreakUpdate!).inDays;
-    return daysSinceUpdate > 1; // More than 1 day = streak broken
+    final acc = practiceAccuracy;
+    if (acc == null) return 'beginner';
+    if (acc >= 0.8) return 'expert';
+    if (acc >= 0.6) return 'intermediate';
+    return 'beginner';
   }
 }

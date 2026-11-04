@@ -23,11 +23,11 @@ class DateTimeUtils {
     final seconds = duration.inSeconds.remainder(60);
 
     if (hours > 0) {
-      return '${hours}ч ${minutes}м';
+      return '$hoursч $minutesм';
     } else if (minutes > 0) {
-      return '${minutes}м ${seconds}с';
+      return '$minutesм $secondsс';
     } else {
-      return '${seconds}с';
+      return '$secondsс';
     }
   }
 
