@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
 
-/// In-memory flag that is `true` only after [AdminLoginPage] has signed the user
-/// in with Firebase Auth **and** verified that their `/users/{uid}.role` is
-/// `'admin'` (the same field `firestore.rules` `isAdmin()` trusts).
+/// In-memory flag that is `true` only after the admin login has signed the
+/// user in with Firebase Auth **and** resolved a valid admin role: the custom
+/// claim `role` from `getIdTokenResult(true)` (super_admin, content_manager,
+/// methodologist, moderator, support), falling back to the legacy
+/// `/users/{uid}.role == 'admin'` (= super_admin). See ARCHITECTURE.md §2.
 ///
 /// The go_router redirect reads this synchronously to gate every `/admin/*`
-/// route. It is intentionally NOT persisted: on a cold start (or after sign-out)
-/// it resets to `false`, forcing admins to re-authenticate through the admin
-/// login screen. This is the "role in router, no backend" gate; the long-term
-/// target is Firebase Auth custom claims (see CTO_AUDIT_REPORT.md §11.3).
+/// route. The resolved role itself lives in `adminSessionProvider` /
+/// `adminRoleProvider` (lib/providers/admin_access_provider.dart), which keep
+/// this flag in sync. It is intentionally NOT persisted: on a cold start (or
+/// after sign-out) it resets to `false`, forcing admins back through the admin
+/// login screen.
 final ValueNotifier<bool> adminVerified = ValueNotifier<bool>(false);
