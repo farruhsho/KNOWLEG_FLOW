@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../core/network/firebase_service.dart';
 import '../core/routes/admin_session.dart';
+import '../features/settings/data/reminder_settings.dart';
 import '../firebase_options.dart';
 import '../shared/models/user_model.dart';
 import 'onboarding_provider.dart';
@@ -43,6 +44,8 @@ final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService(
     // Answers given in onboarding before sign-in are saved to the profile.
     onSignedIn: (user) => onboarding.flushPendingAnswers(user.uid),
+    // Unregister this device from the account's study reminders (D12).
+    beforeSignOut: () => ref.read(reminderSettingsProvider).onSignOut(),
   );
 });
 
@@ -99,12 +102,17 @@ class AuthService {
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
     Future<void> Function(User user)? onSignedIn,
+    Future<void> Function()? beforeSignOut,
   })  : _authOverride = auth,
         _firestoreOverride = firestore,
-        _onSignedIn = onSignedIn;
+        _onSignedIn = onSignedIn,
+        _beforeSignOut = beforeSignOut;
 
   /// Runs (best-effort) after every successful sign-in / sign-up.
   final Future<void> Function(User user)? _onSignedIn;
+
+  /// Runs (best-effort) while still signed in, right before sign-out.
+  final Future<void> Function()? _beforeSignOut;
 
   final FirebaseAuth? _authOverride;
   final FirebaseFirestore? _firestoreOverride;
@@ -302,6 +310,14 @@ class AuthService {
 
   /// Sign out
   Future<void> signOut() async {
+    final hook = _beforeSignOut;
+    try {
+      // Needs the user's credentials (e.g. removing this device's reminder
+      // token from users/{uid}), so it runs before Auth signs out.
+      if (hook != null) await hook().timeout(const Duration(seconds: 10));
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'before_sign_out');
+    }
     // Drop any verified-admin session so /admin/* re-gates after sign-out.
     adminVerified.value = false;
     FirebaseService.setUserIdentifier(null);

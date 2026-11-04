@@ -1,10 +1,24 @@
 {
+    "schema_version": 2,
+    "note": "'oblast' and 'name' are the canonical stored values (users/{uid}.region, server region_id) and must not change; 'title' holds display names.",
     "regions": [
         {
+            "id": "chuy",
             "oblast": "Чуйская область",
+            "title": {
+                "ru": "Чуйская область",
+                "ky": "Чүй облусу",
+                "en": "Chüy Region"
+            },
             "districts": [
                 {
+                    "id": "chuy.alamudun",
                     "name": "Аламединский район",
+                    "title": {
+                        "ru": "Аламединский район",
+                        "ky": "Аламүдүн району",
+                        "en": "Alamüdün District"
+                    },
                     "settlements": [
                         "Кара-Жыгач",
                         "Лебединовка",
@@ -13,7 +27,13 @@
                     ]
                 },
                 {
+                    "id": "chuy.sokuluk",
                     "name": "Сокулукский район",
+                    "title": {
+                        "ru": "Сокулукский район",
+                        "ky": "Сокулук району",
+                        "en": "Sokuluk District"
+                    },
                     "settlements": [
                         "Сокулук",
                         "Беловодское",
@@ -22,7 +42,13 @@
                     ]
                 },
                 {
+                    "id": "chuy.jayyl",
                     "name": "Жайылский район",
+                    "title": {
+                        "ru": "Жайылский район",
+                        "ky": "Жайыл району",
+                        "en": "Jayyl District"
+                    },
                     "settlements": [
                         "Кант",
                         "Кара-Балта",
@@ -31,7 +57,13 @@
                     ]
                 },
                 {
+                    "id": "chuy.ysyk_ata",
                     "name": "Ысык-Атинский район",
+                    "title": {
+                        "ru": "Ысык-Атинский район",
+                        "ky": "Ысык-Ата району",
+                        "en": "Ysyk-Ata District"
+                    },
                     "settlements": [
                         "Кара-Балта",
                         "Беловодское",
@@ -40,7 +72,13 @@
                     ]
                 },
                 {
+                    "id": "chuy.moskva",
                     "name": "Московский район",
+                    "title": {
+                        "ru": "Московский район",
+                        "ky": "Москва району",
+                        "en": "Moskva District"
+                    },
                     "settlements": [
                         "Беловодское",
                         "Ивановка",
@@ -49,7 +87,13 @@
                     ]
                 },
                 {
+                    "id": "chuy.panfilov",
                     "name": "Панфиловский район",
+                    "title": {
+                        "ru": "Панфиловский район",
+                        "ky": "Панфилов району",
+                        "en": "Panfilov District"
+                    },
                     "settlements": [
                         "Кайынды",
                         "Ивановка",
@@ -60,10 +104,22 @@
             ]
         },
         {
+            "id": "osh_region",
             "oblast": "Ошская область",
+            "title": {
+                "ru": "Ошская область",
+                "ky": "Ош облусу",
+                "en": "Osh Region"
+            },
             "districts": [
                 {
+                    "id": "osh_region.kara_suu",
                     "name": "Кара-Суйский район",
+                    "title": {
+                        "ru": "Кара-Суйский район",
+                        "ky": "Кара-Суу району",
+                        "en": "Kara-Suu District"
+                    },
                     "settlements": [
                         "Кара-Суу",
                         "Кызыл-Кыштак",
@@ -72,7 +128,13 @@
                     ]
                 },
                 {
+                    "id": "osh_region.aravan",
                     "name": "Араванский район",
+                    "title": {
+                        "ru": "Араванский район",
+                        "ky": "Араван району",
+                        "en": "Aravan District"
+                    },
                     "settlements": [
                         "Араван",
                         "Кызыл-Кыштак",
@@ -81,7 +143,13 @@
                     ]
                 },
                 {
+                    "id": "osh_region.nookat",
                     "name": "Ноокатский район",
+                    "title": {
+                        "ru": "Ноокатский район",
+                        "ky": "Ноокат району",
+                        "en": "Nookat District"
+                    },
                     "settlements": [
                         "Ноокат",
                         "Кызыл-Кыштак",
@@ -90,7 +158,13 @@
                     ]
                 },
                 {
+                    "id": "osh_region.alay",
                     "name": "Алайский район",
+                    "title": {
+                        "ru": "Алайский район",
+                        "ky": "Алай району",
+                        "en": "Alay District"
+                    },
                     "settlements": [
                         "Гульча",
                         "Дароот-Коргон",
@@ -99,7 +173,13 @@
                     ]
                 },
                 {
+                    "id": "osh_region.chong_alay",
                     "name": "Чон-Алайский район",
+                    "title": {
+                        "ru": "Чон-Алайский район",
+                        "ky": "Чоң-Алай району",
+                        "en": "Chong-Alay District"
+                    },
                     "settlements": [
                         "Дароот-Коргон",
                         "Сары-Могол",
@@ -108,7 +188,13 @@
                     ]
                 },
                 {
+                    "id": "osh_region.kara_kulja",
                     "name": "Кара-Кулжинский район",
+                    "title": {
+                        "ru": "Кара-Кулжинский район",
+                        "ky": "Кара-Кулжа району",
+                        "en": "Kara-Kulja District"
+                    },
                     "settlements": [
                         "Кара-Кулжа",
                         "Узген",
@@ -117,7 +203,13 @@
                     ]
                 },
                 {
+                    "id": "osh_region.uzgen",
                     "name": "Узгенский район",
+                    "title": {
+                        "ru": "Узгенский район",
+                        "ky": "Өзгөн району",
+                        "en": "Özgön District"
+                    },
                     "settlements": [
                         "Узген",
                         "Кара-Кулжа",
@@ -128,10 +220,22 @@
             ]
         },
         {
+            "id": "jalal_abad",
             "oblast": "Джалал-Абадская область",
+            "title": {
+                "ru": "Джалал-Абадская область",
+                "ky": "Жалал-Абад облусу",
+                "en": "Jalal-Abad Region"
+            },
             "districts": [
                 {
+                    "id": "jalal_abad.suzak",
                     "name": "Сузакский район",
+                    "title": {
+                        "ru": "Сузакский район",
+                        "ky": "Сузак району",
+                        "en": "Suzak District"
+                    },
                     "settlements": [
                         "Сузак",
                         "Кара-Куль",
@@ -140,7 +244,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.bazar_korgon",
                     "name": "Базар-Коргонский район",
+                    "title": {
+                        "ru": "Базар-Коргонский район",
+                        "ky": "Базар-Коргон району",
+                        "en": "Bazar-Korgon District"
+                    },
                     "settlements": [
                         "Базар-Коргон",
                         "Кара-Куль",
@@ -149,7 +259,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.nooken",
                     "name": "Ноокенский район",
+                    "title": {
+                        "ru": "Ноокенский район",
+                        "ky": "Ноокен району",
+                        "en": "Nooken District"
+                    },
                     "settlements": [
                         "Кербен",
                         "Кара-Куль",
@@ -158,7 +274,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.aksy",
                     "name": "Аксыйский район",
+                    "title": {
+                        "ru": "Аксыйский район",
+                        "ky": "Аксы району",
+                        "en": "Aksy District"
+                    },
                     "settlements": [
                         "Кербен",
                         "Кара-Куль",
@@ -167,7 +289,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.ala_buka",
                     "name": "Ала-Букинский район",
+                    "title": {
+                        "ru": "Ала-Букинский район",
+                        "ky": "Ала-Бука району",
+                        "en": "Ala-Buka District"
+                    },
                     "settlements": [
                         "Кок-Жангак",
                         "Кара-Куль",
@@ -176,7 +304,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.toktogul",
                     "name": "Токтогульский район",
+                    "title": {
+                        "ru": "Токтогульский район",
+                        "ky": "Токтогул району",
+                        "en": "Toktogul District"
+                    },
                     "settlements": [
                         "Токтогул",
                         "Кара-Куль",
@@ -185,7 +319,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.toguz_toro",
                     "name": "Тогуз-Тороузский район",
+                    "title": {
+                        "ru": "Тогуз-Тороузский район",
+                        "ky": "Тогуз-Торо району",
+                        "en": "Toguz-Toro District"
+                    },
                     "settlements": [
                         "Казарман",
                         "Кара-Куль",
@@ -194,7 +334,13 @@
                     ]
                 },
                 {
+                    "id": "jalal_abad.chatkal",
                     "name": "Чаткальский район",
+                    "title": {
+                        "ru": "Чаткальский район",
+                        "ky": "Чаткал району",
+                        "en": "Chatkal District"
+                    },
                     "settlements": [
                         "Кара-Куль",
                         "Майдан",
@@ -205,10 +351,22 @@
             ]
         },
         {
+            "id": "batken",
             "oblast": "Баткенская область",
+            "title": {
+                "ru": "Баткенская область",
+                "ky": "Баткен облусу",
+                "en": "Batken Region"
+            },
             "districts": [
                 {
+                    "id": "batken.batken",
                     "name": "Баткенский район",
+                    "title": {
+                        "ru": "Баткенский район",
+                        "ky": "Баткен району",
+                        "en": "Batken District"
+                    },
                     "settlements": [
                         "Баткен",
                         "Кызыл-Кыштак",
@@ -217,7 +375,13 @@
                     ]
                 },
                 {
+                    "id": "batken.leilek",
                     "name": "Лейлекский район",
+                    "title": {
+                        "ru": "Лейлекский район",
+                        "ky": "Лейлек району",
+                        "en": "Leilek District"
+                    },
                     "settlements": [
                         "Исфана",
                         "Кызыл-Кыштак",
@@ -226,7 +390,13 @@
                     ]
                 },
                 {
+                    "id": "batken.kadamjay",
                     "name": "Кадамжайский район",
+                    "title": {
+                        "ru": "Кадамжайский район",
+                        "ky": "Кадамжай району",
+                        "en": "Kadamjay District"
+                    },
                     "settlements": [
                         "Кадамжай",
                         "Кызыл-Кыштак",
@@ -237,10 +407,22 @@
             ]
         },
         {
+            "id": "talas",
             "oblast": "Таласская область",
+            "title": {
+                "ru": "Таласская область",
+                "ky": "Талас облусу",
+                "en": "Talas Region"
+            },
             "districts": [
                 {
+                    "id": "talas.talas",
                     "name": "Таласский район",
+                    "title": {
+                        "ru": "Таласский район",
+                        "ky": "Талас району",
+                        "en": "Talas District"
+                    },
                     "settlements": [
                         "Талас",
                         "Кызыл-Адыр",
@@ -249,7 +431,13 @@
                     ]
                 },
                 {
+                    "id": "talas.kara_buura",
                     "name": "Кара-Бууринский район",
+                    "title": {
+                        "ru": "Кара-Бууринский район",
+                        "ky": "Кара-Буура району",
+                        "en": "Kara-Buura District"
+                    },
                     "settlements": [
                         "Кара-Буура",
                         "Кызыл-Адыр",
@@ -258,7 +446,13 @@
                     ]
                 },
                 {
+                    "id": "talas.manas",
                     "name": "Манасский район",
+                    "title": {
+                        "ru": "Манасский район",
+                        "ky": "Манас району",
+                        "en": "Manas District"
+                    },
                     "settlements": [
                         "Покровка",
                         "Кызыл-Адыр",
@@ -267,7 +461,13 @@
                     ]
                 },
                 {
+                    "id": "talas.bakay_ata",
                     "name": "Бакай-Атинский район",
+                    "title": {
+                        "ru": "Бакай-Атинский район",
+                        "ky": "Бакай-Ата району",
+                        "en": "Bakay-Ata District"
+                    },
                     "settlements": [
                         "Бакай-Ата",
                         "Кызыл-Адыр",
@@ -278,10 +478,22 @@
             ]
         },
         {
+            "id": "naryn",
             "oblast": "Нарынская область",
+            "title": {
+                "ru": "Нарынская область",
+                "ky": "Нарын облусу",
+                "en": "Naryn Region"
+            },
             "districts": [
                 {
+                    "id": "naryn.naryn",
                     "name": "Нарынский район",
+                    "title": {
+                        "ru": "Нарынский район",
+                        "ky": "Нарын району",
+                        "en": "Naryn District"
+                    },
                     "settlements": [
                         "Нарын",
                         "Ат-Башы",
@@ -290,7 +502,13 @@
                     ]
                 },
                 {
+                    "id": "naryn.at_bashy",
                     "name": "Ат-Башинский район",
+                    "title": {
+                        "ru": "Ат-Башинский район",
+                        "ky": "Ат-Башы району",
+                        "en": "At-Bashy District"
+                    },
                     "settlements": [
                         "Ат-Башы",
                         "Нарын",
@@ -299,7 +517,13 @@
                     ]
                 },
                 {
+                    "id": "naryn.kochkor",
                     "name": "Кочкорский район",
+                    "title": {
+                        "ru": "Кочкорский район",
+                        "ky": "Кочкор району",
+                        "en": "Kochkor District"
+                    },
                     "settlements": [
                         "Кочкор",
                         "Нарын",
@@ -308,7 +532,13 @@
                     ]
                 },
                 {
+                    "id": "naryn.jumgal",
                     "name": "Жумгальский район",
+                    "title": {
+                        "ru": "Жумгальский район",
+                        "ky": "Жумгал району",
+                        "en": "Jumgal District"
+                    },
                     "settlements": [
                         "Жумгал",
                         "Нарын",
@@ -317,7 +547,13 @@
                     ]
                 },
                 {
+                    "id": "naryn.ak_talaa",
                     "name": "Ак-Талинский район",
+                    "title": {
+                        "ru": "Ак-Талинский район",
+                        "ky": "Ак-Талаа району",
+                        "en": "Ak-Talaa District"
+                    },
                     "settlements": [
                         "Ак-Тала",
                         "Нарын",
@@ -328,10 +564,22 @@
             ]
         },
         {
+            "id": "issyk_kul",
             "oblast": "Ысык-Кульская область",
+            "title": {
+                "ru": "Ысык-Кульская область",
+                "ky": "Ысык-Көл облусу",
+                "en": "Issyk-Kul Region"
+            },
             "districts": [
                 {
+                    "id": "issyk_kul.issyk_kul",
                     "name": "Ысык-Кульский район",
+                    "title": {
+                        "ru": "Ысык-Кульский район",
+                        "ky": "Ысык-Көл району",
+                        "en": "Issyk-Kul District"
+                    },
                     "settlements": [
                         "Чолпон-Ата",
                         "Каракол",
@@ -340,7 +588,13 @@
                     ]
                 },
                 {
+                    "id": "issyk_kul.jeti_oguz",
                     "name": "Жети-Огузский район",
+                    "title": {
+                        "ru": "Жети-Огузский район",
+                        "ky": "Жети-Өгүз району",
+                        "en": "Jeti-Ögüz District"
+                    },
                     "settlements": [
                         "Кызыл-Суу",
                         "Каракол",
@@ -349,7 +603,13 @@
                     ]
                 },
                 {
+                    "id": "issyk_kul.ton",
                     "name": "Тонский район",
+                    "title": {
+                        "ru": "Тонский район",
+                        "ky": "Тоң району",
+                        "en": "Ton District"
+                    },
                     "settlements": [
                         "Бостери",
                         "Каракол",
@@ -358,7 +618,13 @@
                     ]
                 },
                 {
+                    "id": "issyk_kul.tup",
                     "name": "Тюпский район",
+                    "title": {
+                        "ru": "Тюпский район",
+                        "ky": "Түп району",
+                        "en": "Tüp District"
+                    },
                     "settlements": [
                         "Тюп",
                         "Каракол",
@@ -367,7 +633,13 @@
                     ]
                 },
                 {
+                    "id": "issyk_kul.ak_suu",
                     "name": "Ак-Суйский район",
+                    "title": {
+                        "ru": "Ак-Суйский район",
+                        "ky": "Ак-Суу району",
+                        "en": "Ak-Suu District"
+                    },
                     "settlements": [
                         "Балыкчы",
                         "Каракол",
@@ -378,10 +650,22 @@
             ]
         },
         {
+            "id": "bishkek",
             "oblast": "Бишкек",
+            "title": {
+                "ru": "Бишкек",
+                "ky": "Бишкек шаары",
+                "en": "Bishkek City"
+            },
             "districts": [
                 {
+                    "id": "bishkek.leninsky",
                     "name": "Ленинский район",
+                    "title": {
+                        "ru": "Ленинский район",
+                        "ky": "Ленин району",
+                        "en": "Leninsky District"
+                    },
                     "settlements": [
                         "Центр",
                         "Восток-5",
@@ -390,7 +674,13 @@
                     ]
                 },
                 {
+                    "id": "bishkek.pervomaysky",
                     "name": "Первомайский район",
+                    "title": {
+                        "ru": "Первомайский район",
+                        "ky": "Биринчи Май району",
+                        "en": "Pervomaysky District"
+                    },
                     "settlements": [
                         "Ак-Орго",
                         "Кок-Жар",
@@ -399,7 +689,13 @@
                     ]
                 },
                 {
+                    "id": "bishkek.oktyabrsky",
                     "name": "Октябрьский район",
+                    "title": {
+                        "ru": "Октябрьский район",
+                        "ky": "Октябрь району",
+                        "en": "Oktyabrsky District"
+                    },
                     "settlements": [
                         "Аламедин-1",
                         "Кок-Жар",
@@ -408,7 +704,13 @@
                     ]
                 },
                 {
+                    "id": "bishkek.sverdlovsky",
                     "name": "Свердловский район",
+                    "title": {
+                        "ru": "Свердловский район",
+                        "ky": "Свердлов району",
+                        "en": "Sverdlovsky District"
+                    },
                     "settlements": [
                         "Кок-Жар",
                         "Восток-5",
@@ -419,10 +721,22 @@
             ]
         },
         {
+            "id": "osh_city",
             "oblast": "Ош",
+            "title": {
+                "ru": "Ош",
+                "ky": "Ош шаары",
+                "en": "Osh City"
+            },
             "districts": [
                 {
+                    "id": "osh_city.central",
                     "name": "Центральный район",
+                    "title": {
+                        "ru": "Центральный район",
+                        "ky": "Борбордук район",
+                        "en": "Central District"
+                    },
                     "settlements": [
                         "Центр",
                         "Кызыл-Кыштак",
@@ -431,7 +745,13 @@
                     ]
                 },
                 {
+                    "id": "osh_city.eastern",
                     "name": "Восточный район",
+                    "title": {
+                        "ru": "Восточный район",
+                        "ky": "Чыгыш район",
+                        "en": "Eastern District"
+                    },
                     "settlements": [
                         "Кызыл-Кыштак",
                         "Араван",

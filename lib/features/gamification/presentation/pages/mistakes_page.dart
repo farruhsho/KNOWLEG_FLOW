@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../../../core/utils/content_locale.dart';
@@ -19,15 +21,26 @@ import '../../../quiz/domain/practice_launch.dart';
 
 /// "Ошибки и повторение" (GAM-10): wrong answers from practice and exams,
 /// scheduled 1 → 3 → 7 → 14 → 30 days. Practice items can be re-practised
-/// and marked resolved; exam items open the attempt review.
-class MistakesPage extends StatefulWidget {
+/// and marked resolved; exam items open the attempt review and can be marked
+/// as reviewed (next interval) or resolved (GAM-X1).
+class MistakesPage extends ConsumerStatefulWidget {
   const MistakesPage({super.key});
 
   @override
-  State<MistakesPage> createState() => _MistakesPageState();
+  ConsumerState<MistakesPage> createState() => _MistakesPageState();
 }
 
-class _MistakesPageState extends State<MistakesPage> {
+/// Label for a mistake's subject: the learning subject's title for practice
+/// ids (math, russian, …), else the curriculum/blueprint name for exam ids
+/// (verbal, reading, kyrgyz_lit, …) — never a raw id (UX-02).
+String mistakeSubjectLabel(String subjectId, Map<String, String> subjectTitles, TopicNames names, String lang) {
+  if (subjectId.isEmpty) return '';
+  final t = subjectTitles[subjectId];
+  if (t != null && t.trim().isNotEmpty) return t;
+  return names.label(subjectId, lang);
+}
+
+class _MistakesPageState extends ConsumerState<MistakesPage> {
   final String? _uid = FirebaseAuth.instance.currentUser?.uid;
   Stream<List<MistakeItem>>? _stream;
   late final Future<List<SubjectModel>> _subjects;
@@ -90,6 +103,7 @@ class _MistakesPageState extends State<MistakesPage> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final stream = _stream;
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
     return Scaffold(
       appBar: AppBar(title: Text(l.learnMistakesTitle)),
       body: stream == null
@@ -113,17 +127,44 @@ class _MistakesPageState extends State<MistakesPage> {
                     });
                   }
                   if (!snap.hasData) return LoadingView(message: l.loading);
-                  return _content(context, l, snap.data!, subjSnap.data ?? const []);
+                  return _content(context, l, snap.data!, subjSnap.data ?? const [], names);
                 },
               ),
             ),
     );
   }
 
-  Widget _content(BuildContext context, AppLocalizations l, List<MistakeItem> all, List<SubjectModel> subjects) {
+  Future<void> _openExamReview(MistakeItem m) async {
+    final attemptId = m.attemptId;
+    if (attemptId == null) return;
+    final wasDue = m.isDue(DateTime.now());
+    await context.push(RoutePaths.examReviewFor(attemptId));
+    if (!mounted || !wasDue) return;
+    // The attempt review shows the whole attempt, so ask instead of assuming
+    // this mistake was looked at.
+    final l = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(l.learnMistakeReviewedPrompt),
+        action: SnackBarAction(
+          label: l.learnMistakeMarkReviewed,
+          onPressed: () => MistakesService.instance.reviewExamItem(_uid!, m),
+        ),
+      ));
+  }
+
+  Widget _content(
+    BuildContext context,
+    AppLocalizations l,
+    List<MistakeItem> all,
+    List<SubjectModel> subjects,
+    TopicNames names,
+  ) {
     final now = DateTime.now();
     final lang = contentLanguageOf(context);
-    final titles = {for (final s in subjects) s.id: s.getTitle(lang)};
+    final subjectTitles = {for (final s in subjects) s.id: s.getTitle(lang)};
+    String title(String id) => mistakeSubjectLabel(id, subjectTitles, names, lang);
     if (all.isEmpty) {
       return EmptyView(
         icon: Icons.task_alt,
@@ -171,7 +212,7 @@ class _MistakesPageState extends State<MistakesPage> {
               ),
               for (final s in subjectIds)
                 ChoiceChip(
-                  label: Text(titles[s] ?? s),
+                  label: Text(title(s)),
                   selected: _subject == s,
                   onSelected: (_) => setState(() => _subject = s),
                 ),
@@ -201,9 +242,12 @@ class _MistakesPageState extends State<MistakesPage> {
             _MistakeTile(
               item: m,
               question: _questions[m.questionId],
-              subjectTitle: titles[m.subjectId] ?? m.subjectId,
+              subjectTitle: title(m.subjectId),
+              topicTitle: m.topicId == null || m.topicId!.isEmpty ? '' : names.label(m.topicId!, lang),
               onPractice: () => _practice([m]),
               onResolve: () => MistakesService.instance.markResolved(_uid!, m),
+              onOpenReview: () => _openExamReview(m),
+              onReviewed: () => MistakesService.instance.reviewExamItem(_uid!, m),
             ),
       ],
     );
@@ -214,15 +258,21 @@ class _MistakeTile extends StatelessWidget {
   final MistakeItem item;
   final QuestionModel? question;
   final String subjectTitle;
+  final String topicTitle;
   final VoidCallback onPractice;
   final VoidCallback onResolve;
+  final VoidCallback onOpenReview;
+  final VoidCallback onReviewed;
 
   const _MistakeTile({
     required this.item,
     required this.question,
     required this.subjectTitle,
+    required this.topicTitle,
     required this.onPractice,
     required this.onResolve,
+    required this.onOpenReview,
+    required this.onReviewed,
   });
 
   @override
@@ -242,6 +292,7 @@ class _MistakeTile extends StatelessWidget {
         : l.learnMistakeReviewOn(DateFormat.MMMd(locale).format(next.toLocal()));
     final subtitle = [
       if (subjectTitle.isNotEmpty) subjectTitle,
+      if (exam && topicTitle.isNotEmpty && topicTitle != subjectTitle) topicTitle,
       l.learnMistakeWrongCount(item.wrongCount),
       when,
     ].join(' · ');
@@ -253,12 +304,25 @@ class _MistakeTile extends StatelessWidget {
         title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
         subtitle: Text(subtitle, maxLines: 2, overflow: TextOverflow.ellipsis),
         trailing: exam
-            ? (item.attemptId == null
-                ? null
-                : TextButton(
-                    onPressed: () => context.push(RoutePaths.examReviewFor(item.attemptId!)),
-                    child: Text(l.learnMistakeOpenReview),
-                  ))
+            ? PopupMenuButton<String>(
+                tooltip: l.learnMore,
+                onSelected: (v) {
+                  switch (v) {
+                    case 'review':
+                      onOpenReview();
+                    case 'reviewed':
+                      onReviewed();
+                    default:
+                      onResolve();
+                  }
+                },
+                itemBuilder: (_) => [
+                  if (item.attemptId != null) PopupMenuItem(value: 'review', child: Text(l.learnMistakeOpenReview)),
+                  if (item.isDue(DateTime.now()))
+                    PopupMenuItem(value: 'reviewed', child: Text(l.learnMistakeMarkReviewed)),
+                  PopupMenuItem(value: 'resolve', child: Text(l.learnMistakeResolve)),
+                ],
+              )
             : PopupMenuButton<String>(
                 tooltip: l.learnMore,
                 onSelected: (v) => v == 'practice' ? onPractice() : onResolve(),
@@ -267,9 +331,7 @@ class _MistakeTile extends StatelessWidget {
                   PopupMenuItem(value: 'resolve', child: Text(l.learnMistakeResolve)),
                 ],
               ),
-        onTap: exam
-            ? (item.attemptId == null ? null : () => context.push(RoutePaths.examReviewFor(item.attemptId!)))
-            : onPractice,
+        onTap: exam ? (item.attemptId == null ? null : onOpenReview) : onPractice,
       ),
     );
   }

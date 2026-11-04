@@ -53,9 +53,40 @@ class FirebaseService {
   /// Crashlytics only has Android/Apple implementations.
   static bool get supportsCrashlytics => _isMobileOrMac;
 
-  /// App Check: web needs a reCAPTCHA key and Windows a registered debug
-  /// token, neither of which is configured, so only mobile/macOS activate it.
-  static bool get supportsAppCheck => _isMobileOrMac;
+  /// reCAPTCHA Enterprise site key for App Check on web, passed with
+  /// `--dart-define=APP_CHECK_WEB_SITE_KEY=<key>` (registered in the Firebase
+  /// console). Empty = App Check is not activated on web.
+  static const String appCheckWebSiteKey =
+      String.fromEnvironment('APP_CHECK_WEB_SITE_KEY');
+
+  /// Whether App Check can be activated on [platform] (pure, for tests).
+  /// Android/iOS/macOS have attestation providers; web needs a site key;
+  /// Windows/Linux have no provider (decision D7).
+  static bool appCheckAvailable({
+    required bool isWeb,
+    required TargetPlatform platform,
+    String webSiteKey = appCheckWebSiteKey,
+  }) {
+    if (isWeb) return webSiteKey.trim().isNotEmpty;
+    return platform == TargetPlatform.android ||
+        platform == TargetPlatform.iOS ||
+        platform == TargetPlatform.macOS;
+  }
+
+  /// App Check: mobile/macOS always; web only with [appCheckWebSiteKey].
+  static bool get supportsAppCheck =>
+      appCheckAvailable(isWeb: kIsWeb, platform: defaultTargetPlatform);
+
+  /// Whether this build can use the **student** callables (examStart and the
+  /// other exam* functions, aiTutor, recordActivity, billingVerifyPurchase,
+  /// accountDelete). The backend enforces App Check on them, so without an
+  /// App Check provider every call is rejected. Features backed by these
+  /// callables should show a "not available on this platform" state when
+  /// this is false instead of failing (SEC-APPCHECK-01 / D7).
+  ///
+  /// Admin callables (admin*) do not enforce App Check by default
+  /// (APP_CHECK_ENFORCE_ADMIN) and need no such gate.
+  static bool get supportsCallables => supportsAppCheck;
 
   /// Analytics has Android/Apple/web implementations.
   static bool get supportsAnalytics => kIsWeb || _isMobileOrMac;
@@ -106,6 +137,7 @@ class FirebaseService {
     if (!supportsAppCheck) return;
     try {
       await FirebaseAppCheck.instance.activate(
+        providerWeb: kIsWeb ? ReCaptchaEnterpriseProvider(appCheckWebSiteKey) : null,
         providerAndroid: kDebugMode
             ? const AndroidDebugProvider()
             : const AndroidPlayIntegrityProvider(),
@@ -232,13 +264,26 @@ class FirebaseService {
     try {
       // The registration-token API is deprecated in favour of FID-based
       // register()/onRegistered, which needs FCM direct-send support on the
-      // backend. The reminder job (not built yet) targets registration
+      // backend. The reminder job (sendStudyReminders) targets registration
       // tokens, so keep using them until the backend moves to FIDs.
       // ignore: deprecated_member_use
       return await messaging.getToken();
     } catch (e) {
       debugPrint('FCM token unavailable: $e');
       return null;
+    }
+  }
+
+  /// Invalidates this device's FCM registration token (sign-out on a shared
+  /// device). Best-effort, never throws, bounded in time.
+  static Future<void> deleteFCMToken() async {
+    if (!_initialized || !supportsMessaging) return;
+    try {
+      // Registration-token API, same as getFCMToken (see the note there).
+      // ignore: deprecated_member_use
+      await messaging.deleteToken().timeout(const Duration(seconds: 5));
+    } catch (e) {
+      debugPrint('FCM token not deleted: $e');
     }
   }
 

@@ -4,12 +4,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
+import '../../../../core/utils/content_locale.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/auth_provider.dart';
+import '../../../../shared/models/region_model.dart';
 import '../../../../shared/models/user_model.dart';
 import '../../../auth/presentation/widgets/email_verification_banner.dart';
 import '../../../dashboard/data/dashboard_providers.dart';
 import '../../../dashboard/domain/dashboard_models.dart';
+import '../../../onboarding/data/kg_regions_provider.dart';
 import '../../../onboarding/presentation/pages/onboarding_page.dart'
     show gradeLabel;
 import '../widgets/profile_edit_sheet.dart';
@@ -103,9 +106,11 @@ class _ProfileHeader extends ConsumerWidget {
         : (authUser?.displayName ?? '');
     final email = (user?.email.isNotEmpty ?? false) ? user!.email : (authUser?.email ?? '');
 
+    final regions = ref.watch(kgRegionsProvider).valueOrNull ?? const <RegionData>[];
     final facts = <String>[
       if (user != null) gradeLabel(l, user!.grade),
-      if (user?.region != null) user!.region!.oblast,
+      if (user?.region != null)
+        regionDisplayName(regions, user!.region!.oblast, contentLanguageOf(context)),
       if (user?.school != null && user!.school!.trim().isNotEmpty) user!.school!.trim(),
     ];
 

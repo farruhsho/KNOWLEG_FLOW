@@ -2874,7 +2874,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get learnLeaderboardNotRanked =>
-      'You\'re not on this board yet. XP from studying is added automatically.';
+      'You\'re not on this board yet. XP from lessons, practice and mock exams is added automatically.';
+
+  @override
+  String get learnLeaderboardSubjectEmptyBody =>
+      'It will fill up as students complete mock exams in this test.';
+
+  @override
+  String get learnLeaderboardSubjectHint =>
+      'Only this week\'s XP from mock exams in the selected test counts here.';
+
+  @override
+  String get learnLeaderboardSubjectNotRanked =>
+      'You\'re not on this board yet. Only XP from mock exams in this test counts here.';
 
   @override
   String get learnLeaderboardTitle => 'Leaderboard';
@@ -3012,6 +3024,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get learnMistakeFromExam => 'Question from a mock exam';
 
   @override
+  String get learnMistakeMarkReviewed => 'Mark as reviewed';
+
+  @override
   String get learnMistakeOpenReview => 'Review';
 
   @override
@@ -3030,6 +3045,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get learnMistakeReviewToday => 'due today';
+
+  @override
+  String get learnMistakeReviewedPrompt =>
+      'Reviewed this question? Mark it and it will come back later.';
 
   @override
   String learnMistakeWrongCount(int n) {

@@ -1750,7 +1750,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get billingHonestNoGuarantee =>
-      'Сынамык тесттер машыгууга жардам берет, бирок ЖРТдагы жыйынтыкка кепилдик бербейт.';
+      'Сынамык экзамендер машыгууга жардам берет, бирок ЖРТдагы жыйынтыкка кепилдик бербейт.';
 
   @override
   String get billingHonestPayment => 'Төлөм Google Play аркылуу жүргүзүлөт.';
@@ -1802,7 +1802,7 @@ class AppLocalizationsKy extends AppLocalizations {
       'Google Play\'ден сунуштарды жүктөө мүмкүн болбоду.';
 
   @override
-  String get billingProductsTitle => 'Сынамык тесттерди сатып алуу';
+  String get billingProductsTitle => 'Сынамык экзамендерди сатып алуу';
 
   @override
   String get billingPurchasesEmpty => 'Азырынча сатып алуулар жок.';
@@ -2003,7 +2003,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get examCatalogIntro =>
-      'ЖРТнын форматы жана убактысы боюнча толук сынамык тесттер.';
+      'ЖРТнын форматы жана убактысы боюнча толук сынамык экзамендер.';
 
   @override
   String get examCatalogMainTitle => 'Негизги тест';
@@ -2306,7 +2306,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String examResultRecommendation(String topic) {
-    return '«$topic» темасын кайтала: теорияны кайра карап, ушул тема боюнча 10–15 машыгуу тапшырмасын иштеп чык.';
+    return '«$topic» темасын кайталаңыз: теорияны кайра карап, ушул тема боюнча 10–15 машыгуу тапшырмасын иштеңиз.';
   }
 
   @override
@@ -2358,7 +2358,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get examRetry => 'Кайра аракет кылуу';
 
   @override
-  String get examReviewAskTutor => 'AI-репетитордон суроо';
+  String get examReviewAskTutor => 'ЖИ-репетитордон суроо';
 
   @override
   String examReviewCorrectAnswer(String answer) {
@@ -2551,7 +2551,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get language => 'Тил';
 
   @override
-  String get learnAchAccuracy90Desc => 'Пробалык сынакта 90% чогултуңуз';
+  String get learnAchAccuracy90Desc => 'Сынамык экзаменде 90% чогултуңуз';
 
   @override
   String get learnAchAccuracy90Title => '90% тактык';
@@ -2569,10 +2569,10 @@ class AppLocalizationsKy extends AppLocalizations {
   String get learnAchDays30Title => '30 күн машыгуу';
 
   @override
-  String get learnAchExamChampionDesc => '10 пробалык сынакты аяктаңыз';
+  String get learnAchExamChampionDesc => '10 сынамык экзаменди аяктаңыз';
 
   @override
-  String get learnAchExamChampionTitle => 'Пробалык сынактардын чемпиону';
+  String get learnAchExamChampionTitle => 'Сынамык экзамендердин чемпиону';
 
   @override
   String get learnAchFirstLessonDesc => 'Биринчи сабакты өтүңүз';
@@ -2581,7 +2581,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get learnAchFirstLessonTitle => 'Биринчи сабак';
 
   @override
-  String get learnAchMathExpertDesc => 'Үч пробалык сынакта математикадан 90%';
+  String get learnAchMathExpertDesc => 'Үч сынамык экзаменде математикадан 90%';
 
   @override
   String get learnAchMathExpertTitle => 'Математика боюнча эксперт';
@@ -2638,7 +2638,7 @@ class AppLocalizationsKy extends AppLocalizations {
   }
 
   @override
-  String get learnAskTutor => 'AI-репетитордон суроо';
+  String get learnAskTutor => 'ЖИ-репетитордон суроо';
 
   @override
   String learnAvgPerQuestion(int seconds) {
@@ -2702,21 +2702,21 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get learnExamHistoryEmpty =>
-      'Сиз азырынча бир да пробалык сынакты аяктай элексиз.';
+      'Сиз азырынча бир да сынамык экзаменди аяктай элексиз.';
 
   @override
   String get learnExamHistoryTitle => 'Акыркы аракеттер';
 
   @override
   String get learnExamHistoryUnavailable =>
-      'Сынактардын тарыхы азыр жеткиликсиз.';
+      'Экзамендердин тарыхы азыр жеткиликсиз.';
 
   @override
   String get learnExamResultUnofficial =>
       'Окуу жыйынтыгы, ЖРТнын расмий баллы эмес.';
 
   @override
-  String get learnExamResultsTitle => 'Пробалык сынактар';
+  String get learnExamResultsTitle => 'Сынамык экзамендер';
 
   @override
   String get learnExamSectionsTitle => 'Бөлүмдөр боюнча орточо жыйынтык';
@@ -2752,7 +2752,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get learnHandbookFactsUnavailable =>
-      'Сынактын түзүлүшүн жүктөө мүмкүн болбоду.';
+      'Экзамендин түзүлүшүн жүктөө мүмкүн болбоду.';
 
   @override
   String get learnHandbookNotFound => 'Маалымдаманын бөлүмү табылган жок';
@@ -2865,7 +2865,19 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get learnLeaderboardNotRanked =>
-      'Сиз азырынча бул рейтингде жоксуз. Машыгуу үчүн алынган XP бул жерге автоматтык түрдө кошулат.';
+      'Сиз азырынча бул рейтингде жоксуз. Сабактар, машыгуу жана сынамык экзамендер үчүн алынган XP бул жерге автоматтык түрдө кошулат.';
+
+  @override
+  String get learnLeaderboardSubjectEmptyBody =>
+      'Окуучулар ушул тест боюнча сынамык экзамендерди тапшырганда толо баштайт.';
+
+  @override
+  String get learnLeaderboardSubjectHint =>
+      'Бул жерде тандалган тест боюнча ушул аптадагы сынамык экзамендерден алынган XP гана эсептелет.';
+
+  @override
+  String get learnLeaderboardSubjectNotRanked =>
+      'Сиз азырынча бул рейтингде жоксуз. Бул жерде ушул тест боюнча сынамык экзамендерден алынган XP гана эсептелет.';
 
   @override
   String get learnLeaderboardTitle => 'Рейтинг';
@@ -2996,7 +3008,10 @@ class AppLocalizationsKy extends AppLocalizations {
   }
 
   @override
-  String get learnMistakeFromExam => 'Пробалык сынактагы суроо';
+  String get learnMistakeFromExam => 'Сынамык экзамендеги суроо';
+
+  @override
+  String get learnMistakeMarkReviewed => 'Кайталанды деп белгилөө';
 
   @override
   String get learnMistakeOpenReview => 'Талдоо';
@@ -3019,6 +3034,10 @@ class AppLocalizationsKy extends AppLocalizations {
   String get learnMistakeReviewToday => 'бүгүн кайталоо';
 
   @override
+  String get learnMistakeReviewedPrompt =>
+      'Бул суроону талдадыңызбы? Белгилеңиз — ал кийинчерээк кайра чыгат.';
+
+  @override
   String learnMistakeWrongCount(int n) {
     return 'ката: $n';
   }
@@ -3033,7 +3052,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get learnMistakesEmptyBody =>
-      'Машыгуудагы жана сынактардагы туура эмес жооптор бул жерде пайда болот.';
+      'Машыгуудагы жана экзамендердеги туура эмес жооптор бул жерде пайда болот.';
 
   @override
   String get learnMistakesEmptyTitle => 'Кайталай турган каталар жок';
@@ -3122,7 +3141,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get learnPracticeNotOrtNote =>
-      'Бул машыгуунун жыйынтыгы, ЖРТнын баллы эмес: кыска суроолор топтому боюнча сынак баллын баалоого болбойт.';
+      'Бул машыгуунун жыйынтыгы, ЖРТнын баллы эмес: кыска суроолор топтому боюнча экзамендин баллын баалоого болбойт.';
 
   @override
   String learnPracticePercentLabel(int percent) {
@@ -3232,14 +3251,14 @@ class AppLocalizationsKy extends AppLocalizations {
       '…анткени тактык боюнча тыянактар болжол менен 20 жооптон кийин ишенимдүү болот.';
 
   @override
-  String get learnRecNoExamTitle => 'Пробалык сынактан өтүүнү сунуштайбыз';
+  String get learnRecNoExamTitle => 'Сынамык экзамен тапшырууну сунуштайбыз';
 
   @override
   String get learnRecNoExamWhy =>
       '…анткени азырынча бардык бөлүмдөр боюнча бир да жыйынтык жок — ансыз кайсы бөлүм начар экени көрүнбөйт.';
 
   @override
-  String get learnRecOpenExams => 'Сынактарга';
+  String get learnRecOpenExams => 'Экзамендерге';
 
   @override
   String learnRecWeakSectionTitle(String section) {
@@ -3248,7 +3267,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String learnRecWeakSectionWhy(int percent) {
-    return '…анткени пробалык сынактарда ал жерде орточо $percent% туура жооп — бул эң алсыз бөлүм.';
+    return '…анткени сынамык экзамендерде ал жерде орточо $percent% туура жооп — бул эң алсыз бөлүм.';
   }
 
   @override
@@ -3328,7 +3347,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get learnStatCorrect => 'Туура';
 
   @override
-  String get learnStatExams => 'Пробалык сынактар';
+  String get learnStatExams => 'Сынамык экзамендер';
 
   @override
   String learnStatLessonsCompleted(int n) {
@@ -3458,13 +3477,13 @@ class AppLocalizationsKy extends AppLocalizations {
   String get mbankPayment => 'MBank аркылуу төлөө';
 
   @override
-  String get mockTest => 'Пробалык экзамен';
+  String get mockTest => 'Сынамык экзамен';
 
   @override
-  String get mockTestDesc => 'Чыныгы форматта пробалык экзаменди өтүңүз';
+  String get mockTestDesc => 'Сынамык экзаменди чыныгы форматта тапшырыңыз';
 
   @override
-  String get mockTestTitle => 'Толук ОРТ симуляциясы';
+  String get mockTestTitle => 'ЖРТнын толук симуляциясы';
 
   @override
   String get monthly => 'Айлык';
@@ -3476,7 +3495,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get next => 'Кийинки';
 
   @override
-  String get nextOrtDate => 'Кийинки ОРТ каттоо';
+  String get nextOrtDate => 'ЖРТга кийинки каттоо';
 
   @override
   String get noConnection => 'Интернет байланышы жок';
@@ -3486,7 +3505,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get onboardingDesc1 =>
-      'ОРТ экзаменине бардык предметтер боюнча практикалык тесттерди өтүңүз';
+      'ЖРТга даярдануу үчүн бардык предметтер боюнча машыгуу тесттерин өтүңүз';
 
   @override
   String get onboardingDesc2 =>
@@ -3494,16 +3513,16 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get onboardingDesc3 =>
-      'Чыныгы ОРТ форматында жана убакытында толук симуляцияларды өтүңүз';
+      'ЖРТнын чыныгы форматында жана убактысында толук симуляцияларды өтүңүз';
 
   @override
-  String get onboardingTitle1 => 'ОРТка даярданыңыз';
+  String get onboardingTitle1 => 'ЖРТга даярданыңыз';
 
   @override
   String get onboardingTitle2 => 'Прогрессти көзөмөлдөө';
 
   @override
-  String get onboardingTitle3 => 'Пробалык экзамендер';
+  String get onboardingTitle3 => 'Сынамык экзамендер';
 
   @override
   String get orContinueWith => 'же менен улантыңыз';
@@ -3909,7 +3928,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get shellNavExams => 'Экзамендер';
 
   @override
-  String get shellNavHome => 'Башкы';
+  String get shellNavHome => 'Башкы бет';
 
   @override
   String get shellNavLearn => 'Окуу';
@@ -4102,7 +4121,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get shellQuickTitle => 'Тез аракеттер';
 
   @override
-  String get shellQuickTutor => 'AI-репетитор';
+  String get shellQuickTutor => 'ЖИ-репетитор';
 
   @override
   String get shellRegionDistrict => 'Район';
@@ -4329,7 +4348,7 @@ class AppLocalizationsKy extends AppLocalizations {
   String get tutorContextQuestion => 'Суроо тиркелди';
 
   @override
-  String get tutorContextRemove => 'Тиркемени алып салуу';
+  String get tutorContextRemove => 'Тиркелгенди алып салуу';
 
   @override
   String get tutorDisclaimer =>

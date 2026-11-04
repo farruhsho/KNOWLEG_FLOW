@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../../../core/utils/content_locale.dart';
@@ -18,14 +20,49 @@ import '../../domain/recommendations.dart';
 /// Progress built only from real data (GAM-08/09): server stats, practice
 /// aggregates, completed exam attempts and the mistakes queue. No invented
 /// trends, no "AI forecast", no ORT score from practice.
-class ProgressPage extends StatefulWidget {
+class ProgressPage extends ConsumerStatefulWidget {
   const ProgressPage({super.key});
 
   @override
-  State<ProgressPage> createState() => _ProgressPageState();
+  ConsumerState<ProgressPage> createState() => _ProgressPageState();
 }
 
-class _ProgressPageState extends State<ProgressPage> {
+/// Display labels for ids shown on the progress page (UX-02): learning
+/// subject titles and blueprint section titles first, then the bundled
+/// curriculum names ([TopicNames]); never a raw id.
+class ProgressLabels {
+  const ProgressLabels({
+    required this.lang,
+    required this.names,
+    this.subjectTitles = const {},
+    this.sectionTitles = const {},
+  });
+
+  final String lang;
+  final TopicNames names;
+  final Map<String, String> subjectTitles;
+  final Map<String, Map<String, String>> sectionTitles;
+
+  String subject(String? id) {
+    if (id == null || id.isEmpty) return '';
+    final t = subjectTitles[id];
+    return (t != null && t.trim().isNotEmpty) ? t : names.label(id, lang);
+  }
+
+  String section(String? id) {
+    if (id == null || id.isEmpty) return '';
+    final t = sectionTitles[id];
+    if (t != null) {
+      final v = pickLocalized(t, lang);
+      if (v.trim().isNotEmpty) return v;
+    }
+    return subject(id);
+  }
+
+  String topic(String? id) => (id == null || id.isEmpty) ? '' : names.label(id, lang);
+}
+
+class _ProgressPageState extends ConsumerState<ProgressPage> {
   final _repo = ProgressRepository();
   Future<ProgressSnapshot>? _future;
 
@@ -54,6 +91,7 @@ class _ProgressPageState extends State<ProgressPage> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final future = _future;
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
     return Scaffold(
       appBar: AppBar(title: Text(l.learnProgressTitle)),
       body: future == null
@@ -67,22 +105,26 @@ class _ProgressPageState extends State<ProgressPage> {
               builder: (context, snap) {
                 if (snap.connectionState != ConnectionState.done) return LoadingView(message: l.loading);
                 if (snap.hasError) return ErrorView.forError(context, snap.error, onRetry: _reload);
-                return RefreshIndicator(onRefresh: _reload, child: _content(context, l, snap.data!));
+                return RefreshIndicator(onRefresh: _reload, child: _content(context, l, snap.data!, names));
               },
             ),
     );
   }
 
-  Widget _content(BuildContext context, AppLocalizations l, ProgressSnapshot s) {
+  Widget _content(BuildContext context, AppLocalizations l, ProgressSnapshot s, TopicNames names) {
     final gutter = AppSpacing.gutter(context);
     final lang = contentLanguageOf(context);
     final theme = Theme.of(context);
     final p = s.progress;
     final stats = s.stats;
     final completed = s.completedAttempts;
-    final subjectTitles = {for (final x in s.subjects) x.id: x.getTitle(lang)};
-    String sectionTitle(String id) =>
-        s.sectionTitles[id] != null ? pickLocalized(s.sectionTitles[id]!, lang) : (subjectTitles[id] ?? id);
+    final labels = ProgressLabels(
+      lang: lang,
+      names: names,
+      subjectTitles: {for (final x in s.subjects) x.id: x.getTitle(lang)},
+      sectionTitles: s.sectionTitles,
+    );
+    String sectionTitle(String id) => labels.section(id);
     String blueprintTitle(String id) =>
         s.blueprintTitles[id] != null ? pickLocalized(s.blueprintTitles[id]!, lang) : id;
 
@@ -104,7 +146,14 @@ class _ProgressPageState extends State<ProgressPage> {
       if (recs.isEmpty)
         _Muted(l.learnRecommendationsNone)
       else
-        for (final r in recs) _RecommendationCard(rec: r, title: _recTitle(l, r, subjectTitles, sectionTitle), body: _recBody(l, r)),
+        for (final r in recs)
+          _RecommendationCard(
+            rec: r,
+            title: _recTitle(l, r, labels),
+            body: _recBody(l, r),
+            // Reviewing mistakes changes the due count: refresh on return.
+            onReturn: _reload,
+          ),
       const SizedBox(height: AppSpacing.xl),
       _Heading(l.learnExamResultsTitle),
       if (s.attempts == null)
@@ -139,10 +188,10 @@ class _ProgressPageState extends State<ProgressPage> {
         _Muted(l.learnPracticeBySubjectEmpty)
       else
         for (final e in (p!.practiceBySubject.entries.toList()..sort((a, b) => b.value.answered.compareTo(a.value.answered))))
-          _AccuracyBar(label: subjectTitles[e.key] ?? e.key, tally: e.value),
+          _AccuracyBar(label: labels.subject(e.key), tally: e.value),
       const SizedBox(height: AppSpacing.xl),
       _Heading(l.learnWeakTopicsTitle),
-      ..._weakTopics(context, l, p),
+      ..._weakTopics(context, l, p, labels),
     ];
 
     return ListView(
@@ -195,21 +244,16 @@ class _ProgressPageState extends State<ProgressPage> {
     ];
   }
 
-  List<Widget> _weakTopics(BuildContext context, AppLocalizations l, UserProgressModel? p) {
+  List<Widget> _weakTopics(BuildContext context, AppLocalizations l, UserProgressModel? p, ProgressLabels labels) {
     final topics = (p?.practiceByTopic.entries ?? const <MapEntry<String, PracticeTally>>[])
         .where((e) => e.value.answered >= RecommendationEngine.minTopicAnswers)
         .toList()
       ..sort((a, b) => (a.value.accuracy ?? 1).compareTo(b.value.accuracy ?? 1));
     if (topics.isEmpty) return [_Muted(l.learnWeakTopicsEmpty)];
     return [
-      for (final e in topics.take(5)) _AccuracyBar(label: _topicLabel(e.key), tally: e.value),
+      for (final e in topics.take(5)) _AccuracyBar(label: labels.topic(e.key), tally: e.value),
       TextButton(onPressed: () => context.push(kMistakesPath), child: Text(l.learnOpenMistakes)),
     ];
-  }
-
-  static String _topicLabel(String id) {
-    final last = id.split('.').last.replaceAll('_', ' ');
-    return last.isEmpty ? id : '${last[0].toUpperCase()}${last.substring(1)}';
   }
 
   String _date(BuildContext context, DateTime? d) {
@@ -217,23 +261,18 @@ class _ProgressPageState extends State<ProgressPage> {
     return DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag()).format(d.toLocal());
   }
 
-  String _recTitle(
-    AppLocalizations l,
-    Recommendation r,
-    Map<String, String> subjects,
-    String Function(String) section,
-  ) {
+  String _recTitle(AppLocalizations l, Recommendation r, ProgressLabels labels) {
     switch (r.kind) {
       case RecommendationKind.dueMistakes:
         return l.learnRecDueMistakesTitle(r.count ?? 0);
       case RecommendationKind.noExam:
         return l.learnRecNoExamTitle;
       case RecommendationKind.weakSubject:
-        return l.learnRecWeakSubjectTitle(subjects[r.refId] ?? r.refId ?? '');
+        return l.learnRecWeakSubjectTitle(labels.subject(r.refId));
       case RecommendationKind.weakExamSection:
-        return l.learnRecWeakSectionTitle(section(r.refId ?? ''));
+        return l.learnRecWeakSectionTitle(labels.section(r.refId));
       case RecommendationKind.weakTopic:
-        return l.learnRecWeakTopicTitle(_topicLabel(r.refId ?? ''));
+        return l.learnRecWeakTopicTitle(labels.topic(r.refId));
       case RecommendationKind.moreData:
         return l.learnRecMoreDataTitle(r.count ?? 0);
     }
@@ -353,18 +392,24 @@ class _RecommendationCard extends StatelessWidget {
   final Recommendation rec;
   final String title;
   final String body;
-  const _RecommendationCard({required this.rec, required this.title, required this.body});
+  final VoidCallback? onReturn;
+  const _RecommendationCard({required this.rec, required this.title, required this.body, this.onReturn});
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    Future<void> openMistakes() async {
+      await context.push(kMistakesPath);
+      onReturn?.call();
+    }
+
     final (String label, VoidCallback onTap) = switch (rec.kind) {
-      RecommendationKind.dueMistakes => (l.learnOpenMistakes, () => context.push(kMistakesPath)),
+      RecommendationKind.dueMistakes => (l.learnOpenMistakes, openMistakes),
       RecommendationKind.noExam => (l.learnRecOpenExams, () => context.go(RoutePaths.exams)),
       RecommendationKind.weakSubject => (l.learnStartPractice, () => context.push(RoutePaths.quizById(rec.refId ?? ''))),
       RecommendationKind.weakExamSection => (l.learnStartPractice, () => context.push(RoutePaths.quizById(rec.refId ?? ''))),
-      RecommendationKind.weakTopic => (l.learnOpenMistakes, () => context.push(kMistakesPath)),
+      RecommendationKind.weakTopic => (l.learnOpenMistakes, openMistakes),
       RecommendationKind.moreData => (l.learnQuickPracticeTitle, () => context.push(RoutePaths.quickTest)),
     };
     return Container(

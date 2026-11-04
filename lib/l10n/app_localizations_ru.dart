@@ -1751,7 +1751,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get billingHonestNoGuarantee =>
-      'Пробные тесты помогают тренироваться, но не гарантируют результат на ОРТ.';
+      'Пробные экзамены помогают тренироваться, но не гарантируют результат на ОРТ.';
 
   @override
   String get billingHonestPayment => 'Оплата проходит через Google Play.';
@@ -1809,7 +1809,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось загрузить предложения из Google Play.';
 
   @override
-  String get billingProductsTitle => 'Купить пробные тесты';
+  String get billingProductsTitle => 'Купить пробные экзамены';
 
   @override
   String get billingPurchasesEmpty => 'Покупок пока нет.';
@@ -2009,7 +2009,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get examCatalogIntro =>
-      'Полные пробные тесты в формате и по времени ОРТ.';
+      'Полные пробные экзамены в формате и по времени ОРТ.';
 
   @override
   String get examCatalogMainTitle => 'Основной тест';
@@ -2318,7 +2318,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String examResultRecommendation(String topic) {
-    return 'Повтори «$topic»: вернись к теории и реши 10–15 тренировочных заданий по этой теме.';
+    return 'Повторите «$topic»: вернитесь к теории и решите 10–15 тренировочных заданий по этой теме.';
   }
 
   @override
@@ -2370,7 +2370,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get examRetry => 'Повторить';
 
   @override
-  String get examReviewAskTutor => 'Спросить AI-репетитора';
+  String get examReviewAskTutor => 'Спросить ИИ-репетитора';
 
   @override
   String examReviewCorrectAnswer(String answer) {
@@ -2662,7 +2662,7 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get learnAskTutor => 'Спросить AI-репетитора';
+  String get learnAskTutor => 'Спросить ИИ-репетитора';
 
   @override
   String learnAvgPerQuestion(int seconds) {
@@ -2907,7 +2907,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get learnLeaderboardNotRanked =>
-      'Вас пока нет в этом рейтинге. XP за занятия попадают сюда автоматически.';
+      'Вас пока нет в этом рейтинге. Сюда автоматически попадает XP за уроки, практику и пробные экзамены.';
+
+  @override
+  String get learnLeaderboardSubjectEmptyBody =>
+      'Он заполнится, когда ученики пройдут пробные экзамены по этому тесту.';
+
+  @override
+  String get learnLeaderboardSubjectHint =>
+      'Учитывается только XP за пробные экзамены по выбранному тесту за эту неделю.';
+
+  @override
+  String get learnLeaderboardSubjectNotRanked =>
+      'Вас пока нет в этом рейтинге. Здесь учитывается только XP за пробные экзамены по этому тесту.';
 
   @override
   String get learnLeaderboardTitle => 'Рейтинг';
@@ -3047,6 +3059,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get learnMistakeFromExam => 'Вопрос из пробного экзамена';
 
   @override
+  String get learnMistakeMarkReviewed => 'Отметить как повторённое';
+
+  @override
   String get learnMistakeOpenReview => 'Разбор';
 
   @override
@@ -3065,6 +3080,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get learnMistakeReviewToday => 'повторить сегодня';
+
+  @override
+  String get learnMistakeReviewedPrompt =>
+      'Разобрали этот вопрос? Отметьте — он вернётся позже.';
 
   @override
   String learnMistakeWrongCount(int n) {
@@ -4174,7 +4193,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shellQuickTitle => 'Быстрые действия';
 
   @override
-  String get shellQuickTutor => 'AI-репетитор';
+  String get shellQuickTutor => 'ИИ-репетитор';
 
   @override
   String get shellRegionDistrict => 'Район';

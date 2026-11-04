@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/utils/content_locale.dart';
 import '../models/region_model.dart';
 
 /// Reusable widget for hierarchical region selection
@@ -147,7 +148,7 @@ class _RegionSelectionWidgetState extends State<RegionSelectionWidget> {
           items: _regions.map((region) {
             return DropdownMenuItem(
               value: region.oblast,
-              child: Text(region.oblast),
+              child: Text(region.label(contentLanguageOf(context))),
             );
           }).toList(),
           onChanged: widget.enabled ? _onOblastChanged : null,
@@ -165,7 +166,7 @@ class _RegionSelectionWidgetState extends State<RegionSelectionWidget> {
           items: _getDistricts().map((district) {
             return DropdownMenuItem(
               value: district.name,
-              child: Text(district.name),
+              child: Text(district.label(contentLanguageOf(context))),
             );
           }).toList(),
           onChanged: widget.enabled && _selectedOblast != null

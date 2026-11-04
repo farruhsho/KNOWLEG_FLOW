@@ -5029,8 +5029,26 @@ abstract class AppLocalizations {
   /// No description provided for @learnLeaderboardNotRanked.
   ///
   /// In en, this message translates to:
-  /// **'You\'re not on this board yet. XP from studying is added automatically.'**
+  /// **'You\'re not on this board yet. XP from lessons, practice and mock exams is added automatically.'**
   String get learnLeaderboardNotRanked;
+
+  /// No description provided for @learnLeaderboardSubjectEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It will fill up as students complete mock exams in this test.'**
+  String get learnLeaderboardSubjectEmptyBody;
+
+  /// No description provided for @learnLeaderboardSubjectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only this week\'s XP from mock exams in the selected test counts here.'**
+  String get learnLeaderboardSubjectHint;
+
+  /// No description provided for @learnLeaderboardSubjectNotRanked.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not on this board yet. Only XP from mock exams in this test counts here.'**
+  String get learnLeaderboardSubjectNotRanked;
 
   /// No description provided for @learnLeaderboardTitle.
   ///
@@ -5242,6 +5260,12 @@ abstract class AppLocalizations {
   /// **'Question from a mock exam'**
   String get learnMistakeFromExam;
 
+  /// No description provided for @learnMistakeMarkReviewed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as reviewed'**
+  String get learnMistakeMarkReviewed;
+
   /// No description provided for @learnMistakeOpenReview.
   ///
   /// In en, this message translates to:
@@ -5277,6 +5301,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'due today'**
   String get learnMistakeReviewToday;
+
+  /// No description provided for @learnMistakeReviewedPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewed this question? Mark it and it will come back later.'**
+  String get learnMistakeReviewedPrompt;
 
   /// No description provided for @learnMistakeWrongCount.
   ///
