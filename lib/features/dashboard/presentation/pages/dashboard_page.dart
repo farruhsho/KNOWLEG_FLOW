@@ -1,551 +1,187 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/routes/app_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/models/gamification_models.dart';
-import '../../../../shared/services/gamification_service.dart';
-import '../../../../shared/widgets/gamification_bar.dart';
-import '../../../../shared/widgets/daily_quests_widget.dart';
-import '../../../../shared/widgets/glass_container.dart';
 
-class DashboardPage extends StatefulWidget {
+import '../../../../core/design/tokens.dart';
+import '../../../../core/routes/app_router.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../providers/auth_provider.dart';
+import '../../../auth/presentation/widgets/email_verification_banner.dart';
+import '../../data/dashboard_providers.dart';
+import '../widgets/dashboard_cards.dart';
+
+/// Home tab (GAM-07 / UI-07): real data only, honest empty states.
+///
+/// Every card is its own small consumer so a change in one source (stats,
+/// entitlements, latest exam) rebuilds only that card.
+class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
+  Future<void> _refresh(WidgetRef ref) async {
+    ref.invalidate(userStatsProvider);
+    ref.invalidate(latestExamProvider);
+    ref.invalidate(userModelProvider);
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+  }
+
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gutter = AppSpacing.gutter(context);
+    final banner = ref.watch(examResumeBannerBuilderProvider);
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: () => _refresh(ref),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(gutter, AppSpacing.lg, gutter, AppSpacing.xxxl),
+            children: [
+              const _Greeting(),
+              const SizedBox(height: AppSpacing.lg),
+              banner(),
+              const EmailVerificationBanner(),
+              const SizedBox(height: AppSpacing.md),
+              const TodayCard(),
+              const SizedBox(height: AppSpacing.md),
+              const NextStepCard(),
+              const SizedBox(height: AppSpacing.md),
+              const EntitlementChip(),
+              const StudyProfilePromptCard(),
+              const ReminderPromptCard(),
+              const SizedBox(height: AppSpacing.xl),
+              const _QuickActions(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  final _gamificationService = GamificationService();
-  UserGamification? _userGamification;
-  List<DailyQuest> _dailyQuests = [];
-  bool _isLoading = true;
+class _Greeting extends ConsumerWidget {
+  const _Greeting();
 
   @override
-  void initState() {
-    super.initState();
-    _loadGamificationData();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
+    final text = Theme.of(context).textTheme;
+    final profileName =
+        ref.watch(userModelProvider.select((v) => v.valueOrNull?.name));
+    final authName = ref.watch(
+      authStateProvider.select((v) => v.valueOrNull?.displayName),
+    );
+    final name = _firstName(profileName) ?? _firstName(authName);
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name == null ? l.shellHomeGreeting : l.shellHomeGreetingName(name),
+                style: text.headlineSmall,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              Text(
+                l.shellHomeSubtitle,
+                style: text.bodyMedium?.copyWith(color: context.tokens.textSecondary),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Semantics(
+          button: true,
+          label: l.shellNavProfile,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => context.go(RoutePaths.profile),
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Text(
+                (name ?? '').isEmpty ? '?' : name!.characters.first.toUpperCase(),
+                style: text.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  Future<void> _loadGamificationData() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) {
-      if (mounted) setState(() => _isLoading = false);
-      return;
-    }
-    try {
-      final gamification = await _gamificationService.getUserGamification(uid);
-      final quests = await _gamificationService.getDailyQuests(uid);
-      await _gamificationService.updateStreak(uid);
-
-      if (!mounted) return;
-
-      setState(() {
-        _userGamification = gamification;
-        _dailyQuests = quests;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  static String? _firstName(String? full) {
+    final trimmed = full?.trim() ?? '';
+    if (trimmed.isEmpty) return null;
+    return trimmed.split(RegExp(r'\s+')).first;
   }
+}
+
+class _QuickActions extends StatelessWidget {
+  const _QuickActions();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient Blobs
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.2),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 100,
-            left: -50,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.secondary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _loadGamificationData,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header Section
-                    _buildHeader(context),
-                    const SizedBox(height: 24),
-
-                    // Gamification Bar
-                    if (_userGamification != null && !_isLoading) ...[
-                      GamificationBar(
-                        gamification: _userGamification!,
-                        onTap: () => context.go(AppRouter.achievements),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-
-                    // Progress Overview
-                    _buildProgressSection(context),
-                    const SizedBox(height: 24),
-
-                    // Quick Actions Grid
-                    Text(
-                      'Быстрый старт',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildQuickActionsGrid(context),
-                    const SizedBox(height: 24),
-
-                    // Daily Quests
-                    if (_dailyQuests.isNotEmpty && !_isLoading) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Задания на сегодня',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          TextButton(
-                            onPressed: _showDailyQuestsDialog,
-                            child: const Text('Все'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      CompactDailyQuests(
-                        quests: _dailyQuests,
-                        onViewAll: _showDailyQuestsDialog,
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-
-                    // Subjects Horizontal List
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Мои предметы',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.arrow_forward),
-                          onPressed: () => context.go(AppRouter.subjects),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildSubjectsList(context),
-                    const SizedBox(height: 24),
-
-                    // Mock Test CTA
-                    _buildMockTestCard(context),
-                    const SizedBox(height: 40), // Bottom padding
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+    final l = AppLocalizations.of(context)!;
+    final actions = <QuickAction>[
+      QuickAction(
+        icon: Icons.assignment_outlined,
+        label: l.shellQuickMockExam,
+        onTap: () => context.go(RoutePaths.exams),
       ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Добрый день,',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-            Text(
-              'Студент 👋',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-            ),
-          ],
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.grey200),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProgressSection(BuildContext context) {
-    return GlassContainer(
-      gradient: AppColors.primaryGradient,
-      opacity: 0.9,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Твой прогресс',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                    ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.trending_up, color: Colors.white, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      '+12%',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _buildProgressStat('Тесты', '12', Icons.assignment_turned_in),
-              _buildVerticalDivider(),
-              _buildProgressStat('Ср. балл', '145', Icons.analytics),
-              _buildVerticalDivider(),
-              _buildProgressStat('Дни', '7', Icons.local_fire_department),
-            ],
-          ),
-        ],
+      QuickAction(
+        icon: Icons.bolt_outlined,
+        label: l.shellQuickTest,
+        onTap: () => context.push(RoutePaths.quickTest),
       ),
-    );
-  }
-
-  Widget _buildVerticalDivider() {
-    return Container(
-      height: 40,
-      width: 1,
-      color: Colors.white.withValues(alpha: 0.3),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-    );
-  }
-
-  Widget _buildProgressStat(String label, String value, IconData icon) {
-    return Expanded(
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.8), size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.outfit(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
-          ),
-        ],
+      QuickAction(
+        icon: Icons.today_outlined,
+        label: l.shellQuickDailyLesson,
+        onTap: () => context.push(RoutePaths.dailyLesson),
       ),
-    );
-  }
-
-  Widget _buildQuickActionsGrid(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildActionCard(
-            context,
-            title: 'Урок дня',
-            subtitle: 'Новая тема',
-            icon: Icons.menu_book,
-            color: AppColors.primary,
-            onTap: () => context.go('/lessons/daily'),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildActionCard(
-            context,
-            title: 'Быстрый тест',
-            subtitle: '10 вопросов',
-            icon: Icons.timer_outlined,
-            color: AppColors.secondary,
-            onTap: () => context.go(AppRouter.quickTest),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.grey200),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.grey200.withValues(alpha: 0.5),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-          ],
-        ),
+      QuickAction(
+        icon: Icons.forum_outlined,
+        label: l.shellQuickTutor,
+        onTap: () => context.push(RoutePaths.tutor),
       ),
-    );
-  }
-
-  Widget _buildSubjectsList(BuildContext context) {
-    final subjects = [
-      {'name': 'Математика', 'icon': '📐', 'color': AppColors.mathColor},
-      {'name': 'Физика', 'icon': '⚡', 'color': AppColors.physicsColor},
-      {'name': 'Химия', 'icon': '🧪', 'color': AppColors.chemistryColor},
-      {'name': 'Биология', 'icon': '🧬', 'color': AppColors.biologyColor},
+      QuickAction(
+        icon: Icons.leaderboard_outlined,
+        label: l.shellQuickLeaderboard,
+        onTap: () => context.push(RoutePaths.leaderboard),
+      ),
+      QuickAction(
+        icon: Icons.menu_book_outlined,
+        label: l.shellQuickHandbook,
+        onTap: () => context.push(AppRouter.handbookIndex),
+      ),
     ];
 
-    return SizedBox(
-      height: 120,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: subjects.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final subject = subjects[index];
-          return Container(
-            width: 100,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.grey200),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l.shellQuickTitle, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: AppSpacing.md),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth >= 520 ? 3 : 2;
+            final width = (constraints.maxWidth - AppSpacing.sm * (columns - 1)) / columns;
+            return Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: (subject['color'] as Color).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    subject['icon'] as String,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  subject['name'] as String,
-                  style: Theme.of(context).textTheme.labelMedium,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                for (final action in actions)
+                  SizedBox(width: width, child: QuickActionTile(action: action)),
               ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMockTestCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: AppColors.purpleGradient,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.chemistryColor.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.school, color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Пробный ОРТ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Проверь свои знания в полной симуляции экзамена',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => context.go('/mock-test/demo'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.chemistryColor,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text('Начать тестирование'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDailyQuestsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: GlassContainer(
-          color: AppColors.white,
-          opacity: 0.95,
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Ежедневные задания',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: DailyQuestsWidget(
-                    quests: _dailyQuests,
-                    onQuestTap: (questId) => Navigator.of(context).pop(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
-      ),
+      ],
     );
   }
 }
-

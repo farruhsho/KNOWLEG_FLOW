@@ -1,45 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-/// Language provider for managing app language (RU/KG/EN)
-class LanguageNotifier extends StateNotifier<String> {
-  static const String _languageKey = 'app_language';
-  final SharedPreferences _prefs;
+import 'locale_provider.dart';
 
-  LanguageNotifier(this._prefs) : super(_prefs.getString(_languageKey) ?? 'ru');
+// Compatibility shim. The app used to have two language providers that never
+// talked to each other (LANG-01 / UI-02): `languageProvider` ('app_language')
+// was written by the language picker while MaterialApp read `localeProvider`
+// ('app_locale'). Everything now goes through [localeProvider]; the legacy
+// preference is migrated by LocaleController on first read.
+export 'locale_provider.dart'
+    show sharedPreferencesProvider, localeProvider, contentLanguageProvider;
 
-  /// Change language and persist to shared preferences
-  Future<void> setLanguage(String languageCode) async {
-    if (languageCode == state) return;
-    
-    // Validate language code
-    if (!['ru', 'ky', 'en'].contains(languageCode)) {
-      throw ArgumentError('Invalid language code: $languageCode');
-    }
-
-    await _prefs.setString(_languageKey, languageCode);
-    state = languageCode;
-  }
-
-  /// Get current language
-  String get currentLanguage => state;
-
-  /// Check if language is Russian
-  bool get isRussian => state == 'ru';
-
-  /// Check if language is Kyrgyz
-  bool get isKyrgyz => state == 'ky';
-
-  /// Check if language is English
-  bool get isEnglish => state == 'en';
-}
-
-/// Provider for language state
-final languageProvider = StateNotifierProvider<LanguageNotifier, String>((ref) {
-  throw UnimplementedError('languageProvider must be overridden with SharedPreferences');
-});
-
-/// Provider for SharedPreferences
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('sharedPreferencesProvider must be overridden');
-});
+/// Read-only view of the current UI language code ('ru' | 'ky' | 'en').
+/// To change the language use `ref.read(localeProvider.notifier)`.
+@Deprecated('Use localeProvider or contentLanguageProvider')
+final languageProvider = Provider<String>(
+  (ref) => ref.watch(localeProvider.select((l) => l.languageCode)),
+);

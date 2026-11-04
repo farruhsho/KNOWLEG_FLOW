@@ -1,106 +1,94 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/language_provider.dart';
 
-/// Language toggle widget for switching between RU/KG/EN
+import '../../core/design/tokens.dart';
+import '../../core/network/firebase_service.dart';
+import '../../l10n/app_localizations.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
+
+/// Changes the live app language (LANG-01 / UI-02) and, for a signed-in
+/// user, mirrors ru/ky into `users.preferred_language` (best-effort).
+Future<void> changeAppLanguage(WidgetRef ref, String languageCode) async {
+  await ref.read(localeProvider.notifier).setLanguageCode(languageCode);
+  if (!FirebaseService.isInitialized) return;
+  if (!kContentLanguageCodes.contains(languageCode)) return;
+  if (ref.read(currentUidProvider) == null) return;
+  unawaited(ref.read(authServiceProvider).updatePreferredLanguage(languageCode));
+}
+
+/// Language picker for Русский / Кыргызча / English.
 class LanguageToggleWidget extends ConsumerWidget {
   final bool showLabel;
   final bool compact;
+
+  /// Pops the enclosing route (dialog / sheet) after a choice.
+  final bool closeOnSelect;
 
   const LanguageToggleWidget({
     super.key,
     this.showLabel = true,
     this.compact = false,
+    this.closeOnSelect = false,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentLanguage = ref.watch(languageProvider);
+    final current = ref.watch(localeProvider.select((l) => l.languageCode));
+    final l = AppLocalizations.of(context)!;
 
-    if (compact) {
-      return _buildCompactToggle(context, ref, currentLanguage);
+    Future<void> select(String code) async {
+      await changeAppLanguage(ref, code);
+      if (closeOnSelect && context.mounted) Navigator.of(context).maybePop();
     }
 
-    return _buildFullToggle(context, ref, currentLanguage);
-  }
+    if (compact) {
+      return SegmentedButton<String>(
+        segments: const [
+          ButtonSegment(value: 'ru', label: Text('РУ')),
+          ButtonSegment(value: 'ky', label: Text('КЫ')),
+          ButtonSegment(value: 'en', label: Text('EN')),
+        ],
+        selected: {current},
+        showSelectedIcon: false,
+        onSelectionChanged: (selection) => select(selection.first),
+      );
+    }
 
-  Widget _buildCompactToggle(BuildContext context, WidgetRef ref, String currentLanguage) {
-    return SegmentedButton<String>(
-      segments: const [
-        ButtonSegment(
-          value: 'ru',
-          label: Text('РУ'),
-        ),
-        ButtonSegment(
-          value: 'ky',
-          label: Text('КЫ'),
-        ),
-        ButtonSegment(
-          value: 'en',
-          label: Text('EN'),
-        ),
-      ],
-      selected: {currentLanguage},
-      onSelectionChanged: (Set<String> newSelection) {
-        ref.read(languageProvider.notifier).setLanguage(newSelection.first);
-      },
-    );
-  }
+    final options = <(String, String, String)>[
+      ('ru', l.shellLangRu, l.shellLangRuNative),
+      ('ky', l.shellLangKy, l.shellLangKyNative),
+      ('en', l.shellLangEn, l.shellLangEnNative),
+    ];
 
-  Widget _buildFullToggle(BuildContext context, WidgetRef ref, String currentLanguage) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (showLabel)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
             child: Text(
-              'Язык приложения',
+              l.shellSettingsLanguage,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                RadioListTile<String>(
-                  title: const Text('Русский'),
-                  subtitle: const Text('Russian'),
-                  value: 'ru',
-                  groupValue: currentLanguage,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref.read(languageProvider.notifier).setLanguage(value);
-                    }
-                  },
-                ),
-                RadioListTile<String>(
-                  title: const Text('Кыргызча'),
-                  subtitle: const Text('Kyrgyz'),
-                  value: 'ky',
-                  groupValue: currentLanguage,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref.read(languageProvider.notifier).setLanguage(value);
-                    }
-                  },
-                ),
-                RadioListTile<String>(
-                  title: const Text('English'),
-                  subtitle: const Text('English'),
-                  value: 'en',
-                  groupValue: currentLanguage,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref.read(languageProvider.notifier).setLanguage(value);
-                    }
-                  },
-                ),
-              ],
-            ),
+        for (final (code, title, native) in options)
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+            title: Text(native),
+            subtitle: native == title ? null : Text(title),
+            selected: current == code,
+            trailing: current == code
+                ? Icon(
+                    Icons.check_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () => select(code),
           ),
-        ),
       ],
     );
   }
