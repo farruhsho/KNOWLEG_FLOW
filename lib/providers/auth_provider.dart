@@ -1,51 +1,132 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import '../core/network/firebase_service.dart';
 import '../core/routes/admin_session.dart';
+import '../firebase_options.dart';
 import '../shared/models/user_model.dart';
+import 'onboarding_provider.dart';
 
-/// Provider for the current Firebase user
+/// Firebase auth state (sign-in / sign-out).
 final authStateProvider = StreamProvider<User?>((ref) {
   return FirebaseService.auth.authStateChanges();
 });
 
-/// Provider for the current user model
-final userModelProvider = StreamProvider<UserModel?>((ref) {
-  final authState = ref.watch(authStateProvider);
+/// Uid of the signed-in user, or null. Downstream providers watch this
+/// instead of [authStateProvider] so token refreshes (same uid) do not
+/// rebuild them.
+final currentUidProvider = Provider<String?>((ref) {
+  return ref.watch(authStateProvider.select((s) => s.valueOrNull?.uid));
+});
 
-  return authState.when(
-    data: (user) {
-      if (user == null) return Stream.value(null);
-      return FirebaseService.firestore
-          .collection('users')
-          .doc(user.uid)
-          .snapshots()
-          .map((snapshot) {
-        if (!snapshot.exists) return null;
-        return UserModel.fromFirestore(snapshot);
-      });
-    },
-    loading: () => Stream.value(null),
-    error: (_, __) => Stream.value(null),
-  );
+/// The signed-in user's `users/{uid}` profile (null while signed out or
+/// before the document exists).
+final userModelProvider = StreamProvider<UserModel?>((ref) {
+  final uid = ref.watch(currentUidProvider);
+  if (uid == null) return Stream.value(null);
+  return FirebaseService.firestore
+      .collection('users')
+      .doc(uid)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.exists ? UserModel.fromFirestore(snapshot) : null);
 });
 
 /// Auth service provider
 final authServiceProvider = Provider<AuthService>((ref) {
-  return AuthService();
+  final onboarding = ref.watch(onboardingServiceProvider);
+  return AuthService(
+    // Answers given in onboarding before sign-in are saved to the profile.
+    onSignedIn: (user) => onboarding.flushPendingAnswers(user.uid),
+  );
 });
 
+/// Thrown when the user closes the Google account picker.
+class SignInCancelledException implements Exception {
+  const SignInCancelledException();
+  @override
+  String toString() => 'SignInCancelledException';
+}
+
+/// Thrown when Google sign-in is not available on this platform/build.
+class SignInUnavailableException implements Exception {
+  const SignInUnavailableException();
+  @override
+  String toString() => 'SignInUnavailableException';
+}
+
+/// Google sign-in availability (AUTH-02).
+///
+/// iOS needs the reversed client id URL scheme and `GIDClientID` in
+/// Info.plist; without them the native SDK raises an exception that crashes
+/// the app. Until the owner adds that configuration the iOS button is hidden;
+/// a configured build enables it with
+/// `--dart-define=GOOGLE_SIGN_IN_IOS_CONFIGURED=true`.
+/// Web uses Firebase's popup flow; desktop has no implementation.
+abstract final class GoogleSignInSupport {
+  static const bool iosConfigured =
+      bool.fromEnvironment('GOOGLE_SIGN_IN_IOS_CONFIGURED');
+
+  static bool get isAvailable {
+    if (kIsWeb) return true;
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return true;
+      case TargetPlatform.iOS:
+        return iosConfigured;
+      default:
+        return false;
+    }
+  }
+}
+
+/// Authentication + profile bootstrap.
+///
+/// Rules (AUTH-01 / AUTH-03):
+///  * Sign-in succeeds as soon as Firebase Auth succeeds. Creating or
+///    touching `users/{uid}` is best-effort and never turns a successful
+///    sign-in into an error.
+///  * Profile creation is idempotent ([ensureProfile]).
+///  * The client never writes `role` (UserModel.toFirestore excludes it) and
+///    no longer writes the unruled `gamification/{uid}` document.
 class AuthService {
-  final FirebaseAuth _auth = FirebaseService.auth;
-  final FirebaseFirestore _firestore = FirebaseService.firestore;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  AuthService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+    Future<void> Function(User user)? onSignedIn,
+  })  : _authOverride = auth,
+        _firestoreOverride = firestore,
+        _onSignedIn = onSignedIn;
+
+  /// Runs (best-effort) after every successful sign-in / sign-up.
+  final Future<void> Function(User user)? _onSignedIn;
+
+  final FirebaseAuth? _authOverride;
+  final FirebaseFirestore? _firestoreOverride;
+  GoogleSignIn? _googleSignInInstance;
+
+  FirebaseAuth get _auth => _authOverride ?? FirebaseService.auth;
+  FirebaseFirestore get _firestore =>
+      _firestoreOverride ?? FirebaseService.firestore;
+
+  GoogleSignIn get _googleSignIn => _googleSignInInstance ??= GoogleSignIn(
+        clientId: !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS
+            ? DefaultFirebaseOptions.ios.iosClientId
+            : null,
+      );
+
+  DocumentReference<Map<String, dynamic>> _userDoc(String uid) =>
+      _firestore.collection('users').doc(uid);
 
   /// Get current user
   User? get currentUser => _auth.currentUser;
 
-  /// Sign in with email and password
+  /// Sign in with email and password.
   Future<UserCredential> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -54,142 +135,183 @@ class AuthService {
       email: email,
       password: password,
     );
-
-    // Create user document if it doesn't exist (for existing users who registered before this feature)
-    if (credential.user != null) {
-      final userDoc = await _firestore
-          .collection('users')
-          .doc(credential.user!.uid)
-          .get();
-
-      if (!userDoc.exists) {
-        await _createUserDocument(
-          uid: credential.user!.uid,
-          email: credential.user!.email ?? email,
-          name: credential.user!.displayName ?? email.split('@').first,
-        );
-      } else {
-        // Update last active timestamp
-        await _firestore.collection('users').doc(credential.user!.uid).update({
-          'last_active': Timestamp.now(),
-        });
-      }
+    final user = credential.user;
+    if (user != null) {
+      unawaited(_afterSignIn(user, fallbackName: email.split('@').first));
     }
-
+    FirebaseService.logEvent('login', {'method': 'password'});
     return credential;
   }
 
-  /// Sign up with email and password
+  /// Creates an email/password account. The profile document, display name
+  /// and verification e-mail are best-effort.
   Future<UserCredential> signUpWithEmailAndPassword({
     required String email,
     required String password,
     required String name,
+    String preferredLanguage = 'ru',
   }) async {
-    // Create user account
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-
-    // Create user document in Firestore
-    if (credential.user != null) {
-      await _createUserDocument(
-        uid: credential.user!.uid,
-        email: email,
-        name: name,
-      );
-
-      // Update display name
-      await credential.user!.updateDisplayName(name);
+    final user = credential.user;
+    if (user != null) {
+      unawaited(_afterSignUp(user, name: name, language: preferredLanguage));
     }
-
+    FirebaseService.logEvent('sign_up', {'method': 'password'});
     return credential;
   }
 
-  /// Sign in with Google
+  Future<void> _afterSignUp(
+    User user, {
+    required String name,
+    required String language,
+  }) async {
+    await ensureProfile(user, name: name, preferredLanguage: language);
+    try {
+      await user.updateDisplayName(name);
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'update_display_name');
+    }
+    await sendEmailVerification();
+    await _runOnSignedIn(user);
+  }
+
+  Future<void> _afterSignIn(User user, {String? fallbackName}) async {
+    await ensureProfile(user, name: fallbackName);
+    await _runOnSignedIn(user);
+  }
+
+  /// Background work for a session restored on a cold start: make sure the
+  /// profile exists, then save pending onboarding answers. Sequential on
+  /// purpose — creating the profile after the answers were merged would
+  /// overwrite them with defaults. Never throws.
+  Future<void> bootstrapSession(User user) => _afterSignIn(user);
+
+  Future<void> _runOnSignedIn(User user) async {
+    try {
+      await _onSignedIn?.call(user);
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'post_sign_in');
+    }
+  }
+
+  /// Sign in with Google. Throws [SignInCancelledException] when the picker
+  /// is closed and [SignInUnavailableException] where it is not supported.
   Future<UserCredential> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-    if (googleUser == null) {
-      throw Exception('Google sign in cancelled');
+    if (!GoogleSignInSupport.isAvailable) {
+      throw const SignInUnavailableException();
     }
 
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    // Sign in with credential
-    final userCredential = await _auth.signInWithCredential(credential);
-
-    // Create user document if it doesn't exist
-    if (userCredential.user != null) {
-      final userDoc = await _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .get();
-
-      if (!userDoc.exists) {
-        await _createUserDocument(
-          uid: userCredential.user!.uid,
-          email: userCredential.user!.email ?? '',
-          name: userCredential.user!.displayName ?? 'User',
-        );
-      }
+    final UserCredential userCredential;
+    if (kIsWeb) {
+      userCredential = await _auth.signInWithPopup(GoogleAuthProvider());
+    } else {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) throw const SignInCancelledException();
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      userCredential = await _auth.signInWithCredential(credential);
     }
 
+    final user = userCredential.user;
+    if (user != null) {
+      unawaited(_afterSignIn(user, fallbackName: user.displayName));
+    }
+    FirebaseService.logEvent('login', {'method': 'google'});
     return userCredential;
   }
 
-  /// Create user document in Firestore
-  Future<void> _createUserDocument({
-    required String uid,
-    required String email,
-    required String name,
+  /// Creates `users/{uid}` if it is missing, otherwise refreshes
+  /// `last_active`. Idempotent and never throws.
+  Future<void> ensureProfile(
+    User user, {
+    String? name,
+    String? preferredLanguage,
   }) async {
-    final userModel = UserModel(
-      uid: uid,
-      name: name,
-      email: email,
-      grade: 11,
-      preferredLanguage: 'ru',
-      subscription: const SubscriptionModel(),
-      linkedAccounts: const LinkedAccounts(),
-      createdAt: DateTime.now(),
-      lastActive: DateTime.now(),
-    );
+    FirebaseService.setUserIdentifier(user.uid);
+    try {
+      final ref = _userDoc(user.uid);
+      final snapshot = await ref.get();
+      if (!snapshot.exists) {
+        final now = DateTime.now();
+        final profile = UserModel(
+          uid: user.uid,
+          name: (name?.trim().isNotEmpty ?? false)
+              ? name!.trim()
+              : (user.displayName ?? user.email?.split('@').first ?? ''),
+          email: user.email ?? '',
+          phone: user.phoneNumber,
+          grade: 11,
+          preferredLanguage: preferredLanguage ?? 'ru',
+          subscription: const SubscriptionModel(),
+          linkedAccounts: const LinkedAccounts(),
+          createdAt: now,
+          lastActive: now,
+        );
+        await ref.set(profile.toFirestore());
+      } else {
+        await ref.update({'last_active': FieldValue.serverTimestamp()});
+      }
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'ensure_profile');
+    }
+  }
 
-    await _firestore
-        .collection('users')
-        .doc(uid)
-        .set(userModel.toFirestore());
+  /// Merges editable profile fields into `users/{uid}`. Only non-privileged
+  /// fields may be passed (rules reject role/subscription changes).
+  Future<void> updateProfileFields(Map<String, dynamic> fields) async {
+    final user = currentUser;
+    if (user == null) throw StateError('Not signed in');
+    assert(!fields.containsKey('role') && !fields.containsKey('subscription'));
+    await _userDoc(user.uid).set(fields, SetOptions(merge: true));
+    final name = fields['name'];
+    if (name is String && name.trim().isNotEmpty && name != user.displayName) {
+      try {
+        await user.updateDisplayName(name.trim());
+      } catch (e, s) {
+        FirebaseService.recordNonFatal(e, s, reason: 'update_display_name');
+      }
+    }
+  }
 
-    // Initialize gamification data
-    await _firestore
-        .collection('gamification')
-        .doc(uid)
-        .set({
-      'userId': uid,
-      'level': 1,
-      'xp': 0,
-      'xpToNextLevel': 100,
-      'coins': 0,
-      'streakDays': 0,
-      'lastActivityDate': Timestamp.now(),
-      'statistics': {},
-    });
+  /// Sends the address-verification e-mail. Returns false on failure.
+  Future<bool> sendEmailVerification() async {
+    final user = currentUser;
+    if (user == null || user.emailVerified || user.email == null) return false;
+    try {
+      await user.sendEmailVerification();
+      return true;
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'send_email_verification');
+      return false;
+    }
+  }
+
+  /// Reloads the user and reports whether the e-mail is now verified.
+  Future<bool> reloadAndCheckEmailVerified() async {
+    final user = currentUser;
+    if (user == null) return false;
+    await user.reload();
+    return _auth.currentUser?.emailVerified ?? false;
   }
 
   /// Sign out
   Future<void> signOut() async {
     // Drop any verified-admin session so /admin/* re-gates after sign-out.
     adminVerified.value = false;
-    await _googleSignIn.signOut();
+    FirebaseService.setUserIdentifier(null);
+    try {
+      if (!kIsWeb && GoogleSignInSupport.isAvailable) {
+        await _googleSignIn.signOut();
+      }
+    } catch (e) {
+      debugPrint('Google sign-out skipped: $e');
+    }
     await _auth.signOut();
   }
 
@@ -198,23 +320,28 @@ class AuthService {
     await _auth.sendPasswordResetEmail(email: email);
   }
 
-  /// Update user's preferred language
+  /// Update user's preferred (content) language. Best-effort.
   Future<void> updatePreferredLanguage(String languageCode) async {
     final user = currentUser;
     if (user == null) return;
-
-    await _firestore.collection('users').doc(user.uid).update({
-      'preferred_language': languageCode,
-    });
+    try {
+      await _userDoc(user.uid).set(
+        {'preferred_language': languageCode},
+        SetOptions(merge: true),
+      );
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'update_language');
+    }
   }
 
-  /// Update last active timestamp
+  /// Update last active timestamp. Best-effort.
   Future<void> updateLastActive() async {
     final user = currentUser;
     if (user == null) return;
-
-    await _firestore.collection('users').doc(user.uid).update({
-      'last_active': Timestamp.now(),
-    });
+    try {
+      await _userDoc(user.uid).update({'last_active': Timestamp.now()});
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'update_last_active');
+    }
   }
 }

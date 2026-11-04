@@ -1,15 +1,41 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+
 import '../../firebase_options.dart';
 
+/// Outcome of asking the OS for notification permission.
+enum NotificationPermissionResult { granted, denied, unsupported, error }
+
+/// Firebase bootstrap plus small, failure-tolerant wrappers around the
+/// Firebase singletons.
+///
+/// Startup contract (BOOT-01 / BOOT-02 / GAM-13 / GAM-14 / GAM-15):
+///  * [initialize] awaits only what must exist before the first Firebase
+///    call: `Firebase.initializeApp`, Firestore settings, App Check and the
+///    crash handlers. It has a timeout and throws on failure so the boot
+///    screen can show an error with a retry button instead of hanging.
+///  * Remote Config is fetched after the first frame ([runDeferredStartupTasks]).
+///  * Notification permission is never requested at startup; Settings and the
+///    dashboard reminder card call [requestNotificationPermission] in context.
 class FirebaseService {
+  FirebaseService._();
+
+  static bool _initialized = false;
+
+  /// True once [initialize] completed successfully.
+  static bool get isInitialized => _initialized;
+
   static FirebaseAuth get auth => FirebaseAuth.instance;
   static FirebaseFirestore get firestore => FirebaseFirestore.instance;
   static FirebaseStorage get storage => FirebaseStorage.instance;
@@ -18,93 +44,230 @@ class FirebaseService {
   static FirebaseMessaging get messaging => FirebaseMessaging.instance;
   static FirebaseRemoteConfig get remoteConfig => FirebaseRemoteConfig.instance;
 
-  static Future<void> initialize() async {
-    try {
+  static bool get _isMobileOrMac =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
+
+  /// Crashlytics only has Android/Apple implementations.
+  static bool get supportsCrashlytics => _isMobileOrMac;
+
+  /// App Check: web needs a reCAPTCHA key and Windows a registered debug
+  /// token, neither of which is configured, so only mobile/macOS activate it.
+  static bool get supportsAppCheck => _isMobileOrMac;
+
+  /// Analytics has Android/Apple/web implementations.
+  static bool get supportsAnalytics => kIsWeb || _isMobileOrMac;
+
+  /// Push notifications (web would also need a VAPID key + service worker).
+  static bool get supportsMessaging => _isMobileOrMac;
+
+  static bool get supportsRemoteConfig => kIsWeb || _isMobileOrMac;
+
+  static bool get _crashReportingEnabled =>
+      _initialized && supportsCrashlytics && !kDebugMode;
+
+  /// Initializes Firebase. Safe to call again after a failure (retry).
+  static Future<void> initialize({
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    if (_initialized) return;
+
+    if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
-      );
+      ).timeout(timeout);
+    }
 
-      // Enable Firestore offline persistence
+    try {
+      // Offline persistence. Must be set before the first Firestore call.
       firestore.settings = const Settings(
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
-
-      // Initialize Remote Config
-      await _initializeRemoteConfig();
-
-      // Setup Crashlytics
-      FlutterError.onError = crashlytics.recordFlutterFatalError;
-
-      // Request notification permissions
-      await _requestNotificationPermissions();
-
-      // ignore: avoid_print
-
-      print('Firebase initialized successfully');
     } catch (e) {
-      // ignore: avoid_print
-      print('Error initializing Firebase: $e');
-      rethrow;
+      debugPrint('Firestore settings were not applied: $e');
     }
+
+    await _activateAppCheck();
+    await _setUpCrashReporting();
+
+    _initialized = true;
+
+    final pending = _pendingStartupError;
+    if (pending != null) {
+      _pendingStartupError = null;
+      recordNonFatal(pending.$1, pending.$2, reason: 'app_check_activate');
+    }
+  }
+
+  static Future<void> _activateAppCheck() async {
+    if (!supportsAppCheck) return;
+    try {
+      await FirebaseAppCheck.instance.activate(
+        providerAndroid: kDebugMode
+            ? const AndroidDebugProvider()
+            : const AndroidPlayIntegrityProvider(),
+        providerApple: kDebugMode
+            ? const AppleDebugProvider()
+            : const AppleAppAttestProvider(),
+      );
+    } catch (e, s) {
+      // Never block startup on App Check: callables will report it instead.
+      debugPrint('App Check activation failed: $e');
+      _pendingStartupError = (e, s);
+    }
+  }
+
+  static (Object, StackTrace)? _pendingStartupError;
+
+  static Future<void> _setUpCrashReporting() async {
+    if (!supportsCrashlytics) {
+      _installDebugOnlyHandlers();
+      return;
+    }
+    try {
+      await crashlytics.setCrashlyticsCollectionEnabled(!kDebugMode);
+    } catch (e) {
+      debugPrint('Crashlytics could not be configured: $e');
+    }
+
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.presentError(details);
+      if (!_crashReportingEnabled) return;
+      // Framework errors (layout overflow, GoError, …) are non-fatal.
+      unawaited(crashlytics.recordFlutterError(details));
+    };
+    PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+      if (_crashReportingEnabled) {
+        unawaited(crashlytics.recordError(error, stack, fatal: true));
+      } else {
+        debugPrint('Uncaught async error: $error\n$stack');
+      }
+      return true;
+    };
+  }
+
+  static void _installDebugOnlyHandlers() {
+    PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+      debugPrint('Uncaught async error: $error\n$stack');
+      return true;
+    };
+  }
+
+  /// Reports a handled failure. Never throws.
+  static void recordNonFatal(Object error, StackTrace? stack, {String? reason}) {
+    debugPrint('Non-fatal${reason == null ? '' : ' ($reason)'}: $error');
+    if (!_crashReportingEnabled) return;
+    try {
+      unawaited(crashlytics.recordError(error, stack, reason: reason));
+    } catch (_) {}
+  }
+
+  /// Tags crash reports with the signed-in user (null clears it).
+  static void setUserIdentifier(String? uid) {
+    if (!_crashReportingEnabled) return;
+    try {
+      unawaited(crashlytics.setUserIdentifier(uid ?? ''));
+    } catch (_) {}
+  }
+
+  /// Work that must not delay the first frame. Called once after it.
+  static void runDeferredStartupTasks() {
+    if (!_initialized) return;
+    unawaited(_initializeRemoteConfig());
   }
 
   static Future<void> _initializeRemoteConfig() async {
+    if (!supportsRemoteConfig) return;
     try {
       await remoteConfig.setConfigSettings(
         RemoteConfigSettings(
-          fetchTimeout: const Duration(minutes: 1),
+          fetchTimeout: const Duration(seconds: 5),
           minimumFetchInterval: const Duration(hours: 1),
         ),
       );
-
-      await remoteConfig.setDefaults({
+      await remoteConfig.setDefaults(const {
         'next_ort_date': '',
         'registration_url': 'https://testing.kg',
-        'practice_tests_url': 'https://ort.kg',
         'show_announcement': false,
         'announcement_text': '',
       });
-
       await remoteConfig.fetchAndActivate();
     } catch (e) {
-      // ignore: avoid_print
-      print('Error initializing Remote Config: $e');
+      debugPrint('Remote Config fetch skipped: $e');
     }
   }
 
-  static Future<void> _requestNotificationPermissions() async {
+  /// Asks for notification permission. Call only from a user action.
+  static Future<NotificationPermissionResult>
+      requestNotificationPermission() async {
+    if (!_initialized || !supportsMessaging) {
+      return NotificationPermissionResult.unsupported;
+    }
     try {
       final settings = await messaging.requestPermission(
         alert: true,
-        announcement: false,
         badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
         sound: true,
       );
-
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        // ignore: avoid_print
-        print('User granted notification permissions');
-      } else {
-        // ignore: avoid_print
-        print('User declined notification permissions');
+      switch (settings.authorizationStatus) {
+        case AuthorizationStatus.authorized:
+        case AuthorizationStatus.provisional:
+          return NotificationPermissionResult.granted;
+        case AuthorizationStatus.denied:
+        case AuthorizationStatus.deniedPermanently:
+        case AuthorizationStatus.notDetermined:
+          return NotificationPermissionResult.denied;
       }
-    } catch (e) {
-      // ignore: avoid_print
-      print('Error requesting notification permissions: $e');
+    } catch (e, s) {
+      recordNonFatal(e, s, reason: 'notification_permission');
+      return NotificationPermissionResult.error;
     }
   }
 
   static Future<String?> getFCMToken() async {
+    if (!_initialized || !supportsMessaging) return null;
     try {
+      // The registration-token API is deprecated in favour of FID-based
+      // register()/onRegistered, which needs FCM direct-send support on the
+      // backend. The reminder job (not built yet) targets registration
+      // tokens, so keep using them until the backend moves to FIDs.
+      // ignore: deprecated_member_use
       return await messaging.getToken();
     } catch (e) {
-      // ignore: avoid_print
-      print('Error getting FCM token: $e');
+      debugPrint('FCM token unavailable: $e');
       return null;
     }
+  }
+
+  /// A screen-view observer for one navigator, or null where Analytics is
+  /// unavailable. Each navigator needs its own instance.
+  static NavigatorObserver? createAnalyticsObserver() {
+    if (!_initialized || !supportsAnalytics) return null;
+    try {
+      return FirebaseAnalyticsObserver(
+        analytics: analytics,
+        onError: (e) => debugPrint('Analytics observer error: $e'),
+      );
+    } catch (e) {
+      debugPrint('Analytics observer unavailable: $e');
+      return null;
+    }
+  }
+
+  static void logScreenView(String screenName) {
+    if (!_initialized || !supportsAnalytics) return;
+    try {
+      unawaited(analytics.logScreenView(screenName: screenName));
+    } catch (_) {}
+  }
+
+  static void logEvent(String name, [Map<String, Object>? parameters]) {
+    if (!_initialized || !supportsAnalytics) return;
+    try {
+      unawaited(analytics.logEvent(name: name, parameters: parameters));
+    } catch (_) {}
   }
 }

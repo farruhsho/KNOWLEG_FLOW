@@ -24,6 +24,12 @@ class UserModel extends Equatable {
   // the router admin-gate both trust this value. See CTO_AUDIT_REPORT.md §3.
   final String role;
   final List<String> aiRecommendations; // Personalized study suggestions
+  /// Daily study goal chosen in onboarding/profile: 10, 20 or 30 minutes.
+  final int? dailyGoalMinutes;
+  /// Target score band chosen in onboarding/profile: '110+', '150+', '190+'.
+  final String? goalBand;
+  /// When the onboarding questionnaire was saved for this account.
+  final DateTime? onboardingCompletedAt;
   final DateTime createdAt;
   final DateTime lastActive;
 
@@ -45,33 +51,108 @@ class UserModel extends Equatable {
     this.level = 'beginner',
     this.role = 'student',
     this.aiRecommendations = const [],
+    this.dailyGoalMinutes,
+    this.goalBand,
+    this.onboardingCompletedAt,
     required this.createdAt,
     required this.lastActive,
   });
 
+  /// Grade value stored for school graduates (matches AppConstants).
+  static const int gradeGraduate = 0;
+
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data();
+    final data = raw is Map<String, dynamic> ? raw : const <String, dynamic>{};
+    return UserModel.fromMap(doc.id, data);
+  }
+
+  /// Tolerant parser (MODEL-01): Firestore stores whole numbers as int, older
+  /// documents may hold strings, and some fields may be missing entirely.
+  factory UserModel.fromMap(String uid, Map<String, dynamic> data) {
     return UserModel(
-      uid: doc.id,
-      name: data['name'] ?? '',
-      email: data['email'] ?? '',
-      phone: data['phone'],
-      studentId: data['student_id'],
-      grade: data['grade'] ?? 11,
-      school: data['school'],
-      preferredLanguage: data['preferred_language'] ?? 'ru',
-      targetUniversities: List<String>.from(data['target_universities'] ?? []),
-      weakSubjects: Map<String, double>.from(data['weak_subjects'] ?? {}),
-      subscription: SubscriptionModel.fromMap(data['subscription'] ?? {}),
-      linkedAccounts: LinkedAccounts.fromMap(data['linked_accounts'] ?? {}),
-      region: data['region'] != null ? RegionModel.fromMap(data['region']) : null,
-      regionLastUpdated: (data['region_last_updated'] as Timestamp?)?.toDate(),
-      level: data['level'] ?? 'beginner',
-      role: data['role'] ?? 'student',
-      aiRecommendations: List<String>.from(data['ai_recommendations'] ?? []),
-      createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastActive: (data['last_active'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      uid: uid,
+      name: parseString(data['name']) ?? '',
+      email: parseString(data['email']) ?? '',
+      phone: parseString(data['phone']),
+      studentId: parseString(data['student_id']),
+      grade: parseInt(data['grade']) ?? 11,
+      school: parseString(data['school']),
+      preferredLanguage: parseString(data['preferred_language']) ?? 'ru',
+      targetUniversities: parseStringList(data['target_universities']),
+      weakSubjects: _doubleMap(data['weak_subjects']),
+      subscription: SubscriptionModel.fromMap(parseMap(data['subscription'])),
+      linkedAccounts: LinkedAccounts.fromMap(parseMap(data['linked_accounts'])),
+      region: parseRegion(data['region']),
+      regionLastUpdated: parseDate(data['region_last_updated']),
+      level: parseString(data['level']) ?? 'beginner',
+      role: parseString(data['role']) ?? 'student',
+      aiRecommendations: parseStringList(data['ai_recommendations']),
+      dailyGoalMinutes: parseInt(data['daily_goal_minutes']),
+      goalBand: parseString(data['goal_band']),
+      onboardingCompletedAt: parseDate(data['onboarding_completed_at']),
+      createdAt: parseDate(data['created_at']) ?? DateTime.now(),
+      lastActive: parseDate(data['last_active']) ?? DateTime.now(),
     );
+  }
+
+  static String? parseString(Object? v) {
+    if (v == null) return null;
+    if (v is String) return v;
+    return v.toString();
+  }
+
+  static int? parseInt(Object? v) {
+    if (v is num) return v.toInt();
+    if (v is String) return int.tryParse(v.trim());
+    return null;
+  }
+
+  static Map<String, dynamic> parseMap(Object? v) {
+    if (v is Map<String, dynamic>) return v;
+    if (v is Map) return v.map((k, value) => MapEntry(k.toString(), value));
+    return const {};
+  }
+
+  static List<String> parseStringList(Object? v) {
+    if (v is Iterable) {
+      return v.where((e) => e != null).map((e) => e.toString()).toList();
+    }
+    if (v is String && v.isNotEmpty) return [v];
+    return const [];
+  }
+
+  static Map<String, double> _doubleMap(Object? v) {
+    final result = <String, double>{};
+    parseMap(v).forEach((key, value) {
+      if (value is num) {
+        result[key] = value.toDouble();
+      } else if (value is String) {
+        final parsed = double.tryParse(value);
+        if (parsed != null) result[key] = parsed;
+      }
+    });
+    return result;
+  }
+
+  static DateTime? parseDate(Object? v) {
+    if (v is Timestamp) return v.toDate();
+    if (v is DateTime) return v;
+    if (v is String) return DateTime.tryParse(v);
+    if (v is int) return DateTime.fromMillisecondsSinceEpoch(v);
+    return null;
+  }
+
+  static RegionModel? parseRegion(Object? v) {
+    if (v is Map) {
+      final region = RegionModel.fromMap(parseMap(v));
+      return region.oblast.isEmpty ? null : region;
+    }
+    // Legacy UserSettingsModel stored the oblast as a plain string.
+    if (v is String && v.isNotEmpty) {
+      return RegionModel(oblast: v, district: '', settlement: '');
+    }
+    return null;
   }
 
   Map<String, dynamic> toFirestore() {
@@ -91,6 +172,10 @@ class UserModel extends Equatable {
       'region_last_updated': regionLastUpdated != null ? Timestamp.fromDate(regionLastUpdated!) : null,
       'level': level,
       'ai_recommendations': aiRecommendations,
+      if (dailyGoalMinutes != null) 'daily_goal_minutes': dailyGoalMinutes,
+      if (goalBand != null) 'goal_band': goalBand,
+      if (onboardingCompletedAt != null)
+        'onboarding_completed_at': Timestamp.fromDate(onboardingCompletedAt!),
       'created_at': Timestamp.fromDate(createdAt),
       'last_active': Timestamp.fromDate(lastActive),
     };
@@ -114,6 +199,9 @@ class UserModel extends Equatable {
     String? level,
     String? role,
     List<String>? aiRecommendations,
+    int? dailyGoalMinutes,
+    String? goalBand,
+    DateTime? onboardingCompletedAt,
     DateTime? createdAt,
     DateTime? lastActive,
   }) {
@@ -135,6 +223,10 @@ class UserModel extends Equatable {
       level: level ?? this.level,
       role: role ?? this.role,
       aiRecommendations: aiRecommendations ?? this.aiRecommendations,
+      dailyGoalMinutes: dailyGoalMinutes ?? this.dailyGoalMinutes,
+      goalBand: goalBand ?? this.goalBand,
+      onboardingCompletedAt:
+          onboardingCompletedAt ?? this.onboardingCompletedAt,
       createdAt: createdAt ?? this.createdAt,
       lastActive: lastActive ?? this.lastActive,
     );
@@ -166,9 +258,19 @@ class UserModel extends Equatable {
         level,
         role,
         aiRecommendations,
+        dailyGoalMinutes,
+        goalBand,
+        onboardingCompletedAt,
         createdAt,
         lastActive,
       ];
+
+  /// True when the user has filled in the onboarding questionnaire (or set a
+  /// goal in the profile).
+  bool get hasStudyProfile =>
+      onboardingCompletedAt != null ||
+      dailyGoalMinutes != null ||
+      goalBand != null;
 }
 
 class SubscriptionModel extends Equatable {
@@ -182,8 +284,8 @@ class SubscriptionModel extends Equatable {
 
   factory SubscriptionModel.fromMap(Map<String, dynamic> map) {
     return SubscriptionModel(
-      tier: map['tier'] ?? 'free',
-      expiresAt: (map['expires_at'] as Timestamp?)?.toDate(),
+      tier: map['tier'] is String ? map['tier'] as String : 'free',
+      expiresAt: UserModel.parseDate(map['expires_at']),
     );
   }
 
@@ -215,8 +317,8 @@ class LinkedAccounts extends Equatable {
 
   factory LinkedAccounts.fromMap(Map<String, dynamic> map) {
     return LinkedAccounts(
-      parents: List<String>.from(map['parents'] ?? []),
-      teachers: List<String>.from(map['teachers'] ?? []),
+      parents: UserModel.parseStringList(map['parents']),
+      teachers: UserModel.parseStringList(map['teachers']),
     );
   }
 
