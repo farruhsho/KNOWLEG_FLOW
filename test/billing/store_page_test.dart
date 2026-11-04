@@ -101,13 +101,18 @@ void main() {
       expect(find.text('US\$ 7.99'), findsOneWidget);
       expect(find.textContaining('100 сом'), findsNothing);
       expect(find.text('1 кредит = 1 полный пробный экзамен'), findsOneWidget);
-      expect(find.text('Восстановить покупки'), findsOneWidget);
 
       // Ordered single → 5 → 10 regardless of Play's order.
       final y1 = tester.getTopLeft(find.text('1 тест')).dy;
       final y5 = tester.getTopLeft(find.text('5 тестов')).dy;
       final y10 = tester.getTopLeft(find.text('10 тестов')).dy;
       expect(y1 < y5 && y5 < y10, isTrue);
+
+      // Restore and the honest copy sit below the fold on a 360x640 phone.
+      await tester.scrollUntilVisible(find.text('Восстановить покупки'), 200);
+      expect(find.text('Восстановить покупки'), findsOneWidget);
+      await tester.scrollUntilVisible(find.textContaining('не гарантируют результат'), 200);
+      expect(find.textContaining('наш сервер подтвердит'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -134,6 +139,7 @@ void main() {
       expect(store.completed, hasLength(1));
       expect(find.text('Покупка подтверждена, кредиты зачислены.'), findsOneWidget);
       // Balance still comes only from the (fake) server document.
+      await tester.scrollUntilVisible(find.text('3 кредита'), -200);
       expect(find.text('3 кредита'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

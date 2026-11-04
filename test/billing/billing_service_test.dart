@@ -56,6 +56,7 @@ void main() {
       expect(req.priceDisplay, 'US\$ 4.49');
       expect(store.completed, [p]);
       expect(service.flow.value.phase, PurchasePhase.granted);
+      await settle(); // notices are delivered asynchronously
       expect(notices.map((n) => n.kind), contains(BillingNoticeKind.granted));
     });
 
@@ -252,6 +253,7 @@ void main() {
 
     test('background grant is announced; background already_processed is silent', () async {
       await service.handlePurchaseUpdates([purchase(token: 'bg1', status: PurchaseStatus.restored)]);
+      await settle();
       expect(notices.where((n) => n.kind == BillingNoticeKind.granted), hasLength(1));
       expect(notices.single.userInitiated, isFalse);
 
@@ -260,6 +262,7 @@ void main() {
         ..clear()
         ..add(const VerifyPurchaseResult(VerifyStatus.alreadyProcessed));
       await service.handlePurchaseUpdates([purchase(token: 'bg2', status: PurchaseStatus.restored)]);
+      await settle();
       expect(notices, isEmpty);
     });
 
@@ -268,6 +271,9 @@ void main() {
         ..clear()
         ..add(FirebaseFunctionsException(code: 'unavailable', message: 'offline'));
       await service.handlePurchaseUpdates([purchase(status: PurchaseStatus.restored)]);
+      await settle();
+      expect(verifier.calls, hasLength(1));
+      expect(store.completed, isEmpty);
       expect(notices.where((n) => n.kind == BillingNoticeKind.failed), isEmpty);
     });
   });

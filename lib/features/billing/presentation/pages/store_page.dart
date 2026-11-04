@@ -68,13 +68,15 @@ class _StorePageState extends ConsumerState<StorePage> {
             ),
         ],
       ),
+      // The purchase status sits outside the scroll view so it stays visible
+      // wherever the user had scrolled to before tapping a product.
+      bottomNavigationBar: sellsInApp ? const _PurchaseStatus() : null,
       body: ListView(
         padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.xxxl),
         children: [
           const _BalanceSection(),
           const SizedBox(height: AppSpacing.xl),
           if (sellsInApp) ...const [
-            _PurchaseStatus(),
             _ProductsSection(),
             SizedBox(height: AppSpacing.sm),
             _RestoreButton(),
@@ -198,9 +200,19 @@ class _PurchaseStatus extends ConsumerWidget {
             ),
         };
         if (line == null) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-          child: line,
+        final gutter = AppSpacing.gutter(context);
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(top: BorderSide(color: context.tokens.border)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.sm),
+              child: line,
+            ),
+          ),
         );
       },
     );

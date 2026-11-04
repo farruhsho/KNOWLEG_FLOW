@@ -48,6 +48,13 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
         _busy = false;
         _error = e.failure == AccountDeleteFailure.canceled ? null : e.failure;
       });
+    } catch (e) {
+      // Never leave the button spinning on an unexpected error.
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _error = AccountDeleteFailure.from(e);
+      });
     }
   }
 

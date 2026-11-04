@@ -61,6 +61,9 @@ class TutorChatController extends StateNotifier<TutorChatState> {
   final DateTime Function() _clock;
   int _seq = 0;
 
+  /// Bumped by [clear]/[reset] so late replies do not land in a new chat.
+  int _generation = 0;
+
   String _nextId() => '${_clock().microsecondsSinceEpoch}_${_seq++}';
 
   void setMode(TutorMode mode) {
@@ -81,11 +84,21 @@ class TutorChatController extends StateNotifier<TutorChatState> {
   void clearContext() => state = state.copyWith(clearContext: true);
 
   void clear() {
+    _generation++;
     state = TutorChatState(
       mode: state.mode,
+      questionId: state.questionId,
+      attemptId: state.attemptId,
       remainingToday: state.remainingToday,
       blockingFailure: state.blockingFailure,
     );
+  }
+
+  /// Forgets everything (sign-out / another account signed in). Replies to
+  /// requests that are still in flight are dropped.
+  void reset() {
+    _generation++;
+    state = const TutorChatState();
   }
 
   /// Sends [text] in [language] (`ru`/`ky`). Returns false if nothing was sent.
@@ -120,9 +133,10 @@ class TutorChatController extends StateNotifier<TutorChatState> {
       attemptId: state.attemptId,
       history: history,
     );
+    final generation = _generation;
     try {
       final reply = await _api.ask(request);
-      if (!mounted) return;
+      if (!mounted || generation != _generation) return;
       state = state.copyWith(
         sending: false,
         remainingToday: reply.remainingToday,
@@ -132,7 +146,7 @@ class TutorChatController extends StateNotifier<TutorChatState> {
         ],
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || generation != _generation) return;
       final failure = TutorFailure.from(e);
       state = state.copyWith(
         sending: false,
@@ -157,7 +171,13 @@ final tutorUidProvider = StreamProvider<String?>((ref) {
   }
 });
 
+/// The chat lives for the app session. It is wiped when the signed-in user
+/// signs out or changes — but not when the auth stream merely delivers the
+/// first value, so route arguments applied on open are not lost.
 final tutorChatProvider = StateNotifierProvider<TutorChatController, TutorChatState>((ref) {
-  ref.watch(tutorUidProvider.select((u) => u.valueOrNull));
-  return TutorChatController(ref.watch(tutorApiProvider));
+  final controller = TutorChatController(ref.watch(tutorApiProvider));
+  ref.listen<String?>(tutorUidProvider.select((u) => u.valueOrNull), (previous, next) {
+    if (previous != null && previous != next) controller.reset();
+  });
+  return controller;
 });
