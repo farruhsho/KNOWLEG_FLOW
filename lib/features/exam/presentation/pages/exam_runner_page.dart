@@ -49,7 +49,10 @@ class _ExamRunnerPageState extends ConsumerState<ExamRunnerPage>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
-      _controller.flushDraft();
+      // Sends the draft and stops the per-question clock (§9.5).
+      _controller.onAppBackground();
+    } else if (state == AppLifecycleState.resumed) {
+      _controller.onAppForeground();
     }
   }
 

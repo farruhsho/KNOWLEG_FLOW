@@ -4469,6 +4469,637 @@ class AppLocalizationsEn extends AppLocalizations {
   String get skip => 'Skip';
 
   @override
+  String get socialAnonymousStudent => 'Student';
+
+  @override
+  String get socialAssignmentAdd => 'Add assignment';
+
+  @override
+  String get socialAssignmentCreated => 'Assignment added';
+
+  @override
+  String get socialAssignmentDelete => 'Delete assignment';
+
+  @override
+  String socialAssignmentDeleteConfirm(String title) {
+    return 'Delete the assignment «$title»?';
+  }
+
+  @override
+  String get socialAssignmentDeleted => 'Assignment deleted';
+
+  @override
+  String get socialAssignmentDone => 'Done';
+
+  @override
+  String socialAssignmentDoneOn(String date) {
+    return 'Done $date';
+  }
+
+  @override
+  String socialAssignmentDue(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String get socialAssignmentDueLabel => 'Due date';
+
+  @override
+  String get socialAssignmentKindExam => 'Mock exam';
+
+  @override
+  String get socialAssignmentKindLesson => 'Lesson';
+
+  @override
+  String get socialAssignmentKindPractice => 'Practice';
+
+  @override
+  String get socialAssignmentMarkDone => 'Mark as done';
+
+  @override
+  String get socialAssignmentMarkedDone => 'Marked as done';
+
+  @override
+  String get socialAssignmentNewTitle => 'New assignment';
+
+  @override
+  String get socialAssignmentNotDone => 'Not done';
+
+  @override
+  String get socialAssignmentNothingFound => 'Nothing found';
+
+  @override
+  String get socialAssignmentOpen => 'Open';
+
+  @override
+  String get socialAssignmentOverdue => 'Overdue';
+
+  @override
+  String get socialAssignmentPickLesson => 'Choose a lesson';
+
+  @override
+  String get socialAssignmentPickRequired => 'Choose what to assign.';
+
+  @override
+  String get socialAssignmentPickSubject => 'Choose a subject';
+
+  @override
+  String get socialAssignmentPickVariant => 'Choose a variant';
+
+  @override
+  String socialAssignmentProgress(int done, int total) {
+    return 'Done: $done of $total';
+  }
+
+  @override
+  String get socialAssignmentQuickPractice => 'Quick practice (any subject)';
+
+  @override
+  String get socialAssignmentSearch => 'Search by title or id';
+
+  @override
+  String get socialAssignmentStatusTitle => 'Members\' progress';
+
+  @override
+  String get socialAssignmentTitleInvalid =>
+      'Enter a title of up to 100 characters.';
+
+  @override
+  String get socialAssignmentTitleLabel => 'Title';
+
+  @override
+  String get socialAssignmentsEmpty => 'No homework yet.';
+
+  @override
+  String get socialAssignmentsEmptyOwner =>
+      'Add the first assignment: a lesson, practice or a mock exam variant.';
+
+  @override
+  String get socialCancel => 'Cancel';
+
+  @override
+  String get socialCodeFieldLabel => 'Code';
+
+  @override
+  String get socialCodeLoadError => 'Couldn\'t get your code.';
+
+  @override
+  String get socialCreate => 'Create';
+
+  @override
+  String get socialDone => 'Done';
+
+  @override
+  String get socialErrorAlreadyDone => 'This has already been done.';
+
+  @override
+  String get socialErrorBanned =>
+      'Your account is restricted. Contact support.';
+
+  @override
+  String get socialErrorCodeExhausted =>
+      'This promo code has run out: all activations are used.';
+
+  @override
+  String get socialErrorCodeExpired => 'This promo code has expired.';
+
+  @override
+  String get socialErrorCodeInvalid =>
+      'There is no such code. Check it and try again.';
+
+  @override
+  String get socialErrorFriendAlready => 'This friend is already on your list.';
+
+  @override
+  String get socialErrorFriendLimit => 'You can have at most 50 friends.';
+
+  @override
+  String get socialErrorGeneric => 'Something went wrong. Try again.';
+
+  @override
+  String get socialErrorGroupAlreadyMember => 'You are already in this group.';
+
+  @override
+  String get socialErrorGroupCodeFormat =>
+      'A group code is 4 to 12 Latin letters and digits.';
+
+  @override
+  String get socialErrorGroupLimit => 'Limit reached: at most 5 groups.';
+
+  @override
+  String get socialErrorLimitGeneric => 'Limit reached.';
+
+  @override
+  String get socialErrorNotFound => 'Not found: it may have been deleted.';
+
+  @override
+  String get socialErrorNotGroupOwner => 'Only the group owner can do this.';
+
+  @override
+  String get socialErrorNotSignedIn => 'Sign in to continue.';
+
+  @override
+  String get socialErrorOffline =>
+      'No connection. Check the internet and try again.';
+
+  @override
+  String get socialErrorOwnCode =>
+      'This is your own code. Enter your friend\'s code.';
+
+  @override
+  String get socialErrorPermission => 'No access. Sign in again.';
+
+  @override
+  String get socialErrorPlatform =>
+      'Not available on this platform. Use the Android app.';
+
+  @override
+  String get socialErrorPromoAlreadyRedeemed =>
+      'You have already used this promo code.';
+
+  @override
+  String get socialErrorPromoFormat =>
+      'A promo code is 4 to 20 Latin letters and digits.';
+
+  @override
+  String get socialErrorRateLimited =>
+      'Too many attempts today. Try again tomorrow.';
+
+  @override
+  String get socialErrorReferralAlreadyApplied =>
+      'You have already entered a friend\'s code. It can be done only once.';
+
+  @override
+  String get socialErrorReferralFormat =>
+      'A friend\'s code is 6 letters and digits, e.g. K7M2QX.';
+
+  @override
+  String get socialErrorReferralNotAllowed =>
+      'A friend\'s code can only be entered by a new account: before your first completed mock exam or credits being added.';
+
+  @override
+  String get socialErrorValidation =>
+      'The server did not accept the data. Check it and try again.';
+
+  @override
+  String get socialFrequentMistakesEmpty =>
+      'No repeated mistakes by topic yet.';
+
+  @override
+  String get socialFrequentMistakesTitle => 'Frequent mistakes';
+
+  @override
+  String get socialFriendsAdd => 'Add friend';
+
+  @override
+  String get socialFriendsAddHint =>
+      'Ask your friend for the invite code from their profile.';
+
+  @override
+  String get socialFriendsAddTitle => 'Add a friend by code';
+
+  @override
+  String socialFriendsAdded(String name) {
+    return '$name is now your friend';
+  }
+
+  @override
+  String get socialFriendsAddedGeneric => 'Friend added';
+
+  @override
+  String get socialFriendsEmptyBody =>
+      'Add a friend by their invite code and compare this week\'s XP.';
+
+  @override
+  String get socialFriendsEmptyTitle => 'No friends yet';
+
+  @override
+  String get socialFriendsHint =>
+      'This week\'s XP of you and your friends (lessons, practice and mock exams).';
+
+  @override
+  String get socialFriendsLoadError => 'Couldn\'t load your friends.';
+
+  @override
+  String get socialFriendsRemove => 'Remove from friends';
+
+  @override
+  String socialFriendsRemoveConfirm(String name) {
+    return 'Remove $name from friends?';
+  }
+
+  @override
+  String get socialGroupCreateTitle => 'New group';
+
+  @override
+  String get socialGroupCreatedBody =>
+      'Send this code to your students so they can join:';
+
+  @override
+  String get socialGroupCreatedTitle => 'Group created';
+
+  @override
+  String socialGroupJoinCode(String code) {
+    return 'Join code: $code';
+  }
+
+  @override
+  String get socialGroupJoinHint =>
+      'The teacher or the group owner gives you the code.';
+
+  @override
+  String get socialGroupJoinTitle => 'Join a group';
+
+  @override
+  String get socialGroupJoined => 'You joined the group';
+
+  @override
+  String get socialGroupLeave => 'Leave group';
+
+  @override
+  String socialGroupLeaveConfirm(String name) {
+    return 'Leave «$name»? You can rejoin with the code.';
+  }
+
+  @override
+  String get socialGroupLeft => 'You left the group';
+
+  @override
+  String get socialGroupMore => 'More';
+
+  @override
+  String get socialGroupNameHint => 'e.g. 11 B, school No. 5';
+
+  @override
+  String get socialGroupNameInvalid => 'Enter a name of up to 60 characters.';
+
+  @override
+  String get socialGroupNameLabel => 'Group name';
+
+  @override
+  String get socialGroupNotFound => 'This group is no longer available to you.';
+
+  @override
+  String get socialGroupOpen => 'Open group';
+
+  @override
+  String get socialGroupOwnerCannotLeave =>
+      'The owner can leave only when no other members are left.';
+
+  @override
+  String get socialGroupRatingEmpty => 'No XP in this group this week yet.';
+
+  @override
+  String get socialGroupRatingHint =>
+      'This week\'s XP of group members (lessons, practice and mock exams).';
+
+  @override
+  String get socialGroupRatingNotRanked =>
+      'You have no XP in this group this week yet.';
+
+  @override
+  String get socialGroupTabAssignments => 'Homework';
+
+  @override
+  String get socialGroupTabMembers => 'Members';
+
+  @override
+  String get socialGroupTabRating => 'Rating';
+
+  @override
+  String get socialGroupsCreate => 'Create group';
+
+  @override
+  String get socialGroupsEmptyBody =>
+      'A group is a class or a study centre: a shared weekly rating and homework from the teacher. Join with a code or create your own.';
+
+  @override
+  String get socialGroupsEmptyTitle => 'You are not in any group yet';
+
+  @override
+  String get socialGroupsJoin => 'Join by code';
+
+  @override
+  String get socialGroupsLimitNote => 'You can be in up to 5 groups.';
+
+  @override
+  String socialGroupsMembers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count members',
+      one: '1 member',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialGroupsOwnerBadge => 'Owner';
+
+  @override
+  String get socialGroupsTitle => 'Groups';
+
+  @override
+  String get socialInviteAlreadyReferred => 'You joined with a friend\'s code.';
+
+  @override
+  String get socialInviteApplied =>
+      'Friend\'s code applied. When you pay for a mock exam for the first time, you both get +1 credit.';
+
+  @override
+  String get socialInviteApply => 'Apply';
+
+  @override
+  String get socialInviteCopied => 'Code copied';
+
+  @override
+  String get socialInviteCopy => 'Copy code';
+
+  @override
+  String get socialInviteCopyText => 'Copy invitation';
+
+  @override
+  String get socialInviteEnterCodeHint =>
+      'It can be entered once, while your account is new.';
+
+  @override
+  String get socialInviteEnterCodeTitle => 'Have a friend\'s code?';
+
+  @override
+  String get socialInviteMyCodeHint =>
+      'Friends enter it in the app: Profile → Invite friends. It also adds you as friends.';
+
+  @override
+  String get socialInviteMyCodeTitle => 'Your invite code';
+
+  @override
+  String get socialInviteReferralsEmpty =>
+      'No one has joined with your code yet.';
+
+  @override
+  String get socialInviteReferralsError =>
+      'Couldn\'t load the list of invited friends.';
+
+  @override
+  String get socialInviteReferralsTitle => 'Invited friends';
+
+  @override
+  String get socialInviteRewardBody =>
+      'When a friend who joined with your code pays for a mock exam for the first time, you both get +1 credit (1 credit = 1 full mock exam). Signing up alone gives no reward. At most 20 rewards a month.';
+
+  @override
+  String get socialInviteRewardTitle => 'How the reward works';
+
+  @override
+  String socialInviteShareText(String code) {
+    return 'I\'m preparing for the ORT in the ORT Master KG app. Install it and enter my code $code (Profile → Invite friends). When you pay for a mock exam for the first time, we both get +1 credit.';
+  }
+
+  @override
+  String get socialInviteTextCopied =>
+      'Invitation copied. Paste it into a chat with your friend.';
+
+  @override
+  String get socialInviteTitle => 'Invite friends';
+
+  @override
+  String get socialJoin => 'Join';
+
+  @override
+  String get socialLeagueFriends => 'Friends';
+
+  @override
+  String get socialLeagueRegion => 'Region';
+
+  @override
+  String get socialMemberRemove => 'Remove from group';
+
+  @override
+  String socialMemberRemoveConfirm(String name) {
+    return 'Remove $name from the group?';
+  }
+
+  @override
+  String get socialMemberRemoved => 'Member removed';
+
+  @override
+  String socialMinSecPerQuestion(int min, int sec) {
+    return '$min min $sec s per question';
+  }
+
+  @override
+  String socialMistakesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mistakes',
+      one: '1 mistake',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialOnbCodeHelper =>
+      'Optional. We\'ll apply it after you sign in.';
+
+  @override
+  String get socialOnbHaveCode => 'I have a friend\'s code';
+
+  @override
+  String get socialPendingReferralBody =>
+      'You entered it during setup. Apply it to your account?';
+
+  @override
+  String get socialPendingReferralDiscard => 'Don\'t apply';
+
+  @override
+  String socialPendingReferralTitle(String code) {
+    return 'Friend\'s code $code';
+  }
+
+  @override
+  String get socialProfileGroups => 'Groups and homework';
+
+  @override
+  String get socialPromoAction => 'Promo code';
+
+  @override
+  String socialPromoBalance(int balance) {
+    return 'Credits on your account: $balance';
+  }
+
+  @override
+  String get socialPromoBody =>
+      'A promo code adds mock exam credits to your account.';
+
+  @override
+  String get socialPromoRedeem => 'Activate';
+
+  @override
+  String socialPromoSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count credits added',
+      one: '+1 credit added',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialPromoTitle => 'Enter a promo code';
+
+  @override
+  String get socialReferralJoined =>
+      'Joined. Reward after their first paid mock exam';
+
+  @override
+  String get socialReferralRewarded => 'Reward received: +1 credit';
+
+  @override
+  String socialReferralSummary(int joined, int rewarded) {
+    return 'Joined: $joined · rewards: $rewarded';
+  }
+
+  @override
+  String get socialRegionEmptyBody =>
+      'The regional league shows this week\'s XP of students from your oblast. Choose your region in the profile.';
+
+  @override
+  String get socialRegionEmptyTitle => 'Set your region';
+
+  @override
+  String socialRegionHint(String region) {
+    return '$region: this week\'s XP (lessons, practice and mock exams).';
+  }
+
+  @override
+  String get socialRegionOpenProfile => 'Open profile';
+
+  @override
+  String get socialRemove => 'Remove';
+
+  @override
+  String get socialRetry => 'Retry';
+
+  @override
+  String get socialRiskActionPractice => 'Quick practice';
+
+  @override
+  String get socialRiskActionReview => 'Review mistakes';
+
+  @override
+  String socialRiskDeclining(String prev, String last) {
+    return 'Your latest mock exam result dropped: $prev% before, $last% now.';
+  }
+
+  @override
+  String get socialRiskDecliningWhy =>
+      'A dip is normal, but it is a signal to go over the mistakes before the next attempt.';
+
+  @override
+  String socialRiskInactive(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'You haven\'t studied for $days days.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialRiskInactiveWhy =>
+      'After a break of 3 days or more it is harder to get back, and what you learned fades faster.';
+
+  @override
+  String get socialRiskStepPractice =>
+      'Next step: 10 quick questions today, about 5 minutes.';
+
+  @override
+  String get socialRiskStepReview =>
+      'Next step: go over the mistakes of your latest exam.';
+
+  @override
+  String get socialRiskTitle => 'Keep your pace';
+
+  @override
+  String get socialSave => 'Save';
+
+  @override
+  String socialSecondsPerQuestion(int seconds) {
+    return '$seconds s per question';
+  }
+
+  @override
+  String get socialSignIn => 'Sign in';
+
+  @override
+  String get socialSignInRequired =>
+      'Sign in to invite friends and join groups.';
+
+  @override
+  String get socialSlowBadge => 'slow';
+
+  @override
+  String get socialSlowTopicsBody =>
+      'On these topics a question took you much longer than usual in this exam. Practise them to answer faster.';
+
+  @override
+  String get socialSlowTopicsTitle => 'Slow topics';
+
+  @override
+  String socialTopicTimeCaption(String date) {
+    return 'Average time per question in the mock exam of $date.';
+  }
+
+  @override
+  String get socialTopicTimeEmpty =>
+      'Appears after a mock exam: we measure how long questions of each topic take you.';
+
+  @override
+  String get socialTopicTimeTitle => 'Time per topic';
+
+  @override
   String get somethingWentWrong => 'Something went wrong';
 
   @override

@@ -4451,6 +4451,635 @@ class AppLocalizationsKy extends AppLocalizations {
   String get skip => 'Өткөрүп жиберүү';
 
   @override
+  String get socialAnonymousStudent => 'Окуучу';
+
+  @override
+  String get socialAssignmentAdd => 'Тапшырма кошуу';
+
+  @override
+  String get socialAssignmentCreated => 'Тапшырма кошулду';
+
+  @override
+  String get socialAssignmentDelete => 'Тапшырманы өчүрүү';
+
+  @override
+  String socialAssignmentDeleteConfirm(String title) {
+    return '«$title» тапшырмасын өчүрөсүзбү?';
+  }
+
+  @override
+  String get socialAssignmentDeleted => 'Тапшырма өчүрүлдү';
+
+  @override
+  String get socialAssignmentDone => 'Аткарылды';
+
+  @override
+  String socialAssignmentDoneOn(String date) {
+    return 'Аткарылды: $date';
+  }
+
+  @override
+  String socialAssignmentDue(String date) {
+    return 'Мөөнөтү: $date';
+  }
+
+  @override
+  String get socialAssignmentDueLabel => 'Мөөнөтү';
+
+  @override
+  String get socialAssignmentKindExam => 'Сынамык экзамен';
+
+  @override
+  String get socialAssignmentKindLesson => 'Сабак';
+
+  @override
+  String get socialAssignmentKindPractice => 'Машыгуу';
+
+  @override
+  String get socialAssignmentMarkDone => 'Аткарылды деп белгилөө';
+
+  @override
+  String get socialAssignmentMarkedDone => 'Аткарылды деп белгиленди';
+
+  @override
+  String get socialAssignmentNewTitle => 'Жаңы тапшырма';
+
+  @override
+  String get socialAssignmentNotDone => 'Аткарыла элек';
+
+  @override
+  String get socialAssignmentNothingFound => 'Эч нерсе табылган жок';
+
+  @override
+  String get socialAssignmentOpen => 'Ачуу';
+
+  @override
+  String get socialAssignmentOverdue => 'Мөөнөтү өттү';
+
+  @override
+  String get socialAssignmentPickLesson => 'Сабакты тандаңыз';
+
+  @override
+  String get socialAssignmentPickRequired => 'Эмне тапшырыларын тандаңыз.';
+
+  @override
+  String get socialAssignmentPickSubject => 'Предметти тандаңыз';
+
+  @override
+  String get socialAssignmentPickVariant => 'Вариантты тандаңыз';
+
+  @override
+  String socialAssignmentProgress(int done, int total) {
+    return 'Аткаргандар: $total ичинен $done';
+  }
+
+  @override
+  String get socialAssignmentQuickPractice => 'Тез машыгуу (каалаган предмет)';
+
+  @override
+  String get socialAssignmentSearch => 'Аталышы же id боюнча издөө';
+
+  @override
+  String get socialAssignmentStatusTitle => 'Мүчөлөрдүн абалы';
+
+  @override
+  String get socialAssignmentTitleInvalid =>
+      '100 белгиге чейинки аталыш жазыңыз.';
+
+  @override
+  String get socialAssignmentTitleLabel => 'Аталышы';
+
+  @override
+  String get socialAssignmentsEmpty => 'Азырынча тапшырма жок.';
+
+  @override
+  String get socialAssignmentsEmptyOwner =>
+      'Биринчи тапшырманы кошуңуз: сабак, машыгуу же сынамык экзамендин варианты.';
+
+  @override
+  String get socialCancel => 'Жокко чыгаруу';
+
+  @override
+  String get socialCodeFieldLabel => 'Код';
+
+  @override
+  String get socialCodeLoadError => 'Кодуңузду алуу мүмкүн болбоду.';
+
+  @override
+  String get socialCreate => 'Түзүү';
+
+  @override
+  String get socialDone => 'Даяр';
+
+  @override
+  String get socialErrorAlreadyDone => 'Бул буга чейин жасалган.';
+
+  @override
+  String get socialErrorBanned =>
+      'Аккаунтуңуз чектелген. Колдоо кызматына кайрылыңыз.';
+
+  @override
+  String get socialErrorCodeExhausted =>
+      'Промокод түгөндү: бардык активациялар колдонулуп бүткөн.';
+
+  @override
+  String get socialErrorCodeExpired => 'Промокоддун мөөнөтү бүткөн.';
+
+  @override
+  String get socialErrorCodeInvalid =>
+      'Мындай код жок. Текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String get socialErrorFriendAlready => 'Бул дос тизмеде бар.';
+
+  @override
+  String get socialErrorFriendLimit => '50дөн ашык дос кошууга болбойт.';
+
+  @override
+  String get socialErrorGeneric => 'Ишке ашкан жок. Кайра аракет кылыңыз.';
+
+  @override
+  String get socialErrorGroupAlreadyMember => 'Сиз бул топтун мүчөсүсүз.';
+
+  @override
+  String get socialErrorGroupCodeFormat =>
+      'Топтун коду — 4төн 12ге чейин латын тамгасы жана сан.';
+
+  @override
+  String get socialErrorGroupLimit =>
+      'Чекке жеттиңиз: 5тен ашык топто болууга болбойт.';
+
+  @override
+  String get socialErrorLimitGeneric => 'Чекке жеттиңиз.';
+
+  @override
+  String get socialErrorNotFound => 'Табылган жок: өчүрүлгөн болушу мүмкүн.';
+
+  @override
+  String get socialErrorNotGroupOwner => 'Муну топтун ээси гана жасай алат.';
+
+  @override
+  String get socialErrorNotSignedIn => 'Улантуу үчүн аккаунтка кириңиз.';
+
+  @override
+  String get socialErrorOffline =>
+      'Байланыш жок. Интернетти текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String get socialErrorOwnCode =>
+      'Бул өзүңүздүн кодуңуз. Досуңуздун кодун киргизиңиз.';
+
+  @override
+  String get socialErrorPermission => 'Уруксат жок. Аккаунтка кайра кириңиз.';
+
+  @override
+  String get socialErrorPlatform =>
+      'Бул платформада жеткиликсиз. Android тиркемесин колдонуңуз.';
+
+  @override
+  String get socialErrorPromoAlreadyRedeemed =>
+      'Бул промокодду мурун колдонгонсуз.';
+
+  @override
+  String get socialErrorPromoFormat =>
+      'Промокод — 4төн 20га чейин латын тамгасы жана сан.';
+
+  @override
+  String get socialErrorRateLimited =>
+      'Бүгүн аракеттер өтө көп болду. Эртең кайра аракет кылыңыз.';
+
+  @override
+  String get socialErrorReferralAlreadyApplied =>
+      'Сиз досуңуздун кодун мурун киргизгенсиз. Муну бир гана жолу жасоого болот.';
+
+  @override
+  String get socialErrorReferralFormat =>
+      'Досуңуздун коду — 6 тамга жана сан, мисалы K7M2QX.';
+
+  @override
+  String get socialErrorReferralNotAllowed =>
+      'Досуңуздун кодун жаңы аккаунтта гана киргизүүгө болот: биринчи сынамык экзамен аяктаганга же кредит түшкөнгө чейин.';
+
+  @override
+  String get socialErrorValidation =>
+      'Сервер маалыматты кабыл алган жок. Текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String get socialFrequentMistakesEmpty =>
+      'Темалар боюнча кайталанган каталар азырынча жок.';
+
+  @override
+  String get socialFrequentMistakesTitle => 'Көп кетирилген каталар';
+
+  @override
+  String get socialFriendsAdd => 'Дос кошуу';
+
+  @override
+  String get socialFriendsAddHint =>
+      'Досуңуздан профилиндеги чакыруу кодун сураңыз.';
+
+  @override
+  String get socialFriendsAddTitle => 'Досту код менен кошуу';
+
+  @override
+  String socialFriendsAdded(String name) {
+    return '$name достор тизмесине кошулду';
+  }
+
+  @override
+  String get socialFriendsAddedGeneric => 'Дос кошулду';
+
+  @override
+  String get socialFriendsEmptyBody =>
+      'Досуңузду анын чакыруу коду менен кошуп, апталык XP салыштырыңыз.';
+
+  @override
+  String get socialFriendsEmptyTitle => 'Азырынча достор жок';
+
+  @override
+  String get socialFriendsHint =>
+      'Ушул аптадагы XP — сиздики жана достордуку (сабактар, машыгуу жана сынамык экзамендер).';
+
+  @override
+  String get socialFriendsLoadError => 'Досторду жүктөө мүмкүн болбоду.';
+
+  @override
+  String get socialFriendsRemove => 'Достордон өчүрүү';
+
+  @override
+  String socialFriendsRemoveConfirm(String name) {
+    return '$name достордон өчүрүлсүнбү?';
+  }
+
+  @override
+  String get socialGroupCreateTitle => 'Жаңы топ';
+
+  @override
+  String get socialGroupCreatedBody =>
+      'Окуучулар кошулушу үчүн бул кодду аларга жөнөтүңүз:';
+
+  @override
+  String get socialGroupCreatedTitle => 'Топ түзүлдү';
+
+  @override
+  String socialGroupJoinCode(String code) {
+    return 'Кошулуу коду: $code';
+  }
+
+  @override
+  String get socialGroupJoinHint => 'Кодду мугалим же топтун ээси берет.';
+
+  @override
+  String get socialGroupJoinTitle => 'Топко кошулуу';
+
+  @override
+  String get socialGroupJoined => 'Сиз топко кошулдуңуз';
+
+  @override
+  String get socialGroupLeave => 'Топтон чыгуу';
+
+  @override
+  String socialGroupLeaveConfirm(String name) {
+    return '«$name» тобунан чыгасызбы? Код менен кайра кошулууга болот.';
+  }
+
+  @override
+  String get socialGroupLeft => 'Сиз топтон чыктыңыз';
+
+  @override
+  String get socialGroupMore => 'Дагы';
+
+  @override
+  String get socialGroupNameHint => 'Мисалы, 11 «Б», № 5 мектеп';
+
+  @override
+  String get socialGroupNameInvalid => '60 белгиге чейинки аталыш жазыңыз.';
+
+  @override
+  String get socialGroupNameLabel => 'Топтун аталышы';
+
+  @override
+  String get socialGroupNotFound => 'Бул топ сиз үчүн мындан ары жеткиликсиз.';
+
+  @override
+  String get socialGroupOpen => 'Топту ачуу';
+
+  @override
+  String get socialGroupOwnerCannotLeave =>
+      'Топто башка мүчөлөр калбаганда гана ээси чыга алат.';
+
+  @override
+  String get socialGroupRatingEmpty => 'Бул аптада топто азырынча XP жок.';
+
+  @override
+  String get socialGroupRatingHint =>
+      'Топ мүчөлөрүнүн ушул аптадагы XP (сабактар, машыгуу жана сынамык экзамендер).';
+
+  @override
+  String get socialGroupRatingNotRanked =>
+      'Бул аптада бул топто сизде азырынча XP жок.';
+
+  @override
+  String get socialGroupTabAssignments => 'Тапшырмалар';
+
+  @override
+  String get socialGroupTabMembers => 'Мүчөлөр';
+
+  @override
+  String get socialGroupTabRating => 'Рейтинг';
+
+  @override
+  String get socialGroupsCreate => 'Топ түзүү';
+
+  @override
+  String get socialGroupsEmptyBody =>
+      'Топ — бул класс же окуу борбору: жалпы апталык рейтинг жана мугалимден үй тапшырмалары. Код менен кошулуңуз же өзүңүз түзүңүз.';
+
+  @override
+  String get socialGroupsEmptyTitle => 'Сиз азырынча эч бир топто жоксуз';
+
+  @override
+  String get socialGroupsJoin => 'Код менен кошулуу';
+
+  @override
+  String get socialGroupsLimitNote => '5тен ашык топто болууга болбойт.';
+
+  @override
+  String socialGroupsMembers(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count мүчө',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialGroupsOwnerBadge => 'Ээси';
+
+  @override
+  String get socialGroupsTitle => 'Топтор';
+
+  @override
+  String get socialInviteAlreadyReferred =>
+      'Сиз досуңуздун коду менен кошулгансыз.';
+
+  @override
+  String get socialInviteApplied =>
+      'Досуңуздун коду колдонулду. Биринчи жолу сынамык экзамен үчүн төлөгөнүңүздө экөөңүз тең +1 кредит аласыз.';
+
+  @override
+  String get socialInviteApply => 'Колдонуу';
+
+  @override
+  String get socialInviteCopied => 'Код көчүрүлдү';
+
+  @override
+  String get socialInviteCopy => 'Кодду көчүрүү';
+
+  @override
+  String get socialInviteCopyText => 'Чакырууну көчүрүү';
+
+  @override
+  String get socialInviteEnterCodeHint =>
+      'Аны аккаунт жаңы кезде бир гана жолу киргизүүгө болот.';
+
+  @override
+  String get socialInviteEnterCodeTitle => 'Досуңуздун коду барбы?';
+
+  @override
+  String get socialInviteMyCodeHint =>
+      'Достор аны тиркемеде киргизишет: Профиль → Досторду чакыруу. Бул код менен сизди досторго да кошууга болот.';
+
+  @override
+  String get socialInviteMyCodeTitle => 'Сиздин чакыруу кодуңуз';
+
+  @override
+  String get socialInviteReferralsEmpty =>
+      'Сиздин кодуңуз менен азырынча эч ким кошула элек.';
+
+  @override
+  String get socialInviteReferralsError =>
+      'Чакырылгандардын тизмесин жүктөө мүмкүн болбоду.';
+
+  @override
+  String get socialInviteReferralsTitle => 'Чакырылган достор';
+
+  @override
+  String get socialInviteRewardBody =>
+      'Сиздин кодуңуз менен келген дос биринчи жолу сынамык экзамен үчүн төлөгөндө, экөөңүз тең +1 кредит аласыз (1 кредит = 1 толук сынамык экзамен). Катталуу үчүн гана сыйлык берилбейт. Айына 20дан ашык сыйлык берилбейт.';
+
+  @override
+  String get socialInviteRewardTitle => 'Сыйлык кантип берилет';
+
+  @override
+  String socialInviteShareText(String code) {
+    return 'Мен ORT Master KG тиркемесинде ЖРТга даярданып жатам. Аны орнотуп, менин $code кодумду киргиз (Профиль → Досторду чакыруу). Сен биринчи жолу сынамык экзамен үчүн төлөгөндө, экөөбүз тең +1 кредит алабыз.';
+  }
+
+  @override
+  String get socialInviteTextCopied =>
+      'Чакыруу көчүрүлдү. Аны досуңуз менен чатка чаптаңыз.';
+
+  @override
+  String get socialInviteTitle => 'Досторду чакыруу';
+
+  @override
+  String get socialJoin => 'Кошулуу';
+
+  @override
+  String get socialLeagueFriends => 'Достор';
+
+  @override
+  String get socialLeagueRegion => 'Аймак';
+
+  @override
+  String get socialMemberRemove => 'Топтон чыгаруу';
+
+  @override
+  String socialMemberRemoveConfirm(String name) {
+    return '$name топтон чыгарылсынбы?';
+  }
+
+  @override
+  String get socialMemberRemoved => 'Мүчө топтон чыгарылды';
+
+  @override
+  String socialMinSecPerQuestion(int min, int sec) {
+    return 'бир суроого $min мүн $sec сек';
+  }
+
+  @override
+  String socialMistakesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ката',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialOnbCodeHelper =>
+      'Милдеттүү эмес. Аккаунтка киргенден кийин колдонобуз.';
+
+  @override
+  String get socialOnbHaveCode => 'Менде досумдун коду бар';
+
+  @override
+  String get socialPendingReferralBody =>
+      'Сиз аны жөндөө учурунда киргизгенсиз. Аккаунтуңузга колдонобузбу?';
+
+  @override
+  String get socialPendingReferralDiscard => 'Колдонбоо';
+
+  @override
+  String socialPendingReferralTitle(String code) {
+    return 'Досуңуздун коду: $code';
+  }
+
+  @override
+  String get socialProfileGroups => 'Топтор жана тапшырмалар';
+
+  @override
+  String get socialPromoAction => 'Промокод';
+
+  @override
+  String socialPromoBalance(int balance) {
+    return 'Аккаунттагы кредиттер: $balance';
+  }
+
+  @override
+  String get socialPromoBody =>
+      'Промокод аккаунтуңузга сынамык экзамендер үчүн кредит кошот.';
+
+  @override
+  String get socialPromoRedeem => 'Активдештирүү';
+
+  @override
+  String socialPromoSuccess(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count кредит кошулду',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialPromoTitle => 'Промокодду киргизүү';
+
+  @override
+  String get socialReferralJoined =>
+      'Кошулду. Сыйлык — анын биринчи төлөнгөн экзаменинен кийин';
+
+  @override
+  String get socialReferralRewarded => 'Сыйлык алынды: +1 кредит';
+
+  @override
+  String socialReferralSummary(int joined, int rewarded) {
+    return 'Кошулгандар: $joined · сыйлыктар: $rewarded';
+  }
+
+  @override
+  String get socialRegionEmptyBody =>
+      'Аймактык лигада облусуңуздагы окуучулардын ушул аптадагы XP көрсөтүлөт. Профилден аймагыңызды тандаңыз.';
+
+  @override
+  String get socialRegionEmptyTitle => 'Аймагыңызды көрсөтүңүз';
+
+  @override
+  String socialRegionHint(String region) {
+    return '$region: ушул аптадагы XP (сабактар, машыгуу жана сынамык экзамендер).';
+  }
+
+  @override
+  String get socialRegionOpenProfile => 'Профилди ачуу';
+
+  @override
+  String get socialRemove => 'Өчүрүү';
+
+  @override
+  String get socialRetry => 'Кайталоо';
+
+  @override
+  String get socialRiskActionPractice => 'Тез машыгуу';
+
+  @override
+  String get socialRiskActionReview => 'Каталарды талдоо';
+
+  @override
+  String socialRiskDeclining(String prev, String last) {
+    return 'Акыркы сынамык экзамендин жыйынтыгы төмөндөдү: мурда $prev%, азыр $last%.';
+  }
+
+  @override
+  String get socialRiskDecliningWhy =>
+      'Төмөндөө кадимки нерсе, бирок бул кийинки аракеттен мурун каталарды талдоо керек деген белги.';
+
+  @override
+  String socialRiskInactive(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Сиз $days күндөн бери окуган жоксуз.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get socialRiskInactiveWhy =>
+      '3 күн же андан көп тыныгуудан кийин кайра баштоо кыйындайт, үйрөнгөнүңүз тезирээк унутулат.';
+
+  @override
+  String get socialRiskStepPractice =>
+      'Кийинки кадам: бүгүн 10 тез суроо — болжол менен 5 мүнөт.';
+
+  @override
+  String get socialRiskStepReview =>
+      'Кийинки кадам: акыркы экзамендин каталарын талдаңыз.';
+
+  @override
+  String get socialRiskTitle => 'Темпти жоготпоңуз';
+
+  @override
+  String get socialSave => 'Сактоо';
+
+  @override
+  String socialSecondsPerQuestion(int seconds) {
+    return 'бир суроого $seconds сек';
+  }
+
+  @override
+  String get socialSignIn => 'Кирүү';
+
+  @override
+  String get socialSignInRequired =>
+      'Досторду чакыруу жана топторго кошулуу үчүн аккаунтка кириңиз.';
+
+  @override
+  String get socialSlowBadge => 'жай';
+
+  @override
+  String get socialSlowTopicsBody =>
+      'Бул темалардагы суроолорго бул экзамендеги адаттагыдан бир топ көп убакыт кетти. Тезирээк жооп берүү үчүн аларды машыктырыңыз.';
+
+  @override
+  String get socialSlowTopicsTitle => 'Жай иштелген темалар';
+
+  @override
+  String socialTopicTimeCaption(String date) {
+    return '$date күнкү сынамык экзамендеги бир суроого кеткен орточо убакыт.';
+  }
+
+  @override
+  String get socialTopicTimeEmpty =>
+      'Сынамык экзаменден кийин пайда болот: ар бир теманын суроолоруна канча убакыт кетерин өлчөйбүз.';
+
+  @override
+  String get socialTopicTimeTitle => 'Темалар боюнча убакыт';
+
+  @override
   String get somethingWentWrong => 'Бир нерсе туура эмес болду';
 
   @override

@@ -2991,6 +2991,345 @@
   "shellVerifyTitle": "Confirm your email",
   "signup": "Sign Up",
   "skip": "Skip",
+  "socialAnonymousStudent": "Student",
+  "socialAssignmentAdd": "Add assignment",
+  "socialAssignmentCreated": "Assignment added",
+  "socialAssignmentDelete": "Delete assignment",
+  "socialAssignmentDeleteConfirm": "Delete the assignment «{title}»?",
+  "@socialAssignmentDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "socialAssignmentDeleted": "Assignment deleted",
+  "socialAssignmentDone": "Done",
+  "socialAssignmentDoneOn": "Done {date}",
+  "@socialAssignmentDoneOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "socialAssignmentDue": "Due {date}",
+  "@socialAssignmentDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "socialAssignmentDueLabel": "Due date",
+  "socialAssignmentKindExam": "Mock exam",
+  "socialAssignmentKindLesson": "Lesson",
+  "socialAssignmentKindPractice": "Practice",
+  "socialAssignmentMarkDone": "Mark as done",
+  "socialAssignmentMarkedDone": "Marked as done",
+  "socialAssignmentNewTitle": "New assignment",
+  "socialAssignmentNotDone": "Not done",
+  "socialAssignmentNothingFound": "Nothing found",
+  "socialAssignmentOpen": "Open",
+  "socialAssignmentOverdue": "Overdue",
+  "socialAssignmentPickLesson": "Choose a lesson",
+  "socialAssignmentPickRequired": "Choose what to assign.",
+  "socialAssignmentPickSubject": "Choose a subject",
+  "socialAssignmentPickVariant": "Choose a variant",
+  "socialAssignmentProgress": "Done: {done} of {total}",
+  "@socialAssignmentProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "socialAssignmentQuickPractice": "Quick practice (any subject)",
+  "socialAssignmentSearch": "Search by title or id",
+  "socialAssignmentStatusTitle": "Members' progress",
+  "socialAssignmentTitleInvalid": "Enter a title of up to 100 characters.",
+  "socialAssignmentTitleLabel": "Title",
+  "socialAssignmentsEmpty": "No homework yet.",
+  "socialAssignmentsEmptyOwner": "Add the first assignment: a lesson, practice or a mock exam variant.",
+  "socialCancel": "Cancel",
+  "socialCodeFieldLabel": "Code",
+  "socialCodeLoadError": "Couldn't get your code.",
+  "socialCreate": "Create",
+  "socialDone": "Done",
+  "socialErrorAlreadyDone": "This has already been done.",
+  "socialErrorBanned": "Your account is restricted. Contact support.",
+  "socialErrorCodeExhausted": "This promo code has run out: all activations are used.",
+  "socialErrorCodeExpired": "This promo code has expired.",
+  "socialErrorCodeInvalid": "There is no such code. Check it and try again.",
+  "socialErrorFriendAlready": "This friend is already on your list.",
+  "socialErrorFriendLimit": "You can have at most 50 friends.",
+  "socialErrorGeneric": "Something went wrong. Try again.",
+  "socialErrorGroupAlreadyMember": "You are already in this group.",
+  "socialErrorGroupCodeFormat": "A group code is 4 to 12 Latin letters and digits.",
+  "socialErrorGroupLimit": "Limit reached: at most 5 groups.",
+  "socialErrorLimitGeneric": "Limit reached.",
+  "socialErrorNotFound": "Not found: it may have been deleted.",
+  "socialErrorNotGroupOwner": "Only the group owner can do this.",
+  "socialErrorNotSignedIn": "Sign in to continue.",
+  "socialErrorOffline": "No connection. Check the internet and try again.",
+  "socialErrorOwnCode": "This is your own code. Enter your friend's code.",
+  "socialErrorPermission": "No access. Sign in again.",
+  "socialErrorPlatform": "Not available on this platform. Use the Android app.",
+  "socialErrorPromoAlreadyRedeemed": "You have already used this promo code.",
+  "socialErrorPromoFormat": "A promo code is 4 to 20 Latin letters and digits.",
+  "socialErrorRateLimited": "Too many attempts today. Try again tomorrow.",
+  "socialErrorReferralAlreadyApplied": "You have already entered a friend's code. It can be done only once.",
+  "socialErrorReferralFormat": "A friend's code is 6 letters and digits, e.g. K7M2QX.",
+  "socialErrorReferralNotAllowed": "A friend's code can only be entered by a new account: before your first completed mock exam or credits being added.",
+  "socialErrorValidation": "The server did not accept the data. Check it and try again.",
+  "socialFrequentMistakesEmpty": "No repeated mistakes by topic yet.",
+  "socialFrequentMistakesTitle": "Frequent mistakes",
+  "socialFriendsAdd": "Add friend",
+  "socialFriendsAddHint": "Ask your friend for the invite code from their profile.",
+  "socialFriendsAddTitle": "Add a friend by code",
+  "socialFriendsAdded": "{name} is now your friend",
+  "@socialFriendsAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialFriendsAddedGeneric": "Friend added",
+  "socialFriendsEmptyBody": "Add a friend by their invite code and compare this week's XP.",
+  "socialFriendsEmptyTitle": "No friends yet",
+  "socialFriendsHint": "This week's XP of you and your friends (lessons, practice and mock exams).",
+  "socialFriendsLoadError": "Couldn't load your friends.",
+  "socialFriendsRemove": "Remove from friends",
+  "socialFriendsRemoveConfirm": "Remove {name} from friends?",
+  "@socialFriendsRemoveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialGroupCreateTitle": "New group",
+  "socialGroupCreatedBody": "Send this code to your students so they can join:",
+  "socialGroupCreatedTitle": "Group created",
+  "socialGroupJoinCode": "Join code: {code}",
+  "@socialGroupJoinCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "socialGroupJoinHint": "The teacher or the group owner gives you the code.",
+  "socialGroupJoinTitle": "Join a group",
+  "socialGroupJoined": "You joined the group",
+  "socialGroupLeave": "Leave group",
+  "socialGroupLeaveConfirm": "Leave «{name}»? You can rejoin with the code.",
+  "@socialGroupLeaveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialGroupLeft": "You left the group",
+  "socialGroupMore": "More",
+  "socialGroupNameHint": "e.g. 11 B, school No. 5",
+  "socialGroupNameInvalid": "Enter a name of up to 60 characters.",
+  "socialGroupNameLabel": "Group name",
+  "socialGroupNotFound": "This group is no longer available to you.",
+  "socialGroupOpen": "Open group",
+  "socialGroupOwnerCannotLeave": "The owner can leave only when no other members are left.",
+  "socialGroupRatingEmpty": "No XP in this group this week yet.",
+  "socialGroupRatingHint": "This week's XP of group members (lessons, practice and mock exams).",
+  "socialGroupRatingNotRanked": "You have no XP in this group this week yet.",
+  "socialGroupTabAssignments": "Homework",
+  "socialGroupTabMembers": "Members",
+  "socialGroupTabRating": "Rating",
+  "socialGroupsCreate": "Create group",
+  "socialGroupsEmptyBody": "A group is a class or a study centre: a shared weekly rating and homework from the teacher. Join with a code or create your own.",
+  "socialGroupsEmptyTitle": "You are not in any group yet",
+  "socialGroupsJoin": "Join by code",
+  "socialGroupsLimitNote": "You can be in up to 5 groups.",
+  "socialGroupsMembers": "{count, plural, =1{1 member} other{{count} members}}",
+  "@socialGroupsMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialGroupsOwnerBadge": "Owner",
+  "socialGroupsTitle": "Groups",
+  "socialInviteAlreadyReferred": "You joined with a friend's code.",
+  "socialInviteApplied": "Friend's code applied. When you pay for a mock exam for the first time, you both get +1 credit.",
+  "socialInviteApply": "Apply",
+  "socialInviteCopied": "Code copied",
+  "socialInviteCopy": "Copy code",
+  "socialInviteCopyText": "Copy invitation",
+  "socialInviteEnterCodeHint": "It can be entered once, while your account is new.",
+  "socialInviteEnterCodeTitle": "Have a friend's code?",
+  "socialInviteMyCodeHint": "Friends enter it in the app: Profile → Invite friends. It also adds you as friends.",
+  "socialInviteMyCodeTitle": "Your invite code",
+  "socialInviteReferralsEmpty": "No one has joined with your code yet.",
+  "socialInviteReferralsError": "Couldn't load the list of invited friends.",
+  "socialInviteReferralsTitle": "Invited friends",
+  "socialInviteRewardBody": "When a friend who joined with your code pays for a mock exam for the first time, you both get +1 credit (1 credit = 1 full mock exam). Signing up alone gives no reward. At most 20 rewards a month.",
+  "socialInviteRewardTitle": "How the reward works",
+  "socialInviteShareText": "I'm preparing for the ORT in the ORT Master KG app. Install it and enter my code {code} (Profile → Invite friends). When you pay for a mock exam for the first time, we both get +1 credit.",
+  "@socialInviteShareText": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "socialInviteTextCopied": "Invitation copied. Paste it into a chat with your friend.",
+  "socialInviteTitle": "Invite friends",
+  "socialJoin": "Join",
+  "socialLeagueFriends": "Friends",
+  "socialLeagueRegion": "Region",
+  "socialMemberRemove": "Remove from group",
+  "socialMemberRemoveConfirm": "Remove {name} from the group?",
+  "@socialMemberRemoveConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialMemberRemoved": "Member removed",
+  "socialMinSecPerQuestion": "{min} min {sec} s per question",
+  "@socialMinSecPerQuestion": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "sec": {
+        "type": "int"
+      }
+    }
+  },
+  "socialMistakesCount": "{count, plural, =1{1 mistake} other{{count} mistakes}}",
+  "@socialMistakesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialOnbCodeHelper": "Optional. We'll apply it after you sign in.",
+  "socialOnbHaveCode": "I have a friend's code",
+  "socialPendingReferralBody": "You entered it during setup. Apply it to your account?",
+  "socialPendingReferralDiscard": "Don't apply",
+  "socialPendingReferralTitle": "Friend's code {code}",
+  "@socialPendingReferralTitle": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "socialProfileGroups": "Groups and homework",
+  "socialPromoAction": "Promo code",
+  "socialPromoBalance": "Credits on your account: {balance}",
+  "@socialPromoBalance": {
+    "placeholders": {
+      "balance": {
+        "type": "int"
+      }
+    }
+  },
+  "socialPromoBody": "A promo code adds mock exam credits to your account.",
+  "socialPromoRedeem": "Activate",
+  "socialPromoSuccess": "{count, plural, =1{+1 credit added} other{+{count} credits added}}",
+  "@socialPromoSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "socialPromoTitle": "Enter a promo code",
+  "socialReferralJoined": "Joined. Reward after their first paid mock exam",
+  "socialReferralRewarded": "Reward received: +1 credit",
+  "socialReferralSummary": "Joined: {joined} · rewards: {rewarded}",
+  "@socialReferralSummary": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "rewarded": {
+        "type": "int"
+      }
+    }
+  },
+  "socialRegionEmptyBody": "The regional league shows this week's XP of students from your oblast. Choose your region in the profile.",
+  "socialRegionEmptyTitle": "Set your region",
+  "socialRegionHint": "{region}: this week's XP (lessons, practice and mock exams).",
+  "@socialRegionHint": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "socialRegionOpenProfile": "Open profile",
+  "socialRemove": "Remove",
+  "socialRetry": "Retry",
+  "socialRiskActionPractice": "Quick practice",
+  "socialRiskActionReview": "Review mistakes",
+  "socialRiskDeclining": "Your latest mock exam result dropped: {prev}% before, {last}% now.",
+  "@socialRiskDeclining": {
+    "placeholders": {
+      "prev": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "socialRiskDecliningWhy": "A dip is normal, but it is a signal to go over the mistakes before the next attempt.",
+  "socialRiskInactive": "{days, plural, other{You haven't studied for {days} days.}}",
+  "@socialRiskInactive": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "socialRiskInactiveWhy": "After a break of 3 days or more it is harder to get back, and what you learned fades faster.",
+  "socialRiskStepPractice": "Next step: 10 quick questions today, about 5 minutes.",
+  "socialRiskStepReview": "Next step: go over the mistakes of your latest exam.",
+  "socialRiskTitle": "Keep your pace",
+  "socialSave": "Save",
+  "socialSecondsPerQuestion": "{seconds} s per question",
+  "@socialSecondsPerQuestion": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "socialSignIn": "Sign in",
+  "socialSignInRequired": "Sign in to invite friends and join groups.",
+  "socialSlowBadge": "slow",
+  "socialSlowTopicsBody": "On these topics a question took you much longer than usual in this exam. Practise them to answer faster.",
+  "socialSlowTopicsTitle": "Slow topics",
+  "socialTopicTimeCaption": "Average time per question in the mock exam of {date}.",
+  "@socialTopicTimeCaption": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "socialTopicTimeEmpty": "Appears after a mock exam: we measure how long questions of each topic take you.",
+  "socialTopicTimeTitle": "Time per topic",
   "somethingWentWrong": "Something went wrong",
   "startLearning": "Start Learning",
   "startQuiz": "Start Quiz",

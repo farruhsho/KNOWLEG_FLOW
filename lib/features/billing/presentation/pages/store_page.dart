@@ -12,6 +12,7 @@ import '../../domain/entitlements.dart';
 import '../../domain/pricing_config.dart';
 import '../billing_messages.dart';
 import '../widgets/billing_state_views.dart';
+import '../widgets/promo_code_dialog.dart';
 
 /// Exam access store (RoutePaths.store).
 ///
@@ -77,6 +78,8 @@ class _StorePageState extends ConsumerState<StorePage> {
         padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.xxxl),
         children: [
           const _BalanceSection(),
+          // A promo code is not a payment: offered in both billing modes.
+          if (signedIn) const _PromoEntry(),
           const SizedBox(height: AppSpacing.xl),
           if (sellsInApp && playPlatform) ...const [
             _ProductsSection(),
@@ -171,6 +174,25 @@ class _BalanceCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(l10n.billingCreditRule, style: theme.textTheme.bodySmall),
         ],
+      ),
+    );
+  }
+}
+
+/// "Промокод" → dialog → `promoRedeem` (ARCHITECTURE §9.2).
+class _PromoEntry extends StatelessWidget {
+  const _PromoEntry();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton.icon(
+        key: const ValueKey('store_promo_code'),
+        onPressed: () => showPromoCodeDialog(context),
+        icon: const Icon(Icons.redeem_outlined),
+        label: Text(l10n.socialPromoAction),
       ),
     );
   }

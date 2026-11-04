@@ -50,6 +50,7 @@ class LearningActivityService {
       refId: s.sessionId,
       count: s.answered,
       correct: s.correct,
+      seconds: s.elapsedSeconds,
     ));
   }
 
@@ -134,7 +135,8 @@ class LearningActivityService {
 
   /// Lesson completion: idempotent arrayUnion on `user_progress` plus the
   /// server XP event (refId = lessonId → XP at most once per lesson).
-  Future<ActivityResult?> recordLessonCompleted(String uid, String lessonId) {
+  /// [seconds]: time spent on the lesson screen (study-time stats, §9.5).
+  Future<ActivityResult?> recordLessonCompleted(String uid, String lessonId, {int? seconds}) {
     unawaited(_db.collection(AppConstants.collectionUserProgress).doc(uid).set({
       'completedLessons': FieldValue.arrayUnion([lessonId]),
       'lastActivityDate': FieldValue.serverTimestamp(),
@@ -144,6 +146,7 @@ class LearningActivityService {
     return ActivityReporter.instance.report(ActivityEvent(
       kind: ActivityKinds.lessonCompleted,
       refId: lessonId,
+      seconds: seconds,
     ));
   }
 }

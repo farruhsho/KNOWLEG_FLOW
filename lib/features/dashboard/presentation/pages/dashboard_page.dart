@@ -8,6 +8,7 @@ import '../../../../core/routes/route_paths.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../auth/presentation/widgets/email_verification_banner.dart';
+import '../../../social/presentation/widgets/pending_referral_card.dart';
 import '../../data/dashboard_providers.dart';
 import '../widgets/dashboard_cards.dart';
 
@@ -24,6 +25,7 @@ class DashboardPage extends ConsumerWidget {
     ref.invalidate(userStatsProvider);
     ref.invalidate(latestExamProvider);
     ref.invalidate(userModelProvider);
+    ref.invalidate(recentExamPointsProvider);
     try {
       await Future.wait<Object?>([
         ref.read(userStatsProvider.future),
@@ -51,7 +53,9 @@ class DashboardPage extends ConsumerWidget {
               banner(),
               const EmailVerificationBanner(),
               const SizedBox(height: AppSpacing.md),
+              const PendingReferralCard(),
               const TodayCard(),
+              const MotivationNudgeCard(),
               const SizedBox(height: AppSpacing.md),
               const NextStepCard(),
               const SizedBox(height: AppSpacing.md),

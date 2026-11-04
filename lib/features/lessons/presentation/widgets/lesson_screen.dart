@@ -45,6 +45,9 @@ class _LessonScreenState extends State<LessonScreen> {
   late Future<_LessonData?> _future;
   bool _completed = false;
 
+  /// Time on the lesson screen, reported with the completion (§9.5).
+  final _onScreen = Stopwatch()..start();
+
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
   @override
@@ -220,7 +223,9 @@ class _LessonScreenState extends State<LessonScreen> {
     final messenger = ScaffoldMessenger.of(context);
     messenger.showSnackBar(SnackBar(content: Text(l.learnLessonCompletedToast)));
     // Non-blocking: progress is cached locally; XP comes from the server.
-    unawaited(LearningActivityService.instance.recordLessonCompleted(uid, lesson.id).then((r) {
+    unawaited(LearningActivityService.instance
+        .recordLessonCompleted(uid, lesson.id, seconds: _onScreen.elapsed.inSeconds)
+        .then((r) {
       if (r != null && r.xpAwarded > 0 && mounted) {
         messenger.showSnackBar(SnackBar(content: Text(l.learnXpAwarded(r.xpAwarded))));
       }

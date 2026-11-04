@@ -10,6 +10,7 @@ import '../../../../providers/auth_provider.dart';
 import '../../../../providers/locale_provider.dart';
 import '../../../billing/application/billing_providers.dart' show canSellProvider;
 import '../../../billing/domain/entitlements.dart';
+import '../../../progress/presentation/widgets/motivation_risk_card.dart';
 import '../../../settings/data/reminder_settings.dart';
 import '../../data/dashboard_providers.dart';
 import '../../domain/dashboard_models.dart';
@@ -658,6 +659,22 @@ class QuickActionTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Compact motivation-risk nudge (no activity ≥ 3 days, or a falling exam
+/// result) with one concrete next step. Renders nothing when all is well.
+class MotivationNudgeCard extends ConsumerWidget {
+  const MotivationNudgeCard({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final risk = ref.watch(motivationRiskProvider);
+    if (risk == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: MotivationRiskCard(risk: risk, compact: true),
     );
   }
 }

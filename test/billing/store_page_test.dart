@@ -159,6 +159,22 @@ void main() {
       await pumpStore(tester, mode: BillingMode.external, brightness: Brightness.dark);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('promo code is offered (it is not a payment, §9.2)', (tester) async {
+      await pumpStore(tester, mode: BillingMode.external);
+      expect(find.byKey(const ValueKey('store_promo_code')), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('store_promo_code')));
+      await tester.pumpAndSettle();
+      expect(find.text('Ввести промокод'), findsOneWidget);
+      final offending = visibleStrings(tester).where(purchaseWording.hasMatch).toList();
+      expect(offending, isEmpty);
+    });
+
+    testWidgets('signed out: no promo code entry', (tester) async {
+      await pumpStore(tester, mode: BillingMode.external, uid: null);
+      await tester.pump();
+      expect(find.byKey(const ValueKey('store_promo_code')), findsNothing);
+    });
   });
 
   group('free exams from config/pricing (D14)', () {

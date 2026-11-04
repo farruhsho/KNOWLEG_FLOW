@@ -8,6 +8,7 @@ import '../../data/exam_local_store.dart';
 import '../../data/exam_remote_datasource.dart';
 import '../../domain/exam_failure.dart';
 import '../../domain/exam_session.dart';
+import '../../domain/question_timing.dart';
 
 /// One-shot messages for the runner UI (snackbars).
 enum ExamRunnerNotice { fiveMinutesLeft, oneMinuteLeft, autoSubmitted }
@@ -99,6 +100,14 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   DateTime? _lastAutoRetry;
   Future<void> _saveChain = Future.value();
 
+  /// Time per question of the open section (ARCHITECTURE §9.5). Not part of
+  /// [state]: it changes every instant and must never rebuild widgets.
+  QuestionTimer? _timer;
+
+  /// Timings restored from the device for a section not yet re-opened.
+  QuestionTimer? _restoredTimer;
+  bool _backgrounded = false;
+
   ExamRunnerController({
     required this.attemptId,
     required ExamRemoteDataSource remote,
@@ -131,9 +140,15 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     } catch (e) {
       debugPrint('exam: local load failed ($e)');
     }
+    try {
+      _restoredTimer = await _store.loadTimings(attemptId);
+    } catch (e) {
+      debugPrint('exam: local timings unreadable ($e)');
+    }
     if (!mounted) return;
     if (local != null && (local.uid == null || _uid == null || local.uid == _uid)) {
       state = state.copyWith(loading: false, session: local);
+      _syncTimer(local);
       _startTimers();
     }
     await _syncWithServer(initial: true);
@@ -214,6 +229,7 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   void _commit(ExamSession session, {bool content = false}) {
     if (!mounted) return;
     state = state.copyWith(session: session);
+    _syncTimer(session);
     // Serialise writes so an older snapshot can never land after a newer one.
     _saveChain = _saveChain.then((_) async {
       try {
@@ -234,6 +250,76 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   /// Completes when every local write issued so far has finished.
   Future<void> get pendingWrites => _saveChain;
 
+  // -------------------------------------------------------------- timings
+
+  static int _sectionCapSec(ExamSession s) => s.section.durationSec > 0
+      ? s.section.durationSec
+      : s.sectionSpec.durationMinutes * 60;
+
+  /// Points the question clock at whatever is on screen for [s]: the
+  /// current question while answering, nothing on the interstitial, the
+  /// submit screens or after the deadline.
+  void _syncTimer(ExamSession s) {
+    final now = _clock();
+    if (s.phase == ExamPhase.completed || !s.hasQuestions) {
+      _timer?.focus(null, now);
+      return;
+    }
+    final sectionId = s.section.sectionId;
+    var timer = _timer;
+    if (timer == null || timer.sectionId != sectionId) {
+      final restored = _restoredTimer;
+      _restoredTimer = null;
+      timer = restored != null && restored.sectionId == sectionId
+          ? restored
+          : QuestionTimer(sectionId: sectionId, capSeconds: _sectionCapSec(s));
+      if (_backgrounded) timer.pause(now);
+      _timer = timer;
+    }
+    final visible =
+        s.phase == ExamPhase.inSection && !s.isExpired(now) ? s.currentQuestion?.id : null;
+    final before = timer.activeQuestionId;
+    timer.focus(visible, now);
+    if (before != visible) _persistTimer();
+  }
+
+  void _persistTimer() {
+    final timer = _timer;
+    if (timer == null) return;
+    final now = _clock();
+    _saveChain = _saveChain.then((_) async {
+      try {
+        await _store.saveTimings(attemptId, timer, now);
+      } catch (e) {
+        debugPrint('exam: timings save failed ($e)');
+      }
+    });
+  }
+
+  /// Seconds per question of the open section measured so far (for tests
+  /// and diagnostics).
+  Map<String, int> questionTimings() {
+    final s = state.session;
+    final timer = _timer;
+    if (s == null || timer == null || timer.sectionId != s.section.sectionId) return const {};
+    return timer.secondsAt(_clock(), questionIds: [for (final q in s.questions) q.id]);
+  }
+
+  /// The app went to the background: stop the question clock, keep the
+  /// timings and send the draft.
+  void onAppBackground() {
+    _backgrounded = true;
+    _timer?.pause(_clock());
+    _persistTimer();
+    flushDraft();
+  }
+
+  /// The app is visible again: the question on screen counts again.
+  void onAppForeground() {
+    _backgrounded = false;
+    _timer?.resume(_clock());
+  }
+
   // ------------------------------------------------------------ submission
 
   /// Closes the open section (after the user confirmed, or automatically at
@@ -247,7 +333,11 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     }
     _submitting = true;
     try {
-      final locked = s.beginSubmit(now: _clock(), automatic: automatic);
+      final locked = s.beginSubmit(
+        now: _clock(),
+        automatic: automatic,
+        timings: questionTimings(),
+      );
       _commit(locked);
       state = state.copyWith(clearSubmitFailure: true);
       final submission = locked.pendingSubmission!;
@@ -362,6 +452,7 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     _draftTimer ??= Timer.periodic(draftInterval, (_) {
       final s = state.session;
       if (s != null) _syncDraftNow(s);
+      if (s?.phase == ExamPhase.inSection && !_backgrounded) _persistTimer();
     });
   }
 
@@ -399,7 +490,11 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     _ticker?.cancel();
     _draftTimer?.cancel();
     final s = state.session;
-    if (s != null && s.phase == ExamPhase.inSection) _syncDraftNow(s);
+    if (s != null && s.phase == ExamPhase.inSection) {
+      _syncDraftNow(s);
+      _timer?.focus(null, _clock());
+      _persistTimer();
+    }
     super.dispose();
   }
 }

@@ -8,6 +8,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/locale_provider.dart';
 import '../../../../providers/onboarding_provider.dart';
+import '../../../social/application/social_providers.dart';
+import '../../../social/domain/social_codes.dart';
+import '../../../social/presentation/widgets/social_widgets.dart';
 import '../../domain/onboarding_answers.dart';
 import '../widgets/choice_tile.dart';
 import '../widgets/region_picker.dart';
@@ -27,6 +30,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   final _pageController = PageController();
   final _universityController = TextEditingController();
+
+  /// Optional friend's code (ARCHITECTURE §9.1). The student has no account
+  /// yet, so it is kept on the device and offered on the home screen after
+  /// sign-in (never applied silently).
+  final _friendCodeController = TextEditingController();
+  String? _friendCodeError;
   int _step = 0;
   bool _saving = false;
   late OnboardingAnswers _answers;
@@ -41,12 +50,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       language: pending?.language ?? contentLanguageFor(uiLanguage),
     );
     _universityController.text = _answers.targetUniversity ?? '';
+    _friendCodeController.text = ref.read(pendingReferralProvider) ?? '';
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _universityController.dispose();
+    _friendCodeController.dispose();
     super.dispose();
   }
 
@@ -81,8 +92,22 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   Future<void> _finish({bool skipped = false}) async {
     if (_saving) return;
-    setState(() => _saving = true);
     final l = AppLocalizations.of(context)!;
+    if (!skipped) {
+      final code = SocialCodes.normalize(_friendCodeController.text);
+      if (code.isNotEmpty) {
+        if (!SocialCodes.isReferralCode(code)) {
+          setState(() => _friendCodeError = l.socialErrorReferralFormat);
+          return;
+        }
+        await ref.read(pendingReferralProvider.notifier).save(code);
+        if (!mounted) return;
+      }
+    }
+    setState(() {
+      _saving = true;
+      _friendCodeError = null;
+    });
     final messenger = ScaffoldMessenger.of(context);
     final service = ref.read(onboardingServiceProvider);
 
@@ -165,6 +190,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     _DailyGoalStep(
                       answers: _answers,
                       onChanged: _update,
+                      friendCodeController: _friendCodeController,
+                      friendCodeError: _friendCodeError,
                     ),
                   ],
                 ),
@@ -447,10 +474,17 @@ class _GoalStep extends StatelessWidget {
 }
 
 class _DailyGoalStep extends StatelessWidget {
-  const _DailyGoalStep({required this.answers, required this.onChanged});
+  const _DailyGoalStep({
+    required this.answers,
+    required this.onChanged,
+    required this.friendCodeController,
+    this.friendCodeError,
+  });
 
   final OnboardingAnswers answers;
   final ValueChanged<OnboardingAnswers> onChanged;
+  final TextEditingController friendCodeController;
+  final String? friendCodeError;
 
   @override
   Widget build(BuildContext context) {
@@ -477,7 +511,48 @@ class _DailyGoalStep extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
         ],
+        const SizedBox(height: AppSpacing.md),
+        _FriendCodeEntry(controller: friendCodeController, errorText: friendCodeError),
       ],
+    );
+  }
+}
+
+/// Optional "У меня есть код друга": collapsed by default.
+class _FriendCodeEntry extends StatefulWidget {
+  const _FriendCodeEntry({required this.controller, this.errorText});
+
+  final TextEditingController controller;
+  final String? errorText;
+
+  @override
+  State<_FriendCodeEntry> createState() => _FriendCodeEntryState();
+}
+
+class _FriendCodeEntryState extends State<_FriendCodeEntry> {
+  late bool _open = widget.controller.text.isNotEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final open = _open || widget.errorText != null;
+    if (!open) {
+      return Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          key: const ValueKey('onboarding_friend_code'),
+          onPressed: () => setState(() => _open = true),
+          icon: const Icon(Icons.card_giftcard_outlined, size: 18),
+          label: Text(l.socialOnbHaveCode),
+        ),
+      );
+    }
+    return SocialCodeField(
+      controller: widget.controller,
+      maxLength: SocialCodes.referralLength,
+      label: l.socialOnbHaveCode,
+      helperText: l.socialOnbCodeHelper,
+      errorText: widget.errorText,
     );
   }
 }

@@ -21,13 +21,20 @@ class ActivityEvent {
   final int? correct;
   final int? count;
 
-  const ActivityEvent({required this.kind, required this.refId, this.correct, this.count});
+  /// Study time of this activity (ARCHITECTURE §9.5); the server accepts
+  /// 0..[maxSeconds].
+  final int? seconds;
+
+  static const maxSeconds = 3600;
+
+  const ActivityEvent({required this.kind, required this.refId, this.correct, this.count, this.seconds});
 
   Map<String, dynamic> toJson() => {
         'kind': kind,
         'refId': refId,
         if (correct != null) 'correct': correct,
         if (count != null) 'count': count,
+        if (seconds != null) 'seconds': seconds!.clamp(0, maxSeconds),
       };
 
   static ActivityEvent? fromJson(Object? raw) {
@@ -41,6 +48,7 @@ class ActivityEvent {
       refId: ref,
       correct: JsonRead.integer(m, ['correct']),
       count: JsonRead.integer(m, ['count']),
+      seconds: JsonRead.integer(m, ['seconds']),
     );
   }
 

@@ -47,6 +47,10 @@ class SectionSubmission {
   final int clientElapsedSec;
   final bool automatic;
 
+  /// Seconds each question was on screen (ARCHITECTURE §9.5), capped at the
+  /// section duration. Empty when nothing was measured (older sessions).
+  final Map<String, int> timings;
+
   const SectionSubmission({
     required this.attemptId,
     required this.sectionId,
@@ -54,6 +58,7 @@ class SectionSubmission {
     required this.flags,
     required this.clientElapsedSec,
     this.automatic = false,
+    this.timings = const {},
   });
 
   Map<String, dynamic> toCallableData() => {
@@ -62,6 +67,7 @@ class SectionSubmission {
         'answers': answers,
         'flags': flags,
         'clientElapsedSec': clientElapsedSec,
+        if (timings.isNotEmpty) 'timings': timings,
       };
 
   Map<String, dynamic> toJson() => {
@@ -78,6 +84,10 @@ class SectionSubmission {
       flags: asStringList(m['flags']),
       clientElapsedSec: asInt(m['clientElapsedSec']) ?? 0,
       automatic: asBool(m['automatic']),
+      timings: {
+        for (final e in asJsonMap(m['timings']).entries)
+          if (asInt(e.value) case final v? when v >= 0) e.key: v,
+      },
     );
   }
 }
@@ -435,7 +445,15 @@ class ExamSession {
   /// Closes the section and prepares the payload for `examSubmitSection`.
   /// From [ExamPhase.submitPending] the original submission is reused, so a
   /// retry sends exactly what was locked in.
-  ExamSession beginSubmit({required DateTime now, bool automatic = false}) {
+  ///
+  /// [timings] (seconds per question, see `QuestionTimer`) are sent as they
+  /// are, restricted to this section's questions and clamped to
+  /// `0..duration`.
+  ExamSession beginSubmit({
+    required DateTime now,
+    bool automatic = false,
+    Map<String, int>? timings,
+  }) {
     if (phase == ExamPhase.submitPending && pendingSubmission != null) {
       return _copy(phase: ExamPhase.submitting);
     }
@@ -444,6 +462,7 @@ class ExamSession {
         ? section.durationSec
         : sectionSpec.durationMinutes * 60;
     final elapsed = (total - remaining(now).inSeconds).clamp(0, total);
+    final ids = {for (final q in questions) q.id};
     final submission = SectionSubmission(
       attemptId: attemptId,
       sectionId: section.sectionId,
@@ -454,6 +473,10 @@ class ExamSession {
       ],
       clientElapsedSec: elapsed,
       automatic: automatic,
+      timings: {
+        for (final e in (timings ?? const <String, int>{}).entries)
+          if (ids.contains(e.key)) e.key: e.value.clamp(0, total),
+      },
     );
     return _copy(phase: ExamPhase.submitting, pendingSubmission: submission);
   }

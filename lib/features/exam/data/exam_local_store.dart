@@ -7,6 +7,7 @@ import '../domain/exam_payload.dart';
 import '../domain/exam_session.dart';
 import '../domain/json_utils.dart';
 import '../domain/localized_text.dart';
+import '../domain/question_timing.dart';
 
 /// Lightweight description of a locally saved, unfinished attempt (for the
 /// resume banner) — read without restoring the whole session.
@@ -42,13 +43,16 @@ class LocalAttemptInfo {
 /// Hive box `exam_sessions`: every answer change of an attempt in progress is
 /// written here immediately as JSON, so an app kill loses nothing.
 ///
-/// Two keys per attempt: `state:<id>` (small; answers, flags, position,
-/// phase — rewritten on every change) and `content:<id>` (blueprint and the
-/// open section's questions — rewritten only when the section changes).
+/// Keys per attempt: `state:<id>` (small; answers, flags, position, phase —
+/// rewritten on every change), `content:<id>` (blueprint and the open
+/// section's questions — rewritten only when the section changes) and
+/// `timing:<id>` (seconds per question of the open section, ARCHITECTURE
+/// §9.5 — rewritten when the question changes and every ~20 s).
 class ExamLocalStore {
   static const boxName = 'exam_sessions';
   static const _statePrefix = 'state:';
   static const _contentPrefix = 'content:';
+  static const _timingPrefix = 'timing:';
 
   final Future<Box<String>> Function() _openBox;
   Future<Box<String>>? _box;
@@ -148,16 +152,32 @@ class ExamLocalStore {
     return result is Map ? ExamResult.fromJson(result) : null;
   }
 
-  /// Drops the (large) question content of a finished attempt but keeps its
-  /// small state record.
+  /// Per-question timings of the open section (survive an app kill).
+  Future<void> saveTimings(String attemptId, QuestionTimer timer, DateTime now) async {
+    final box = await _boxFuture;
+    await box.put('$_timingPrefix$attemptId', jsonEncode(timer.toJson(now)));
+  }
+
+  Future<QuestionTimer?> loadTimings(String attemptId) async {
+    final box = await _boxFuture;
+    final raw = _decode(box.get('$_timingPrefix$attemptId'));
+    return raw == null ? null : QuestionTimer.fromJson(raw);
+  }
+
+  /// Drops the (large) question content and the timings of a finished
+  /// attempt but keeps its small state record.
   Future<void> pruneContent(String attemptId) async {
     final box = await _boxFuture;
-    await box.delete('$_contentPrefix$attemptId');
+    await box.deleteAll(['$_contentPrefix$attemptId', '$_timingPrefix$attemptId']);
   }
 
   Future<void> remove(String attemptId) async {
     final box = await _boxFuture;
-    await box.deleteAll(['$_statePrefix$attemptId', '$_contentPrefix$attemptId']);
+    await box.deleteAll([
+      '$_statePrefix$attemptId',
+      '$_contentPrefix$attemptId',
+      '$_timingPrefix$attemptId',
+    ]);
   }
 
   Map<String, dynamic>? _decode(String? raw) {
