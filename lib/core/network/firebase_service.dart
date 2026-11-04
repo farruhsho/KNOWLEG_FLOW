@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../firebase_options.dart';
+import '../backend/callable_platform.dart' as platform_gate;
 
 /// Outcome of asking the OS for notification permission.
 enum NotificationPermissionResult { granted, denied, unsupported, error }
@@ -53,25 +54,21 @@ class FirebaseService {
   /// Crashlytics only has Android/Apple implementations.
   static bool get supportsCrashlytics => _isMobileOrMac;
 
-  /// reCAPTCHA Enterprise site key for App Check on web, passed with
-  /// `--dart-define=APP_CHECK_WEB_SITE_KEY=<key>` (registered in the Firebase
-  /// console). Empty = App Check is not activated on web.
-  static const String appCheckWebSiteKey =
-      String.fromEnvironment('APP_CHECK_WEB_SITE_KEY');
+  /// reCAPTCHA Enterprise site key for App Check on web
+  /// (`--dart-define=APP_CHECK_WEB_SITE_KEY=<key>`). Defined once in
+  /// lib/core/backend/callable_platform.dart.
+  static const String appCheckWebSiteKey = platform_gate.appCheckWebSiteKey;
 
   /// Whether App Check can be activated on [platform] (pure, for tests).
-  /// Android/iOS/macOS have attestation providers; web needs a site key;
-  /// Windows/Linux have no provider (decision D7).
+  /// Delegates to [platform_gate.callablesSupportedOn] so the boot code and
+  /// the feature gates can never disagree (decision D7).
   static bool appCheckAvailable({
     required bool isWeb,
     required TargetPlatform platform,
     String webSiteKey = appCheckWebSiteKey,
-  }) {
-    if (isWeb) return webSiteKey.trim().isNotEmpty;
-    return platform == TargetPlatform.android ||
-        platform == TargetPlatform.iOS ||
-        platform == TargetPlatform.macOS;
-  }
+  }) =>
+      platform_gate.callablesSupportedOn(
+          isWeb: isWeb, platform: platform, webSiteKey: webSiteKey);
 
   /// App Check: mobile/macOS always; web only with [appCheckWebSiteKey].
   static bool get supportsAppCheck =>

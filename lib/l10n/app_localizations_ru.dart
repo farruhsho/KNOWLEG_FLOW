@@ -2220,7 +2220,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get examErrorPlatformUnsupported =>
-      'На этом устройстве пробные тесты недоступны. Откройте приложение на телефоне (Android или iPhone) или в браузере.';
+      'На этом устройстве пробные экзамены недоступны. Откройте приложение на телефоне (Android или iPhone) или в браузере.';
 
   @override
   String get examErrorSignIn => 'Войдите в аккаунт, чтобы проходить экзамены.';

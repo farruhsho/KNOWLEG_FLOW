@@ -124,9 +124,9 @@ void main() {
     expect(find.text('Неверно или пропущено'), findsNothing);
 
     final scrollable = find.byType(Scrollable).first;
-    await tester.scrollUntilVisible(find.textContaining('Повтори «'), 200,
+    await tester.scrollUntilVisible(find.textContaining('Повторите «'), 200,
         scrollable: scrollable);
-    expect(find.textContaining('Повтори «Арифметика»'), findsOneWidget);
+    expect(find.textContaining('Повторите «Арифметика»'), findsOneWidget);
     expect(find.textContaining('arithmetic'), findsNothing);
     expect(find.textContaining('main_idea'), findsNothing);
     // Section titles without a blueprint come from the catalog too.

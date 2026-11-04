@@ -205,7 +205,7 @@ void main() {
     await tester.pump();
     await tester.pump();
     expect(find.byKey(const ValueKey('exam_platform_notice')), findsOneWidget);
-    expect(find.textContaining('На этом устройстве пробные тесты недоступны'),
+    expect(find.textContaining('На этом устройстве пробные экзамены недоступны'),
         findsOneWidget);
     expect(tester.takeException(), isNull);
   });

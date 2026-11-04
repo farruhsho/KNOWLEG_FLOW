@@ -2214,7 +2214,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get examErrorPlatformUnsupported =>
-      'Бул түзмөктө сынамык тесттер жеткиликсиз. Колдонмону телефондон (Android же iPhone) же браузерден ачыңыз.';
+      'Бул түзмөктө сынамык экзамендер жеткиликсиз. Колдонмону телефондон (Android же iPhone) же браузерден ачыңыз.';
 
   @override
   String get examErrorSignIn => 'Экзамен тапшыруу үчүн аккаунтуңузга кириңиз.';

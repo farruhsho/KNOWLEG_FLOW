@@ -88,7 +88,7 @@ void main() {
           onRetry: () {},
         ),
       )));
-      expect(find.textContaining('На этом устройстве пробные тесты недоступны'),
+      expect(find.textContaining('На этом устройстве пробные экзамены недоступны'),
           findsOneWidget);
       expect(find.text('Повторить'), findsNothing);
     });

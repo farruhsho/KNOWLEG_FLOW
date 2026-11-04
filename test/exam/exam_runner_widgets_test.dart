@@ -251,7 +251,7 @@ void main() {
           _app(const ExamRunnerPage(attemptId: 'att1'), overrides: overrides()));
       await tester.pump();
       await tester.pump();
-      expect(find.textContaining('На этом устройстве пробные тесты недоступны'),
+      expect(find.textContaining('На этом устройстве пробные экзамены недоступны'),
           findsOneWidget);
       expect(find.text('Повторить'), findsNothing);
     });
