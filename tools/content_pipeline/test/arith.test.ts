@@ -29,6 +29,16 @@ describe('arithmetic checker', () => {
     assert.equal(val('$12 \\%$'), '3/25');
   });
 
+  // Found while verifying the pilot variant: `1\frac{1}{2}` was read as 1·½,
+  // so a correct key would have been reported as FAIL.
+  it('reads mixed numbers as whole + fraction, not as a product', () => {
+    assert.equal(val('$1\\frac{1}{2}$'), '3/2');
+    assert.equal(val('$2\\frac{3}{4} - \\frac{1}{4}$'), '5/2');
+    assert.equal(val('$-1\\frac{1}{2} + 3$'), '3/2');
+    assert.equal(val('$3 \\cdot \\frac{1}{2}$'), '3/2');
+    assert.equal(val('$2^2\\frac{1}{2}$'), '2');
+  });
+
   it('never guesses: variables, irrational roots and words are not computable', () => {
     assert.equal(latexToPlain('$x^2$'), null);
     assert.equal(val('$\\sqrt{2}$'), null);

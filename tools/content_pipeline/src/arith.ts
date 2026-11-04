@@ -94,7 +94,16 @@ export function latexToPlain(src: string): string | null {
         const a = convert(g1[0]);
         const b = convert(g2[0]);
         if (a === null || b === null) return null;
-        out += `((${a})/(${b}))`;
+        // Mixed number: a whole integer written right before the fraction
+        // (`1\frac{1}{2}` = 1½), not a product. `3 \cdot \frac12` already has
+        // an operator, and a digit after '.', '^' or another digit is not a
+        // standalone whole part.
+        const whole = /(\d+)\s*$/.exec(out);
+        if (whole && !/[.^\d]$/.test(out.slice(0, whole.index))) {
+          out = `${out.slice(0, whole.index)}(${whole[1]}+((${a})/(${b})))`;
+        } else {
+          out += `((${a})/(${b}))`;
+        }
         i = g2[1];
         continue;
       }

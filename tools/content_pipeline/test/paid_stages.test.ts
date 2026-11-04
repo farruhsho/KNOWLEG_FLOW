@@ -141,8 +141,24 @@ describe('generate (fake model)', () => {
   });
 
   it('only verified, not-yet-translated standalone items are translation candidates', async () => {
+    // Property check against the real bank (its contents grow over time):
+    // drafts are never candidates; every candidate is verified, standalone
+    // and has no Kyrgyz sibling yet.
     const bank = loadBank(REPO_PATHS.bank);
-    assert.equal(translationCandidates(bank, 'ru', 'ky', 'ort_main_2026').length, 0, 'sample items are drafts');
+    const candidates = translationCandidates(bank, 'ru', 'ky', 'ort_main_2026');
+    const kyGroups = new Set(
+      [...bank.items.values()]
+        .filter((e) => e.item.question.language === 'ky')
+        .map((e) => e.item.question.translation_group_id),
+    );
+    for (const it of candidates) {
+      assert.ok(['ai_verified', 'methodologist_approved'].includes(it.question.review.status), `${it.id} is verified`);
+      assert.equal(it.question.passage_id, null, `${it.id} is standalone`);
+      assert.ok(!kyGroups.has(it.question.translation_group_id), `${it.id} has no ky sibling`);
+    }
+    const sampleDrafts = [...bank.items.values()].filter((e) => e.item.question.review.status === 'draft');
+    assert.ok(sampleDrafts.length > 0);
+    assert.ok(!candidates.some((c) => c.question.review.status === 'draft'), 'drafts are never candidates');
   });
 });
 

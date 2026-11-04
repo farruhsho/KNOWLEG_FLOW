@@ -246,8 +246,12 @@ function selectItems(bank: Bank, o: Opts): BankItem[] {
 async function cmdVerify(env: Env, o: Opts): Promise<number> {
   const bank = loadBank(env.paths.bank, { strict: true });
   const force = bool(o, 'force');
-  const items = selectItems(bank, o).filter((it) => needsVerify(it, force)).slice(0, num(o, 'max-items', 100));
-  if (bool(o, 'local-only')) {
+  // The free --local-only check covers every selected item unless capped;
+  // the paid API run keeps the 100-item default.
+  const localOnly = bool(o, 'local-only');
+  const cap = num(o, 'max-items', localOnly ? Number.MAX_SAFE_INTEGER : 100);
+  const items = selectItems(bank, o).filter((it) => needsVerify(it, force)).slice(0, cap);
+  if (localOnly) {
     let failed = 0;
     for (const it of items) {
       if (it.question.subject_id !== 'math') continue;

@@ -1,0 +1,2575 @@
+{
+  "schema_version": 1,
+  "batch": {
+    "id": "pilot_main_ru_v1_grammar",
+    "kind": "generated",
+    "created_at": "2026-11-04T12:00:00.000Z",
+    "note": "Пилотная партия, раздел «Практическая грамматика» (ru): 30 ОРИГИНАЛЬНЫХ заданий single_choice (орфография, пунктуация, словообразование, дополнение, лексико-грамматическое значение, нормы употребления) по матрице ort_main_2026. Написано вручную (claude-pilot-author), не по материалам ЦООМО/testing.kg, Secom или других издателей; нормы — по справочникам уровня Розенталя. Статус draft до проверки методистом."
+  },
+  "passages": [],
+  "items": [
+    {
+      "id": "q_942c9419de4f91d90b87",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.unstressed_vowels",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_942c9419de4f91d9",
+        "type": "single_choice",
+        "stem": "В каком слове на месте пропуска пишется буква О?",
+        "options": [
+          {
+            "id": "A",
+            "text": "х..лмистый"
+          },
+          {
+            "id": "B",
+            "text": "тр..винка"
+          },
+          {
+            "id": "C",
+            "text": "ст..рик"
+          },
+          {
+            "id": "D",
+            "text": "гл..за"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: безударные гласные в корне, проверяемые ударением",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:942c9419de4f91d90b874fa577489fcb11fba1ac267ecd74a349e495b988cd1f",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Безударную гласную в корне проверяем однокоренным словом, в котором эта гласная стоит под ударением. Холмистый — холм (ударная О), поэтому пишется О. В остальных словах проверочные слова дают А: травинка — травы, старик — старый, глаза — глазки.",
+        "wrong_option_notes": {
+          "B": "Травинка — проверочное слово «травы» (ударная А), пишется А. Ошибка — выбирать букву на слух, не подбирая проверочного слова.",
+          "C": "Старик — проверочное слово «старый» (ударная А), пишется А.",
+          "D": "Глаза — проверочное слово «глазки» (ударная А), пишется А."
+        },
+        "solution_steps": [
+          "Для каждого слова подбираем однокоренное слово с ударением на корне.",
+          "холмистый — холм (О); травинка — травы (А); старик — старый (А); глаза — глазки (А).",
+          "Буква О пишется только в слове «холмистый» — ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_26814ce5bd54c651d5e9",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.n_nn",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_26814ce5bd54c651",
+        "type": "single_choice",
+        "stem": "В каком ряду в обоих словах на месте пропуска пишется НН?",
+        "options": [
+          {
+            "id": "A",
+            "text": "серебря..ый, стекля..ый"
+          },
+          {
+            "id": "B",
+            "text": "лебеди..ый, кожа..ый"
+          },
+          {
+            "id": "C",
+            "text": "деревя..ый, ветре..ый"
+          },
+          {
+            "id": "D",
+            "text": "клюкве..ый, торжестве..ый"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: Н и НН в суффиксах прилагательных, образованных от существительных",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:26814ce5bd54c651d5e96325c910a813ef6019206327040546291693e994031c",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "В прилагательных, образованных от существительных с помощью суффикса -ЕНН-, пишется НН: клюкв-енн-ый, торжеств-енн-ый. В суффиксах -АН-, -ЯН-, -ИН- пишется одна Н (серебряный, кожаный, лебединый); исключения с НН — стеклянный, оловянный, деревянный. Прилагательное «ветреный» — исключение с одной Н.",
+        "wrong_option_notes": {
+          "A": "«Серебряный» пишется с одной Н (суффикс -ЯН-); с НН здесь пишется только исключение «стеклянный».",
+          "B": "«Лебединый» (суффикс -ИН-) и «кожаный» (суффикс -АН-) пишутся с одной Н.",
+          "C": "«Деревянный» — исключение с НН, но «ветреный» — исключение с одной Н."
+        },
+        "solution_steps": [
+          "Определяем суффикс в каждом прилагательном.",
+          "-ЕНН- (клюквенный, торжественный) — НН; -АН-, -ЯН-, -ИН- — одна Н, кроме исключений стеклянный, оловянный, деревянный.",
+          "«Ветреный» пишется с одной Н как исключение.",
+          "НН в обоих словах только в ряду D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e88e791b0d4820a7480d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.ne_with_words",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_e88e791b0d4820a7",
+        "type": "single_choice",
+        "stem": "В каком предложении НЕ со словом в скобках пишется слитно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Задача оказалась вовсе (не)трудной."
+          },
+          {
+            "id": "B",
+            "text": "В зале разговаривали (не)громко."
+          },
+          {
+            "id": "C",
+            "text": "(Не)решённая учеником задача лежала на столе."
+          },
+          {
+            "id": "D",
+            "text": "Мы (не)успели на последний автобус."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6–7 кл., русский язык: НЕ с прилагательными, наречиями, причастиями и глаголами",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e88e791b0d4820a7480db20845c04fbee6ba7c937d22c0b8841c5f71cc46a40d",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "НЕ с наречиями на -О пишется слитно, если наречие с НЕ можно заменить синонимом без НЕ и в предложении нет противопоставления: негромко — тихо. Поэтому «негромко» пишется слитно.",
+        "wrong_option_notes": {
+          "A": "Слова «вовсе не» усиливают отрицание, и НЕ с прилагательным в этом случае пишется раздельно: «вовсе не трудной».",
+          "C": "НЕ с полным причастием пишется раздельно, если у причастия есть зависимое слово: «не решённая (кем?) учеником».",
+          "D": "НЕ с глаголами пишется раздельно: «не успели»."
+        },
+        "solution_steps": [
+          "Определяем часть речи слова с НЕ и проверяем условия слитного написания.",
+          "«вовсе не трудной» — усиленное отрицание, раздельно; «не решённая учеником» — причастие с зависимым словом, раздельно; «не успели» — глагол, раздельно.",
+          "«негромко» = «тихо», противопоставления нет — пишется слитно, ответ B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_02b25d9a05d906dba652",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.prefixes",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_02b25d9a05d906db",
+        "type": "single_choice",
+        "stem": "В каком ряду во всех словах на месте пропуска пишется буква Е?",
+        "options": [
+          {
+            "id": "A",
+            "text": "пр..открыть, пр..мудрый, пр..дорожный"
+          },
+          {
+            "id": "B",
+            "text": "пр..брежный, пр..вратности, пр..школьный"
+          },
+          {
+            "id": "C",
+            "text": "пр..одолеть, пр..красный, пр..увеличить"
+          },
+          {
+            "id": "D",
+            "text": "пр..образовать, пр..быть (на вокзал), пр..смыкаться"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: правописание приставок ПРЕ- и ПРИ-",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:02b25d9a05d906dba652770181d9dfb90e0a69c7ede974bbd3f02a059dd90a20",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Приставка ПРЕ- пишется в значении «очень» (прекрасный, премудрый) и «пере-» (преобразовать), а также в словах, где значение приставки не выделяется и написание проверяется по словарю (преодолеть, преувеличить, превратности, пресмыкаться). Приставка ПРИ- обозначает приближение, близость, присоединение, неполноту действия: прибыть, прибрежный, пришкольный, придорожный, приоткрыть. В ряду C все три слова пишутся с Е: преодолеть, прекрасный, преувеличить.",
+        "wrong_option_notes": {
+          "A": "«Премудрый» пишется с Е (= очень мудрый), но «приоткрыть» (неполнота действия) и «придорожный» (близость) — с И.",
+          "B": "«Превратности» пишется с Е (словарное слово), но «прибрежный» и «пришкольный» обозначают близость — с И.",
+          "D": "«Преобразовать» и «пресмыкаться» пишутся с Е, но «прибыть» (приближение) — с И."
+        },
+        "solution_steps": [
+          "Определяем значение приставки в каждом слове.",
+          "ПРИ-: приоткрыть (неполнота действия), придорожный, прибрежный, пришкольный (близость), прибыть (приближение).",
+          "ПРЕ-: премудрый, прекрасный (= очень), преобразовать (= пере-), преодолеть, преувеличить, превратности, пресмыкаться (словарные слова).",
+          "Только в ряду C все слова пишутся с Е."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e96b78289c6d94332cad",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.joined_separate",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_e96b78289c6d9433",
+        "type": "single_choice",
+        "stem": "В каком предложении оба выделенных слова пишутся слитно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Я (ТО)ЖЕ поеду на экскурсию, (ЧТО)БЫ увидеть горы."
+          },
+          {
+            "id": "B",
+            "text": "Сестра рисует (ТАК)ЖЕ, как мама, и (ПРИ)ЭТОМ никогда не торопится."
+          },
+          {
+            "id": "C",
+            "text": "(В)ТЕЧЕНИЕ недели мы шли (В)ПЕРЕДИ основной группы."
+          },
+          {
+            "id": "D",
+            "text": "Мы (ЗА)ТО и любим этот город, что он (ПО)ПРЕЖНЕМУ тихий."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: слитное и раздельное написание союзов ТОЖЕ, ТАКЖЕ, ЧТОБЫ, ЗАТО и омонимичных сочетаний, производных предлогов и наречий",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e96b78289c6d94332cadaf9feccef3cc1fb83a9b7f01a39911638a32bc060056",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Союз ТОЖЕ (его можно заменить союзом И: «Я тоже поеду» = «И я поеду») пишется слитно. Союз ЧТОБЫ, присоединяющий обстоятельство цели («поеду, чтобы увидеть»), тоже пишется слитно; частицу БЫ из него нельзя опустить или переставить. В остальных предложениях хотя бы одно из выделенных слов пишется не слитно.",
+        "wrong_option_notes": {
+          "B": "«Так же, как» — наречие ТАК с частицей ЖЕ (после него стоит «как»), пишется раздельно; «при этом» — предлог с местоимением, тоже раздельно.",
+          "C": "«Впереди» пишется слитно, но производный предлог «в течение» пишется раздельно.",
+          "D": "«За то… что» — предлог с указательным местоимением в составе союза «за то что», пишется раздельно; «по-прежнему» пишется через дефис."
+        },
+        "solution_steps": [
+          "Определяем часть речи каждого выделенного сочетания.",
+          "«тоже» = «и» — союз, слитно; «чтобы увидеть» — союз цели, слитно.",
+          "«так же, как», «при этом», «в течение», «за то, что» — раздельно; «впереди» — слитно; «по-прежнему» — через дефис.",
+          "Оба слова пишутся слитно только в предложении A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_8303c5b45cdd877663a3",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.unstressed_vowels",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_8303c5b45cdd8776",
+        "type": "single_choice",
+        "stem": "В каком ряду во всех словах на месте пропуска пишется одна и та же буква?",
+        "options": [
+          {
+            "id": "A",
+            "text": "з..горелый, уг..рать, выг..рки"
+          },
+          {
+            "id": "B",
+            "text": "р..сток, выр..щенный, р..стовщик"
+          },
+          {
+            "id": "C",
+            "text": "прик..сновение, к..саться, к..сательная"
+          },
+          {
+            "id": "D",
+            "text": "оз..рить, оз..рённый, з..рница"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., русский язык: чередующиеся гласные в корне (-ГАР-/-ГОР-, -РАСТ-/-РОС-, -КАС-/-КОС-, -ЗАР-/-ЗОР-)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:8303c5b45cdd877663a3192166766db68d3ae5ee23368164d4d00556f379896a",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "В корне -ЗАР-/-ЗОР- без ударения пишется А (исключение — «зоревать»): озарить, озарённый, зарница. Поэтому в ряду D во всех словах пишется одна и та же буква А. В остальных рядах буквы разные.",
+        "wrong_option_notes": {
+          "A": "В корне -ГАР-/-ГОР- без ударения пишется О (загорелый, угорать), но «выгарки» — исключение с А.",
+          "B": "Перед Щ пишется А (выращенный), а «росток» и «ростовщик» — исключения с О.",
+          "C": "В корне -КАС-/-КОС- пишется А, если после корня стоит суффикс -А- (касаться, касательная); в слове «прикосновение» такого суффикса нет — пишется О."
+        },
+        "solution_steps": [
+          "В каждом ряду находим корень с чередованием и вспоминаем правило.",
+          "-ГАР-/-ГОР-: загорелый, угорать — О; выгарки — А (исключение).",
+          "-РАСТ-/-РОС-: выращенный — А; росток, ростовщик — О (исключения).",
+          "-КАС-/-КОС-: касаться, касательная — А; прикосновение — О.",
+          "-ЗАР-/-ЗОР-: без ударения А — озарить, озарённый, зарница. Ответ D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_8d11ab8abed22fb8de07",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.homogeneous",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_8d11ab8abed22fb8",
+        "type": "single_choice",
+        "stem": "В каком предложении знаки препинания расставлены правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "В саду росли яблони груши и вишни."
+          },
+          {
+            "id": "B",
+            "text": "В саду росли яблони, груши и вишни."
+          },
+          {
+            "id": "C",
+            "text": "В саду росли, яблони, груши и вишни."
+          },
+          {
+            "id": "D",
+            "text": "В саду росли яблони, груши, и вишни."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: знаки препинания при однородных членах предложения",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:8d11ab8abed22fb8de078b8f8000c14b1fc980345fe454ffb842bfb19b07019d",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "«Яблони, груши и вишни» — однородные подлежащие. Между однородными членами, не соединёнными союзом, ставится запятая; перед одиночным союзом И, соединяющим последние однородные члены, запятая не ставится.",
+        "wrong_option_notes": {
+          "A": "Пропущена запятая между однородными членами «яблони, груши», не соединёнными союзом.",
+          "C": "Лишняя запятая между сказуемым «росли» и подлежащими: сказуемое и подлежащее запятой не разделяются.",
+          "D": "Перед одиночным союзом И между однородными членами запятая не ставится."
+        },
+        "solution_steps": [
+          "Находим однородные члены: яблони, груши, вишни.",
+          "Между «яблони» и «груши» союза нет — нужна запятая.",
+          "Перед одиночным И («и вишни») запятая не нужна; между сказуемым и подлежащим запятой нет.",
+          "Правильно — вариант B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_9d0b126dbba7c76ce4b9",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.parenthetical",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_9d0b126dbba7c76c",
+        "type": "single_choice",
+        "stem": "В каком предложении правильно расставлены знаки препинания при обращении?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Расскажи, Тимур, о своей поездке в Каракол."
+          },
+          {
+            "id": "B",
+            "text": "Расскажи Тимур, о своей поездке в Каракол."
+          },
+          {
+            "id": "C",
+            "text": "Расскажи, Тимур о своей поездке в Каракол."
+          },
+          {
+            "id": "D",
+            "text": "Расскажи, Тимур, о своей поездке, в Каракол."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 и 8 кл., русский язык: обращение и знаки препинания при нём",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:9d0b126dbba7c76ce4b9904b7898ce2ed4c0b0cb6ff65b1df5fe34c8616776a3",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "«Тимур» — обращение: так назван тот, к кому обращена речь. Обращение в середине предложения выделяется запятыми с обеих сторон: «Расскажи, Тимур, о своей поездке в Каракол». Других знаков внутри предложения не требуется.",
+        "wrong_option_notes": {
+          "B": "Обращение в середине предложения выделяется с обеих сторон; здесь нет запятой перед словом «Тимур».",
+          "C": "Нет закрывающей запятой после обращения «Тимур».",
+          "D": "Обращение выделено верно, но лишняя запятая разрывает словосочетание «поездке в Каракол»."
+        },
+        "solution_steps": [
+          "Находим обращение: «Тимур» (к нему обращена просьба).",
+          "Обращение в середине предложения выделяется запятыми с обеих сторон.",
+          "Других знаков внутри предложения не нужно — ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_31378f683da7d0066694",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.participial_phrases",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_31378f683da7d006",
+        "type": "single_choice",
+        "stem": "В каком предложении знаки препинания при причастном обороте расставлены правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Стоящий на полке, словарь принадлежал деду."
+          },
+          {
+            "id": "B",
+            "text": "Словарь стоящий на полке, принадлежал деду."
+          },
+          {
+            "id": "C",
+            "text": "Стоящий на полке словарь принадлежал деду."
+          },
+          {
+            "id": "D",
+            "text": "Словарь, стоящий на полке принадлежал деду."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: обособление причастного оборота",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:31378f683da7d00666948d2f3795c6b09b12eab52ca2b1f898397b85c4797dd6",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Причастный оборот обособляется, если стоит после определяемого слова. Если оборот стоит перед определяемым словом и не имеет добавочного обстоятельственного значения, запятые не ставятся: «Стоящий на полке словарь принадлежал деду».",
+        "wrong_option_notes": {
+          "A": "Причастный оборот перед определяемым словом «словарь» не обособляется, запятая не нужна.",
+          "B": "Оборот после определяемого слова выделяется запятыми с двух сторон; нет запятой после слова «словарь».",
+          "D": "Оборот после определяемого слова выделяется запятыми с двух сторон; нет запятой после слова «полке»."
+        },
+        "solution_steps": [
+          "Находим причастный оборот «стоящий на полке» и определяемое слово «словарь».",
+          "Оборот после определяемого слова выделяется запятыми с двух сторон, оборот перед ним — не выделяется.",
+          "В варианте C оборот стоит перед словом «словарь» и запятых нет — это верно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1a053de221be7b5c40e7",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.complex_sentences",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_1a053de221be7b5c",
+        "type": "single_choice",
+        "stem": "В каком предложении перед союзом И нужно поставить запятую? (Знаки препинания внутри предложений не расставлены.)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Ветер срывал листья и кружил их над дорогой."
+          },
+          {
+            "id": "B",
+            "text": "Вечером похолодало и пошёл мелкий дождь."
+          },
+          {
+            "id": "C",
+            "text": "В комнате было светло и тихо."
+          },
+          {
+            "id": "D",
+            "text": "Ветер усилился и по озеру побежали высокие волны."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., русский язык: запятая между частями сложносочинённого предложения",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1a053de221be7b5c40e7f73036134f1b170426c45b8ca13857102e35f8c5bb66",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Запятая перед И ставится между частями сложносочинённого предложения, если у них нет общего второстепенного члена. В предложении D две грамматические основы (ветер усилился; волны побежали) и общего члена нет: «Ветер усилился, и по озеру побежали высокие волны».",
+        "wrong_option_notes": {
+          "A": "«Срывал и кружил» — однородные сказуемые при одном подлежащем «ветер»; перед одиночным И запятая не нужна.",
+          "B": "Это сложное предложение, но у его частей общий второстепенный член «вечером», поэтому запятая перед И не ставится.",
+          "C": "«Светло и тихо» — однородные члены простого предложения; перед одиночным И запятая не ставится."
+        },
+        "solution_steps": [
+          "Находим грамматические основы в каждом предложении.",
+          "A и C — простые предложения с однородными членами: запятая перед И не нужна.",
+          "B — две основы, но обстоятельство «вечером» общее для обеих частей: запятая не нужна.",
+          "D — две основы без общего члена: перед И нужна запятая."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_6550129427ebf23d8a07",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.parenthetical",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_6550129427ebf23d",
+        "type": "single_choice",
+        "stem": "В каком предложении выделенное слово является вводным и должно выделяться запятыми? (Знаки препинания не расставлены.)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Мы НАКОНЕЦ добрались до перевала."
+          },
+          {
+            "id": "B",
+            "text": "Ты КОНЕЧНО помнишь этот день."
+          },
+          {
+            "id": "C",
+            "text": "Небо КАЗАЛОСЬ совсем чёрным."
+          },
+          {
+            "id": "D",
+            "text": "Это ВСЁ-ТАКИ лучший выход."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., русский язык: вводные слова и знаки препинания при них",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6550129427ebf23d8a077d4c37b19794f38907f13e97fcc29f7137933627ac54",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Вводное слово «конечно» выражает уверенность говорящего, не является членом предложения и выделяется запятыми: «Ты, конечно, помнишь этот день».",
+        "wrong_option_notes": {
+          "A": "«Наконец» в значении «в конце концов, после долгого ожидания» — наречие (обстоятельство), запятыми не выделяется.",
+          "C": "«Казалось» здесь — часть сказуемого («казалось чёрным»), а не вводное слово.",
+          "D": "«Всё-таки» — частица, а не вводное слово; запятыми не выделяется."
+        },
+        "solution_steps": [
+          "Определяем роль выделенного слова: член предложения, частица или вводное слово, выражающее отношение говорящего к сообщению.",
+          "«наконец» — обстоятельство времени, «казалось» — часть сказуемого, «всё-таки» — частица.",
+          "«конечно» выражает уверенность говорящего — это вводное слово, ответ B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_93bd5552c702126ab46c",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.complex_sentences",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_93bd5552c702126a",
+        "type": "single_choice",
+        "stem": "Сколько запятых нужно поставить в предложении?\n\nУчитель сказал что экскурсия в Ала-Арчу которую мы ждали всю весну состоится в субботу если не пойдёт дождь.",
+        "options": [
+          {
+            "id": "A",
+            "text": "2"
+          },
+          {
+            "id": "B",
+            "text": "3"
+          },
+          {
+            "id": "C",
+            "text": "4"
+          },
+          {
+            "id": "D",
+            "text": "5"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., русский язык: знаки препинания в сложноподчинённом предложении с несколькими придаточными",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:93bd5552c702126ab46c3c70f8a77a02ec315659f3258afc132a3edd9fe05e87",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Правильно: «Учитель сказал, что экскурсия в Ала-Арчу, которую мы ждали всю весну, состоится в субботу, если не пойдёт дождь». Придаточное изъяснительное отделяется запятой перед союзом ЧТО (1); определительное придаточное «которую мы ждали всю весну» стоит внутри другого придаточного и выделяется запятыми с двух сторон (2, 3); придаточное условия отделяется запятой перед ЕСЛИ (4). Всего четыре запятые.",
+        "wrong_option_notes": {
+          "A": "Учтены только запятые перед союзами ЧТО и ЕСЛИ; пропущено выделение придаточного «которую мы ждали всю весну».",
+          "B": "Типичная ошибка: придаточное «которую мы ждали всю весну» стоит в середине другого придаточного и выделяется запятыми с двух сторон, а не только перед словом «которую».",
+          "D": "Пятой запятой нет: остальные слова входят в состав частей сложного предложения и запятыми не отделяются."
+        },
+        "solution_steps": [
+          "Находим грамматические основы: учитель сказал; экскурсия состоится; мы ждали; не пойдёт дождь.",
+          "Ставим запятую перед ЧТО (1).",
+          "Придаточное «которую мы ждали всю весну» выделяем с двух сторон (2 и 3).",
+          "Ставим запятую перед ЕСЛИ (4). Итого четыре — ответ C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_20cf5d7175591557cedf",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.morphemes",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_20cf5d7175591557",
+        "type": "single_choice",
+        "stem": "Какое слово состоит из приставки, корня, суффикса и окончания?",
+        "options": [
+          {
+            "id": "A",
+            "text": "пригородный"
+          },
+          {
+            "id": "B",
+            "text": "городской"
+          },
+          {
+            "id": "C",
+            "text": "городок"
+          },
+          {
+            "id": "D",
+            "text": "горожане"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: морфемный состав слова",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:20cf5d7175591557cedf5fd30e5559ca5b69f105e77e84a97166b12819e97c35",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Пригородный: при- (приставка) + -город- (корень) + -н- (суффикс) + -ый (окончание). В остальных словах приставки нет.",
+        "wrong_option_notes": {
+          "B": "Городской: город-ск-ой — корень, суффикс и окончание; приставки нет.",
+          "C": "Городок: город-ок — корень, суффикс и нулевое окончание; приставки нет.",
+          "D": "Горожане: горож-ан-е — корень (с чередованием д/ж), суффикс и окончание; приставки нет."
+        },
+        "solution_steps": [
+          "Разбираем слова по составу.",
+          "пригородный — при-город-н-ый; городской — город-ск-ой; городок — город-ок; горожане — горож-ан-е.",
+          "Все четыре морфемы есть только в слове «пригородный» — ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1551136eff69267ee320",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.methods",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_1551136eff69267e",
+        "type": "single_choice",
+        "stem": "Каким способом образовано слово ПЕРЕПИСАТЬ?",
+        "options": [
+          {
+            "id": "A",
+            "text": "суффиксальным"
+          },
+          {
+            "id": "B",
+            "text": "приставочным"
+          },
+          {
+            "id": "C",
+            "text": "приставочно-суффиксальным"
+          },
+          {
+            "id": "D",
+            "text": "сложением"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: основные способы образования слов",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1551136eff69267ee320d017c48aaeeea1c449057deb9f45094b1c28118d2791",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Слово «переписать» образовано от глагола «писать» присоединением приставки ПЕРЕ-: писать → пере-писать. Это приставочный способ.",
+        "wrong_option_notes": {
+          "A": "Новый суффикс не присоединялся: суффиксы в слове «переписать» те же, что и в исходном слове «писать».",
+          "C": "Добавлена только приставка; остальная часть слова совпадает с производящим словом «писать».",
+          "D": "Сложение — соединение двух основ (как в слове «пароход»); в слове «переписать» один корень."
+        },
+        "solution_steps": [
+          "Подбираем производящее слово: переписать ← писать.",
+          "Сравниваем: к слову «писать» добавлена только приставка ПЕРЕ-.",
+          "Способ — приставочный, ответ B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1dd24dd54cb612a972f8",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.methods",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_1dd24dd54cb612a9",
+        "type": "single_choice",
+        "stem": "Укажите слово, образованное приставочно-суффиксальным способом.",
+        "options": [
+          {
+            "id": "A",
+            "text": "пересадка"
+          },
+          {
+            "id": "B",
+            "text": "учительница"
+          },
+          {
+            "id": "C",
+            "text": "непогода"
+          },
+          {
+            "id": "D",
+            "text": "подоконник"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: приставочно-суффиксальный способ образования слов",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1dd24dd54cb612a972f889d66e68a153f8f9d267e0d01535778c7dc843aaf7cb",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Подоконник — «доска под окном»: слово образовано от существительного «окно» одновременным присоединением приставки ПОД- и суффикса -НИК- (под-окон-ник). Это приставочно-суффиксальный способ.",
+        "wrong_option_notes": {
+          "A": "Пересадка образована от глагола «пересадить» с помощью суффикса -К-; приставка ПЕРЕ- уже была в производящем слове, значит, способ суффиксальный.",
+          "B": "Учительница ← учитель + суффикс -НИЦ-: суффиксальный способ.",
+          "C": "Непогода ← погода + приставка НЕ-: приставочный способ."
+        },
+        "solution_steps": [
+          "Для каждого слова находим производящее слово.",
+          "пересадка ← пересадить (+ -к-); учительница ← учитель (+ -ниц-); непогода ← погода (+ не-).",
+          "подоконник ← окно (под- и -ник- присоединяются одновременно).",
+          "Приставочно-суффиксальный способ только у слова «подоконник» — ответ D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_56938be9f71adc7e6afb",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.morphemes",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_56938be9f71adc7e",
+        "type": "single_choice",
+        "stem": "В каком ряду все слова однокоренные?",
+        "options": [
+          {
+            "id": "A",
+            "text": "гора, горный, горевать"
+          },
+          {
+            "id": "B",
+            "text": "лес, лесник, лестница"
+          },
+          {
+            "id": "C",
+            "text": "вода, водный, подводник"
+          },
+          {
+            "id": "D",
+            "text": "нос, носильщик, переносица"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: корень слова, однокоренные слова и омонимичные корни",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:56938be9f71adc7e6afb8bef53b3e08984c12b970a6e920de2f3ad28266c5a80",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Однокоренные слова имеют общий корень и связаны по значению. Вода, водный, подводник объединены значением «вода» (подводник — моряк подводной лодки, которая плавает под водой) и имеют общий корень -ВОД-.",
+        "wrong_option_notes": {
+          "A": "«Горевать» связано со словом «горе», а не «гора»: корни только звучат одинаково (омонимичные корни).",
+          "B": "«Лестница» исторически связана с глаголом «лезть» и по значению не связана со словом «лес».",
+          "D": "«Носильщик» образовано от глагола «носить», а не от слова «нос» (хотя «переносица» со словом «нос» однокоренное)."
+        },
+        "solution_steps": [
+          "Проверяем не только совпадение звучания корня, но и общность значения.",
+          "горевать — от «горе»; лестница — от «лезть»; носильщик — от «носить».",
+          "вода — водный — подводник объединены значением «вода» — ответ C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_379d1b48a8610c48e9d6",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_form",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_379d1b48a8610c48",
+        "type": "single_choice",
+        "stem": "Вставьте пропущенное слово.\n\nСогласно ____ поезд прибывает в Балыкчы в восемь часов утра.",
+        "options": [
+          {
+            "id": "A",
+            "text": "расписанию"
+          },
+          {
+            "id": "B",
+            "text": "расписания"
+          },
+          {
+            "id": "C",
+            "text": "расписание"
+          },
+          {
+            "id": "D",
+            "text": "расписанием"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: производные предлоги и падеж существительного после них",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:379d1b48a8610c48e9d64c3cb91f73c75a0835e3477530ea8e02cc3779b5d8cd",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Производный предлог СОГЛАСНО (как и БЛАГОДАРЯ, ВОПРЕКИ) требует дательного падежа: согласно (чему?) расписанию.",
+        "wrong_option_notes": {
+          "B": "Типичная ошибка: «согласно расписания» — родительный падеж после СОГЛАСНО не употребляется.",
+          "C": "Форма именительного или винительного падежа не сочетается с предлогом СОГЛАСНО.",
+          "D": "Творительный падеж после СОГЛАСНО не употребляется."
+        },
+        "solution_steps": [
+          "Определяем падеж, которого требует предлог СОГЛАСНО: дательный (чему?).",
+          "Дательный падеж слова «расписание» — «расписанию».",
+          "Ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_09b2b97c0007b3df05dd",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_choice",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_09b2b97c0007b3df",
+        "type": "single_choice",
+        "stem": "Вставьте подходящее по смыслу слово.\n\nУчёный ____ смелую гипотезу, которую позже подтвердили опыты.",
+        "options": [
+          {
+            "id": "A",
+            "text": "поставил"
+          },
+          {
+            "id": "B",
+            "text": "провёл"
+          },
+          {
+            "id": "C",
+            "text": "внёс"
+          },
+          {
+            "id": "D",
+            "text": "выдвинул"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7–9 кл., русский язык: лексическая сочетаемость слов",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:09b2b97c0007b3df05dd32301710bc69ce7601ff411b23965f79e41d8c39a0fa",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Слово «гипотеза» (научное предположение) сочетается с глаголами «выдвинуть», «высказать», «предложить»: учёный выдвинул гипотезу.",
+        "wrong_option_notes": {
+          "A": "«Поставить» сочетается со словами «вопрос», «задача», «опыт», но не со словом «гипотеза».",
+          "B": "«Провести» сочетается со словами «опыт», «исследование»; провести гипотезу нельзя.",
+          "C": "«Внести» сочетается со словами «предложение», «вклад», «поправка»; здесь смешаны сочетания «внести предложение» и «выдвинуть гипотезу»."
+        },
+        "solution_steps": [
+          "Определяем значение слова «гипотеза» — научное предположение.",
+          "Подбираем устойчивое сочетание: «выдвинуть гипотезу».",
+          "Остальные глаголы со словом «гипотеза» не сочетаются — ответ D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_ebe5606c462556f390eb",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_form",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_ebe5606c462556f3",
+        "type": "single_choice",
+        "stem": "Вставьте пропущенные слова.\n\nНа рынке в тот день не было ни ____, ни ____.",
+        "options": [
+          {
+            "id": "A",
+            "text": "яблоков … апельсин"
+          },
+          {
+            "id": "B",
+            "text": "яблок … апельсинов"
+          },
+          {
+            "id": "C",
+            "text": "яблоков … апельсинов"
+          },
+          {
+            "id": "D",
+            "text": "яблок … апельсин"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: родительный падеж множественного числа существительных",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:ebe5606c462556f390eb35e754570e442474e28f3f55a9a997005ce3b082de79",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "После «не было ни…, ни…» нужен родительный падеж множественного числа: яблоко — (нет) яблок (нулевое окончание, как у большинства существительных среднего рода на -О), апельсин — (нет) апельсинов (окончание -ОВ, как помидоров, мандаринов).",
+        "wrong_option_notes": {
+          "A": "Обе формы неверны: правильно «яблок» и «апельсинов».",
+          "C": "Форма «яблоков» — ошибка: у слова «яблоко» в родительном падеже множественного числа нулевое окончание.",
+          "D": "Форма «апельсин» в родительном падеже множественного числа разговорная; по норме — «апельсинов»."
+        },
+        "solution_steps": [
+          "После «не было ни…, ни…» нужен родительный падеж множественного числа.",
+          "яблоко → яблок (нулевое окончание); апельсин → апельсинов (окончание -ов).",
+          "Ответ B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b82efbfc597f611c7c31",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_choice",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_b82efbfc597f611c",
+        "type": "single_choice",
+        "stem": "Вставьте подходящее по смыслу слово.\n\nДождь шёл весь день, ____ мы всё-таки отправились в поход.",
+        "options": [
+          {
+            "id": "A",
+            "text": "поэтому"
+          },
+          {
+            "id": "B",
+            "text": "потому что"
+          },
+          {
+            "id": "C",
+            "text": "однако"
+          },
+          {
+            "id": "D",
+            "text": "так как"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: сочинительные и подчинительные союзы, их значение",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b82efbfc597f611c7c31aabc5b121e91ef906e172ca827568349539e6d60f329",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Части предложения противопоставлены: несмотря на дождь, поход состоялся (на это указывает и частица «всё-таки»). Противительное значение передаёт союз ОДНАКО.",
+        "wrong_option_notes": {
+          "A": "«Поэтому» выражает следствие, а поход не может быть следствием дождя; к тому же «всё-таки» указывает на противопоставление.",
+          "B": "«Потому что» вводит причину, но вторая часть не объясняет, почему шёл дождь.",
+          "D": "«Так как» тоже вводит причину; смысл предложения становится нелогичным."
+        },
+        "solution_steps": [
+          "Определяем смысловые отношения частей: шёл дождь — и всё же поход состоялся.",
+          "Это противопоставление; его выражает противительный союз ОДНАКО.",
+          "Ответ C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_88fa831b626595e2b530",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_form",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_88fa831b626595e2",
+        "type": "single_choice",
+        "stem": "Вставьте пропущенные слова.\n\nЭкскурсию провели для ____ учеников из ____ школ района.",
+        "options": [
+          {
+            "id": "A",
+            "text": "двухсот пятидесяти … тридцати трёх"
+          },
+          {
+            "id": "B",
+            "text": "двести пятидесяти … тридцати трёх"
+          },
+          {
+            "id": "C",
+            "text": "двухсот пятьдесят … тридцать трёх"
+          },
+          {
+            "id": "D",
+            "text": "двухсот пятидесяти … тридцать три"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: склонение составных количественных числительных",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:88fa831b626595e2b53012390a7e1d6ddfcbbcdaa325daf60f584e24a8e07922",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "У составных количественных числительных склоняется каждое слово. Предлоги ДЛЯ и ИЗ требуют родительного падежа: (для) двухсот пятидесяти учеников, (из) тридцати трёх школ.",
+        "wrong_option_notes": {
+          "B": "Изменена только вторая часть числительного: в родительном падеже «двести» → «двухсот».",
+          "C": "Не просклонены «пятьдесят» (→ пятидесяти) и «тридцать» (→ тридцати).",
+          "D": "Второе числительное не изменено: после предлога ИЗ нужен родительный падеж — «тридцати трёх»."
+        },
+        "solution_steps": [
+          "Определяем падеж: для (кого?) и из (чего?) — родительный.",
+          "250 в родительном падеже — «двухсот пятидесяти»; 33 — «тридцати трёх».",
+          "Склоняются все части составного числительного — ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_fc47f89d24879e412bcd",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.word_meaning",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_fc47f89d24879e41",
+        "type": "single_choice",
+        "stem": "Укажите антоним к слову ТЯЖЁЛЫЙ.",
+        "options": [
+          {
+            "id": "A",
+            "text": "трудный"
+          },
+          {
+            "id": "B",
+            "text": "лёгкий"
+          },
+          {
+            "id": "C",
+            "text": "большой"
+          },
+          {
+            "id": "D",
+            "text": "твёрдый"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: антонимы",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 3, 2026-11-05): прежняя версия (q_bbac135570e6000bd056) прошла слепое решение в раунде 1; при сборке варианта координатор нашёл подсказку между разделами (вербальное задание q_3a2ac52c8f6fe4420c96 «ЩЕДРЫЙ : ЖАДНЫЙ» с вариантом «жадный : скупой» подсказывало ответ «скупой») и заменил слово ЩЕДРЫЙ на ТЯЖЁЛЫЙ (тема, подтема, сложность и позиция ключа сохранены); новая версия заново решена координатором без ключа, ключ совпал. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:fc47f89d24879e412bcd0a1029b8cf6d9c22d919d853a60637caebfe95108008",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:15:49.694Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Антонимы — слова с противоположным значением. «Тяжёлый» — имеющий большой вес (тяжёлый чемодан), а в переносном значении — требующий больших усилий (тяжёлая работа). Противоположное значение в обоих случаях у слова «лёгкий»: лёгкий чемодан, лёгкая работа.",
+        "wrong_option_notes": {
+          "A": "«Трудный» близко по значению к слову «тяжёлый» в переносном смысле (тяжёлая задача — трудная задача): это синоним, а не антоним.",
+          "C": "«Большой» говорит о размере, а не о весе: большой предмет может быть и тяжёлым, и лёгким, поэтому это не антоним.",
+          "D": "«Твёрдый» обозначает другое свойство (его антоним — «мягкий») и не противопоставлен слову «тяжёлый»."
+        },
+        "solution_steps": [
+          "Определяем значение слова «тяжёлый» — имеющий большой вес; в переносном значении — трудный, требующий усилий.",
+          "Ищем слово с противоположным значением — «лёгкий» (лёгкий чемодан, лёгкая задача).",
+          "Ответ B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 3,
+          "method": "coordinator re-solve without the key after the cross-section cueing fix; the previous version passed blind solve in round 1",
+          "result": "passed",
+          "fixed_after_round": 2,
+          "replaces": "q_bbac135570e6000bd056",
+          "reason": "вербальное задание q_3a2ac52c8f6fe4420c96 «ЩЕДРЫЙ : ЖАДНЫЙ» с вариантом «жадный : скупой» подсказывало ответ «скупой»",
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_9c96e5ba5d3bc0054a7e",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.parts_of_speech",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_9c96e5ba5d3bc005",
+        "type": "single_choice",
+        "stem": "Укажите слово, которое является именем числительным.",
+        "options": [
+          {
+            "id": "A",
+            "text": "четвёрка"
+          },
+          {
+            "id": "B",
+            "text": "вчетвером"
+          },
+          {
+            "id": "C",
+            "text": "учетверить"
+          },
+          {
+            "id": "D",
+            "text": "четверо"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: имя числительное (собирательные числительные)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:9c96e5ba5d3bc0054a7e0a4c35fdac756556ff9583a35e396af5b72bb252a759",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "«Четверо» — собирательное числительное: обозначает количество и отвечает на вопрос «сколько?» (четверо друзей).",
+        "wrong_option_notes": {
+          "A": "«Четвёрка» — имя существительное (что?), обозначает предмет: оценку, цифру, группу из четырёх.",
+          "B": "«Вчетвером» — наречие (как?), не изменяется.",
+          "C": "«Учетверить» — глагол (что сделать?)."
+        },
+        "solution_steps": [
+          "Ставим вопрос к каждому слову.",
+          "четвёрка — что? (существительное); вчетвером — как? (наречие); учетверить — что сделать? (глагол).",
+          "четверо — сколько? — числительное, ответ D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_fbd3fa6385e53ddf1a7a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.paronyms",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_fbd3fa6385e53ddf",
+        "type": "single_choice",
+        "stem": "В каком предложении выделенное слово употреблено правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Мама НАДЕЛА малыша и вывела его на прогулку."
+          },
+          {
+            "id": "B",
+            "text": "На уроке химии ученики выполнили ПРАКТИЧНУЮ работу."
+          },
+          {
+            "id": "C",
+            "text": "Библиотека ПРЕДОСТАВИЛА студентам доступ к архиву."
+          },
+          {
+            "id": "D",
+            "text": "В филармонии продали все АБОНЕНТЫ на зимний сезон."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: паронимы",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 3, 2026-11-05): прежняя версия (q_c074df6e9edbe0d54ffa) прошла слепое решение в раунде 1; при сборке варианта координатор нашёл подсказку между разделами (вариант B повторял предложение вербального задания q_c59dc0a369de2dbb1d4a «Новый способ полива оказался … эффектным/эффективным») и заменил неверный вариант B (пароним «эффектный/эффективный» → «практичный/практический»; ключ C не менялся); новая версия заново решена координатором без ключа, ключ совпал. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:fbd3fa6385e53ddf1a7a46d42300b8bb94ccb52ea1c70a360fd3a0ea4ab1505c",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:15:49.694Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "ПРЕДОСТАВИТЬ — дать возможность пользоваться чем-либо, отдать в распоряжение: предоставить доступ, слово, жильё. В предложении C слово употреблено верно.",
+        "wrong_option_notes": {
+          "A": "Одеть кого-то (одеть малыша), надеть что-то (надеть куртку). Нужно «одела малыша».",
+          "B": "Практичный — удобный, выгодный в использовании (практичная обувь, практичный человек); практический — связанный с применением знаний на практике (практическая работа, практические занятия). Нужно «практическую».",
+          "D": "Абонент — тот, кто пользуется телефонной связью, библиотекой и т. п.; абонемент — документ на право пользования чем-либо в течение срока. Нужно «абонементы»."
+        },
+        "solution_steps": [
+          "Для каждого выделенного слова вспоминаем его пароним и различие в значениях.",
+          "надеть/одеть, практичный/практический, абонент/абонемент — в A, B, D выбран не тот пароним.",
+          "«предоставить доступ» (дать в пользование) — верно, ответ C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 3,
+          "method": "coordinator re-solve without the key after the cross-section cueing fix; the previous version passed blind solve in round 1",
+          "result": "passed",
+          "fixed_after_round": 2,
+          "replaces": "q_c074df6e9edbe0d54ffa",
+          "reason": "вариант B повторял предложение вербального задания q_c59dc0a369de2dbb1d4a «Новый способ полива оказался … эффектным/эффективным»",
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_df1e5ee052179940b5df",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.parts_of_speech",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_df1e5ee052179940",
+        "type": "single_choice",
+        "stem": "В каком предложении выделенное слово является наречием?",
+        "options": [
+          {
+            "id": "A",
+            "text": "ВОКРУГ стояла глубокая тишина."
+          },
+          {
+            "id": "B",
+            "text": "Мы сели ВОКРУГ костра."
+          },
+          {
+            "id": "C",
+            "text": "Мы встретились ВОЗЛЕ школы."
+          },
+          {
+            "id": "D",
+            "text": "ПОКА брат спал, мы готовили завтрак."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: наречие; отличие наречий от омонимичных предлогов и союзов",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:df1e5ee052179940b5df536698870fa8c55e6e4573e60069419a3da4db0dac10",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Наречие обозначает признак действия и не имеет при себе зависимого существительного: стояла (где?) вокруг. В остальных предложениях выделенные слова — служебные части речи.",
+        "wrong_option_notes": {
+          "B": "«Вокруг костра» — предлог: он связывает глагол с существительным в родительном падеже.",
+          "C": "«Возле школы» — предлог с существительным в родительном падеже.",
+          "D": "«Пока» здесь — подчинительный союз, присоединяющий придаточное времени."
+        },
+        "solution_steps": [
+          "Проверяем, есть ли при выделенном слове зависимое существительное.",
+          "вокруг костра, возле школы — предлоги; «пока брат спал» — союз.",
+          "«вокруг стояла» — без существительного, отвечает на вопрос «где?» — наречие, ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_207846b59262931cd512",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.paronyms",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_207846b59262931c",
+        "type": "single_choice",
+        "stem": "В каком предложении выделенное слово употреблено НЕВЕРНО?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Для борьбы с лесными пожарами приняли ДЕЙСТВЕННЫЕ меры."
+          },
+          {
+            "id": "B",
+            "text": "По ГАРАНТИРОВАННОМУ талону мастер бесплатно отремонтировал телевизор."
+          },
+          {
+            "id": "C",
+            "text": "Новый двигатель оказался ЭКОНОМИЧНЫМ: он расходует мало топлива."
+          },
+          {
+            "id": "D",
+            "text": "Учёные провели ДЛИТЕЛЬНОЕ наблюдение за ледником."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: паронимы и лексическая сочетаемость",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:207846b59262931cd512ef3a15682c708617e30f48352d5f345e6ae0e6300357",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Гарантированный — обеспеченный гарантией, обязательный (гарантированный доход). Гарантийный — относящийся к гарантии, подтверждающий её (гарантийный талон, гарантийный ремонт). В предложении B нужен пароним: «по гарантийному талону».",
+        "wrong_option_notes": {
+          "A": "Действенный — дающий результат, эффективный; «действенные меры» — правильное сочетание (не путать с «действительный» — настоящий).",
+          "C": "Экономичный — выгодный в использовании, требующий мало затрат; о двигателе сказано верно (не путать с «экономный» — бережливый).",
+          "D": "Длительный — продолжительный во времени; «длительное наблюдение» — верно (не путать с «длинный» — о протяжённости в пространстве)."
+        },
+        "solution_steps": [
+          "Для каждого выделенного слова вспоминаем его пароним.",
+          "«действенные меры», «экономичный двигатель», «длительное наблюдение» — употреблено верно.",
+          "Талон, подтверждающий гарантию, — «гарантийный»; ошибка в варианте B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_353b6629b50a6d444d6c",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.word_forms",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_353b6629b50a6d44",
+        "type": "single_choice",
+        "stem": "В каком варианте правильно образована форма степени сравнения прилагательного ИНТЕРЕСНЫЙ?",
+        "options": [
+          {
+            "id": "A",
+            "text": "более интереснее"
+          },
+          {
+            "id": "B",
+            "text": "самый интереснейший"
+          },
+          {
+            "id": "C",
+            "text": "наиболее интереснее"
+          },
+          {
+            "id": "D",
+            "text": "интереснее"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: степени сравнения имён прилагательных",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:353b6629b50a6d444d6c649f75896a7f9afbd42f726501cc0a312f8b39d6f611",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Простая сравнительная степень образуется с помощью суффикса -ЕЕ: интереснее. Составная — словами «более», «менее» и исходной формой: более интересный. Смешивать простую и составную формы нельзя.",
+        "wrong_option_notes": {
+          "A": "Смешаны составная («более») и простая («интереснее») формы сравнительной степени; правильно «интереснее» или «более интересный».",
+          "B": "Смешаны составная («самый») и простая («интереснейший») формы превосходной степени; правильно «самый интересный» или «интереснейший».",
+          "C": "«Наиболее» образует составную превосходную степень и не сочетается с формой сравнительной степени «интереснее»."
+        },
+        "solution_steps": [
+          "Вспоминаем: простая и составная формы степеней сравнения не смешиваются.",
+          "«более интереснее», «самый интереснейший», «наиболее интереснее» — смешанные формы.",
+          "«интереснее» — простая сравнительная степень, ответ D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_218e90579ed4fd069947",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.agreement_government",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_218e90579ed4fd06",
+        "type": "single_choice",
+        "stem": "В каком предложении нет грамматической ошибки?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Пассажиры должны оплатить за проезд при входе."
+          },
+          {
+            "id": "B",
+            "text": "Он выразил уверенность в победу команды."
+          },
+          {
+            "id": "C",
+            "text": "По приезде в Ош мы сразу отправились на базар."
+          },
+          {
+            "id": "D",
+            "text": "Заведующий библиотеки подписал приказ."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: нормы управления в словосочетаниях",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:218e90579ed4fd069947a6cc14fa64b91176ea6d516309e35157f3ddbd2ca5f6",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Предлог ПО в значении «после» требует предложного падежа: по приезде, по окончании, по прибытии. Предложение C построено правильно.",
+        "wrong_option_notes": {
+          "A": "Оплатить (что?) проезд — без предлога; «оплатить за проезд» — смешение с «заплатить за проезд».",
+          "B": "Уверенность (в чём?) в победе — нужен предложный падеж.",
+          "D": "Заведующий (чем?) библиотекой — нужен творительный падеж."
+        },
+        "solution_steps": [
+          "Проверяем управление в каждом словосочетании.",
+          "Нужно: оплатить проезд, уверенность в победе, заведующий библиотекой — в A, B, D ошибки.",
+          "«по приезде» — нормативная форма, ответ C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a8f25a100fe7a0c30bda",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.collocation",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_a8f25a100fe7a0c3",
+        "type": "single_choice",
+        "stem": "В каком предложении нет лексической ошибки?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Администрация города приняла срочные меры по ремонту дороги."
+          },
+          {
+            "id": "B",
+            "text": "Этот случай оказал на меня сильное впечатление."
+          },
+          {
+            "id": "C",
+            "text": "Спорт играет большое значение в жизни подростка."
+          },
+          {
+            "id": "D",
+            "text": "В кабинете висел прейскурант цен на услуги."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: лексическая сочетаемость, плеоназм",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a8f25a100fe7a0c30bda399a895249e8c2dffef4a479015f6f90f9a7f3b17b97",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Сочетание «принять меры» нормативно, лексическая сочетаемость в предложении A не нарушена.",
+        "wrong_option_notes": {
+          "B": "Смешаны сочетания «произвести впечатление» и «оказать влияние»; нужно «произвёл на меня сильное впечатление».",
+          "C": "Смешаны сочетания «играть роль» и «иметь значение»; нужно «играет большую роль» или «имеет большое значение».",
+          "D": "Плеоназм: прейскурант — это и есть перечень цен, слово «цен» лишнее."
+        },
+        "solution_steps": [
+          "Проверяем устойчивые сочетания и наличие лишних слов.",
+          "«оказать впечатление» и «играть значение» — смешение сочетаний; «прейскурант цен» — плеоназм.",
+          "«принять меры» — правильно, ответ A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_c30067b6bb5fcb9f9910",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.agreement_government",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_c30067b6bb5fcb9f",
+        "type": "single_choice",
+        "stem": "В каком предложении нет грамматической ошибки?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Прочитав статью, у меня возникло много вопросов."
+          },
+          {
+            "id": "B",
+            "text": "В журнале «Литературный Кыргызстан» напечатали новый рассказ молодого автора."
+          },
+          {
+            "id": "C",
+            "text": "Каждый из выпускников получили памятный альбом."
+          },
+          {
+            "id": "D",
+            "text": "По окончанию концерта зрители долго аплодировали артистам."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: грамматические нормы (деепричастный оборот, согласование подлежащего и сказуемого, управление, названия при родовых словах)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (пилотная партия); ключ, пояснения и правило проверены автором вручную. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:c30067b6bb5fcb9f99108e50077847a32e6e396fdca5f09deca3de286bc9ab40",
+        "created_at": "2026-11-04T12:00:00.000Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Название в кавычках при родовом слове («журнал», «газета») не склоняется и не согласуется с ним: в журнале «Литературный Кыргызстан». Предложение B построено правильно.",
+        "wrong_option_notes": {
+          "A": "Деепричастие должно обозначать добавочное действие того же лица, что и сказуемое; статью прочитал я, а «возникли» вопросы. Правильно: «Когда я прочитал статью, у меня возникло много вопросов».",
+          "C": "Подлежащее «каждый» стоит в единственном числе, поэтому сказуемое — «получил».",
+          "D": "Предлог ПО в значении «после» требует предложного падежа: «по окончании»."
+        },
+        "solution_steps": [
+          "Проверяем деепричастный оборот, согласование подлежащего и сказуемого, управление.",
+          "A — деепричастие и сказуемое относятся к разным лицам; C — «каждый… получили»; D — «по окончанию».",
+          "B — название при родовом слове не склоняется, ошибки нет, ответ B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_grammar",
+        "generated_by": "hand:claude-pilot-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 0,
+          "batch_round2_failures": 0
+        }
+      }
+    }
+  ]
+}

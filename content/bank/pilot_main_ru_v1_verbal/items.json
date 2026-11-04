@@ -1,0 +1,2562 @@
+{
+  "schema_version": 1,
+  "batch": {
+    "id": "pilot_main_ru_v1_verbal",
+    "kind": "generated",
+    "created_at": "2026-11-04T16:49:18.505Z",
+    "note": "Pilot batch: ORIGINAL verbal items for ort_main_2026 (ru) — 15 analogies + 15 sentence completions, written from scratch by an AI author (not from ЦООМО/testing.kg, Secom or any published collection). Topic × difficulty follow content/matrix/ort_main_2026.json. Status draft; keys double-checked by the author, methodologist review required."
+  },
+  "passages": [],
+  "items": [
+    {
+      "id": "q_5e0f99fa81b8b65f1e40",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.synonym",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_5e0f99fa81b8b65f",
+        "type": "analogy",
+        "stem": "СМЕЛЫЙ : ОТВАЖНЫЙ",
+        "options": [
+          {
+            "id": "A",
+            "text": "храбрый : трусливый"
+          },
+          {
+            "id": "B",
+            "text": "прочный : крепкий"
+          },
+          {
+            "id": "C",
+            "text": "сильный : сила"
+          },
+          {
+            "id": "D",
+            "text": "герой : смелый"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 5–7 кл.: лексика, синонимы; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:5e0f99fa81b8b65f1e40415f8291c2a2c3ee4aca68a07fecff6264fb5db3dac5",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "«Смелый» и «отважный» — синонимы: прилагательные с близким значением. Такое же отношение (синонимия) есть только в паре «прочный : крепкий»: оба слова означают «такой, который трудно сломать или разрушить».",
+        "wrong_option_notes": {
+          "A": "«Храбрый» и «трусливый» — антонимы (противоположные значения); пару выбирают из-за близкой темы.",
+          "C": "Признак и его название: прилагательное и однокоренное существительное, а не два слова с близким значением.",
+          "D": "Лицо и его характерный признак («смелый герой»), а не синонимы."
+        },
+        "solution_steps": [
+          "Отношение в исходной паре: «смелый» и «отважный» близки по значению — это синонимы.",
+          "Ищем пару слов одной части речи с близким значением: «прочный» и «крепкий».",
+          "Остальные пары — антонимы, однокоренные слова разных частей речи, лицо и признак. Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_3a2ac52c8f6fe4420c96",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.antonym",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_3a2ac52c8f6fe442",
+        "type": "analogy",
+        "stem": "ЩЕДРЫЙ : ЖАДНЫЙ",
+        "options": [
+          {
+            "id": "A",
+            "text": "жадный : скупой"
+          },
+          {
+            "id": "B",
+            "text": "добрый : доброта"
+          },
+          {
+            "id": "C",
+            "text": "щедрый : подарок"
+          },
+          {
+            "id": "D",
+            "text": "трудолюбивый : ленивый"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 5–7 кл.: лексика, антонимы; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:3a2ac52c8f6fe4420c969acefec87e45b4a31d29b37bac4f7e730e0258156140",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "«Щедрый» и «жадный» — антонимы: прилагательные с противоположным значением, называющие черты характера. Такое же отношение — в паре «трудолюбивый : ленивый».",
+        "wrong_option_notes": {
+          "A": "«Жадный» и «скупой» близки по значению — это синонимы; пару выбирают, потому что в ней повторяется слово из условия.",
+          "B": "Признак и его название (однокоренное существительное), а не противоположные значения.",
+          "C": "Признак и предмет, к которому он может относиться («щедрый подарок»)."
+        },
+        "solution_steps": [
+          "Отношение в исходной паре: противоположные черты характера — антонимы.",
+          "«Трудолюбивый» и «ленивый» тоже противоположные черты характера.",
+          "Остальные пары — синонимы, однокоренные слова, признак и предмет. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_952ef7e1df435063e3c1",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.part_whole",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_952ef7e1df435063",
+        "type": "analogy",
+        "stem": "ЛЕПЕСТОК : ЦВЕТОК",
+        "options": [
+          {
+            "id": "A",
+            "text": "книга : страница"
+          },
+          {
+            "id": "B",
+            "text": "роза : цветок"
+          },
+          {
+            "id": "C",
+            "text": "ветка : дерево"
+          },
+          {
+            "id": "D",
+            "text": "цветок : ваза"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Биология 6 кл.: строение растения, цветок; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:952ef7e1df435063e3c166c38ed16f65cf3f0cccf360b6a1972239aae6ddd7a8",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Лепесток — часть цветка: отношение «часть — целое», часть стоит на первом месте. Так же ветка — часть дерева.",
+        "wrong_option_notes": {
+          "A": "Порядок обратный: сначала целое (книга), потом часть (страница).",
+          "B": "Роза — вид цветка: это отношение «вид — род», а не «часть — целое».",
+          "D": "Ваза — сосуд, в который ставят цветы; цветок не является её частью."
+        },
+        "solution_steps": [
+          "Отношение: лепесток входит в состав цветка — «часть — целое».",
+          "Ветка входит в состав дерева, и часть тоже стоит первой.",
+          "Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_44ebc5454d4a3a8d7423",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.part_whole",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_44ebc5454d4a3a8d",
+        "type": "analogy",
+        "stem": "ГЛАВА : РОМАН",
+        "options": [
+          {
+            "id": "A",
+            "text": "куплет : песня"
+          },
+          {
+            "id": "B",
+            "text": "альбом : фотография"
+          },
+          {
+            "id": "C",
+            "text": "писатель : роман"
+          },
+          {
+            "id": "D",
+            "text": "рассказ : произведение"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Литература 5–8 кл.: эпические и лирические произведения, их композиция; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:44ebc5454d4a3a8d74230261b83a9881933f8427e57a5c02038c7707ea503971",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Роман делится на главы: глава — часть романа (отношение «часть — целое», часть стоит первой). Так же песня состоит из куплетов: куплет — часть песни.",
+        "wrong_option_notes": {
+          "B": "Порядок обратный: альбом — целое, фотографии — его составляющие.",
+          "C": "Автор и созданное им произведение, а не часть и целое; пару выбирают из-за повтора слова «роман».",
+          "D": "Рассказ — разновидность литературного произведения: это отношение «вид — род», а не «часть — целое»."
+        },
+        "solution_steps": [
+          "Отношение: глава — составная часть романа.",
+          "Куплет — составная часть песни, порядок тот же (часть, затем целое).",
+          "Проверяем ловушки: «рассказ : произведение» — вид и род, «альбом : фотография» — обратный порядок. Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_dd41a01280f12de78b1d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.cause_effect",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_dd41a01280f12de7",
+        "type": "analogy",
+        "stem": "ЗАСУХА : НЕУРОЖАЙ",
+        "options": [
+          {
+            "id": "A",
+            "text": "снег : зима"
+          },
+          {
+            "id": "B",
+            "text": "дождь : зонт"
+          },
+          {
+            "id": "C",
+            "text": "простуда : сквозняк"
+          },
+          {
+            "id": "D",
+            "text": "ливень : наводнение"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "География 6 кл.: погода, атмосферные явления, стихийные бедствия; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:dd41a01280f12de78b1d9b691f110afc3c163a133056af2c27e7a5f85793aeca",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Засуха — причина, неурожай — её следствие (отношение «причина — следствие», причина стоит первой). Так же сильный ливень вызывает наводнение.",
+        "wrong_option_notes": {
+          "A": "Снег — явление, характерное для зимы; зима не является следствием снега.",
+          "B": "Зонт — предмет, защищающий от дождя: отношение «явление — средство защиты от него».",
+          "C": "Порядок обратный: сначала следствие (простуда), потом причина (сквозняк)."
+        },
+        "solution_steps": [
+          "Отношение: засуха приводит к неурожаю — «причина — следствие».",
+          "Ливень приводит к наводнению, причина тоже стоит первой.",
+          "Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_38a70e060c9e8563748e",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.cause_effect",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_38a70e060c9e8563",
+        "type": "analogy",
+        "stem": "ТРЕНИРОВКА : ВЫНОСЛИВОСТЬ",
+        "options": [
+          {
+            "id": "A",
+            "text": "загар : солнце"
+          },
+          {
+            "id": "B",
+            "text": "спортсмен : стадион"
+          },
+          {
+            "id": "C",
+            "text": "упражнение : навык"
+          },
+          {
+            "id": "D",
+            "text": "бег : движение"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Словесно-логическое мышление; лексика 7–9 кл.: причинно-следственные отношения (физическая культура, учебная деятельность)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:38a70e060c9e8563748eb1787ce9bdc88b93163c59dbc1057cd8dfd4e28e8666",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Регулярные тренировки развивают выносливость: первое слово — причина (действие), второе — результат, к которому оно приводит. Так же упражнения приводят к появлению навыка.",
+        "wrong_option_notes": {
+          "A": "Порядок обратный: загар — следствие, солнце — причина.",
+          "B": "Человек и место, где он занимается; причинной связи нет.",
+          "D": "Бег — один из видов движения: отношение «вид — род»."
+        },
+        "solution_steps": [
+          "Отношение: тренировка (действие) приводит к выносливости (результату).",
+          "Упражнение (действие) приводит к навыку (результату), порядок тот же.",
+          "«Загар : солнце» — та же связь, но в обратном порядке. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_92b0e4236c46b13beb28",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.function",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_92b0e4236c46b13b",
+        "type": "analogy",
+        "stem": "ТЕРМОМЕТР : ТЕМПЕРАТУРА",
+        "options": [
+          {
+            "id": "A",
+            "text": "часы : стрелка"
+          },
+          {
+            "id": "B",
+            "text": "весы : масса"
+          },
+          {
+            "id": "C",
+            "text": "градус : температура"
+          },
+          {
+            "id": "D",
+            "text": "линейка : карандаш"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Физика 7–8 кл.: физические величины и приборы для их измерения; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:92b0e4236c46b13beb28981d8423eb95945944d1d6d99793504d2b35156c8a8a",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Термометр — прибор для измерения температуры (отношение «прибор — величина, которую он измеряет»). Так же весы служат для измерения массы.",
+        "wrong_option_notes": {
+          "A": "Стрелка — часть часов (отношение «целое — часть»), а не измеряемая величина.",
+          "C": "Градус — единица измерения температуры, а не прибор; пара похожа по теме, но отношение другое.",
+          "D": "Чертёжные принадлежности, которыми пользуются вместе; назначение линейки не связано с карандашом."
+        },
+        "solution_steps": [
+          "Отношение: термометр предназначен для измерения температуры.",
+          "Весы предназначены для измерения массы — то же отношение.",
+          "«Градус : температура» — единица и величина, а не прибор. Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_dbc375078ca2edfb03db",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.function",
+        "subtopic_id": null,
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_dbc375078ca2edfb",
+        "type": "analogy",
+        "stem": "МИКРОСКОП : НАБЛЮДЕНИЕ",
+        "options": [
+          {
+            "id": "A",
+            "text": "калькулятор : вычисление"
+          },
+          {
+            "id": "B",
+            "text": "телескоп : звезда"
+          },
+          {
+            "id": "C",
+            "text": "линза : микроскоп"
+          },
+          {
+            "id": "D",
+            "text": "микроскоп : лаборатория"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Биология 5–6 кл.: увеличительные приборы, микроскоп; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:dbc375078ca2edfb03db4e626359fe65e8b597be6f36c217391687c5e46432a4",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Микроскоп предназначен для наблюдения: пара называет устройство и действие, для которого оно служит. Так же калькулятор служит для вычислений.",
+        "wrong_option_notes": {
+          "B": "Ловушка по теме: телескоп — тоже оптический прибор, но звезда — объект наблюдения, а не действие, для которого служит прибор.",
+          "C": "Линза — часть микроскопа: отношение «часть — целое».",
+          "D": "Прибор и место, где им пользуются; пару выбирают из-за повтора слова «микроскоп»."
+        },
+        "solution_steps": [
+          "Уточняем отношение: второе слово — не предмет, а действие, для которого создан прибор.",
+          "«Калькулятор : вычисление» — устройство и действие, для которого оно служит.",
+          "«Телескоп : звезда» — прибор и объект наблюдения, это другое отношение. Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_34bb675947465ab454c7",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.degree",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_34bb675947465ab4",
+        "type": "analogy",
+        "stem": "ВЕТЕР : УРАГАН",
+        "options": [
+          {
+            "id": "A",
+            "text": "буря : ветерок"
+          },
+          {
+            "id": "B",
+            "text": "туча : дождь"
+          },
+          {
+            "id": "C",
+            "text": "дождь : ливень"
+          },
+          {
+            "id": "D",
+            "text": "гроза : молния"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "География 6 кл.: атмосфера, ветер, атмосферные осадки; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:34bb675947465ab454c7a6fb187010438ae3d26e081c06b230d5a60f069d3da0",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Ураган — очень сильный ветер: второе слово называет то же явление в большей степени (отношение «степень признака», от слабого к сильному). Так же ливень — очень сильный дождь.",
+        "wrong_option_notes": {
+          "A": "Степень меняется в обратном направлении: от сильного (буря) к слабому (ветерок).",
+          "B": "Из тучи идёт дождь: отношение «источник (причина) — следствие».",
+          "D": "Молния — проявление (составная часть) грозы: отношение «целое — часть»."
+        },
+        "solution_steps": [
+          "Отношение: то же явление, во втором слове — в более сильной степени.",
+          "«Дождь : ливень» — то же усиление, порядок от слабого к сильному.",
+          "«Буря : ветерок» — степень, но в обратном направлении. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_0b9c3eecd8ca9dfafe15",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.degree",
+        "subtopic_id": null,
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_0b9c3eecd8ca9dfa",
+        "type": "analogy",
+        "stem": "УДИВЛЕНИЕ : ИЗУМЛЕНИЕ",
+        "options": [
+          {
+            "id": "A",
+            "text": "гнев : раздражение"
+          },
+          {
+            "id": "B",
+            "text": "страх : смелость"
+          },
+          {
+            "id": "C",
+            "text": "грусть : слёзы"
+          },
+          {
+            "id": "D",
+            "text": "радость : восторг"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 8–10 кл.: лексическое значение слова, смысловые оттенки синонимов; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:0b9c3eecd8ca9dfafe15c66ba3cc51195e73dd99071bc4400f15034bfbc04125",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Изумление — очень сильное удивление: второе слово называет ту же эмоцию в большей степени (от слабой к сильной). Так же восторг — высшая степень радости.",
+        "wrong_option_notes": {
+          "A": "Направление обратное: гнев сильнее раздражения, то есть пара идёт от сильного к слабому.",
+          "B": "Противоположные понятия (антонимы), а не степени одного чувства.",
+          "C": "Слёзы — внешнее проявление (следствие) грусти, а не более сильная степень того же чувства."
+        },
+        "solution_steps": [
+          "Отношение: одна и та же эмоция, во втором слове — сильнее.",
+          "Проверяем направление: «радость → восторг» — усиление, «гнев → раздражение» — ослабление.",
+          "Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_8d5d038f7f5d206e97c0",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.category_member",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_8d5d038f7f5d206e",
+        "type": "analogy",
+        "stem": "ХИЩНИК : ВОЛК",
+        "options": [
+          {
+            "id": "A",
+            "text": "берёза : дерево"
+          },
+          {
+            "id": "B",
+            "text": "грызун : белка"
+          },
+          {
+            "id": "C",
+            "text": "волк : стая"
+          },
+          {
+            "id": "D",
+            "text": "лиса : хитрость"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Биология 7 кл.: многообразие животных, систематические группы; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:8d5d038f7f5d206e97c0bfeee21131d6b2cef2091eaa66f0b6e947b73d296f5f",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Волк — один из хищников: первое слово — общее понятие (род), второе — входящий в него вид (отношение «род — вид»). Так же белка относится к грызунам.",
+        "wrong_option_notes": {
+          "A": "Порядок обратный: сначала вид (берёза), потом род (дерево).",
+          "C": "Стая — группа волков: отношение «элемент — совокупность», а не «род — вид».",
+          "D": "Животное и черта, которую ему традиционно приписывают: отношение «предмет — признак»."
+        },
+        "solution_steps": [
+          "Отношение: общее понятие (хищник) и его представитель (волк) — «род — вид».",
+          "Грызун — общее понятие, белка — его представитель; порядок тот же.",
+          "Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a2c2216fbbc6345b637a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.category_member",
+        "subtopic_id": null,
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_a2c2216fbbc6345b",
+        "type": "analogy",
+        "stem": "ОСАДКИ : ГРАД",
+        "options": [
+          {
+            "id": "A",
+            "text": "металл : медь"
+          },
+          {
+            "id": "B",
+            "text": "снег : снежинка"
+          },
+          {
+            "id": "C",
+            "text": "туча : дождь"
+          },
+          {
+            "id": "D",
+            "text": "дождь : осадки"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "География 6 кл.: атмосферные осадки; химия 8 кл.: металлы; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a2c2216fbbc6345b637a88dcb192ad13e63138424011f45fcd4d8fe4b10ffa02",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Град — один из видов атмосферных осадков: первое слово — общее понятие (род), второе — вид. Так же медь — один из металлов.",
+        "wrong_option_notes": {
+          "B": "Снег состоит из снежинок: это «целое — часть»; снежинка не разновидность снега.",
+          "C": "Из тучи выпадает дождь: отношение «источник (причина) — следствие».",
+          "D": "Порядок обратный: дождь — вид, осадки — род. Пара близка по теме, но направление отношения не совпадает."
+        },
+        "solution_steps": [
+          "Отношение: «осадки» — общее понятие, «град» — его разновидность (род — вид).",
+          "Отбрасываем пары той же темы: «снег : снежинка» — целое и часть, «туча : дождь» — источник и следствие, «дождь : осадки» — обратный порядок.",
+          "«Металл : медь» — род и вид в том же порядке. Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_21b784b3db80ff36ac57",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.worker_tool_product",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_21b784b3db80ff36",
+        "type": "analogy",
+        "stem": "ХИРУРГ : СКАЛЬПЕЛЬ",
+        "options": [
+          {
+            "id": "A",
+            "text": "художник : картина"
+          },
+          {
+            "id": "B",
+            "text": "пила : плотник"
+          },
+          {
+            "id": "C",
+            "text": "врач : больница"
+          },
+          {
+            "id": "D",
+            "text": "парикмахер : ножницы"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Словесно-логическое мышление; лексика 5–9 кл.: профессии, орудия и результаты труда",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:21b784b3db80ff36ac57daf2efe88c12858f2563f7f341fc2f9f3dbdf205f311",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Скальпель — рабочий инструмент хирурга (отношение «профессия — инструмент», профессия стоит первой). Так же ножницы — инструмент парикмахера.",
+        "wrong_option_notes": {
+          "A": "Картина — результат труда художника, а не его инструмент.",
+          "B": "Порядок обратный: сначала инструмент, потом профессия.",
+          "C": "Больница — место работы врача, а не инструмент."
+        },
+        "solution_steps": [
+          "Отношение: человек определённой профессии и его рабочий инструмент.",
+          "«Парикмахер : ножницы» — то же отношение и тот же порядок.",
+          "Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_0c2f5ea3f8f6838f2b86",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.object_property",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_0c2f5ea3f8f6838f",
+        "type": "analogy",
+        "stem": "ЛИМОН : КИСЛЫЙ",
+        "options": [
+          {
+            "id": "A",
+            "text": "солёный : огурец"
+          },
+          {
+            "id": "B",
+            "text": "мёд : пчела"
+          },
+          {
+            "id": "C",
+            "text": "сахар : сладкий"
+          },
+          {
+            "id": "D",
+            "text": "яблоко : груша"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 5–6 кл.: имя существительное и имя прилагательное, лексика; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:0c2f5ea3f8f6838f2b864a49a1e21d6b97371d489fd04ea40edfc703cc3e3ebb",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Кислый вкус — характерный признак лимона (отношение «предмет — его признак», предмет стоит первым). Так же сладкий вкус — характерный признак сахара.",
+        "wrong_option_notes": {
+          "A": "Порядок обратный: сначала признак, потом предмет.",
+          "B": "Мёд производят пчёлы: отношение «продукт — производитель».",
+          "D": "Два плода одной группы (соподчинённые понятия); признака здесь нет."
+        },
+        "solution_steps": [
+          "Отношение: предмет и его постоянный характерный признак.",
+          "«Сахар : сладкий» — то же отношение и тот же порядок.",
+          "«Солёный : огурец» — признак и предмет, порядок обратный. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_8fa1d7d926b28779ecb7",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.material_product",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_8fa1d7d926b28779",
+        "type": "analogy",
+        "stem": "ГЛИНА : КУВШИН",
+        "options": [
+          {
+            "id": "A",
+            "text": "ваза : хрусталь"
+          },
+          {
+            "id": "B",
+            "text": "шерсть : свитер"
+          },
+          {
+            "id": "C",
+            "text": "гончар : горшок"
+          },
+          {
+            "id": "D",
+            "text": "нитка : иголка"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Технология 5–7 кл.: материалы и изделия из них; словесно-логическое мышление (аналогии)",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:8fa1d7d926b28779ecb77e8b412eff883381e08dc082fbd42408f20ff5df69b6",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Кувшин делают из глины (отношение «материал — изделие», материал стоит первым). Так же свитер вяжут из шерсти.",
+        "wrong_option_notes": {
+          "A": "Порядок обратный: сначала изделие (ваза), потом материал (хрусталь).",
+          "C": "Гончар — мастер, горшок — результат его труда: отношение «мастер — изделие».",
+          "D": "Предметы, которыми пользуются вместе; ни один не сделан из другого."
+        },
+        "solution_steps": [
+          "Отношение: из первого (материала) делают второе (изделие).",
+          "Из шерсти вяжут свитер — то же отношение и тот же порядок.",
+          "Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_053316a6e56011b03232",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.logical_connectors",
+        "subtopic_id": "completion.logical_connectors.cause_result",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_053316a6e56011b0",
+        "type": "completion",
+        "stem": "Всю ночь шёл сильный снег, ____ утром дороги на горных перевалах закрыли для движения транспорта.",
+        "options": [
+          {
+            "id": "A",
+            "text": "хотя"
+          },
+          {
+            "id": "B",
+            "text": "потому что"
+          },
+          {
+            "id": "C",
+            "text": "поэтому"
+          },
+          {
+            "id": "D",
+            "text": "зато"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 9 кл.: сложное предложение, союзы со значением причины и следствия",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:053316a6e56011b03232c0dd70ccbb6594cba84144527ad0dc1fba17ae8dcdc9",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Первая часть называет причину (сильный снегопад), вторая — её следствие (дороги закрыли). Следствие вводится союзом «поэтому».",
+        "wrong_option_notes": {
+          "A": "«Хотя» выражает уступку (вопреки чему-то), а снегопад не противоречит закрытию дорог, а вызывает его.",
+          "B": "«Потому что» вводит причину, но после пропуска стоит следствие: закрытие дорог не могло вызвать ночной снегопад.",
+          "D": "«Зато» вводит что-то хорошее в противовес плохому, а закрытие дорог не является таким противовесом."
+        },
+        "solution_steps": [
+          "Определяем смысловую связь частей: снегопад → дороги закрыли.",
+          "Вторая часть — следствие первой, нужен союз со значением следствия.",
+          "Подходит «поэтому». Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_76c5c12cb7c7d375e712",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.logical_connectors",
+        "subtopic_id": "completion.logical_connectors.contrast",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_76c5c12cb7c7d375",
+        "type": "completion",
+        "stem": "Азамат долго готовился к олимпиаде по физике и решил все тренировочные задачи, ____ на самом соревновании растерялся и допустил несколько досадных ошибок.",
+        "options": [
+          {
+            "id": "A",
+            "text": "поэтому"
+          },
+          {
+            "id": "B",
+            "text": "однако"
+          },
+          {
+            "id": "C",
+            "text": "зато"
+          },
+          {
+            "id": "D",
+            "text": "так как"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 8–9 кл.: союзы со значением противопоставления, различение «однако» и «зато»",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:76c5c12cb7c7d375e71294d52dd7485fd8fdd902778bf575ec9fa31dacb8e111",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "От хорошей подготовки ждут успеха, а на деле Азамат растерялся и ошибся: части предложения противопоставлены. Противопоставление выражает союз «однако».",
+        "wrong_option_notes": {
+          "A": "«Поэтому» вводит следствие, но подготовка не может быть причиной растерянности и ошибок.",
+          "C": "«Зато» вводит положительное в противовес отрицательному, а здесь наоборот: после хорошего идёт плохое.",
+          "D": "«Так как» вводит причину, но ошибки на соревновании не объясняют, почему Азамат готовился."
+        },
+        "solution_steps": [
+          "Первая часть — хорошая подготовка, вторая — неудача: ожидание не оправдалось.",
+          "Нужен союз со значением противопоставления; «зато» не подходит, так как вторая часть отрицательная.",
+          "Подходит «однако». Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_6a307a3af584d9fe1f4b",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.logical_connectors",
+        "subtopic_id": "completion.logical_connectors.addition_example",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_6a307a3af584d9fe",
+        "type": "completion",
+        "stem": "Горные реки — главный источник электроэнергии в Кыргызстане. ____ они дают воду для полива полей и садов в долинах.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Например,"
+          },
+          {
+            "id": "B",
+            "text": "Иными словами,"
+          },
+          {
+            "id": "C",
+            "text": "Тем не менее,"
+          },
+          {
+            "id": "D",
+            "text": "Кроме того,"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 8–9 кл.: вводные слова, средства связи предложений в тексте; география Кыргызстана 8 кл.: внутренние воды",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6a307a3af584d9fe1f4bf25f567a713e0790f4b93dbe5809ba14f856cef375ee",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Во втором предложении названа ещё одна польза горных рек — вода для полива. Новая информация добавляется к уже сказанному, поэтому нужна связка со значением добавления «кроме того».",
+        "wrong_option_notes": {
+          "A": "«Например» вводит пример к сказанному, но полив полей — не пример выработки электроэнергии.",
+          "B": "«Иными словами» вводит пересказ той же мысли, а здесь сообщается новый факт.",
+          "C": "«Тем не менее» вводит то, что противоречит ожиданию, а две пользы рек друг другу не противоречат."
+        },
+        "solution_steps": [
+          "Сравниваем предложения: электроэнергия и вода для полива — две разные пользы рек.",
+          "Второе предложение не пример, не пересказ и не противопоставление, а добавление.",
+          "Подходит «Кроме того». Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_3f26b21fd76c8b8a59d1",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.logical_connectors",
+        "subtopic_id": "completion.logical_connectors.cause_result",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_3f26b21fd76c8b8a",
+        "type": "completion",
+        "stem": "Экскурсию в ущелье Ала-Арча перенесли на следующую неделю, ____ синоптики предупредили о сильных ливнях и угрозе селей.",
+        "options": [
+          {
+            "id": "A",
+            "text": "так как"
+          },
+          {
+            "id": "B",
+            "text": "поэтому"
+          },
+          {
+            "id": "C",
+            "text": "несмотря на то что"
+          },
+          {
+            "id": "D",
+            "text": "чтобы"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 9 кл.: сложноподчинённые предложения с придаточными причины, цели, уступки",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:3f26b21fd76c8b8a59d1ff14a317be40180cfb12243145bdd3d9322d08a3e8eb",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "После пропуска названа причина переноса экскурсии — предупреждение о ливнях и селях. Причину вводит союз «так как».",
+        "wrong_option_notes": {
+          "B": "«Поэтому» вводит следствие, но предупреждение синоптиков не вызвано переносом экскурсии: связь перевёрнута.",
+          "C": "«Несмотря на то что» выражает уступку, а предупреждение о селях не противоречит переносу, а объясняет его.",
+          "D": "«Чтобы» вводит цель, но экскурсию переносили не для того, чтобы синоптики сделали предупреждение."
+        },
+        "solution_steps": [
+          "Определяем связь: экскурсию перенесли — почему? Из-за предупреждения о ливнях.",
+          "Часть после пропуска — причина, нужен причинный союз.",
+          "Подходит «так как». Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_4bb7e398114230fb36ee",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.logical_connectors",
+        "subtopic_id": "completion.logical_connectors.contrast",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_4bb7e398114230fb",
+        "type": "completion",
+        "stem": "Участники экспедиции решили продолжить восхождение, ____ продуктов оставалось лишь на несколько дней, а погода с каждым часом ухудшалась.",
+        "options": [
+          {
+            "id": "A",
+            "text": "тем более что"
+          },
+          {
+            "id": "B",
+            "text": "несмотря на то что"
+          },
+          {
+            "id": "C",
+            "text": "благодаря тому что"
+          },
+          {
+            "id": "D",
+            "text": "при условии что"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 9 кл.: сложноподчинённые предложения с придаточными уступки, причины и условия; составные союзы",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:4bb7e398114230fb36ee122aa5e315727fd59f739b5bb77b73febc5d032bb245",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Нехватка продуктов и плохая погода мешают восхождению, но участники всё равно решили его продолжить: действие совершается вопреки обстоятельствам. Такое отношение (уступку) выражает союз «несмотря на то что».",
+        "wrong_option_notes": {
+          "A": "«Тем более что» добавляет ещё один довод в пользу решения, а нехватка продуктов и плохая погода — доводы против восхождения.",
+          "C": "«Благодаря тому что» называет причину с положительным результатом, а нехватка еды и непогода не помогают продолжить путь.",
+          "D": "«При условии что» вводит условие, но эти обстоятельства не условие продолжения пути, а препятствие ему."
+        },
+        "solution_steps": [
+          "Оцениваем обстоятельства после пропуска: они говорят против восхождения.",
+          "Решение принято вопреки им — это уступка, а не причина, добавочный довод или условие.",
+          "Подходит «несмотря на то что». Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_235f6b2025c5c79d0cfa",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_235f6b2025c5c79d",
+        "type": "completion",
+        "stem": "Чтобы не опоздать на поезд, мы вышли из дома ____ — за целый час до его отправления.",
+        "options": [
+          {
+            "id": "A",
+            "text": "наугад"
+          },
+          {
+            "id": "B",
+            "text": "с опозданием"
+          },
+          {
+            "id": "C",
+            "text": "впоследствии"
+          },
+          {
+            "id": "D",
+            "text": "заранее"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 7 кл.: наречие, лексическое значение слова",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:235f6b2025c5c79d0cfa96acda9f84feb0904b4a75a50c4cc41962aaac5fe7a6",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Пояснение после тире («за целый час до отправления») показывает, что вышли с запасом времени. Это значение у наречия «заранее» — «до наступления нужного момента, загодя».",
+        "wrong_option_notes": {
+          "A": "«Наугад» — наобум, не выбирая; ко времени выхода из дома не подходит.",
+          "B": "Противоречит началу предложения: вышли, чтобы не опоздать.",
+          "C": "«Впоследствии» — позже, потом; не сочетается с пояснением «за час до отправления»."
+        },
+        "solution_steps": [
+          "Опора — пояснение после тире: «за целый час до отправления».",
+          "Нужно наречие со значением «загодя, с запасом времени».",
+          "Подходит «заранее». Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_51751caddc0b35c216ea",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_51751caddc0b35c2",
+        "type": "completion",
+        "stem": "Старый деревянный мост стал ____, поэтому проезд по нему грузовикам запретили.",
+        "options": [
+          {
+            "id": "A",
+            "text": "ненадёжным"
+          },
+          {
+            "id": "B",
+            "text": "живописным"
+          },
+          {
+            "id": "C",
+            "text": "знаменитым"
+          },
+          {
+            "id": "D",
+            "text": "пустынным"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 6–7 кл.: лексическое значение слова, имя прилагательное",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:51751caddc0b35c216eadca9b813bc5a935852db9bcd9956fb38d09649281cf6",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Вторая часть — следствие: грузовикам запретили проезд. Причиной может быть только то, что мост стал непрочным, опасным, то есть ненадёжным.",
+        "wrong_option_notes": {
+          "B": "«Живописный» — красивый; красота моста не причина запрета.",
+          "C": "Известность моста не объясняет запрет на проезд.",
+          "D": "«Пустынный» — безлюдный; отсутствие людей на мосту не причина запрета."
+        },
+        "solution_steps": [
+          "Союз «поэтому» показывает: признак моста — причина запрета.",
+          "Запрещают проезд, когда мост может не выдержать грузовик.",
+          "Подходит «ненадёжным». Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_c59dc0a369de2dbb1d4a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_c59dc0a369de2dbb",
+        "type": "completion",
+        "stem": "Новый способ полива оказался очень ____: за один сезон урожай на опытном участке вырос почти на треть, а расход воды сократился.",
+        "options": [
+          {
+            "id": "A",
+            "text": "эффектным"
+          },
+          {
+            "id": "B",
+            "text": "трудоёмким"
+          },
+          {
+            "id": "C",
+            "text": "эффективным"
+          },
+          {
+            "id": "D",
+            "text": "сомнительным"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 10–11 кл.: паронимы, лексическое значение слова",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:c59dc0a369de2dbb1d4a5859f2f9e09e0fe35abcae93adfeece47ab67fe02b11",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "После двоеточия перечислены результаты: урожай вырос, воды тратится меньше. Значит, способ даёт хороший результат — он эффективный. Пароним «эффектный» означает «яркий, производящий сильное впечатление» и говорит о внешнем впечатлении, а не о результате.",
+        "wrong_option_notes": {
+          "A": "Пароним: «эффектный» — яркий, производящий впечатление; результативность выражает слово «эффективный».",
+          "B": "«Трудоёмкий» — требующий много труда; двоеточие поясняет не затраты труда, а успешные результаты.",
+          "D": "Противоречит пояснению: способ дал хорошие результаты, значит, он не сомнительный."
+        },
+        "solution_steps": [
+          "Двоеточие указывает: дальше пояснение пропущенного слова — урожай вырос, расход воды сократился.",
+          "Нужно слово со значением «дающий нужный результат».",
+          "Различаем паронимы: «эффективный» — результативный, «эффектный» — яркий. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_6d4159782b697c14bfd1",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_6d4159782b697c14",
+        "type": "completion",
+        "stem": "Рассказ получился удивительно ____: на двух страницах автор сумел уместить целую человеческую жизнь.",
+        "options": [
+          {
+            "id": "A",
+            "text": "лаконичным"
+          },
+          {
+            "id": "B",
+            "text": "многословным"
+          },
+          {
+            "id": "C",
+            "text": "поучительным"
+          },
+          {
+            "id": "D",
+            "text": "затянутым"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 8–10 кл.: лексическое значение слова, книжная лексика",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6d4159782b697c14bfd1a984805ab20c3a072bf4e5260b7af4ecfa1d665f25c6",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Пояснение после двоеточия говорит о краткости: на двух страницах — целая жизнь. Краткий, но ёмкий по содержанию текст называют лаконичным.",
+        "wrong_option_notes": {
+          "B": "«Многословный» — с лишними словами; противоречит пояснению о двух страницах.",
+          "C": "«Поучительный» — содержащий урок, мораль; пояснение говорит не о морали, а о краткости.",
+          "D": "«Затянутый» — слишком длинный; противоречит пояснению."
+        },
+        "solution_steps": [
+          "Опора — пояснение после двоеточия: много содержания в малом объёме.",
+          "Нужно слово со значением «краткий и ёмкий».",
+          "Подходит «лаконичным». Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_77c1a6d572d4cedaba15",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_77c1a6d572d4ceda",
+        "type": "completion",
+        "stem": "Жители соседних районов собрали для пострадавших от наводнения ____ помощь: палатки, тёплые одеяла и продукты.",
+        "options": [
+          {
+            "id": "A",
+            "text": "гуманную"
+          },
+          {
+            "id": "B",
+            "text": "финансовую"
+          },
+          {
+            "id": "C",
+            "text": "медицинскую"
+          },
+          {
+            "id": "D",
+            "text": "гуманитарную"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 10–11 кл.: паронимы, лексическая сочетаемость",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:77c1a6d572d4cedaba15b46e848fa42b9439ddbb62a8f0fdcc2e6d13e73b89dd",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "После двоеточия перечислены вещи первой необходимости. Такую помощь пострадавшим называют гуманитарной. Пароним «гуманный» значит «человечный» (гуманный поступок) и в значении «помощь вещами и продуктами» не употребляется.",
+        "wrong_option_notes": {
+          "A": "Пароним: «гуманный» — человечный, милосердный; помощь вещами и продуктами называют гуманитарной.",
+          "B": "Финансовая помощь — это деньги, а перечислены палатки, одеяла и продукты.",
+          "C": "Медицинская помощь — лечение и лекарства; перечисленные вещи к ней не относятся."
+        },
+        "solution_steps": [
+          "Опора — перечень после двоеточия: палатки, одеяла, продукты.",
+          "Это вещи первой необходимости, такая помощь называется гуманитарной.",
+          "Не путаем с паронимом «гуманный». Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_971beac3f510c4add867",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_971beac3f510c4ad",
+        "type": "completion",
+        "stem": "Поначалу выводы молодого учёного многим казались ____, однако серия независимых экспериментов полностью их подтвердила.",
+        "options": [
+          {
+            "id": "A",
+            "text": "неопровержимыми"
+          },
+          {
+            "id": "B",
+            "text": "голословными"
+          },
+          {
+            "id": "C",
+            "text": "исчерпывающими"
+          },
+          {
+            "id": "D",
+            "text": "закономерными"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 10–11 кл.: лексическое значение слова, книжная лексика; противительные союзы",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:971beac3f510c4add867f433658c620bb19b60c4ad87d23b44f3b3aa7dfd042e",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Союз «однако» противопоставляет первое впечатление результату: эксперименты выводы подтвердили. Значит, сначала выводы казались необоснованными. Такое значение — «не подкреплённый доказательствами» — есть только у слова «голословный».",
+        "wrong_option_notes": {
+          "A": "«Неопровержимый» — бесспорный; если выводы казались бесспорными, их подтверждение не противоречит ожиданию и «однако» неуместно.",
+          "C": "«Исчерпывающий» — полный, всесторонний; это положительная оценка, противопоставления с подтверждением нет.",
+          "D": "«Закономерный» — естественный, ожидаемый; противопоставления с подтверждением тоже нет."
+        },
+        "solution_steps": [
+          "«Однако» требует противопоставления: сначала выводы оценивали иначе, чем показали эксперименты.",
+          "Эксперименты выводы подтвердили, значит, сначала они казались недоказанными.",
+          "Значение «не подкреплённый доказательствами» — у слова «голословный». Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_536e63f5499c15fb1600",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.collocations",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_536e63f5499c15fb",
+        "type": "completion",
+        "stem": "Жюри конкурса ____ особое внимание на оригинальность проектов.",
+        "options": [
+          {
+            "id": "A",
+            "text": "обратило"
+          },
+          {
+            "id": "B",
+            "text": "уделило"
+          },
+          {
+            "id": "C",
+            "text": "придало"
+          },
+          {
+            "id": "D",
+            "text": "оказало"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 10–11 кл.: лексическая сочетаемость, управление, устойчивые сочетания",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:536e63f5499c15fb1600e6a363b2b89eb9d895050c568ffe7adf4ada283445b0",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Со словом «внимание» и предлогом «на» сочетается только глагол «обратить»: обратить внимание на что-либо. Глагол «уделить» требует дательного падежа без предлога: уделить внимание чему-либо.",
+        "wrong_option_notes": {
+          "B": "Смешение конструкций: правильно «уделить внимание чему» — без предлога «на».",
+          "C": "«Придать» сочетается со словом «значение» (придать значение чему-либо); «придать внимание» не говорят.",
+          "D": "«Оказать внимание» — проявить заботу, любезность по отношению к кому-либо; сочетание «оказать внимание на» неверно."
+        },
+        "solution_steps": [
+          "Смотрим на управление: «внимание на что» — с предлогом «на» и винительным падежом.",
+          "Такая конструкция возможна только с глаголом «обратить».",
+          "Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_f6f7f9b1c5b0c71b1b29",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.collocations",
+        "subtopic_id": null,
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_f6f7f9b1c5b0c71b",
+        "type": "completion",
+        "stem": "Правильно подобранное снаряжение ____ решающее значение для успеха горной экспедиции.",
+        "options": [
+          {
+            "id": "A",
+            "text": "сыграло"
+          },
+          {
+            "id": "B",
+            "text": "оказало"
+          },
+          {
+            "id": "C",
+            "text": "имело"
+          },
+          {
+            "id": "D",
+            "text": "придавало"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 10–11 кл.: лексическая сочетаемость, смешение устойчивых сочетаний",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:f6f7f9b1c5b0c71b1b29dfd641a43ac55ea4a13d2a89a3454f42156221c001ac",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Слово «значение» в смысле «важность» сочетается с глаголом «иметь»: иметь значение для чего-либо. «Сыграть» сочетается со словом «роль» (сыграть роль), «оказать» — со словом «влияние» (оказать влияние); их соединение со словом «значение» — смешение устойчивых сочетаний.",
+        "wrong_option_notes": {
+          "A": "Смешение сочетаний «сыграть роль» и «иметь значение».",
+          "B": "Смешение сочетаний «оказать влияние» и «иметь значение».",
+          "D": "«Придавать значение» чему-либо может только человек; снаряжение ничему значения не придаёт."
+        },
+        "solution_steps": [
+          "Определяем устойчивое сочетание со словом «значение»: «иметь значение».",
+          "Отбрасываем смешения: «сыграть роль», «оказать влияние».",
+          "«Придавать значение» требует одушевлённого подлежащего. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_bf76f714235c089b4cd9",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.sentence_logic",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_bf76f714235c089b",
+        "type": "completion",
+        "stem": "Утро выдалось ____, однако ближе к полудню тучи рассеялись, и до самого вечера было ____.",
+        "options": [
+          {
+            "id": "A",
+            "text": "ясным … пасмурно"
+          },
+          {
+            "id": "B",
+            "text": "безоблачным … солнечно"
+          },
+          {
+            "id": "C",
+            "text": "пасмурным … облачно"
+          },
+          {
+            "id": "D",
+            "text": "пасмурным … солнечно"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 6–9 кл.: антонимы, сложносочинённое предложение с противительным союзом",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:bf76f714235c089b4cd9e33b3b030ba28494c96c101fd66350422dc8b2440069",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Союз «однако» противопоставляет утро остальной части дня. Раз тучи рассеялись, после полудня стало солнечно, а утром, наоборот, было пасмурно. Обоим пропускам подходит только пара «пасмурным … солнечно».",
+        "wrong_option_notes": {
+          "A": "Если утро было ясным, тучам нечего было рассеиваться; к тому же после того, как тучи рассеялись, не может стать пасмурно.",
+          "B": "Нет противопоставления, которого требует «однако»; кроме того, в безоблачном небе нет туч, которые могли бы рассеяться.",
+          "C": "Первое слово подходит, но после того, как тучи рассеялись, не может быть облачно."
+        },
+        "solution_steps": [
+          "Второй пропуск: тучи рассеялись — значит, стало солнечно.",
+          "«Однако» требует противопоставления: утро было пасмурным.",
+          "Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_bd02c6e4f3b5dae2b626",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.sentence_logic",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_36ee2344736bbb42",
+        "type": "completion",
+        "stem": "Хотя первые отзывы критиков о фильме были ____, зрители приняли его ____ — после каждого сеанса зал аплодировал стоя.",
+        "options": [
+          {
+            "id": "A",
+            "text": "хвалебными … равнодушно"
+          },
+          {
+            "id": "B",
+            "text": "сдержанными … холодно"
+          },
+          {
+            "id": "C",
+            "text": "сдержанными … восторженно"
+          },
+          {
+            "id": "D",
+            "text": "хвалебными … восторженно"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 9 кл.: сложноподчинённое предложение с придаточным уступки; лексическое значение слова",
+          "author": "claude-pilot-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пилотная партия; ключ проверен автором, нужна проверка методиста. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-05): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Исправлено автором по замечанию раунда 1, подтверждено в раунде 2. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:bd02c6e4f3b5dae2b626136cae05e45dc40b0cdf8e5aff3091467e46b3168f7a",
+        "created_at": "2026-11-04T16:49:18.505Z",
+        "updated_at": "2026-11-04T17:07:57.136Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Пояснение после тире (после каждого сеанса зал аплодировал стоя) говорит о том, как зрители встретили фильм уже после просмотра: они приняли его восторженно. Союз «хотя» требует противопоставления, значит, отзывы критиков были не восторженными, а сдержанными. Обоим условиям отвечает только пара «сдержанными … восторженно».",
+        "wrong_option_notes": {
+          "A": "Противопоставление есть, но «равнодушно» противоречит пояснению после тире: после каждого сеанса зал аплодировал стоя.",
+          "B": "Обе оценки невосторженные (сдержанные отзывы и холодный приём) — противопоставления, которого требует «хотя», нет; к тому же «холодно» противоречит пояснению после тире: зал аплодировал стоя.",
+          "D": "Второе слово верное, но хвалебные отзывы и восторг зрителей не противопоставлены, поэтому «хотя» здесь неуместно."
+        },
+        "solution_steps": [
+          "Второй пропуск определяем по пояснению после тире: если после каждого сеанса зал аплодировал стоя, зрители приняли фильм восторженно.",
+          "«Хотя» требует противопоставления: отзывы критиков были сдержанными.",
+          "Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "pilot_main_ru_v1_verbal",
+        "generated_by": "model:claude-opus-5-5",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-05",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 1,
+          "batch_round2_failures": 0
+        }
+      }
+    }
+  ]
+}
