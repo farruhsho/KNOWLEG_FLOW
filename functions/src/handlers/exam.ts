@@ -22,6 +22,7 @@ import {
 import { buildSessionPayload, classifySubmit, clientOptions, type ExamSessionPayload } from '../domain/payload';
 import { DomainError, Reasons } from '../domain/reasons';
 import type { ExamResult } from '../domain/scoring';
+import { sanitizeTimings, storedTimings } from '../domain/timings';
 import { isRecord, num, partForIndex, type Blueprint } from '../domain/types';
 import {
   callableOptions,
@@ -91,6 +92,10 @@ function draftRef(attemptId: string, sectionId: string) {
 function answersFromSnap(snap: DocumentSnapshot | undefined): Record<string, string | null> {
   const a = snap?.exists ? snap.get('answers') : null;
   return isRecord(a) ? (a as Record<string, string | null>) : {};
+}
+
+function timingsFromSnap(snap: DocumentSnapshot | undefined): Record<string, number> {
+  return storedTimings(snap?.exists ? snap.get('timings') : null);
 }
 
 // ---------------------------------------------------------------------------
@@ -184,8 +189,10 @@ export const examGetState = onCall(
 );
 
 // ---------------------------------------------------------------------------
-// examSubmitSection {attemptId, sectionId, answers, flags, clientElapsedSec}
+// examSubmitSection {attemptId, sectionId, answers, flags, clientElapsedSec, timings?}
 //   -> {completed, next?, result?}
+// timings {questionId: seconds} (ARCHITECTURE §9.5): current-section questions
+// only, whole seconds in [0, section duration]; invalid entries are dropped.
 
 export const examSubmitSection = onCall(
   callableOptions({ timeoutSeconds: 120, memory: '512MiB' }),
@@ -226,11 +233,14 @@ export const examSubmitSection = onCall(
       const sec = attempt.sections[attempt.current_section_index]!;
       const answers = sanitizeAnswers(data['answers'], sec.question_ids);
       const flags = sanitizeFlags(data['flags'], sec.question_ids);
+      const bs = blueprint.sections.find((s) => s.id === sectionId);
+      const timings = sanitizeTimings(data['timings'], sec.question_ids, (bs?.duration_minutes ?? 0) * 60);
       const transition = applySectionSubmit(attempt, blueprint, sectionId, nowMs);
       const answersDoc = {
         section_id: sectionId,
         answers,
         flags,
+        timings,
         submitted_at: Timestamp.fromMillis(nowMs),
         late: transition.closed.late,
         client_elapsed_sec: clientElapsedSec,
@@ -247,9 +257,14 @@ export const examSubmitSection = onCall(
       const others = transition.attempt.sections.filter((s) => s.section_id !== sectionId);
       const otherSnaps = others.length > 0 ? await tx.getAll(...others.map((s) => answersRef(attemptId, s.section_id))) : [];
       const answersBySection: Record<string, Record<string, string | null>> = {};
-      others.forEach((s, i) => (answersBySection[s.section_id] = answersFromSnap(otherSnaps[i])));
+      const timingsBySection: Record<string, Record<string, number>> = {};
+      others.forEach((s, i) => {
+        answersBySection[s.section_id] = answersFromSnap(otherSnaps[i]);
+        timingsBySection[s.section_id] = timingsFromSnap(otherSnaps[i]);
+      });
       answersBySection[sectionId] = answers;
-      const ctx: CompletionContext = { uid, attemptId, attempt: transition.attempt, blueprint, answersBySection, nowMs };
+      timingsBySection[sectionId] = timings;
+      const ctx: CompletionContext = { uid, attemptId, attempt: transition.attempt, blueprint, answersBySection, timingsBySection, nowMs };
       const reads = await readCompletionInputs(tx, ctx, content);
       tx.set(answersRef(attemptId, sectionId), answersDoc);
       const result = writeCompletion(tx, ctx, reads);
@@ -360,7 +375,11 @@ async function expireOne(attemptId: string): Promise<'expired' | 'skipped'> {
     const snaps = refs.length > 0 ? await tx.getAll(...refs) : [];
     const draft = current ? snaps[0] : undefined;
     const answersBySection: Record<string, Record<string, string | null>> = {};
-    submitted.forEach((s, i) => (answersBySection[s.section_id] = answersFromSnap(snaps[(current ? 1 : 0) + i])));
+    const timingsBySection: Record<string, Record<string, number>> = {};
+    submitted.forEach((s, i) => {
+      answersBySection[s.section_id] = answersFromSnap(snaps[(current ? 1 : 0) + i]);
+      timingsBySection[s.section_id] = timingsFromSnap(snaps[(current ? 1 : 0) + i]);
+    });
     for (const s of transition.attempt.sections) {
       if (!closedIds.has(s.section_id)) continue;
       answersBySection[s.section_id] =
@@ -369,7 +388,7 @@ async function expireOne(attemptId: string): Promise<'expired' | 'skipped'> {
           : sanitizeAnswers(null, s.question_ids);
     }
 
-    const ctx: CompletionContext = { uid: attempt.uid, attemptId, attempt: transition.attempt, blueprint, answersBySection, nowMs };
+    const ctx: CompletionContext = { uid: attempt.uid, attemptId, attempt: transition.attempt, blueprint, answersBySection, timingsBySection, nowMs };
     const reads = await readCompletionInputs(tx, ctx, content);
     for (const c of transition.closed) {
       const flags = current && c.section_id === current.section_id && draft?.exists ? draft.get('flags') : [];

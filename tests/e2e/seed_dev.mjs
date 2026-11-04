@@ -5,7 +5,7 @@
 //   flutter run -d chrome --dart-define=USE_FIREBASE_EMULATORS=true --dart-define=BILLING_MODE=external
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { blueprints, seedExamBase, seedLearning, seedVariant } from './seed_lib.mjs';
+import { blueprints, seedExamBase, seedGrowth, seedLearning, seedVariant } from './seed_lib.mjs';
 
 process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8080';
 process.env.FIREBASE_AUTH_EMULATOR_HOST ??= '127.0.0.1:9099';
@@ -19,4 +19,5 @@ await seedVariant(db, bp('ort_main_2026'), 'dev_main_ky_1', 'ky', 1);
 await seedVariant(db, bp('ort_subject_chemistry_2026'), 'dev_chem_ru_1', 'ru', 1);
 await seedVariant(db, bp('ort_state_language_2026'), 'dev_state_ky_1', 'ky', 1);
 await seedLearning(db);
-console.log('seeded: blueprints, 4 published variants, pricing, subjects, a lesson, practice questions');
+await seedGrowth(db);
+console.log('seeded: blueprints, 4 published variants, pricing, subjects, a lesson, practice questions, promo code DEMO2026');

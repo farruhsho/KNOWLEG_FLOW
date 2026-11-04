@@ -48,6 +48,17 @@ What is covered:
 - Storage: content media by role (claim, or legacy `users.role == 'admin'` without a claim) with
   type/size limits (SVG rejected), avatars, `temp_uploads` images ≤ 5 MB, deletes where writes are
   allowed.
+- Phase 3 (ARCHITECTURE §9): `referral_code`, `referred_by`, `group_ids` are privileged on
+  `users`; `referral_codes`, `group_join_codes`, `promo_attempts`, `notification_quota` have no
+  client access; `promo_codes` (+ `redemptions`) readable only by `super_admin`; `referrals`
+  (counters + items) readable by the referrer; `friends/{uid}/list` owner read + delete only;
+  `groups` and `members` readable by members only, never client-written; assignments created /
+  edited / deleted by the group owner with the §9.3 map (kind, sizes, immutable `created_by` /
+  `created_at`, banned owners rejected); submissions `{done_at, score_percent? 0..100}` written by
+  the member for themself only, read by the owner (all) or the member (own); `notifications`
+  readable by every admin role; `config/achievements` read by signed-in users, written by
+  `super_admin` / `content_manager` with keys `titles`, `descriptions`, `disabled` only; region and
+  group league boards read-only.
 
 CI: add a job with `actions/setup-java` (21) + `actions/setup-node` (22) running `npm ci && npm test`
 in this directory (the existing `.github/workflows/flutter-ci.yml` has a commented-out

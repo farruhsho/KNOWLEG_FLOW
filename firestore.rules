@@ -1,7 +1,8 @@
 rules_version = '2';
 
 // ORT Master KG — Firestore security rules.
-// Contract: docs/modernization/ARCHITECTURE.md §1 (collection table), §2 (roles), §3 (notes).
+// Contract: docs/modernization/ARCHITECTURE.md §1 (collection table), §2 (roles), §3 (notes),
+// §9 (phase 3: referrals, promo codes, friends, groups, broadcasts, achievements config).
 //
 // Principles
 // - The server (Cloud Functions, Admin SDK — bypasses these rules) is the
@@ -57,6 +58,8 @@ service cloud.firestore {
     function canViewUsers() { return hasAnyRole(['super_admin', 'moderator', 'support']); }
     function canModerateUsers() { return hasAnyRole(['super_admin', 'moderator']); }
     function canViewPayments() { return hasAnyRole(['super_admin', 'support']); }
+    function canGrantCredits() { return hasAnyRole(['super_admin']); }
+    function isAnyAdmin() { return hasAnyRole(validRoles()); }
 
     function changedKeys() {
       return request.resource.data.diff(resource.data).affectedKeys();
@@ -72,10 +75,12 @@ service cloud.firestore {
     // users/{uid}
 
     // Fields only the server / admins may set (SEC-002, SEC-USR-01, FB-08).
+    // Phase 3 (§9): referral_code, referred_by and group_ids are server-written.
     function privilegedUserFields() {
       return ['role', 'roles', 'admin_role', 'isAdmin', 'is_admin', 'premium', 'is_premium',
               'subscription', 'is_banned', 'banned', 'ban_reason', 'banned_at', 'banned_by',
-              'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by'];
+              'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by',
+              'referral_code', 'referred_by', 'group_ids'];
     }
 
     // Staff profiles (legacy admin or an admin_role mirrored by adminSetRole):
@@ -102,7 +107,8 @@ service cloud.firestore {
       let d = request.resource.data;
       return !d.keys().hasAny(['roles', 'admin_role', 'isAdmin', 'is_admin', 'premium', 'is_premium',
                                'is_banned', 'banned', 'ban_reason', 'banned_at', 'banned_by',
-                               'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by'])
+                               'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by',
+                               'referral_code', 'referred_by', 'group_ids'])
         && d.get('role', 'student') == 'student'
         && (!('subscription' in d) || (
               d.subscription is map
@@ -422,10 +428,153 @@ service cloud.firestore {
       allow read: if signedIn();
       allow write: if false;
     }
+
+    // Achievement texts (§9.4): written directly by manage_achievements roles;
+    // thresholds and award logic stay in the server code.
+    function validAchievementsConfig() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['titles', 'descriptions', 'disabled'])
+        && (!('titles' in d) || d.titles is map)
+        && (!('descriptions' in d) || d.descriptions is map)
+        && (!('disabled' in d) || (d.disabled is list && d.disabled.size() <= 100));
+    }
+
+    match /config/achievements {
+      allow read: if signedIn();
+      allow create, update: if canManageAchievements() && validAchievementsConfig();
+      allow delete: if false;
+    }
     // config/ai_tutor and any other config doc: server only (default deny).
 
     match /admin_logs/{logId} {
       allow read: if hasAnyRole(['super_admin', 'support']);
+      allow write: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Phase 3: growth and social (ARCHITECTURE §9). Every write below goes
+    // through a callable unless noted (assignments, submissions, friend
+    // deletion, config/achievements).
+
+    // Code reservations and counters: server only.
+    match /referral_codes/{code} {
+      allow read, write: if false;
+    }
+
+    match /group_join_codes/{code} {
+      allow read, write: if false;
+    }
+
+    match /promo_attempts/{attemptId} {
+      allow read, write: if false;
+    }
+
+    match /notification_quota/{day} {
+      allow read, write: if false;
+    }
+
+    // Promo codes: no client access; grant_credits (super_admin) reads them.
+    match /promo_codes/{code} {
+      allow read: if canGrantCredits();
+      allow write: if false;
+
+      match /redemptions/{redeemerUid} {
+        allow read: if canGrantCredits();
+        allow write: if false;
+      }
+    }
+
+    // Referrals: the referrer reads their counters and the people they invited.
+    match /referrals/{referrerUid} {
+      allow read: if isOwner(referrerUid);
+      allow write: if false;
+
+      match /items/{itemUid} {
+        allow read: if isOwner(referrerUid);
+        allow write: if false;
+      }
+    }
+
+    // Friends: created only by friendAdd; the owner reads and removes.
+    match /friends/{ownerUid}/list/{friendUid} {
+      allow read: if isOwner(ownerUid);
+      allow delete: if isOwner(ownerUid);
+      allow create, update: if false;
+    }
+
+    function groupPath(gid) {
+      return /databases/$(database)/documents/groups/$(gid);
+    }
+
+    function isGroupMember(gid) {
+      return signedIn() && exists(/databases/$(database)/documents/groups/$(gid)/members/$(request.auth.uid));
+    }
+
+    function isGroupOwner(gid) {
+      return signedIn() && exists(groupPath(gid)) && get(groupPath(gid)).data.owner_uid == request.auth.uid;
+    }
+
+    // groups/{gid}/assignments/{aid} = {title, kind, ref_id, due_at, created_by, created_at}
+    // (+ optional description, updated_at).
+    function validAssignment() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['title', 'kind', 'ref_id', 'due_at', 'created_by', 'created_at', 'description', 'updated_at'])
+        && d.keys().hasAll(['title', 'kind', 'ref_id', 'created_by', 'created_at'])
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 120
+        && d.kind in ['lesson', 'practice', 'exam_variant']
+        && d.ref_id is string && d.ref_id.size() >= 1 && d.ref_id.size() <= 150
+        && (d.get('due_at', null) == null || d.due_at is timestamp)
+        && d.created_at is timestamp
+        && (d.get('description', null) == null || (d.description is string && d.description.size() <= 1000))
+        && (d.get('updated_at', null) == null || d.updated_at is timestamp);
+    }
+
+    // .../submissions/{uid} = {done_at, score_percent?}
+    function validSubmission() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['done_at', 'score_percent'])
+        && d.done_at is timestamp
+        && (d.get('score_percent', null) == null
+            || ((d.score_percent is int || d.score_percent is float) && d.score_percent >= 0 && d.score_percent <= 100));
+    }
+
+    // Groups: membership (members/{uid}), member_count and users.group_ids
+    // change only through groupCreate / groupJoin / groupLeave /
+    // groupRemoveMember. Members read the group and its member list.
+    match /groups/{gid} {
+      allow read: if isGroupMember(gid);
+      allow write: if false;
+
+      match /members/{memberUid} {
+        allow read: if isGroupMember(gid);
+        allow write: if false;
+      }
+
+      // Homework (FR-LRN-6): the group owner creates, edits and deletes;
+      // members read.
+      match /assignments/{aid} {
+        allow read: if isGroupMember(gid);
+        allow create: if isGroupOwner(gid) && !callerBanned() && validAssignment()
+                      && request.resource.data.created_by == request.auth.uid;
+        allow update: if isGroupOwner(gid) && !callerBanned() && validAssignment()
+                      && request.resource.data.created_by == resource.data.created_by
+                      && request.resource.data.created_at == resource.data.created_at;
+        allow delete: if isGroupOwner(gid);
+
+        // A member writes only their own submission; the owner reads all.
+        match /submissions/{subUid} {
+          allow read: if isGroupOwner(gid) || (isOwner(subUid) && isGroupMember(gid));
+          allow create, update: if isOwner(subUid) && isGroupMember(gid)
+                                && exists(/databases/$(database)/documents/groups/$(gid)/assignments/$(aid))
+                                && validSubmission();
+          allow delete: if isOwner(subUid) && isGroupMember(gid);
+        }
+      }
+    }
+
+    // Broadcast history (adminSendNotification): admin roles read.
+    match /notifications/{notificationId} {
+      allow read: if isAnyAdmin();
       allow write: if false;
     }
 

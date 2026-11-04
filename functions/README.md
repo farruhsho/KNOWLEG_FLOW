@@ -1,6 +1,7 @@
 # ORT Master KG — Cloud Functions (2nd gen)
 
-Server side of the contract in [`docs/modernization/ARCHITECTURE.md`](../docs/modernization/ARCHITECTURE.md) §3.
+Server side of the contract in [`docs/modernization/ARCHITECTURE.md`](../docs/modernization/ARCHITECTURE.md) §3
+(phase 3 — referrals, promo codes, friends, groups, broadcasts, analytics — §9).
 TypeScript (strict), Node.js 22, `firebase-functions` 7.4, `firebase-admin` 14 (modular imports),
 `@anthropic-ai/sdk` 1.3, `@googleapis/androidpublisher`. Region: `europe-west1`, `maxInstances: 20`
 (`src/config.ts`).
@@ -15,6 +16,11 @@ TypeScript (strict), Node.js 22, `firebase-functions` 7.4, `firebase-admin` 14 (
 | `adminSetRole`, `adminGrantCredits`, `adminUpdatePricing` | callable | `super_admin` |
 | `adminPublishVariant` | callable | `super_admin`, `content_manager` |
 | `adminAiDraftQuestions` | callable | `super_admin`, `content_manager`, `methodologist` |
+| `referralGetCode`, `referralApply`, `friendAdd` | callable | signed-in |
+| `promoRedeem` | callable | signed-in |
+| `groupCreate`, `groupJoin`, `groupLeave`, `groupRemoveMember` | callable | signed-in (owner for remove) |
+| `adminUpsertPromoCode` | callable | `super_admin` (`grant_credits`) |
+| `adminSendNotification` | callable | `super_admin`, `content_manager` (`send_notifications`) |
 | `examExpireStale` | schedule, every 30 min (Asia/Bishkek) | — |
 | `billingRtdn` | Pub/Sub topic `play-billing` | — |
 | `billingSweepVoided` | schedule, daily 04:00 (Asia/Bishkek) | — |
@@ -45,6 +51,13 @@ src/
     tutor_quota.ts     AI tutor input validation, daily quota, cost estimate
     tutor_prompt.ts    frozen (cacheable) system prompt + per-request context
     blueprint_validation.ts  variant vs blueprint checks before publishing
+    codes.ts           referral / group join codes (6 chars, unambiguous alphabet), promo code format
+    referral.ts        referralApply rules, first-paid-grant reward, monthly cap (Bishkek month)
+    promo.ts           promoRedeem decision (10 attempts/day), adminUpsertPromoCode validation
+    groups.ts          friend / group limits, join / leave / remove decisions
+    notifications.ts   broadcast input, audience filter, language, FCM batches of 500, 3/day
+    regions.ts         kg_regions.json index, users.region -> region id (leagues, audiences)
+    timings.ts         exam timings sanitizing, topic_time_avg / slow_topics, activity seconds
     time.ts, types.ts, hash.ts, reasons.ts
   handlers/            thin Firebase adapters (Firestore transactions, Auth, Play, Anthropic)
 test/                  node:test unit tests for every domain module
@@ -55,7 +68,7 @@ test/                  node:test unit tests for every domain module
 ```bash
 cd functions
 npm install
-npm run build      # clean + tsc + copies ../assets/data/exam_blueprints.json to lib/data/
+npm run build      # clean + tsc + copies ../assets/data/{exam_blueprints,kg_regions}.json to lib/data/
 npm test           # tsc typecheck (src + test) and node:test via tsx
 ```
 
@@ -182,6 +195,10 @@ first `firebase deploy --only storage` the CLI asks to grant the Storage service
 **Firebase Rules Firestore Service Agent** role; accept it, or legacy admins (no role claim) cannot
 upload CMS media.
 
+Phase 3 needs one more index override (in `firestore.indexes.json`): `members.uid` with
+collection-group scope (accountDelete finds the user's group memberships). Broadcast audiences page
+through `users` ordered by document id and filter in code, so they need no composite index.
+
 `onUserBanChanged` is a Firestore trigger (Eventarc): it must be deployed in the Firestore
 database's region (see step 1). `sendStudyReminders` needs the Firebase Cloud Messaging API
 (enabled by default for Firebase projects).
@@ -254,3 +271,70 @@ legacy field (cross-service rules, see step 9); migrating to the claim is still 
   uploads); a retry after a partial failure finishes the data cleanup;
   `purchases` and legacy `payments` are kept for finance/fraud review with
   `uid = 'deleted:' + sha256(uid)`.
+  Phase 3 adds: friend list, referral tree and code, promo attempt counters, the referrer's item
+  about the user, group memberships (owned groups are deleted with their assignments; the other
+  members' `group_ids` are cleaned).
+
+## Phase 3 (ARCHITECTURE §9)
+
+New `details.reason` codes: `CODE_INVALID` (not-found), `CODE_EXPIRED` (failed-precondition),
+`CODE_EXHAUSTED` (resource-exhausted), `ALREADY_REDEEMED` (already-exists), `RATE_LIMITED`
+(resource-exhausted), `REFERRAL_NOT_ALLOWED` (failed-precondition, `details.why`: `own_code`,
+`already_referred`, `has_exams`, `has_purchases`), `LIMIT_REACHED` (resource-exhausted,
+`details.what`), `NOT_GROUP_OWNER` (permission-denied).
+
+- **Referrals.** `referralGetCode {}` → `{code}` creates the code once (6 characters from
+  `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`, reserved in `referral_codes/{code}`, mirrored to the
+  privileged `users/{uid}.referral_code`). `referralApply {code}` → `{ok}` sets the privileged
+  `users/{uid}.referred_by` and `referrals/{referrer}/items/{uid}` (`status: joined`); allowed only
+  while the caller has no completed exam and no purchase, never with the caller's own code, and
+  only one referrer per account (re-applying the same code is an idempotent `{ok: true}`).
+  **Reward:** inside the `billingVerifyPurchase` grant transaction, the referred user's first
+  non-test paid grant adds +1 credit to both (ledger `reason: 'referral'`, item → `rewarded`).
+  The referrer gets at most 20 rewards per Bishkek calendar month (`referrals/{referrer}.month_key`
+  / `month_rewarded`); past the cap only the referred user is rewarded (`referrer_capped: true`).
+  A refund of that purchase does not take the referral credits back.
+- **Promo codes.** `adminUpsertPromoCode {code, credits 1..10, maxRedemptions?, expiresAt? (ms),
+  active, note}` → `{ok, code, created}` (code upper-cased, 4–20 `A-Z0-9`; `admin_logs`).
+  `promoRedeem {code}` → `{credits, balance}` in one transaction: every call is counted in
+  `promo_attempts/{uid}_{yyyy-mm-dd}` (Bishkek day; the 11th call of the day is `RATE_LIMITED`),
+  checks are unknown/inactive → `CODE_INVALID`, already redeemed → `ALREADY_REDEEMED`, expired →
+  `CODE_EXPIRED`, `redemptions >= max_redemptions` → `CODE_EXHAUSTED`; on success
+  `promo_codes/{CODE}/redemptions/{uid}`, `redemptions + 1` and a ledger `reason: 'promo'` entry.
+  Promo and referral credits are gifts: they do not count as purchases and do not settle refund debt.
+- **Friends.** `friendAdd {code}` (the friend's referral code) → `{ok, friendUid, displayName}`
+  writes `friends/{uid}/list/{friendUid} = {display_name, added_at}`; one-directional, idempotent,
+  never yourself (`VALIDATION_FAILED`), at most 50 (`LIMIT_REACHED`). The owner deletes entries
+  directly (rules).
+- **Groups.** `groupCreate {name 2..60}` → `{groupId, joinCode}`; `groupJoin {code}` →
+  `{groupId, name}`; `groupLeave {groupId}` → `{ok}`; `groupRemoveMember {groupId, uid}` → `{ok}`.
+  The owner is a member (`members/{uid}.role == 'owner'`, listed in `group_ids`), so "≤ 5 own
+  groups" and "≤ 5 memberships" are both enforced; a group holds at most 500 members.
+  Members docs, `member_count` and `users.group_ids` change in one transaction. The owner can
+  leave only as the last member, which deletes the group (assignments, submissions, join code);
+  otherwise `VALIDATION_FAILED` (`why: owner_has_members`). Leaving / removal also deletes the
+  current week's group-league entry. Join codes are reserved in `group_join_codes/{code}`.
+  Assignments and submissions are written by clients under `firestore.rules`.
+- **Leagues.** Wherever weekly XP is written (exam completion, `recordActivity`), the same XP also
+  goes to `leaderboards/region_{regionId}_weekly_{YYYY}-W{ww}` (region id from
+  `assets/data/kg_regions.json`, matched from `users.region.oblast`, a region id or legacy
+  `region_id`) and `leaderboards/group_{gid}_weekly_{YYYY}-W{ww}` for each `users.group_ids` entry.
+  Banned users get no entries, as before.
+- **Broadcasts.** `adminSendNotification {title: {ru, ky}, body: {ru, ky}, audience: {kind:
+  all|language|region|group, value?}, dryRun?}` → `{recipients, tokens, sent, failed, pruned,
+  notificationId, dryRun}`. Recipients: not banned, with `fcm_tokens`; text by
+  `preferred_language` (`ky*` → ky, else ru; an empty language falls back to the other). Audiences
+  page through `users` by document id and filter in code (group: the group's members). Multicast
+  batches of ≤ 500 tokens per language; invalid tokens are removed. At most 3 real sends per
+  Bishkek day (`notification_quota/{day}`, `RATE_LIMITED`); `dryRun` only counts (no history,
+  `notificationId: null`, not capped). History in `notifications/{id}` (`status: sending → sent |
+  failed`), plus `admin_logs`.
+- **Exam timings.** `examSubmitSection` accepts `timings: {questionId: seconds}`; only questions of
+  the submitted section with values in `[0, section duration]` (rounded to whole seconds) are kept
+  in `answers/{sectionId}.timings`, anything else is dropped (a non-object is `VALIDATION_FAILED`).
+  `ExamResult.topic_time_avg` = mean seconds per topic (1 decimal) over timed questions;
+  `slow_topics` = topics whose mean is above 1.5 × the attempt's median per-question time, slowest
+  first. Both are always present (`{}` / `[]` without timings).
+- **Study time.** `recordActivity` accepts `seconds` (integer 0..3600, else `VALIDATION_FAILED`):
+  `user_stats.study_seconds_total`, `study_seconds_today` and `study_day` (Bishkek day; today is
+  capped at 24 h). Study time is recorded even when the call earns no XP (duplicate, daily cap).

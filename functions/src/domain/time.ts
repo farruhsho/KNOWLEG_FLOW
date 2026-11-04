@@ -20,6 +20,12 @@ export function bishkekDayKey(ms: number): string {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
+/** `YYYY-MM` of the Bishkek calendar month containing the instant `ms`. */
+export function bishkekMonthKey(ms: number): string {
+  const d = shifted(ms);
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}`;
+}
+
 const DAY_KEY_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 export function isDayKey(value: unknown): value is string {
@@ -59,4 +65,14 @@ export const ALL_TIME_BOARD_ID = 'all_time';
 
 export function subjectWeeklyBoardId(subjectId: string, ms: number): string {
   return `subject_${subjectId}_weekly_${isoWeekId(ms)}`;
+}
+
+/** Regional league (ARCHITECTURE §9.3): `region_{regionId}_weekly_{YYYY}-W{ww}`. */
+export function regionWeeklyBoardId(regionId: string, ms: number): string {
+  return `region_${regionId}_weekly_${isoWeekId(ms)}`;
+}
+
+/** Group league (ARCHITECTURE §9.3): `group_{gid}_weekly_{YYYY}-W{ww}`. */
+export function groupWeeklyBoardId(groupId: string, ms: number): string {
+  return `group_${groupId}_weekly_${isoWeekId(ms)}`;
 }

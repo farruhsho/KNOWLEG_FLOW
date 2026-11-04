@@ -21,6 +21,23 @@ export const Reasons = {
   USER_BANNED: 'USER_BANNED',
   /** accountDelete needs a sign-in (ID token auth_time) from the last 5 minutes. */
   REQUIRES_RECENT_LOGIN: 'REQUIRES_RECENT_LOGIN',
+  // Phase 3 (ARCHITECTURE §9).
+  /** Unknown, malformed or inactive promo / referral / friend / group code. */
+  CODE_INVALID: 'CODE_INVALID',
+  /** Promo code past its expires_at. */
+  CODE_EXPIRED: 'CODE_EXPIRED',
+  /** Promo code reached max_redemptions. */
+  CODE_EXHAUSTED: 'CODE_EXHAUSTED',
+  /** This account already redeemed the promo code. */
+  ALREADY_REDEEMED: 'ALREADY_REDEEMED',
+  /** Daily cap reached (promo attempts 10/day, broadcasts 3/day). */
+  RATE_LIMITED: 'RATE_LIMITED',
+  /** referralApply: own code, a different code already applied, or the account already has exams/purchases. */
+  REFERRAL_NOT_ALLOWED: 'REFERRAL_NOT_ALLOWED',
+  /** Count limit: 50 friends, 5 groups (own or joined), group size. */
+  LIMIT_REACHED: 'LIMIT_REACHED',
+  /** Group action reserved for the group owner. */
+  NOT_GROUP_OWNER: 'NOT_GROUP_OWNER',
 } as const;
 
 export type Reason = (typeof Reasons)[keyof typeof Reasons];
@@ -31,6 +48,7 @@ export type ErrorCode =
   | 'failed-precondition'
   | 'not-found'
   | 'permission-denied'
+  | 'already-exists'
   | 'resource-exhausted'
   | 'unauthenticated'
   | 'unavailable'
@@ -53,6 +71,14 @@ export const defaultCodeFor: Record<Reason, ErrorCode> = {
   VALIDATION_FAILED: 'invalid-argument',
   USER_BANNED: 'permission-denied',
   REQUIRES_RECENT_LOGIN: 'failed-precondition',
+  CODE_INVALID: 'not-found',
+  CODE_EXPIRED: 'failed-precondition',
+  CODE_EXHAUSTED: 'resource-exhausted',
+  ALREADY_REDEEMED: 'already-exists',
+  RATE_LIMITED: 'resource-exhausted',
+  REFERRAL_NOT_ALLOWED: 'failed-precondition',
+  LIMIT_REACHED: 'resource-exhausted',
+  NOT_GROUP_OWNER: 'permission-denied',
 };
 
 /**

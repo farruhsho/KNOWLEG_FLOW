@@ -495,3 +495,231 @@ describe('legacy collections', () => {
     await assertFails(getDoc(doc(db('alice'), 'admins/alice')));
   });
 });
+
+// ---------------------------------------------------------------------------
+// Phase 3 (ARCHITECTURE §9): referrals, promo codes, friends, groups,
+// assignments, broadcasts, achievements config. Client maps below are the
+// shapes §9 defines.
+
+describe('phase 3: server-only fields and collections', () => {
+  it('users: referral_code, referred_by and group_ids are privileged (create and update)', async () => {
+    await assertFails(setDoc(doc(db('alice'), 'users/alice'), { ...freeProfile, referral_code: 'ABC234' }));
+    await assertFails(setDoc(doc(db('alice'), 'users/alice'), { ...freeProfile, referred_by: 'bob' }));
+    await assertFails(setDoc(doc(db('alice'), 'users/alice'), { ...freeProfile, group_ids: ['g1'] }));
+    await seed('users/alice', { ...freeProfile, role: 'student', referral_code: 'ABC234', group_ids: ['g1'] });
+    const a = db('alice');
+    await assertFails(updateDoc(doc(a, 'users/alice'), { referral_code: 'ZZZ999' }));
+    await assertFails(updateDoc(doc(a, 'users/alice'), { referred_by: 'bob' }));
+    await assertFails(updateDoc(doc(a, 'users/alice'), { group_ids: ['g1', 'g2'] }));
+    await assertFails(updateDoc(doc(a, 'users/alice'), { group_ids: [] }));
+    // Ordinary profile edits (merge) keep working with the server fields present.
+    await assertSucceeds(
+      setDoc(doc(a, 'users/alice'), { name: 'Aida', region: { oblast: 'Чуйская область', district: '', settlement: '' } }, { merge: true }),
+    );
+  });
+
+  it('code reservations, promo attempt counters and broadcast quota are never client-accessible', async () => {
+    await seed('referral_codes/ABC234', { uid: 'alice' });
+    await seed('group_join_codes/XYZ789', { group_id: 'g1' });
+    await seed('promo_attempts/alice_2026-11-05', { count: 3 });
+    await seed('notification_quota/2026-11-05', { count: 1 });
+    for (const who of [db('alice'), db('root', { role: 'super_admin' })]) {
+      for (const p of ['referral_codes/ABC234', 'group_join_codes/XYZ789', 'promo_attempts/alice_2026-11-05', 'notification_quota/2026-11-05']) {
+        await assertFails(getDoc(doc(who, p)));
+        await assertFails(setDoc(doc(who, p), { x: 1 }));
+      }
+    }
+    await assertFails(getDocs(query(collection(db('alice'), 'referral_codes'), where('uid', '==', 'alice'))));
+  });
+
+  it('promo codes: students never read them; super_admin (grant_credits) reads codes and redemptions; nobody writes', async () => {
+    await seed('promo_codes/WELCOME', { credits: 1, max_redemptions: null, redemptions: 1, expires_at: null, active: true, note: '', created_by: 'root' });
+    await seed('promo_codes/WELCOME/redemptions/alice', { at: Timestamp.now() });
+    await assertFails(getDoc(doc(db('alice'), 'promo_codes/WELCOME')));
+    await assertFails(getDoc(doc(db('alice'), 'promo_codes/WELCOME/redemptions/alice')));
+    await assertFails(getDocs(collection(db('alice'), 'promo_codes')));
+    const root = db('root', { role: 'super_admin' });
+    await assertSucceeds(getDocs(collection(root, 'promo_codes')));
+    await assertSucceeds(getDoc(doc(root, 'promo_codes/WELCOME')));
+    await assertSucceeds(getDocs(collection(root, 'promo_codes/WELCOME/redemptions')));
+    await assertFails(setDoc(doc(root, 'promo_codes/NEW1'), { credits: 1, active: true }));
+    await assertFails(updateDoc(doc(root, 'promo_codes/WELCOME'), { redemptions: 0 }));
+    for (const role of ['content_manager', 'support', 'moderator', 'methodologist']) {
+      await assertFails(getDoc(doc(db(`u_${role}`, { role }), 'promo_codes/WELCOME')));
+    }
+    await seed('users/legacy', { ...freeProfile, role: 'admin' });
+    await assertSucceeds(getDoc(doc(db('legacy'), 'promo_codes/WELCOME')));
+  });
+
+  it('referrals: the referrer reads their counters and items; nobody writes', async () => {
+    await seed('referrals/alice', { joined_total: 1, rewarded_total: 0, month_key: '2026-11', month_rewarded: 0 });
+    await seed('referrals/alice/items/bob', { status: 'joined', joined_at: Timestamp.now(), display_name: 'Bob' });
+    const a = db('alice');
+    await assertSucceeds(getDoc(doc(a, 'referrals/alice')));
+    await assertSucceeds(getDocs(collection(a, 'referrals/alice/items')));
+    await assertSucceeds(getDoc(doc(a, 'referrals/alice/items/bob')));
+    await assertFails(getDoc(doc(db('bob'), 'referrals/alice/items/bob')));
+    await assertFails(getDocs(collection(db('bob'), 'referrals/alice/items')));
+    await assertFails(setDoc(doc(a, 'referrals/alice/items/carol'), { status: 'rewarded', joined_at: Timestamp.now(), display_name: 'C' }));
+    await assertFails(updateDoc(doc(a, 'referrals/alice/items/bob'), { status: 'rewarded' }));
+    await assertFails(setDoc(doc(a, 'referrals/alice'), { month_rewarded: 0 }));
+  });
+
+  it('friends: the owner reads and deletes; only friendAdd creates', async () => {
+    await seed('friends/alice/list/bob', { display_name: 'Bob', added_at: Timestamp.now() });
+    const a = db('alice');
+    await assertSucceeds(getDocs(collection(a, 'friends/alice/list')));
+    await assertFails(getDocs(collection(db('bob'), 'friends/alice/list')));
+    await assertFails(setDoc(doc(a, 'friends/alice/list/carol'), { display_name: 'Carol', added_at: serverTimestamp() }));
+    await assertFails(updateDoc(doc(a, 'friends/alice/list/bob'), { display_name: 'Robert' }));
+    await assertFails(deleteDoc(doc(db('bob'), 'friends/alice/list/bob')));
+    await assertSucceeds(deleteDoc(doc(a, 'friends/alice/list/bob')));
+  });
+
+  it('notifications history: admin roles read, students do not, nobody writes', async () => {
+    await seed('notifications/n1', {
+      title: { ru: 't', ky: 't' }, body: { ru: 'b', ky: 'b' }, audience: { kind: 'all', value: null }, recipients: 3, sent: 3, failed: 0,
+    });
+    for (const role of ['super_admin', 'content_manager', 'methodologist', 'moderator', 'support']) {
+      await assertSucceeds(getDoc(doc(db(`u_${role}`, { role }), 'notifications/n1')));
+    }
+    await assertSucceeds(getDocs(collection(db('cm', { role: 'content_manager' }), 'notifications')));
+    await assertFails(getDoc(doc(db('alice'), 'notifications/n1')));
+    await assertFails(setDoc(doc(db('root', { role: 'super_admin' }), 'notifications/n2'), { title: {} }));
+  });
+
+  it('config/achievements: signed-in read; manage_achievements roles write exactly {titles, descriptions, disabled}', async () => {
+    const cfg = {
+      titles: { streak_7: { ru: 'Неделя подряд', ky: 'Жума катары' } },
+      descriptions: { streak_7: { ru: '7 дней подряд', ky: '7 күн катары' } },
+      disabled: ['reader'],
+    };
+    for (const role of ['super_admin', 'content_manager']) {
+      await assertSucceeds(setDoc(doc(db(`u_${role}`, { role }), 'config/achievements'), cfg));
+    }
+    const cm = db('cm', { role: 'content_manager' });
+    await assertSucceeds(setDoc(doc(cm, 'config/achievements'), { disabled: [] }, { merge: true }));
+    await assertSucceeds(getDoc(doc(db('alice'), 'config/achievements')));
+    await assertFails(getDoc(doc(db(null), 'config/achievements')));
+    await assertFails(setDoc(doc(db('alice'), 'config/achievements'), cfg));
+    await assertFails(setDoc(doc(db('me', { role: 'methodologist' }), 'config/achievements'), cfg));
+    await assertFails(setDoc(doc(cm, 'config/achievements'), { ...cfg, thresholds: { streak_7: 1 } }));
+    await assertFails(setDoc(doc(cm, 'config/achievements'), { ...cfg, disabled: 'reader' }));
+    await assertFails(setDoc(doc(cm, 'config/achievements'), { ...cfg, titles: 'x' }));
+    await assertFails(deleteDoc(doc(db('root', { role: 'super_admin' }), 'config/achievements')));
+  });
+
+  it('region and group league boards are readable like every leaderboard, never writable', async () => {
+    await seed('leaderboards/region_chuy_weekly_2026-W45/entries/alice', { uid: 'alice', xp: 10 });
+    await seed('leaderboards/group_g1_weekly_2026-W45/entries/alice', { uid: 'alice', xp: 10 });
+    await assertSucceeds(getDocs(collection(db('bob'), 'leaderboards/region_chuy_weekly_2026-W45/entries')));
+    await assertSucceeds(getDoc(doc(db('bob'), 'leaderboards/group_g1_weekly_2026-W45/entries/alice')));
+    await assertFails(setDoc(doc(db('alice'), 'leaderboards/group_g1_weekly_2026-W45/entries/alice'), { xp: 1e6 }));
+  });
+});
+
+describe('phase 3: groups, assignments, submissions', () => {
+  const due = () => Timestamp.fromMillis(Date.now() + 7 * 86_400_000);
+  // Exact client maps (ARCHITECTURE §9.3).
+  const assignmentMap = (owner) => ({
+    title: 'Повторить квадратные уравнения',
+    kind: 'lesson',
+    ref_id: 'math_quadratic_1',
+    due_at: due(),
+    created_by: owner,
+    created_at: serverTimestamp(),
+  });
+  const submissionMap = { done_at: serverTimestamp(), score_percent: 80 };
+
+  beforeEach(async () => {
+    await seed('groups/g1', { name: '11А', owner_uid: 'teacher', join_code: 'ABC234', member_count: 2, created_at: Timestamp.now() });
+    await seed('groups/g1/members/teacher', { uid: 'teacher', display_name: 'Teacher', role: 'owner', joined_at: Timestamp.now() });
+    await seed('groups/g1/members/alice', { uid: 'alice', display_name: 'Aida', role: 'member', joined_at: Timestamp.now() });
+    await seed('groups/g1/assignments/a1', { ...assignmentMap('teacher'), created_at: Timestamp.now() });
+    await seed('groups/g1/assignments/a1/submissions/alice', { done_at: Timestamp.now() });
+  });
+
+  it('members read the group, its members and assignments; outsiders do not', async () => {
+    for (const uid of ['teacher', 'alice']) {
+      const c = db(uid);
+      await assertSucceeds(getDoc(doc(c, 'groups/g1')));
+      await assertSucceeds(getDocs(collection(c, 'groups/g1/members')));
+      await assertSucceeds(getDocs(collection(c, 'groups/g1/assignments')));
+    }
+    const out = db('mallory');
+    await assertFails(getDoc(doc(out, 'groups/g1')));
+    await assertFails(getDocs(collection(out, 'groups/g1/members')));
+    await assertFails(getDoc(doc(out, 'groups/g1/assignments/a1')));
+    await assertFails(getDoc(doc(db('root', { role: 'super_admin' }), 'groups/g1')));
+  });
+
+  it('nobody writes groups or members directly (callables only)', async () => {
+    await assertFails(updateDoc(doc(db('teacher'), 'groups/g1'), { member_count: 99 }));
+    await assertFails(updateDoc(doc(db('teacher'), 'groups/g1'), { name: 'Renamed' }));
+    await assertFails(
+      setDoc(doc(db('mallory'), 'groups/g1/members/mallory'), { uid: 'mallory', display_name: 'M', role: 'member', joined_at: serverTimestamp() }),
+    );
+    await assertFails(setDoc(doc(db('alice'), 'groups/g1/members/alice'), { role: 'owner' }, { merge: true }));
+    await assertFails(deleteDoc(doc(db('teacher'), 'groups/g1/members/alice')));
+    await assertFails(setDoc(doc(db('mallory'), 'groups/g2'), { name: 'x', owner_uid: 'mallory', join_code: 'ZZZ999', member_count: 1 }));
+  });
+
+  it('the owner creates, edits and deletes assignments with the §9 map', async () => {
+    const t = db('teacher');
+    await assertSucceeds(setDoc(doc(t, 'groups/g1/assignments/a2'), assignmentMap('teacher')));
+    await assertSucceeds(
+      setDoc(doc(t, 'groups/g1/assignments/a3'), { ...assignmentMap('teacher'), kind: 'exam_variant', ref_id: 'ort_main_ru_1', due_at: null }),
+    );
+    await assertSucceeds(setDoc(doc(t, 'groups/g1/assignments/a4'), { ...assignmentMap('teacher'), kind: 'practice', ref_id: 'math' }));
+    await assertSucceeds(updateDoc(doc(t, 'groups/g1/assignments/a2'), { title: 'Новый заголовок', due_at: due() }));
+    await assertSucceeds(updateDoc(doc(t, 'groups/g1/assignments/a2'), { description: 'Страницы 1–3', updated_at: serverTimestamp() }));
+    await assertSucceeds(deleteDoc(doc(t, 'groups/g1/assignments/a4')));
+  });
+
+  it('assignments: members, outsiders and malformed maps are rejected', async () => {
+    await assertFails(setDoc(doc(db('alice'), 'groups/g1/assignments/x'), assignmentMap('alice')));
+    await assertFails(setDoc(doc(db('mallory'), 'groups/g1/assignments/x'), assignmentMap('mallory')));
+    await assertFails(deleteDoc(doc(db('alice'), 'groups/g1/assignments/a1')));
+    const t = db('teacher');
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), assignmentMap('someone_else')));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), kind: 'video' }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), title: '' }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), title: 'x'.repeat(121) }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), ref_id: '' }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), due_at: 'next week' }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), points: 10 }));
+    const { created_at: _omit, ...noCreatedAt } = assignmentMap('teacher');
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), noCreatedAt));
+    await assertFails(updateDoc(doc(t, 'groups/g1/assignments/a1'), { created_by: 'alice' }));
+    await assertFails(updateDoc(doc(t, 'groups/g1/assignments/a1'), { created_at: Timestamp.fromMillis(0) }));
+    // A banned owner cannot publish homework.
+    await seed('users/teacher', { ...freeProfile, is_banned: true });
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), assignmentMap('teacher')));
+  });
+
+  it('submissions: a member writes only their own {done_at, score_percent?}', async () => {
+    const a = db('alice');
+    const own = 'groups/g1/assignments/a1/submissions/alice';
+    await assertSucceeds(setDoc(doc(a, own), submissionMap));
+    await assertSucceeds(setDoc(doc(a, own), { done_at: serverTimestamp() }));
+    await assertSucceeds(setDoc(doc(a, own), { done_at: serverTimestamp(), score_percent: 66.7 }));
+    await assertSucceeds(setDoc(doc(a, own), { done_at: serverTimestamp(), score_percent: null }));
+    await assertFails(setDoc(doc(a, 'groups/g1/assignments/a1/submissions/teacher'), submissionMap));
+    await assertFails(setDoc(doc(a, own), { done_at: serverTimestamp(), score_percent: 101 }));
+    await assertFails(setDoc(doc(a, own), { done_at: serverTimestamp(), score_percent: -1 }));
+    await assertFails(setDoc(doc(a, own), { done_at: 'today' }));
+    await assertFails(setDoc(doc(a, own), { ...submissionMap, verified: true }));
+    await assertFails(setDoc(doc(a, 'groups/g1/assignments/missing/submissions/alice'), submissionMap));
+    await assertFails(setDoc(doc(db('mallory'), 'groups/g1/assignments/a1/submissions/mallory'), submissionMap));
+  });
+
+  it('submissions: the owner reads all; a member reads only their own', async () => {
+    await seed('groups/g1/members/bob', { uid: 'bob', display_name: 'Bob', role: 'member', joined_at: Timestamp.now() });
+    await assertSucceeds(getDocs(collection(db('teacher'), 'groups/g1/assignments/a1/submissions')));
+    await assertSucceeds(getDoc(doc(db('alice'), 'groups/g1/assignments/a1/submissions/alice')));
+    await assertFails(getDoc(doc(db('bob'), 'groups/g1/assignments/a1/submissions/alice')));
+    await assertFails(getDocs(collection(db('bob'), 'groups/g1/assignments/a1/submissions')));
+    await assertFails(getDoc(doc(db('mallory'), 'groups/g1/assignments/a1/submissions/alice')));
+    await assertSucceeds(deleteDoc(doc(db('alice'), 'groups/g1/assignments/a1/submissions/alice')));
+  });
+});
