@@ -194,9 +194,15 @@ class ExamResult {
   final int total;
   final double percent;
 
-  /// Optional — only when the server reports them.
+  /// Scored questions answered wrongly / left unanswered (contract D4). Null
+  /// for results written before the server reported them; use
+  /// [incorrectCount] / [skippedCount], which fall back to [answered].
   final int? incorrect;
   final int? skipped;
+
+  /// Questions with any answer (older results only; may include unscored
+  /// questions).
+  final int? answered;
   final List<SectionScore> sections;
   final List<TopicScore> topics;
   final List<String> weakTopics;
@@ -211,6 +217,7 @@ class ExamResult {
     required this.percent,
     this.incorrect,
     this.skipped,
+    this.answered,
     this.sections = const [],
     this.topics = const [],
     this.weakTopics = const [],
@@ -231,6 +238,7 @@ class ExamResult {
           asDouble(m['percent']) ?? (total == 0 ? 0 : correct * 100 / total),
       incorrect: asInt(pick(m, const ['incorrect', 'wrong'])),
       skipped: asInt(pick(m, const ['skipped', 'unanswered'])),
+      answered: asInt(m['answered']),
       sections: asJsonList(m['sections'])
           .map(SectionScore.fromJson)
           .toList(growable: false),
@@ -254,6 +262,7 @@ class ExamResult {
         'percent': percent,
         if (incorrect != null) 'incorrect': incorrect,
         if (skipped != null) 'skipped': skipped,
+        if (answered != null) 'answered': answered,
         'sections': sections.map((s) => s.toJson()).toList(),
         'topics': topics.map((t) => t.toJson()).toList(),
         'weak_topics': weakTopics,
@@ -262,6 +271,27 @@ class ExamResult {
         'leaderboard_eligible': leaderboardEligible,
         'disclaimer_key': disclaimerKey,
       };
+
+  /// Wrong answers: the server's `incorrect`, else (older results) the
+  /// answered questions that were not correct, clamped to the possible range.
+  int? get incorrectCount {
+    final wrongMax = (total - correct).clamp(0, total);
+    if (incorrect != null) return incorrect!.clamp(0, wrongMax);
+    if (skipped != null) return (wrongMax - skipped!).clamp(0, wrongMax);
+    final a = answered;
+    if (a == null) return null;
+    return (a - correct).clamp(0, wrongMax);
+  }
+
+  /// Unanswered questions: the server's `skipped`, else (older results)
+  /// `total - correct - answeredWrong`.
+  int? get skippedCount {
+    final wrongMax = (total - correct).clamp(0, total);
+    if (skipped != null) return skipped!.clamp(0, wrongMax);
+    final wrong = incorrectCount;
+    if (wrong == null) return null;
+    return (total - correct - wrong).clamp(0, wrongMax);
+  }
 
   TopicScore? topic(String id) {
     for (final t in topics) {
@@ -304,8 +334,17 @@ class ReviewItem {
   final String? correct;
   final String explanation;
   final String? topicId;
+
+  /// Part of the section the question belongs to (when the server says).
+  final String? partId;
+
+  /// Image reference (https URL or Storage path), resolved when shown.
   final String? imageUrl;
   final QuestionTable? table;
+
+  /// Quantitative-comparison quantities (examGetReview `columnA`/`columnB`).
+  final String? columnA;
+  final String? columnB;
   final bool? flagged;
 
   const ReviewItem({
@@ -318,10 +357,16 @@ class ReviewItem {
     required this.explanation,
     this.passage,
     this.topicId,
+    this.partId,
     this.imageUrl,
     this.table,
+    this.columnA,
+    this.columnB,
     this.flagged,
   });
+
+  bool get hasComparisonColumns =>
+      (columnA?.trim().isNotEmpty ?? false) || (columnB?.trim().isNotEmpty ?? false);
 
   bool get isSkipped => userAnswer == null || userAnswer!.isEmpty;
   bool get isCorrect => !isSkipped && userAnswer == correct;
@@ -332,6 +377,7 @@ class ReviewItem {
     final options = asJsonList(m['options']);
     final p = m['passage'];
     final qid = asString(pick(m, const ['questionId', 'question_id', 'id'])) ?? '';
+    final (columnA, columnB) = examComparisonColumns(m);
     return ReviewItem(
       questionId: qid,
       sectionId: asString(pick(m, const ['sectionId', 'section_id'])) ?? '',
@@ -348,8 +394,11 @@ class ReviewItem {
       correct: asString(pick(m, const ['correct', 'correctAnswer'])),
       explanation: asString(m['explanation']) ?? '',
       topicId: asString(pick(m, const ['topicId', 'topic_id'])),
-      imageUrl: asString(pick(m, const ['imageUrl', 'image_url'])),
+      partId: asString(pick(m, const ['partId', 'part_id'])),
+      imageUrl: examImageReference(m),
       table: QuestionTable.fromJson(m['table']),
+      columnA: columnA,
+      columnB: columnB,
       flagged: m['flagged'] is bool ? m['flagged'] as bool : null,
     );
   }

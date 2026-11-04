@@ -1,5 +1,10 @@
 import '../../../core/backend/backend_contract.dart';
 
+/// `details.reason` of a banned account (contract D5). Mirrors
+/// `BackendReasons.userBanned`; kept here as a literal so this feature does
+/// not depend on when that constant lands.
+const String examReasonUserBanned = 'USER_BANNED';
+
 /// Typed failure of an exam backend call, mapped from
 /// `HttpsError.details.reason` ([BackendReasons]) or the transport error.
 enum ExamFailureKind {
@@ -10,6 +15,13 @@ enum ExamFailureKind {
   wrongSection,
   validationFailed,
   unauthenticated,
+
+  /// The account is banned by a moderator (`USER_BANNED`). Not retryable.
+  userBanned,
+
+  /// Exam callables need App Check, which has no provider on this platform
+  /// (Windows / Linux desktop builds, contract D7). Not retryable.
+  platformUnsupported,
 
   /// No connection / timeout / backend unavailable — safe to retry.
   network,
@@ -23,6 +35,7 @@ enum ExamFailureKind {
           ExamFailureKind.attemptNotInProgress,
         BackendReasons.wrongSection => ExamFailureKind.wrongSection,
         BackendReasons.validationFailed => ExamFailureKind.validationFailed,
+        examReasonUserBanned => ExamFailureKind.userBanned,
         _ => ExamFailureKind.unknown,
       };
 
@@ -40,6 +53,10 @@ enum ExamFailureKind {
       };
 
   bool get isRetryable => this == network || this == unknown;
+
+  /// The user cannot fix this by trying again (a retry button would only
+  /// repeat the same answer).
+  bool get isTerminal => this == userBanned || this == platformUnsupported;
 }
 
 class ExamFailure implements Exception {

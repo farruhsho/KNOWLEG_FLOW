@@ -2069,11 +2069,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get examErrorAttemptNotFound => 'Попытка не найдена.';
 
   @override
+  String get examErrorBanned =>
+      'Ваш аккаунт заблокирован модератором, поэтому тесты недоступны. Если это ошибка, напишите в поддержку.';
+
+  @override
   String get examErrorGeneric => 'Что-то пошло не так. Попробуйте ещё раз.';
 
   @override
   String get examErrorNetwork =>
       'Нет соединения. Проверьте интернет и повторите.';
+
+  @override
+  String get examErrorPlatformUnsupported =>
+      'На этом устройстве пробные тесты недоступны. Откройте приложение на телефоне (Android или iPhone) или в браузере.';
 
   @override
   String get examErrorSignIn => 'Войдите в аккаунт, чтобы проходить экзамены.';
@@ -2214,6 +2222,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get examNextSectionTitle => 'Следующий раздел';
 
   @override
+  String get examNoCreditsAvailable => 'Нет доступных кредитов';
+
+  @override
   String get examNoQuestions =>
       'В этом разделе нет вопросов. Напишите в поддержку.';
 
@@ -2261,6 +2272,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get examPassage => 'Текст';
+
+  @override
+  String get examPlatformUnsupportedShort => 'Недоступно на этом устройстве';
 
   @override
   String get examPassageHide => 'Скрыть текст';

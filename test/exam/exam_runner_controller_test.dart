@@ -145,6 +145,55 @@ void main() {
     expect(c.state.session!.phase, ExamPhase.sectionIntro);
   });
 
+  test('draft write failure (EXAM-01): reported once, retried, Hive copy untouched',
+      () async {
+    final flaky = FlakyDraftSink(failTimes: 2);
+    final reports = <String>[];
+    store = MemoryExamStore();
+    c = ExamRunnerController(
+      attemptId: 'att1',
+      remote: remote,
+      store: store,
+      drafts: flaky,
+      clock: () => now,
+      uid: 'u1',
+      reportError: (e, s, reason) => reports.add(reason),
+      tickInterval: const Duration(hours: 1),
+      draftInterval: const Duration(hours: 1),
+      retryInterval: Duration.zero,
+      autoLoad: false,
+    );
+    await c.load();
+    c.selectAnswer('q1', 'A');
+    await c.pendingWrites;
+
+    c.flushDraft();
+    await Future<void>.delayed(Duration.zero);
+    expect(flaky.calls, 1);
+    expect(reports, ['exam_draft_write'], reason: 'not swallowed silently');
+    expect(c.draftFailures, 1);
+    expect(store.saved!.answerOf('q1'), 'A', reason: 'local copy is authoritative');
+    expect(c.state.session!.answerOf('q1'), 'A');
+
+    // Still dirty after the failure: the next interval retries without a
+    // new edit, and a repeated failure of the same section is not
+    // re-reported.
+    c.flushDraft();
+    await Future<void>.delayed(Duration.zero);
+    expect(flaky.calls, 2);
+    expect(reports, hasLength(1));
+
+    c.flushDraft();
+    await Future<void>.delayed(Duration.zero);
+    expect(flaky.calls, 3);
+    expect(flaky.written.single, {'q1': 'A'});
+
+    // Saved: nothing new to send.
+    c.flushDraft();
+    await Future<void>.delayed(Duration.zero);
+    expect(flaky.calls, 3);
+  });
+
   test('last section completes the attempt with the server result', () async {
     c = build();
     remote.onGetState = () => nextPayload(deviceNow: now);

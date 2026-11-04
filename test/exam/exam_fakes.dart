@@ -32,10 +32,16 @@ class FakeExamRemote implements ExamRemoteDataSource {
     return f(submission);
   }
 
+  /// Replaces the default [startPayload] answer of `examStart` (may throw).
+  ExamSessionPayload Function()? onStart;
+  int startCalls = 0;
+
   @override
   Future<ExamSessionPayload> start(
-          {required String variantId, required String clientAppVersion}) async =>
-      startPayload();
+      {required String variantId, required String clientAppVersion}) async {
+    startCalls++;
+    return (onStart ?? startPayload)();
+  }
 
   @override
   Future<List<ReviewItem>> getReview(String attemptId) async => const [];
@@ -76,6 +82,30 @@ class MemoryExamStore implements ExamLocalStore {
 
   @override
   Future<void> remove(String attemptId) async => saved = null;
+}
+
+/// Draft sink whose first [failTimes] writes fail (e.g. PERMISSION_DENIED).
+class FlakyDraftSink implements ExamDraftSink {
+  int failTimes;
+  int calls = 0;
+  final written = <Map<String, String>>[];
+
+  FlakyDraftSink({this.failTimes = 1});
+
+  @override
+  Future<void> writeDraft({
+    required String attemptId,
+    required String sectionId,
+    required Map<String, String> answers,
+    required List<String> flags,
+  }) async {
+    calls++;
+    if (failTimes > 0) {
+      failTimes--;
+      throw StateError('permission-denied');
+    }
+    written.add(Map.of(answers));
+  }
 }
 
 class RecordingDraftSink implements ExamDraftSink {

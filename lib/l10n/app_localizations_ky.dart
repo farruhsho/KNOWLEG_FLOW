@@ -2063,12 +2063,20 @@ class AppLocalizationsKy extends AppLocalizations {
   String get examErrorAttemptNotFound => 'Бул аракет табылган жок.';
 
   @override
+  String get examErrorBanned =>
+      'Аккаунтуңуз модератор тарабынан бөгөттөлгөн, ошондуктан тесттер жеткиликсиз. Эгер бул ката болсо, колдоо кызматына жазыңыз.';
+
+  @override
   String get examErrorGeneric =>
       'Бир нерсе туура эмес болду. Кайра аракет кылып көрүңүз.';
 
   @override
   String get examErrorNetwork =>
       'Байланыш жок. Интернетти текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String get examErrorPlatformUnsupported =>
+      'Бул түзмөктө сынамык тесттер жеткиликсиз. Колдонмону телефондон (Android же iPhone) же браузерден ачыңыз.';
 
   @override
   String get examErrorSignIn => 'Экзамен тапшыруу үчүн аккаунтуңузга кириңиз.';
@@ -2209,6 +2217,9 @@ class AppLocalizationsKy extends AppLocalizations {
   String get examNextSectionTitle => 'Кийинки бөлүм';
 
   @override
+  String get examNoCreditsAvailable => 'Жеткиликтүү кредит жок';
+
+  @override
   String get examNoQuestions =>
       'Бул бөлүмдө суроолор жок. Колдоо кызматына жазыңыз.';
 
@@ -2257,6 +2268,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get examPassage => 'Текст';
+
+  @override
+  String get examPlatformUnsupportedShort => 'Бул түзмөктө жеткиликсиз';
 
   @override
   String get examPassageHide => 'Текстти жашыруу';

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/firebase_service.dart';
 import '../../../../providers/locale_provider.dart';
 import '../../data/exam_catalog_repository.dart';
 import '../../data/exam_draft_sink.dart';
@@ -30,8 +31,14 @@ final examAuthUidProvider = StreamProvider<String?>((ref) =>
 final examUidProvider =
     Provider<String?>((ref) => ref.watch(examAuthUidProvider).valueOrNull);
 
-final examRemoteProvider = Provider<ExamRemoteDataSource>(
-    (ref) => const FirebaseExamRemoteDataSource());
+/// Whether exam callables work on this platform (false on Windows/Linux:
+/// no App Check provider, contract D7). Overridden in tests.
+final examCallablesSupportedProvider =
+    Provider<bool>((ref) => examCallablesSupported());
+
+final examRemoteProvider = Provider<ExamRemoteDataSource>((ref) =>
+    FirebaseExamRemoteDataSource(
+        platformSupported: ref.watch(examCallablesSupportedProvider)));
 
 final examCatalogRepositoryProvider = Provider<ExamCatalogRepository>(
     (ref) => FirestoreExamCatalogRepository(FirebaseFirestore.instance, rootBundle));
@@ -40,6 +47,13 @@ final examLocalStoreProvider = Provider<ExamLocalStore>((ref) => ExamLocalStore(
 
 final examDraftSinkProvider = Provider<ExamDraftSink>(
     (ref) => FirestoreExamDraftSink(FirebaseFirestore.instance));
+
+/// Non-fatal errors of the runner (draft autosave failures) go to crash
+/// reporting; overridden in tests.
+final examErrorReporterProvider = Provider<ExamErrorReporter>(
+  (ref) => (error, stack, reason) =>
+      FirebaseService.recordNonFatal(error, stack, reason: reason),
+);
 
 // ---------------------------------------------------------------- catalog
 
@@ -238,6 +252,7 @@ final examRunnerControllerProvider = StateNotifierProvider.autoDispose
     drafts: ref.watch(examDraftSinkProvider),
     clock: ref.watch(examClockProvider),
     uid: ref.read(examUidProvider),
+    reportError: ref.watch(examErrorReporterProvider),
   );
 });
 
@@ -262,9 +277,12 @@ class ExamResultData {
     required this.localRecords,
   });
 
-  /// Number of unanswered questions, when known.
+  /// Number of unanswered questions, when known: from the server result
+  /// (`skipped`, or derived from `answered` on older results), else from
+  /// this device's section records.
   int? get skipped {
-    if (result.skipped != null) return result.skipped;
+    final server = result.skippedCount;
+    if (server != null) return server;
     if (localRecords.isEmpty) return null;
     final answered = localRecords.values.fold<int>(0, (s, r) => s + r.answered);
     final total = localRecords.values.fold<int>(0, (s, r) => s + r.total);
@@ -273,7 +291,8 @@ class ExamResultData {
   }
 
   int? get incorrect {
-    if (result.incorrect != null) return result.incorrect;
+    final server = result.incorrectCount;
+    if (server != null) return server;
     final s = skipped;
     if (s == null) return null;
     return (result.total - result.correct - s).clamp(0, result.total);

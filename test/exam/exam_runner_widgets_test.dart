@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:knowledge_flow/core/design/tokens.dart';
+import 'package:knowledge_flow/features/exam/domain/exam_failure.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_payload.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_session.dart';
 import 'package:knowledge_flow/features/exam/presentation/pages/exam_runner_page.dart';
@@ -193,6 +195,65 @@ void main() {
       await tester.pump();
       await tester.pump();
       expect(find.text('Вопрос 1 из 3'), findsOneWidget);
+    });
+
+    testWidgets('back press on the load-failure screen just leaves (UX-08)',
+        (tester) async {
+      _phone(tester);
+      remote.onGetState = null; // offline, no local copy: load fails
+      final router = GoRouter(routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, _) => Scaffold(
+            body: TextButton(
+              onPressed: () => context.push('/run'),
+              child: const Text('HOME'),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/run',
+          builder: (_, __) => const ExamRunnerPage(attemptId: 'att1'),
+        ),
+      ]);
+      await tester.pumpWidget(ProviderScope(
+        overrides: overrides(),
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('ru'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: ThemeData(extensions: [AppTokens.light]),
+        ),
+      ));
+      await tester.tap(find.text('HOME'));
+      await tester.pumpAndSettle();
+      expect(find.text('Повторить'), findsOneWidget, reason: 'load failed');
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Выйти из теста?'), findsNothing,
+          reason: 'no "timer keeps running" dialog for an attempt that never loaded');
+      expect(find.text('HOME'), findsOneWidget);
+    });
+
+    testWidgets('platform without App Check: clear message, no retry (D7)',
+        (tester) async {
+      _phone(tester);
+      remote.onGetState = () =>
+          throw const ExamFailure(ExamFailureKind.platformUnsupported);
+      await tester.pumpWidget(
+          _app(const ExamRunnerPage(attemptId: 'att1'), overrides: overrides()));
+      await tester.pump();
+      await tester.pump();
+      expect(find.textContaining('На этом устройстве пробные тесты недоступны'),
+          findsOneWidget);
+      expect(find.text('Повторить'), findsNothing);
     });
 
     testWidgets('back press asks before leaving', (tester) async {

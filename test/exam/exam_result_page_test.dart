@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:knowledge_flow/core/content/topic_names.dart';
 import 'package:knowledge_flow/core/design/tokens.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_blueprint.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_payload.dart';
@@ -19,10 +20,12 @@ ExamBlueprint _blueprint(String id) {
   return ExamBlueprint.listFromJson(jsonDecode(raw)).firstWhere((b) => b.id == id);
 }
 
-Widget _app(ExamResultData data, {Brightness brightness = Brightness.light}) {
+Widget _app(ExamResultData data,
+    {Brightness brightness = Brightness.light, List<Override> extra = const []}) {
   return ProviderScope(
     overrides: [
       examResultProvider.overrideWith((ref, attemptId) async => data),
+      ...extra,
     ],
     child: MaterialApp(
       locale: const Locale('ru'),
@@ -76,6 +79,58 @@ void main() {
         reason: 'plain-language recommendation for the weak topic');
     // State-language level explanation is only for state_language blueprints.
     expect(find.text('Как выдаётся официальный результат'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('topic names, not slugs (UX-02); wrong/skipped off-device (EXAM-05)',
+      (tester) async {
+    _phone(tester);
+    final names = TopicNames.fromJson(
+        jsonDecode(File('assets/data/topic_names.json').readAsStringSync())
+            as Map<String, dynamic>);
+    final data = ExamResultData(
+      attemptId: 'att1',
+      // An older server result opened on another device: no local records,
+      // no incorrect/skipped fields, only `answered`.
+      result: ExamResult.fromJson({
+        'correct': 3,
+        'total': 6,
+        'percent': 50.0,
+        'answered': 5,
+        'sections': [
+          {'section_id': 'math', 'correct': 2, 'total': 3, 'percent': 66.7},
+          {'section_id': 'verbal', 'correct': 1, 'total': 3, 'percent': 33.3},
+        ],
+        'topics': [
+          {'topic_id': 'math.arithmetic', 'correct': 0, 'total': 3},
+          {'topic_id': 'reading.main_idea', 'correct': 3, 'total': 3},
+        ],
+        'weak_topics': ['math.arithmetic'],
+        'strong_topics': ['reading.main_idea'],
+      }),
+      blueprint: null,
+      attempt: null,
+      localRecords: const {},
+    );
+    await tester.pumpWidget(_app(data, extra: [
+      topicNamesProvider.overrideWith((ref) async => names),
+    ]));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Неверно'), findsOneWidget);
+    expect(find.text('Пропущено'), findsOneWidget);
+    expect(find.text('2'), findsWidgets, reason: '5 answered - 3 correct = 2 wrong');
+    expect(find.text('Неверно или пропущено'), findsNothing);
+
+    final scrollable = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(find.textContaining('Повтори «'), 200,
+        scrollable: scrollable);
+    expect(find.textContaining('Повтори «Арифметика»'), findsOneWidget);
+    expect(find.textContaining('arithmetic'), findsNothing);
+    expect(find.textContaining('main_idea'), findsNothing);
+    // Section titles without a blueprint come from the catalog too.
+    expect(find.textContaining('verbal'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

@@ -2,36 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../domain/exam_blueprint.dart';
 import '../../domain/exam_payload.dart';
+import '../../domain/localized_text.dart';
 import '../providers/exam_providers.dart';
 import '../widgets/exam_common.dart';
+import '../widgets/exam_labels.dart';
 
-/// Human label for a topic id. Prefers a title the server sent; otherwise
-/// maps the id prefix to the blueprint's section / part title.
-String examTopicLabel(String topicId, ExamResult result, ExamBlueprint? bp, String lang) {
-  final t = result.topic(topicId);
-  if (t != null && !t.title.isEmpty) return t.title.resolve(lang);
-  final segments = topicId.split('.');
-  String? area;
-  if (bp != null) {
-    for (final s in bp.sections) {
-      if (s.id == segments.first || s.subjectArea == segments.first) {
-        area = s.title.resolve(lang);
-      }
-      for (final p in s.parts) {
-        if (p.id == segments.first) area = p.title.resolve(lang);
-      }
-    }
-  }
-  final rest = segments.length > 1
-      ? segments.sublist(1).join(' · ').replaceAll('_', ' ')
-      : '';
-  if (area == null) return topicId.replaceAll('_', ' ');
-  return rest.isEmpty ? area : '$area · $rest';
-}
+/// Human label for a topic id of [result]: the title the server sent, else
+/// the curriculum catalog name ([TopicNames]), else the blueprint section /
+/// part — never the raw slug.
+String examTopicLabel(
+  String topicId,
+  ExamResult result,
+  ExamBlueprint? bp,
+  String lang, {
+  TopicNames names = TopicNames.empty,
+}) =>
+    examTopicName(
+      topicId,
+      names: names,
+      lang: lang,
+      blueprint: bp,
+      serverTitle: result.topic(topicId)?.title ?? LocalizedText.empty,
+    );
 
 /// Result of a completed attempt (RoutePaths.examResult). Shows only the
 /// server-computed raw result and percentage, never an "ORT score".
@@ -52,6 +49,7 @@ class ExamResultPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
     final async = ref.watch(examResultProvider(attemptId));
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
     return Scaffold(
       appBar: AppBar(
         title: Text(l.examResultTitle),
@@ -75,7 +73,11 @@ class ExamResultPage extends ConsumerWidget {
                 error: e,
                 onRetry: () => ref.invalidate(examResultProvider(attemptId)),
               ),
-        data: (data) => _ResultBody(data: data, onToExams: () => _toExams(context)),
+        data: (data) => _ResultBody(
+          data: data,
+          names: names,
+          onToExams: () => _toExams(context),
+        ),
       ),
     );
   }
@@ -83,9 +85,14 @@ class ExamResultPage extends ConsumerWidget {
 
 class _ResultBody extends StatelessWidget {
   final ExamResultData data;
+  final TopicNames names;
   final VoidCallback onToExams;
 
-  const _ResultBody({required this.data, required this.onToExams});
+  const _ResultBody({
+    required this.data,
+    required this.names,
+    required this.onToExams,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +102,7 @@ class _ResultBody extends StatelessWidget {
     final scheme = theme.colorScheme;
     final r = data.result;
     final bp = data.blueprint;
+    final blueprintId = bp?.id ?? data.attempt?.blueprintId ?? '';
     final ui = context.uiLang;
     final gutter = AppSpacing.gutter(context);
     final percent = formatExamPercent(r.percent, ui);
@@ -109,8 +117,10 @@ class _ResultBody extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.huge),
       children: [
-        if (bp != null)
-          Text(bp.title.resolve(ui),
+        if (blueprintId.isNotEmpty)
+          Text(
+              examBlueprintName(blueprintId,
+                  l: l, names: names, lang: ui, blueprint: bp),
               style: theme.textTheme.titleMedium?.copyWith(color: tokens.textSecondary)),
         const SizedBox(height: AppSpacing.sm),
         ExamCard(
@@ -203,7 +213,8 @@ class _ResultBody extends StatelessWidget {
               children: [
                 for (final s in r.sections)
                   _SectionBar(
-                    title: bp?.sectionById(s.sectionId)?.title.resolve(ui) ?? s.sectionId,
+                    title: examSectionName(s.sectionId,
+                        names: names, lang: ui, blueprint: bp),
                     score: s,
                   ),
               ],
@@ -220,7 +231,7 @@ class _ResultBody extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: _TopicCard(
-                label: examTopicLabel(t, r, bp, ui),
+                label: examTopicLabel(t, r, bp, ui, names: names),
                 score: r.topic(t),
               ),
             ),
@@ -234,7 +245,7 @@ class _ResultBody extends StatelessWidget {
             children: [
               for (final t in r.strongTopics.take(8))
                 ExamPill(
-                  label: examTopicLabel(t, r, bp, ui),
+                  label: examTopicLabel(t, r, bp, ui, names: names),
                   background: tokens.successContainer,
                   foreground: tokens.success,
                   icon: Icons.star_rounded,

@@ -1233,6 +1233,10 @@
   "@examErrorAttemptNotFound": {
     "description": "Exam mode"
   },
+  "examErrorBanned": "Your account has been blocked by a moderator, so tests are not available. If you think this is a mistake, contact support.",
+  "@examErrorBanned": {
+    "description": "Exam mode: the backend rejected the request with USER_BANNED"
+  },
   "examErrorGeneric": "Something went wrong. Please try again.",
   "@examErrorGeneric": {
     "description": "Exam mode"
@@ -1240,6 +1244,10 @@
   "examErrorNetwork": "No connection. Check the internet and try again.",
   "@examErrorNetwork": {
     "description": "Exam mode"
+  },
+  "examErrorPlatformUnsupported": "Practice tests are not available on this device. Open the app on your phone (Android or iPhone) or in a web browser.",
+  "@examErrorPlatformUnsupported": {
+    "description": "Exam mode: desktop builds (Windows/Linux) cannot call the exam functions"
   },
   "examErrorSignIn": "Sign in to take exams.",
   "@examErrorSignIn": {
@@ -1442,6 +1450,10 @@
   "@examNextSectionTitle": {
     "description": "Exam mode"
   },
+  "examNoCreditsAvailable": "No credits available",
+  "@examNoCreditsAvailable": {
+    "description": "Exam intro: disabled start button when there are no credits and the build does not sell in the app (neutral, no purchase wording)"
+  },
   "examNoQuestions": "This section has no questions. Please contact support.",
   "@examNoQuestions": {
     "description": "Exam mode"
@@ -1507,6 +1519,10 @@
   "examPassage": "Text",
   "@examPassage": {
     "description": "Exam mode"
+  },
+  "examPlatformUnsupportedShort": "Not available on this device",
+  "@examPlatformUnsupportedShort": {
+    "description": "Exam intro: disabled start button on Windows/Linux desktop builds"
   },
   "examPassageHide": "Hide text",
   "@examPassageHide": {

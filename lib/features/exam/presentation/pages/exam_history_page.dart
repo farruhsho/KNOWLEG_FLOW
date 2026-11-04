@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../domain/exam_attempt.dart';
 import '../../domain/exam_blueprint.dart';
 import '../providers/exam_providers.dart';
 import '../widgets/exam_common.dart';
+import '../widgets/exam_labels.dart';
 
 /// Completed attempts, newest first, with best / last per direction
 /// (RoutePaths.examHistory).
@@ -20,6 +22,7 @@ class ExamHistoryPage extends ConsumerWidget {
     final state = ref.watch(examHistoryProvider);
     final blueprints = ref.watch(examBlueprintsProvider).valueOrNull ?? const [];
     final byId = {for (final b in blueprints) b.id: b};
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
     final Widget body;
     if (state.isInitialLoading) {
       body = const ExamLoadingView();
@@ -41,10 +44,16 @@ class ExamHistoryPage extends ConsumerWidget {
           padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.huge),
           itemCount: 1 + state.items.length + extra,
           itemBuilder: (context, i) {
-            if (i == 0) return _TrendSummary(trends: trends, blueprints: byId);
+            if (i == 0) {
+              return _TrendSummary(trends: trends, blueprints: byId, names: names);
+            }
             final idx = i - 1;
             if (idx < state.items.length) {
-              return _AttemptRow(attempt: state.items[idx], blueprint: byId[state.items[idx].blueprintId]);
+              return _AttemptRow(
+                attempt: state.items[idx],
+                blueprint: byId[state.items[idx].blueprintId],
+                names: names,
+              );
             }
             if (state.failure != null) {
               return TextButton.icon(
@@ -78,8 +87,13 @@ class ExamHistoryPage extends ConsumerWidget {
 class _TrendSummary extends StatelessWidget {
   final List<BlueprintTrend> trends;
   final Map<String, ExamBlueprint> blueprints;
+  final TopicNames names;
 
-  const _TrendSummary({required this.trends, required this.blueprints});
+  const _TrendSummary({
+    required this.trends,
+    required this.blueprints,
+    required this.names,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +113,12 @@ class _TrendSummary extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(blueprints[t.blueprintId]?.title.resolve(ui) ?? t.blueprintId,
+                    Text(
+                        examBlueprintName(t.blueprintId,
+                            l: l,
+                            names: names,
+                            lang: ui,
+                            blueprint: blueprints[t.blueprintId]),
                         style: theme.textTheme.titleSmall),
                     const SizedBox(height: AppSpacing.xs),
                     Wrap(
@@ -163,8 +182,13 @@ class _Trend extends StatelessWidget {
 class _AttemptRow extends StatelessWidget {
   final AttemptSummary attempt;
   final ExamBlueprint? blueprint;
+  final TopicNames names;
 
-  const _AttemptRow({required this.attempt, required this.blueprint});
+  const _AttemptRow({
+    required this.attempt,
+    required this.blueprint,
+    required this.names,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +206,12 @@ class _AttemptRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(blueprint?.title.resolve(ui) ?? attempt.blueprintId,
+                  Text(
+                      examBlueprintName(attempt.blueprintId,
+                          l: context.l10n,
+                          names: names,
+                          lang: ui,
+                          blueprint: blueprint),
                       style: theme.textTheme.titleSmall),
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
