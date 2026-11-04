@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_russian_lit_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "russian_lit",
+          "order": 1,
+          "subject_id": "russian_lit",
+          "duration_minutes": 60,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_russian_lit_2026/russian_lit/russian_language",
+              "section_id": "russian_lit",
+              "part_id": "russian_language",
+              "item_type": "single_choice",
+              "question_count": 20,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 6,
+                "2": 10,
+                "3": 4
+              },
+              "passage_plan": {
+                "standalone_texts": 1,
+                "paired_texts": 0,
+                "questions_per_text": 5,
+                "passage_topics": [
+                  "russian.text_work"
+                ],
+                "words": [
+                  200,
+                  400
+                ]
+              },
+              "topics": [
+                {
+                  "topic_id": "russian.phonetics",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Фонетика и орфоэпия",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian.lexicology",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Лексика и фразеология",
+                  "grades": [
+                    5,
+                    7
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian.morphology",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Морфология",
+                  "grades": [
+                    5,
+                    7
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian.syntax",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Синтаксис",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian.orthography",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Орфография",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian.punctuation",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Пунктуация",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian.text_work",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Работа с текстом",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            },
+            {
+              "slot": "ort_subject_russian_lit_2026/russian_lit/russian_literature",
+              "section_id": "russian_lit",
+              "part_id": "russian_literature",
+              "item_type": "single_choice",
+              "question_count": 20,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 6,
+                "2": 10,
+                "3": 4
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "russian_lit.old_and_18th_century",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Древнерусская литература и литература XVIII века",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian_lit.century_19",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Литература XIX века",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian_lit.century_20",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Литература XX века",
+                  "grades": [
+                    11,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "russian_lit.theory",
+                  "subject_id": "russian_lit",
+                  "title_ru": "Теория литературы",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

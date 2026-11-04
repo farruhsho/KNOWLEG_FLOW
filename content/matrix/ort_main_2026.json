@@ -1,0 +1,2481 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_main_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "math",
+          "order": 1,
+          "subject_id": "math",
+          "duration_minutes": 90,
+          "question_count": 60,
+          "parts": [
+            {
+              "slot": "ort_main_2026/math/math_comparison",
+              "section_id": "math",
+              "part_id": "math_comparison",
+              "item_type": "quantitative_comparison",
+              "question_count": 30,
+              "options_per_question": 4,
+              "fixed_options": true,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "math.arithmetic",
+                  "subject_id": "math",
+                  "title_ru": "Арифметика",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.arithmetic.order_of_operations",
+                    "math.arithmetic.divisibility",
+                    "math.arithmetic.gcd_lcm",
+                    "math.arithmetic.powers_roots",
+                    "math.arithmetic.estimation"
+                  ]
+                },
+                {
+                  "topic_id": "math.fractions_percents",
+                  "subject_id": "math",
+                  "title_ru": "Дроби и проценты",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.fractions_percents.common_fractions",
+                    "math.fractions_percents.decimals",
+                    "math.fractions_percents.percent_of_number",
+                    "math.fractions_percents.percent_change"
+                  ]
+                },
+                {
+                  "topic_id": "math.ratios_proportions",
+                  "subject_id": "math",
+                  "title_ru": "Отношения и пропорции",
+                  "grades": [
+                    6,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.ratios_proportions.ratio",
+                    "math.ratios_proportions.direct_inverse",
+                    "math.ratios_proportions.scale"
+                  ]
+                },
+                {
+                  "topic_id": "math.algebraic_expressions",
+                  "subject_id": "math",
+                  "title_ru": "Алгебраические выражения",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.algebraic_expressions.polynomials",
+                    "math.algebraic_expressions.short_multiplication",
+                    "math.algebraic_expressions.factoring",
+                    "math.algebraic_expressions.algebraic_fractions",
+                    "math.algebraic_expressions.expressions_with_variables"
+                  ]
+                },
+                {
+                  "topic_id": "math.equations_systems",
+                  "subject_id": "math",
+                  "title_ru": "Уравнения и системы уравнений",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.equations_systems.linear",
+                    "math.equations_systems.quadratic_vieta",
+                    "math.equations_systems.systems",
+                    "math.equations_systems.rational_irrational"
+                  ]
+                },
+                {
+                  "topic_id": "math.inequalities",
+                  "subject_id": "math",
+                  "title_ru": "Неравенства",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.inequalities.linear",
+                    "math.inequalities.quadratic",
+                    "math.inequalities.systems",
+                    "math.inequalities.absolute_value"
+                  ]
+                },
+                {
+                  "topic_id": "math.functions_graphs",
+                  "subject_id": "math",
+                  "title_ru": "Функции и графики",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.functions_graphs.linear",
+                    "math.functions_graphs.quadratic",
+                    "math.functions_graphs.inverse_proportion",
+                    "math.functions_graphs.reading_graphs"
+                  ]
+                },
+                {
+                  "topic_id": "math.sequences",
+                  "subject_id": "math",
+                  "title_ru": "Последовательности и прогрессии",
+                  "grades": [
+                    9,
+                    9
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.sequences.arithmetic",
+                    "math.sequences.geometric",
+                    "math.sequences.patterns"
+                  ]
+                },
+                {
+                  "topic_id": "math.plane_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Планиметрия",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.plane_geometry.angles_parallel",
+                    "math.plane_geometry.triangles",
+                    "math.plane_geometry.quadrilaterals",
+                    "math.plane_geometry.circle",
+                    "math.plane_geometry.areas",
+                    "math.plane_geometry.similarity"
+                  ]
+                },
+                {
+                  "topic_id": "math.solid_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Стереометрия",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.solid_geometry.cuboid",
+                    "math.solid_geometry.prism_pyramid",
+                    "math.solid_geometry.solids_of_revolution",
+                    "math.solid_geometry.volume_surface"
+                  ]
+                },
+                {
+                  "topic_id": "math.data_probability",
+                  "subject_id": "math",
+                  "title_ru": "Данные и вероятность",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.data_probability.charts_tables",
+                    "math.data_probability.averages",
+                    "math.data_probability.probability",
+                    "math.data_probability.combinatorics"
+                  ]
+                }
+              ]
+            },
+            {
+              "slot": "ort_main_2026/math/math_problems",
+              "section_id": "math",
+              "part_id": "math_problems",
+              "item_type": "single_choice",
+              "question_count": 30,
+              "options_per_question": 5,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "math.arithmetic",
+                  "subject_id": "math",
+                  "title_ru": "Арифметика",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.arithmetic.order_of_operations",
+                    "math.arithmetic.divisibility",
+                    "math.arithmetic.gcd_lcm",
+                    "math.arithmetic.powers_roots",
+                    "math.arithmetic.estimation"
+                  ]
+                },
+                {
+                  "topic_id": "math.fractions_percents",
+                  "subject_id": "math",
+                  "title_ru": "Дроби и проценты",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.fractions_percents.common_fractions",
+                    "math.fractions_percents.decimals",
+                    "math.fractions_percents.percent_of_number",
+                    "math.fractions_percents.percent_change"
+                  ]
+                },
+                {
+                  "topic_id": "math.ratios_proportions",
+                  "subject_id": "math",
+                  "title_ru": "Отношения и пропорции",
+                  "grades": [
+                    6,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.ratios_proportions.ratio",
+                    "math.ratios_proportions.direct_inverse",
+                    "math.ratios_proportions.scale"
+                  ]
+                },
+                {
+                  "topic_id": "math.algebraic_expressions",
+                  "subject_id": "math",
+                  "title_ru": "Алгебраические выражения",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.algebraic_expressions.polynomials",
+                    "math.algebraic_expressions.short_multiplication",
+                    "math.algebraic_expressions.factoring",
+                    "math.algebraic_expressions.algebraic_fractions",
+                    "math.algebraic_expressions.expressions_with_variables"
+                  ]
+                },
+                {
+                  "topic_id": "math.equations_systems",
+                  "subject_id": "math",
+                  "title_ru": "Уравнения и системы уравнений",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.equations_systems.linear",
+                    "math.equations_systems.quadratic_vieta",
+                    "math.equations_systems.systems",
+                    "math.equations_systems.rational_irrational"
+                  ]
+                },
+                {
+                  "topic_id": "math.inequalities",
+                  "subject_id": "math",
+                  "title_ru": "Неравенства",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.inequalities.linear",
+                    "math.inequalities.quadratic",
+                    "math.inequalities.systems",
+                    "math.inequalities.absolute_value"
+                  ]
+                },
+                {
+                  "topic_id": "math.functions_graphs",
+                  "subject_id": "math",
+                  "title_ru": "Функции и графики",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.functions_graphs.linear",
+                    "math.functions_graphs.quadratic",
+                    "math.functions_graphs.inverse_proportion",
+                    "math.functions_graphs.reading_graphs"
+                  ]
+                },
+                {
+                  "topic_id": "math.sequences",
+                  "subject_id": "math",
+                  "title_ru": "Последовательности и прогрессии",
+                  "grades": [
+                    9,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.sequences.arithmetic",
+                    "math.sequences.geometric",
+                    "math.sequences.patterns"
+                  ]
+                },
+                {
+                  "topic_id": "math.plane_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Планиметрия",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.plane_geometry.angles_parallel",
+                    "math.plane_geometry.triangles",
+                    "math.plane_geometry.quadrilaterals",
+                    "math.plane_geometry.circle",
+                    "math.plane_geometry.areas",
+                    "math.plane_geometry.similarity"
+                  ]
+                },
+                {
+                  "topic_id": "math.solid_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Стереометрия",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.solid_geometry.cuboid",
+                    "math.solid_geometry.prism_pyramid",
+                    "math.solid_geometry.solids_of_revolution",
+                    "math.solid_geometry.volume_surface"
+                  ]
+                },
+                {
+                  "topic_id": "math.word_problems",
+                  "subject_id": "math",
+                  "title_ru": "Текстовые задачи",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.word_problems.motion",
+                    "math.word_problems.work",
+                    "math.word_problems.percent",
+                    "math.word_problems.mixtures",
+                    "math.word_problems.logic"
+                  ]
+                },
+                {
+                  "topic_id": "math.data_probability",
+                  "subject_id": "math",
+                  "title_ru": "Данные и вероятность",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.data_probability.charts_tables",
+                    "math.data_probability.averages",
+                    "math.data_probability.probability",
+                    "math.data_probability.combinatorics"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_id": "verbal",
+          "order": 2,
+          "subject_id": "verbal",
+          "duration_minutes": 30,
+          "question_count": 30,
+          "parts": [
+            {
+              "slot": "ort_main_2026/verbal/analogies",
+              "section_id": "verbal",
+              "part_id": "analogies",
+              "item_type": "analogy",
+              "question_count": 15,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": false,
+              "difficulty_counts": {
+                "1": 4,
+                "2": 8,
+                "3": 3
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "analogies.synonym",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: синонимы",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 0,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.antonym",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: антонимы",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 0,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.part_whole",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: часть и целое",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.cause_effect",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: причина и следствие",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.function",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: предмет и его назначение",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.degree",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: степень признака",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.category_member",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: род и вид",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.worker_tool_product",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: профессия, инструмент, результат труда",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.object_property",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: предмет и его признак",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.material_product",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: материал и изделие",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                }
+              ]
+            },
+            {
+              "slot": "ort_main_2026/verbal/completion",
+              "section_id": "verbal",
+              "part_id": "completion",
+              "item_type": "completion",
+              "question_count": 15,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": false,
+              "difficulty_counts": {
+                "1": 4,
+                "2": 8,
+                "3": 3
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "completion.logical_connectors",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: логические связки",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "completion.logical_connectors.contrast",
+                    "completion.logical_connectors.cause_result",
+                    "completion.logical_connectors.addition_example"
+                  ]
+                },
+                {
+                  "topic_id": "completion.vocabulary_in_context",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: слово в контексте",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "completion.collocations",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: сочетаемость слов",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "completion.sentence_logic",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: логика предложения (два пропуска)",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_id": "reading",
+          "order": 3,
+          "subject_id": "reading",
+          "duration_minutes": 60,
+          "question_count": 30,
+          "parts": [
+            {
+              "slot": "ort_main_2026/reading/reading",
+              "section_id": "reading",
+              "part_id": "reading",
+              "item_type": "text_based",
+              "question_count": 30,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": {
+                "standalone_texts": 2,
+                "paired_texts": 1,
+                "questions_per_text": 10,
+                "words": [
+                  400,
+                  850
+                ]
+              },
+              "topics": [
+                {
+                  "topic_id": "reading.main_idea",
+                  "subject_id": "reading",
+                  "title_ru": "Основная мысль текста",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.detail",
+                  "subject_id": "reading",
+                  "title_ru": "Поиск информации в тексте",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 7,
+                  "target": 7,
+                  "min": 5,
+                  "max": 9,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.inference",
+                  "subject_id": "reading",
+                  "title_ru": "Вывод из прочитанного",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.vocabulary_in_context",
+                  "subject_id": "reading",
+                  "title_ru": "Значение слова в тексте",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.authors_purpose",
+                  "subject_id": "reading",
+                  "title_ru": "Цель и позиция автора",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.paired_comparison",
+                  "subject_id": "reading",
+                  "title_ru": "Сравнение двух текстов",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_id": "grammar",
+          "order": 4,
+          "subject_id": "grammar",
+          "duration_minutes": 35,
+          "question_count": 30,
+          "parts": [
+            {
+              "slot": "ort_main_2026/grammar/grammar",
+              "section_id": "grammar",
+              "part_id": "grammar",
+              "item_type": "single_choice",
+              "question_count": 30,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "grammar_ru.spelling",
+                  "subject_id": "grammar",
+                  "title_ru": "Орфография",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "grammar_ru.spelling.unstressed_vowels",
+                    "grammar_ru.spelling.n_nn",
+                    "grammar_ru.spelling.ne_with_words",
+                    "grammar_ru.spelling.prefixes",
+                    "grammar_ru.spelling.joined_separate"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ru.punctuation",
+                  "subject_id": "grammar",
+                  "title_ru": "Пунктуация",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ru.punctuation.homogeneous",
+                    "grammar_ru.punctuation.participial_phrases",
+                    "grammar_ru.punctuation.complex_sentences",
+                    "grammar_ru.punctuation.parenthetical"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ru.word_formation",
+                  "subject_id": "grammar",
+                  "title_ru": "Словообразование",
+                  "grades": [
+                    5,
+                    7
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "grammar_ru.word_formation.morphemes",
+                    "grammar_ru.word_formation.methods"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ru.completion",
+                  "subject_id": "grammar",
+                  "title_ru": "Дополнение (выбор формы и слова)",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ru.completion.word_form",
+                    "grammar_ru.completion.word_choice"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ru.lexical_grammatical_meaning",
+                  "subject_id": "grammar",
+                  "title_ru": "Лексико-грамматическое значение",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ru.lexical_grammatical_meaning.parts_of_speech",
+                    "grammar_ru.lexical_grammatical_meaning.paronyms",
+                    "grammar_ru.lexical_grammatical_meaning.word_meaning"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ru.usage_norms",
+                  "subject_id": "grammar",
+                  "title_ru": "Нормы употребления",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ru.usage_norms.agreement_government",
+                    "grammar_ru.usage_norms.collocation",
+                    "grammar_ru.usage_norms.word_forms"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "math",
+          "order": 1,
+          "subject_id": "math",
+          "duration_minutes": 90,
+          "question_count": 60,
+          "parts": [
+            {
+              "slot": "ort_main_2026/math/math_comparison",
+              "section_id": "math",
+              "part_id": "math_comparison",
+              "item_type": "quantitative_comparison",
+              "question_count": 30,
+              "options_per_question": 4,
+              "fixed_options": true,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "math.arithmetic",
+                  "subject_id": "math",
+                  "title_ru": "Арифметика",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.arithmetic.order_of_operations",
+                    "math.arithmetic.divisibility",
+                    "math.arithmetic.gcd_lcm",
+                    "math.arithmetic.powers_roots",
+                    "math.arithmetic.estimation"
+                  ]
+                },
+                {
+                  "topic_id": "math.fractions_percents",
+                  "subject_id": "math",
+                  "title_ru": "Дроби и проценты",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.fractions_percents.common_fractions",
+                    "math.fractions_percents.decimals",
+                    "math.fractions_percents.percent_of_number",
+                    "math.fractions_percents.percent_change"
+                  ]
+                },
+                {
+                  "topic_id": "math.ratios_proportions",
+                  "subject_id": "math",
+                  "title_ru": "Отношения и пропорции",
+                  "grades": [
+                    6,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.ratios_proportions.ratio",
+                    "math.ratios_proportions.direct_inverse",
+                    "math.ratios_proportions.scale"
+                  ]
+                },
+                {
+                  "topic_id": "math.algebraic_expressions",
+                  "subject_id": "math",
+                  "title_ru": "Алгебраические выражения",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.algebraic_expressions.polynomials",
+                    "math.algebraic_expressions.short_multiplication",
+                    "math.algebraic_expressions.factoring",
+                    "math.algebraic_expressions.algebraic_fractions",
+                    "math.algebraic_expressions.expressions_with_variables"
+                  ]
+                },
+                {
+                  "topic_id": "math.equations_systems",
+                  "subject_id": "math",
+                  "title_ru": "Уравнения и системы уравнений",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.equations_systems.linear",
+                    "math.equations_systems.quadratic_vieta",
+                    "math.equations_systems.systems",
+                    "math.equations_systems.rational_irrational"
+                  ]
+                },
+                {
+                  "topic_id": "math.inequalities",
+                  "subject_id": "math",
+                  "title_ru": "Неравенства",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.inequalities.linear",
+                    "math.inequalities.quadratic",
+                    "math.inequalities.systems",
+                    "math.inequalities.absolute_value"
+                  ]
+                },
+                {
+                  "topic_id": "math.functions_graphs",
+                  "subject_id": "math",
+                  "title_ru": "Функции и графики",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.functions_graphs.linear",
+                    "math.functions_graphs.quadratic",
+                    "math.functions_graphs.inverse_proportion",
+                    "math.functions_graphs.reading_graphs"
+                  ]
+                },
+                {
+                  "topic_id": "math.sequences",
+                  "subject_id": "math",
+                  "title_ru": "Последовательности и прогрессии",
+                  "grades": [
+                    9,
+                    9
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.sequences.arithmetic",
+                    "math.sequences.geometric",
+                    "math.sequences.patterns"
+                  ]
+                },
+                {
+                  "topic_id": "math.plane_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Планиметрия",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.plane_geometry.angles_parallel",
+                    "math.plane_geometry.triangles",
+                    "math.plane_geometry.quadrilaterals",
+                    "math.plane_geometry.circle",
+                    "math.plane_geometry.areas",
+                    "math.plane_geometry.similarity"
+                  ]
+                },
+                {
+                  "topic_id": "math.solid_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Стереометрия",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.solid_geometry.cuboid",
+                    "math.solid_geometry.prism_pyramid",
+                    "math.solid_geometry.solids_of_revolution",
+                    "math.solid_geometry.volume_surface"
+                  ]
+                },
+                {
+                  "topic_id": "math.data_probability",
+                  "subject_id": "math",
+                  "title_ru": "Данные и вероятность",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.data_probability.charts_tables",
+                    "math.data_probability.averages",
+                    "math.data_probability.probability",
+                    "math.data_probability.combinatorics"
+                  ]
+                }
+              ]
+            },
+            {
+              "slot": "ort_main_2026/math/math_problems",
+              "section_id": "math",
+              "part_id": "math_problems",
+              "item_type": "single_choice",
+              "question_count": 30,
+              "options_per_question": 5,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "math.arithmetic",
+                  "subject_id": "math",
+                  "title_ru": "Арифметика",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.arithmetic.order_of_operations",
+                    "math.arithmetic.divisibility",
+                    "math.arithmetic.gcd_lcm",
+                    "math.arithmetic.powers_roots",
+                    "math.arithmetic.estimation"
+                  ]
+                },
+                {
+                  "topic_id": "math.fractions_percents",
+                  "subject_id": "math",
+                  "title_ru": "Дроби и проценты",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.fractions_percents.common_fractions",
+                    "math.fractions_percents.decimals",
+                    "math.fractions_percents.percent_of_number",
+                    "math.fractions_percents.percent_change"
+                  ]
+                },
+                {
+                  "topic_id": "math.ratios_proportions",
+                  "subject_id": "math",
+                  "title_ru": "Отношения и пропорции",
+                  "grades": [
+                    6,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.ratios_proportions.ratio",
+                    "math.ratios_proportions.direct_inverse",
+                    "math.ratios_proportions.scale"
+                  ]
+                },
+                {
+                  "topic_id": "math.algebraic_expressions",
+                  "subject_id": "math",
+                  "title_ru": "Алгебраические выражения",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.algebraic_expressions.polynomials",
+                    "math.algebraic_expressions.short_multiplication",
+                    "math.algebraic_expressions.factoring",
+                    "math.algebraic_expressions.algebraic_fractions",
+                    "math.algebraic_expressions.expressions_with_variables"
+                  ]
+                },
+                {
+                  "topic_id": "math.equations_systems",
+                  "subject_id": "math",
+                  "title_ru": "Уравнения и системы уравнений",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.equations_systems.linear",
+                    "math.equations_systems.quadratic_vieta",
+                    "math.equations_systems.systems",
+                    "math.equations_systems.rational_irrational"
+                  ]
+                },
+                {
+                  "topic_id": "math.inequalities",
+                  "subject_id": "math",
+                  "title_ru": "Неравенства",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.inequalities.linear",
+                    "math.inequalities.quadratic",
+                    "math.inequalities.systems",
+                    "math.inequalities.absolute_value"
+                  ]
+                },
+                {
+                  "topic_id": "math.functions_graphs",
+                  "subject_id": "math",
+                  "title_ru": "Функции и графики",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.functions_graphs.linear",
+                    "math.functions_graphs.quadratic",
+                    "math.functions_graphs.inverse_proportion",
+                    "math.functions_graphs.reading_graphs"
+                  ]
+                },
+                {
+                  "topic_id": "math.sequences",
+                  "subject_id": "math",
+                  "title_ru": "Последовательности и прогрессии",
+                  "grades": [
+                    9,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.sequences.arithmetic",
+                    "math.sequences.geometric",
+                    "math.sequences.patterns"
+                  ]
+                },
+                {
+                  "topic_id": "math.plane_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Планиметрия",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.plane_geometry.angles_parallel",
+                    "math.plane_geometry.triangles",
+                    "math.plane_geometry.quadrilaterals",
+                    "math.plane_geometry.circle",
+                    "math.plane_geometry.areas",
+                    "math.plane_geometry.similarity"
+                  ]
+                },
+                {
+                  "topic_id": "math.solid_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Стереометрия",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.solid_geometry.cuboid",
+                    "math.solid_geometry.prism_pyramid",
+                    "math.solid_geometry.solids_of_revolution",
+                    "math.solid_geometry.volume_surface"
+                  ]
+                },
+                {
+                  "topic_id": "math.word_problems",
+                  "subject_id": "math",
+                  "title_ru": "Текстовые задачи",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.word_problems.motion",
+                    "math.word_problems.work",
+                    "math.word_problems.percent",
+                    "math.word_problems.mixtures",
+                    "math.word_problems.logic"
+                  ]
+                },
+                {
+                  "topic_id": "math.data_probability",
+                  "subject_id": "math",
+                  "title_ru": "Данные и вероятность",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.data_probability.charts_tables",
+                    "math.data_probability.averages",
+                    "math.data_probability.probability",
+                    "math.data_probability.combinatorics"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_id": "verbal",
+          "order": 2,
+          "subject_id": "verbal",
+          "duration_minutes": 30,
+          "question_count": 30,
+          "parts": [
+            {
+              "slot": "ort_main_2026/verbal/analogies",
+              "section_id": "verbal",
+              "part_id": "analogies",
+              "item_type": "analogy",
+              "question_count": 15,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": false,
+              "difficulty_counts": {
+                "1": 4,
+                "2": 8,
+                "3": 3
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "analogies.synonym",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: синонимы",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 0,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.antonym",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: антонимы",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 0,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.part_whole",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: часть и целое",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.cause_effect",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: причина и следствие",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.function",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: предмет и его назначение",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.degree",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: степень признака",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.category_member",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: род и вид",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.worker_tool_product",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: профессия, инструмент, результат труда",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.object_property",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: предмет и его признак",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "analogies.material_product",
+                  "subject_id": "verbal",
+                  "title_ru": "Аналогии: материал и изделие",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                }
+              ]
+            },
+            {
+              "slot": "ort_main_2026/verbal/completion",
+              "section_id": "verbal",
+              "part_id": "completion",
+              "item_type": "completion",
+              "question_count": 15,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": false,
+              "difficulty_counts": {
+                "1": 4,
+                "2": 8,
+                "3": 3
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "completion.logical_connectors",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: логические связки",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "completion.logical_connectors.contrast",
+                    "completion.logical_connectors.cause_result",
+                    "completion.logical_connectors.addition_example"
+                  ]
+                },
+                {
+                  "topic_id": "completion.vocabulary_in_context",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: слово в контексте",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "completion.collocations",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: сочетаемость слов",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "completion.sentence_logic",
+                  "subject_id": "verbal",
+                  "title_ru": "Дополнение: логика предложения (два пропуска)",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_id": "reading",
+          "order": 3,
+          "subject_id": "reading",
+          "duration_minutes": 60,
+          "question_count": 30,
+          "parts": [
+            {
+              "slot": "ort_main_2026/reading/reading",
+              "section_id": "reading",
+              "part_id": "reading",
+              "item_type": "text_based",
+              "question_count": 30,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": {
+                "standalone_texts": 2,
+                "paired_texts": 1,
+                "questions_per_text": 10,
+                "words": [
+                  400,
+                  850
+                ]
+              },
+              "topics": [
+                {
+                  "topic_id": "reading.main_idea",
+                  "subject_id": "reading",
+                  "title_ru": "Основная мысль текста",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.detail",
+                  "subject_id": "reading",
+                  "title_ru": "Поиск информации в тексте",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 7,
+                  "target": 7,
+                  "min": 5,
+                  "max": 9,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.inference",
+                  "subject_id": "reading",
+                  "title_ru": "Вывод из прочитанного",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.vocabulary_in_context",
+                  "subject_id": "reading",
+                  "title_ru": "Значение слова в тексте",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.authors_purpose",
+                  "subject_id": "reading",
+                  "title_ru": "Цель и позиция автора",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "reading.paired_comparison",
+                  "subject_id": "reading",
+                  "title_ru": "Сравнение двух текстов",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_id": "grammar",
+          "order": 4,
+          "subject_id": "grammar",
+          "duration_minutes": 35,
+          "question_count": 30,
+          "parts": [
+            {
+              "slot": "ort_main_2026/grammar/grammar",
+              "section_id": "grammar",
+              "part_id": "grammar",
+              "item_type": "single_choice",
+              "question_count": 30,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 9,
+                "2": 15,
+                "3": 6
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "grammar_ky.spelling",
+                  "subject_id": "grammar",
+                  "title_ru": "Орфография (кыргызский язык)",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "grammar_ky.spelling.vowel_harmony",
+                    "grammar_ky.spelling.consonants",
+                    "grammar_ky.spelling.compound_words",
+                    "grammar_ky.spelling.loanwords"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ky.punctuation",
+                  "subject_id": "grammar",
+                  "title_ru": "Пунктуация (кыргызский язык)",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ky.punctuation.homogeneous",
+                    "grammar_ky.punctuation.compound_sentences",
+                    "grammar_ky.punctuation.parenthetical",
+                    "grammar_ky.punctuation.direct_speech"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ky.word_formation",
+                  "subject_id": "grammar",
+                  "title_ru": "Словообразование (кыргызский язык)",
+                  "grades": [
+                    5,
+                    7
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "grammar_ky.word_formation.affixation",
+                    "grammar_ky.word_formation.compounding"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ky.completion",
+                  "subject_id": "grammar",
+                  "title_ru": "Дополнение (кыргызский язык)",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ky.completion.word_choice",
+                    "grammar_ky.completion.affix_choice"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ky.lexical_grammatical_meaning",
+                  "subject_id": "grammar",
+                  "title_ru": "Лексико-грамматическое значение (кыргызский язык)",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ky.lexical_grammatical_meaning.parts_of_speech",
+                    "grammar_ky.lexical_grammatical_meaning.polysemy",
+                    "grammar_ky.lexical_grammatical_meaning.synonyms_antonyms"
+                  ]
+                },
+                {
+                  "topic_id": "grammar_ky.usage_norms",
+                  "subject_id": "grammar",
+                  "title_ru": "Нормы употребления (кыргызский язык)",
+                  "grades": [
+                    6,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "grammar_ky.usage_norms.case_endings",
+                    "grammar_ky.usage_norms.verb_tenses",
+                    "grammar_ky.usage_norms.word_links"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

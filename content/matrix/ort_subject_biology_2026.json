@@ -1,0 +1,384 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_biology_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "biology",
+          "order": 1,
+          "subject_id": "biology",
+          "duration_minutes": 60,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_biology_2026/biology/biology",
+              "section_id": "biology",
+              "part_id": "biology",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "biology.cell",
+                  "subject_id": "biology",
+                  "title_ru": "Клетка",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.cell.structure",
+                    "biology.cell.division",
+                    "biology.cell.metabolism"
+                  ]
+                },
+                {
+                  "topic_id": "biology.botany",
+                  "subject_id": "biology",
+                  "title_ru": "Растения",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.botany.organs",
+                    "biology.botany.photosynthesis",
+                    "biology.botany.taxonomy"
+                  ]
+                },
+                {
+                  "topic_id": "biology.zoology",
+                  "subject_id": "biology",
+                  "title_ru": "Животные",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.zoology.invertebrates",
+                    "biology.zoology.vertebrates"
+                  ]
+                },
+                {
+                  "topic_id": "biology.human",
+                  "subject_id": "biology",
+                  "title_ru": "Человек и его здоровье",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.human.organ_systems",
+                    "biology.human.regulation",
+                    "biology.human.hygiene"
+                  ]
+                },
+                {
+                  "topic_id": "biology.genetics",
+                  "subject_id": "biology",
+                  "title_ru": "Генетика",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "biology.genetics.mendel",
+                    "biology.genetics.heredity_variation"
+                  ]
+                },
+                {
+                  "topic_id": "biology.evolution",
+                  "subject_id": "biology",
+                  "title_ru": "Эволюция",
+                  "grades": [
+                    11,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.evolution.natural_selection"
+                  ]
+                },
+                {
+                  "topic_id": "biology.ecology",
+                  "subject_id": "biology",
+                  "title_ru": "Экология",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.ecology.ecosystems",
+                    "biology.ecology.kyrgyzstan_nature"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "biology",
+          "order": 1,
+          "subject_id": "biology",
+          "duration_minutes": 60,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_biology_2026/biology/biology",
+              "section_id": "biology",
+              "part_id": "biology",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "biology.cell",
+                  "subject_id": "biology",
+                  "title_ru": "Клетка",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.cell.structure",
+                    "biology.cell.division",
+                    "biology.cell.metabolism"
+                  ]
+                },
+                {
+                  "topic_id": "biology.botany",
+                  "subject_id": "biology",
+                  "title_ru": "Растения",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.botany.organs",
+                    "biology.botany.photosynthesis",
+                    "biology.botany.taxonomy"
+                  ]
+                },
+                {
+                  "topic_id": "biology.zoology",
+                  "subject_id": "biology",
+                  "title_ru": "Животные",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.zoology.invertebrates",
+                    "biology.zoology.vertebrates"
+                  ]
+                },
+                {
+                  "topic_id": "biology.human",
+                  "subject_id": "biology",
+                  "title_ru": "Человек и его здоровье",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.human.organ_systems",
+                    "biology.human.regulation",
+                    "biology.human.hygiene"
+                  ]
+                },
+                {
+                  "topic_id": "biology.genetics",
+                  "subject_id": "biology",
+                  "title_ru": "Генетика",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "biology.genetics.mendel",
+                    "biology.genetics.heredity_variation"
+                  ]
+                },
+                {
+                  "topic_id": "biology.evolution",
+                  "subject_id": "biology",
+                  "title_ru": "Эволюция",
+                  "grades": [
+                    11,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.evolution.natural_selection"
+                  ]
+                },
+                {
+                  "topic_id": "biology.ecology",
+                  "subject_id": "biology",
+                  "title_ru": "Экология",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "biology.ecology.ecosystems",
+                    "biology.ecology.kyrgyzstan_nature"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

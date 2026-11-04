@@ -1,0 +1,1308 @@
+{
+  "schema_version": 1,
+  "batch": {
+    "id": "sample",
+    "kind": "sample",
+    "created_at": "2026-11-02T00:00:00.000Z",
+    "note": "Hand-written ORIGINAL sample items (not from ЦООМО, Secom or any publisher). Test fixtures for the pipeline; status draft until a methodologist reviews them. Keys double-checked by hand."
+  },
+  "passages": [],
+  "items": [
+    {
+      "id": "q_70daa720c378ff9bc5b2",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.powers_roots",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_sample_c1",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$2^{10}$",
+              "$10^3$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: степень с натуральным показателем",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:70daa720c378ff9bc5b2bd226577187231dee5930d92944505359fbade288bd4",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "$2^{10} = 1024$, а $10^3 = 1000$. Так как $1024 > 1000$, величина в колонке А больше.",
+        "wrong_option_notes": {
+          "B": "Часто считают, что $2^{10}$ примерно равно 1000 и не больше $10^3$, но $2^{10} = 1024$.",
+          "C": "Величины близки, но не равны: $1024 \\ne 1000$.",
+          "D": "Обе величины — конкретные числа, их всегда можно сравнить."
+        },
+        "solution_steps": [
+          "Вычисляем $2^{10}$: $2^5 = 32$, $2^{10} = 32^2 = 1024$.",
+          "Вычисляем $10^3 = 1000$.",
+          "$1024 > 1000$, значит, верный ответ — А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_6670f4eb4be1515f7500",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.expressions_with_variables",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_sample_c2",
+        "type": "quantitative_comparison",
+        "stem": "$x$ — натуральное число.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x^2$",
+              "$x$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: выражения с переменными, степень",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6670f4eb4be1515f750083b66fb2a97fd9c1d30cb26f75250b909d8166c2187c",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Ответ зависит от $x$. При $x = 1$: $x^2 = 1 = x$ — величины равны. При $x = 2$: $x^2 = 4 > 2$ — больше величина в колонке А. При разных допустимых $x$ соотношение разное, поэтому определить его нельзя.",
+        "wrong_option_notes": {
+          "A": "Верно для всех натуральных $x > 1$, но при $x = 1$ величины равны.",
+          "B": "Для натуральных $x$ квадрат никогда не меньше самого числа.",
+          "C": "Равенство выполняется только при $x = 1$."
+        },
+        "solution_steps": [
+          "Подставим $x = 1$: $1^2 = 1$, величины равны.",
+          "Подставим $x = 2$: $2^2 = 4 > 2$, больше колонка А.",
+          "Соотношение зависит от $x$, поэтому ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_227b420b22560bb4dc94",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.percent_of_number",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_sample_c3",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "15 % от 80",
+              "80 % от 15"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: проценты",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:227b420b22560bb4dc94af5c22d53f8a01a3af707941b9569de6a42e184351e5",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "15 % от 80 — это $80 \\cdot 0{,}15 = 12$; 80 % от 15 — это $15 \\cdot 0{,}8 = 12$. Величины равны: в обоих случаях получается $\\frac{15 \\cdot 80}{100}$.",
+        "wrong_option_notes": {
+          "A": "Число 80 больше, но от него берут лишь 15 %: получается 12.",
+          "B": "80 % — большая доля, но от маленького числа: тоже 12.",
+          "D": "Обе величины вычисляются точно, данных достаточно."
+        },
+        "solution_steps": [
+          "$80 \\cdot 0{,}15 = 12$.",
+          "$15 \\cdot 0{,}8 = 12$.",
+          "$12 = 12$, ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_fed6da25db8f591b80c7",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.areas",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_sample_c4",
+        "type": "quantitative_comparison",
+        "stem": "Катеты прямоугольного треугольника равны 6 и 8.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Площадь треугольника",
+              "25"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., геометрия: площадь треугольника",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:fed6da25db8f591b80c714552ed1ae5f0a58476664064068e4426df17d2d279f",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Площадь прямоугольного треугольника равна половине произведения катетов: $S = \\frac{6 \\cdot 8}{2} = 24$. Так как $24 < 25$, больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Типичная ошибка — не разделить на 2: $6 \\cdot 8 = 48 > 25$.",
+          "C": "Площадь равна 24, а не 25: величины близки, но не равны.",
+          "D": "Катеты известны, поэтому площадь вычисляется однозначно."
+        },
+        "solution_steps": [
+          "$S = \\frac{1}{2} \\cdot 6 \\cdot 8$.",
+          "$S = 24$.",
+          "$24 < 25$, ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_9ab07011a221a2e5f47e",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.quadratic_vieta",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_sample_p1",
+        "type": "single_choice",
+        "stem": "Найдите сумму корней уравнения $x^2 - 7x + 10 = 0$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-7$"
+          },
+          {
+            "id": "B",
+            "text": "$3$"
+          },
+          {
+            "id": "C",
+            "text": "$5$"
+          },
+          {
+            "id": "D",
+            "text": "$7$"
+          },
+          {
+            "id": "E",
+            "text": "$10$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: квадратные уравнения, теорема Виета",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:9ab07011a221a2e5f47ec62af0e79f4aa8e7e6b4280ac9e9996621f8cd7870aa",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "По теореме Виета для приведённого уравнения $x^2 + px + q = 0$ сумма корней равна $-p$. Здесь $p = -7$, поэтому сумма равна 7. Проверка: корни 2 и 5, $2 + 5 = 7$.",
+        "wrong_option_notes": {
+          "A": "Ошибка в знаке: сумма корней равна $-p$, где $p = -7$.",
+          "B": "Это разность корней: $5 - 2 = 3$.",
+          "C": "Это только один из корней.",
+          "E": "Это произведение корней ($q = 10$), а не сумма."
+        },
+        "solution_steps": [
+          "Уравнение приведённое: $p = -7$, $q = 10$.",
+          "По теореме Виета $x_1 + x_2 = -p = 7$.",
+          "Проверка: $x_1 = 2$, $x_2 = 5$, сумма 7."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_ed51ce9120ff80241455",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.word_problems",
+        "subtopic_id": "math.word_problems.percent",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_sample_p2",
+        "type": "single_choice",
+        "stem": "Товар стоил 800 сомов. Сначала его цену повысили на 25 %, а затем новую цену снизили на 20 %. Сколько сомов стоит товар теперь?",
+        "options": [
+          {
+            "id": "A",
+            "text": "750"
+          },
+          {
+            "id": "B",
+            "text": "800"
+          },
+          {
+            "id": "C",
+            "text": "840"
+          },
+          {
+            "id": "D",
+            "text": "1000"
+          },
+          {
+            "id": "E",
+            "text": "1200"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6–7 кл.: проценты, последовательное процентное изменение",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:ed51ce9120ff80241455595f7a48070ea2ce7c7e8543c713ba5a7d2861824ba9",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Каждый процент считается от текущей цены. После повышения на 25 %: $800 \\cdot 1{,}25 = 1000$ сомов. После снижения на 20 %: $1000 \\cdot 0{,}8 = 800$ сомов.",
+        "wrong_option_notes": {
+          "A": "Во втором действии взяли 25 % вместо 20 %: $1000 \\cdot 0{,}75 = 750$.",
+          "C": "Проценты просто вычли друг из друга ($25 - 20 = 5$) и прибавили 5 % к исходной цене, но второй процент считается от новой цены.",
+          "D": "Это цена только после первого изменения.",
+          "E": "Во втором действии цену повысили, а не снизили: $1000 \\cdot 1{,}2 = 1200$."
+        },
+        "solution_steps": [
+          "Повышение на 25 %: $800 \\cdot 1{,}25 = 1000$.",
+          "Снижение на 20 %: $1000 \\cdot 0{,}8 = 800$.",
+          "Ответ: 800 сомов."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_66acc303b2fc68507fca",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.common_fractions",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_sample_p3",
+        "type": "single_choice",
+        "stem": "Вычислите: $\\frac{3}{4} + \\frac{5}{6} - \\frac{1}{3}$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$\\frac{11}{12}$"
+          },
+          {
+            "id": "B",
+            "text": "$1$"
+          },
+          {
+            "id": "C",
+            "text": "$\\frac{5}{4}$"
+          },
+          {
+            "id": "D",
+            "text": "$\\frac{3}{2}$"
+          },
+          {
+            "id": "E",
+            "text": "$\\frac{19}{12}$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл.: сложение и вычитание обыкновенных дробей",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:66acc303b2fc68507fca53c13d1fa8e922c243fc79f4aad2afd8f3f350420742",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Приводим дроби к общему знаменателю 12: $\\frac{3}{4} = \\frac{9}{12}$, $\\frac{5}{6} = \\frac{10}{12}$, $\\frac{1}{3} = \\frac{4}{12}$. Тогда $\\frac{9 + 10 - 4}{12} = \\frac{15}{12} = \\frac{5}{4}$.",
+        "wrong_option_notes": {
+          "A": "Неверно привели $\\frac{1}{3}$ к знаменателю 12: получили $\\frac{8}{12}$ вместо $\\frac{4}{12}$.",
+          "B": "Сложили отдельно числители и знаменатели: $\\frac{3 + 5 - 1}{4 + 6 - 3} = 1$.",
+          "D": "Записали $\\frac{1}{3}$ как $\\frac{1}{12}$, не умножив числитель: $\\frac{19 - 1}{12} = \\frac{3}{2}$.",
+          "E": "Забыли вычесть $\\frac{1}{3}$: $\\frac{3}{4} + \\frac{5}{6} = \\frac{19}{12}$."
+        },
+        "solution_steps": [
+          "Общий знаменатель — 12.",
+          "$\\frac{9}{12} + \\frac{10}{12} - \\frac{4}{12} = \\frac{15}{12}$.",
+          "Сокращаем на 3: $\\frac{5}{4}$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_4b3ada48afb31e2a360b",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.sequences",
+        "subtopic_id": "math.sequences.arithmetic",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_sample_p4",
+        "type": "single_choice",
+        "stem": "Арифметическая прогрессия задана условиями $a_1 = 3$, $d = 4$. Найдите сумму первых десяти её членов.",
+        "options": [
+          {
+            "id": "A",
+            "text": "39"
+          },
+          {
+            "id": "B",
+            "text": "195"
+          },
+          {
+            "id": "C",
+            "text": "210"
+          },
+          {
+            "id": "D",
+            "text": "250"
+          },
+          {
+            "id": "E",
+            "text": "420"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: арифметическая прогрессия",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:4b3ada48afb31e2a360bbb4a1489f71f25aea6c28d7f6f53e583deaa2631875a",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Десятый член: $a_{10} = a_1 + 9d = 3 + 36 = 39$. Сумма: $S_{10} = \\frac{(a_1 + a_{10}) \\cdot 10}{2} = \\frac{(3 + 39) \\cdot 10}{2} = 210$.",
+        "wrong_option_notes": {
+          "A": "Это десятый член прогрессии, а не сумма.",
+          "B": "На 5 умножили только десятый член: $39 \\cdot 5 = 195$.",
+          "D": "В формуле $S_n = n a_1 + d \\cdot \\frac{n(n-1)}{2}$ взяли $\\frac{n(n+1)}{2}$: $30 + 4 \\cdot 55 = 250$.",
+          "E": "Забыли разделить на 2: $(3 + 39) \\cdot 10 = 420$."
+        },
+        "solution_steps": [
+          "$a_{10} = 3 + 9 \\cdot 4 = 39$.",
+          "$S_{10} = \\frac{(3 + 39) \\cdot 10}{2}$.",
+          "$S_{10} = 42 \\cdot 5 = 210$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_afb02a6f04ce5ac199e3",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.function",
+        "subtopic_id": null,
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_sample_a1",
+        "type": "analogy",
+        "stem": "ГЛАЗ : ЗРЕНИЕ",
+        "options": [
+          {
+            "id": "A",
+            "text": "ухо : слух"
+          },
+          {
+            "id": "B",
+            "text": "нос : лицо"
+          },
+          {
+            "id": "C",
+            "text": "рука : перчатка"
+          },
+          {
+            "id": "D",
+            "text": "зуб : щётка"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Словесно-логическое мышление; лексика 5–9 кл.: органы и их функции",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:afb02a6f04ce5ac199e3c916cb7ccda0482a59f1156dd57f8fdffc1cbe075a05",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Глаз — орган, зрение — его функция. Такое же отношение «орган — его функция» есть только в паре «ухо : слух».",
+        "wrong_option_notes": {
+          "B": "Нос — часть лица: это отношение «часть — целое».",
+          "C": "Перчатку надевают на руку: «часть тела — предмет одежды».",
+          "D": "Щёткой чистят зубы: «предмет — средство ухода за ним»."
+        },
+        "solution_steps": [
+          "Определяем отношение: глаз служит для зрения (орган и его функция).",
+          "Проверяем варианты: только ухо служит для слуха.",
+          "Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_af402e83b2ee1bdffce3",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "analogies"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "analogies.degree",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_sample_a2",
+        "type": "analogy",
+        "stem": "ТЁПЛЫЙ : ГОРЯЧИЙ",
+        "options": [
+          {
+            "id": "A",
+            "text": "радостный : грустный"
+          },
+          {
+            "id": "B",
+            "text": "холодный : ледяной"
+          },
+          {
+            "id": "C",
+            "text": "тёплый : одеяло"
+          },
+          {
+            "id": "D",
+            "text": "быстрый : скорость"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Словесно-логическое мышление; лексика: степень признака",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:af402e83b2ee1bdffce39e1d8bdba6588b8cd0b33b87782c290b1b32b77b8e42",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "«Горячий» — тот же признак, что «тёплый», но в большей степени. Так же «ледяной» — более сильная степень признака «холодный».",
+        "wrong_option_notes": {
+          "A": "Это антонимы — противоположные признаки, а не степени одного признака.",
+          "C": "Признак и предмет, которому он свойствен.",
+          "D": "Прилагательное и существительное, называющее тот же признак, без усиления."
+        },
+        "solution_steps": [
+          "Отношение: один и тот же признак, во втором слове он сильнее.",
+          "«Холодный → ледяной» — усиление того же признака.",
+          "Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_e060f2d8bde5fcc72310",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.logical_connectors",
+        "subtopic_id": "completion.logical_connectors.contrast",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_sample_k1",
+        "type": "completion",
+        "stem": "Эксперимент несколько раз заканчивался неудачей, ____ учёные не отказались от своей идеи и в итоге добились результата.",
+        "options": [
+          {
+            "id": "A",
+            "text": "поэтому"
+          },
+          {
+            "id": "B",
+            "text": "однако"
+          },
+          {
+            "id": "C",
+            "text": "потому что"
+          },
+          {
+            "id": "D",
+            "text": "например"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 8–9 кл.: сложное предложение, союзы со значением противопоставления",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e060f2d8bde5fcc72310de04731477352460a0e5de57d3c8e890a87335c38e60",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Части предложения противопоставлены: несмотря на неудачи, учёные продолжили работу. Противопоставление выражает связка «однако».",
+        "wrong_option_notes": {
+          "A": "«Поэтому» вводит следствие, но неудачи не могут быть причиной того, что учёные не сдались.",
+          "C": "«Потому что» вводит причину, а вторая часть не объясняет неудачи.",
+          "D": "«Например» вводит пример, а здесь нет перечисления."
+        },
+        "solution_steps": [
+          "Сравниваем части: неудачи — и всё же учёные продолжили.",
+          "Нужна связка со значением противопоставления.",
+          "Подходит только «однако»."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_5ad0663c6a5d4448aa69",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "verbal",
+        "part_id": "completion"
+      },
+      "question": {
+        "subject_id": "verbal",
+        "section_id": "verbal",
+        "topic_id": "completion.vocabulary_in_context",
+        "subtopic_id": null,
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_sample_k2",
+        "type": "completion",
+        "stem": "Лектор объяснял материал так ____, что даже сложные термины стали понятны слушателям, далёким от науки.",
+        "options": [
+          {
+            "id": "A",
+            "text": "доступно"
+          },
+          {
+            "id": "B",
+            "text": "пространно"
+          },
+          {
+            "id": "C",
+            "text": "сбивчиво"
+          },
+          {
+            "id": "D",
+            "text": "торжественно"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Русский язык 7–9 кл.: лексическое значение слова, наречия",
+          "author": "hand:pipeline-author"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пример для тестов пайплайна; ключ проверен вручную."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:5ad0663c6a5d4448aa69dd95693defb97dad77676707c9f3ee946b5883035a3f",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Вторая часть сообщает следствие: термины стали понятны даже неспециалистам. Значит, лектор объяснял доступно — просто и понятно.",
+        "wrong_option_notes": {
+          "B": "«Пространно» — многословно, с отступлениями; это не делает термины понятнее.",
+          "C": "«Сбивчиво» — путано; это мешает пониманию.",
+          "D": "«Торжественно» говорит о тоне речи, а не о понятности."
+        },
+        "solution_steps": [
+          "Опора — следствие: «термины стали понятны».",
+          "Нужно слово со значением «просто, понятно».",
+          "Подходит «доступно»."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_6c56704b4c95b6304b80",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.powers_roots",
+        "difficulty": 1,
+        "language": "ky",
+        "translation_group_id": "tg_sample_c1",
+        "type": "quantitative_comparison",
+        "stem": "А жана Б мамычаларындагы чоңдуктарды салыштырыңыз.",
+        "options": [
+          {
+            "id": "A",
+            "text": "А мамычасындагы чоңдук чоң"
+          },
+          {
+            "id": "B",
+            "text": "Б мамычасындагы чоңдук чоң"
+          },
+          {
+            "id": "C",
+            "text": "Чоңдуктар барабар"
+          },
+          {
+            "id": "D",
+            "text": "Аныктоо үчүн маалымат жетишсиз"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "А мамычасы",
+            "Б мамычасы"
+          ],
+          "rows": [
+            [
+              "$2^{10}$",
+              "$10^3$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "7-класстын программасы, алгебра: натуралдык көрсөткүчтүү даража",
+          "author": "hand:pipeline-author (орусчадан которулган)"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пайплайндын тесттери үчүн мисал (котормо); ачкычы кол менен текшерилди."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6c56704b4c95b6304b80a434524912d5b8b961b59abcb57273e1a7111512ece3",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "$2^{10} = 1024$, ал эми $10^3 = 1000$. $1024 > 1000$ болгондуктан, А мамычасындагы чоңдук чоң.",
+        "wrong_option_notes": {
+          "B": "$2^{10}$ санын көбүнчө болжол менен 1000 деп эсептешет, бирок чындыгында $2^{10} = 1024$, бул $10^3 = 1000$ санынан чоң.",
+          "C": "Чоңдуктар жакын, бирок барабар эмес: $1024 \\ne 1000$.",
+          "D": "Эки чоңдук тең так сандар, аларды дайыма салыштырууга болот."
+        },
+        "solution_steps": [
+          "$2^{10}$ санын эсептейбиз: $2^5 = 32$, $2^{10} = 32^2 = 1024$.",
+          "$10^3 = 1000$.",
+          "$1024 > 1000$, демек, туура жооп — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_70b080e0c00edf64188a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.percent_of_number",
+        "difficulty": 1,
+        "language": "ky",
+        "translation_group_id": "tg_sample_c3",
+        "type": "quantitative_comparison",
+        "stem": "А жана Б мамычаларындагы чоңдуктарды салыштырыңыз.",
+        "options": [
+          {
+            "id": "A",
+            "text": "А мамычасындагы чоңдук чоң"
+          },
+          {
+            "id": "B",
+            "text": "Б мамычасындагы чоңдук чоң"
+          },
+          {
+            "id": "C",
+            "text": "Чоңдуктар барабар"
+          },
+          {
+            "id": "D",
+            "text": "Аныктоо үчүн маалымат жетишсиз"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "А мамычасы",
+            "Б мамычасы"
+          ],
+          "rows": [
+            [
+              "80 санынын 15 пайызы",
+              "15 санынын 80 пайызы"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "6-класстын программасы, математика: пайыздар",
+          "author": "hand:pipeline-author (орусчадан которулган)"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пайплайндын тесттери үчүн мисал (котормо); ачкычы кол менен текшерилди."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:70b080e0c00edf64188aa1cde78812a67642558d954adf622d0f62b3e5078b6e",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "80 санынын 15 пайызы: $80 \\cdot 0{,}15 = 12$. 15 санынын 80 пайызы: $15 \\cdot 0{,}8 = 12$. Чоңдуктар барабар: эки учурда тең $\\frac{15 \\cdot 80}{100}$ чыгат.",
+        "wrong_option_notes": {
+          "A": "80 саны чоң болгону менен, андан 15 пайызы гана алынат: 12 чыгат.",
+          "B": "80 пайыз — чоң үлүш, бирок кичине сандан алынат: бул да 12.",
+          "D": "Эки чоңдук тең так эсептелет, маалымат жетиштүү."
+        },
+        "solution_steps": [
+          "$80 \\cdot 0{,}15 = 12$.",
+          "$15 \\cdot 0{,}8 = 12$.",
+          "$12 = 12$, жооп — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_5db92004b1e6acd85cfb",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.quadratic_vieta",
+        "difficulty": 1,
+        "language": "ky",
+        "translation_group_id": "tg_sample_p1",
+        "type": "single_choice",
+        "stem": "$x^2 - 7x + 10 = 0$ теңдемесинин тамырларынын суммасын табыңыз.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-7$"
+          },
+          {
+            "id": "B",
+            "text": "$3$"
+          },
+          {
+            "id": "C",
+            "text": "$5$"
+          },
+          {
+            "id": "D",
+            "text": "$7$"
+          },
+          {
+            "id": "E",
+            "text": "$10$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "8-класстын программасы, алгебра: квадраттык теңдемелер, Виета теоремасы",
+          "author": "hand:pipeline-author (орусчадан которулган)"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пайплайндын тесттери үчүн мисал (котормо); ачкычы кол менен текшерилди."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:5db92004b1e6acd85cfba4635bf366b080b37b115fe9fed52c415e497f545dd7",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Виета теоремасы боюнча $x^2 + px + q = 0$ келтирилген теңдемесинин тамырларынын суммасы $-p$ санына барабар. Бул жерде $p = -7$, ошондуктан сумма 7ге барабар. Текшерүү: тамырлар 2 жана 5, $2 + 5 = 7$.",
+        "wrong_option_notes": {
+          "A": "Белгиде ката кетти: тамырлардын суммасы $-p$ санына барабар, мында $p = -7$.",
+          "B": "Бул тамырлардын айырмасы: $5 - 2 = 3$.",
+          "C": "Бул тамырлардын бирөө гана.",
+          "E": "Бул тамырлардын көбөйтүндүсү ($q = 10$), суммасы эмес."
+        },
+        "solution_steps": [
+          "Теңдеме келтирилген түрдө: $p = -7$, $q = 10$.",
+          "Виета теоремасы боюнча $x_1 + x_2 = -p = 7$.",
+          "Текшерүү: $x_1 = 2$, $x_2 = 5$, суммасы 7."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    },
+    {
+      "id": "q_ecc7e1525af0f05a69de",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.word_problems",
+        "subtopic_id": "math.word_problems.percent",
+        "difficulty": 2,
+        "language": "ky",
+        "translation_group_id": "tg_sample_p2",
+        "type": "single_choice",
+        "stem": "Товардын баасы 800 сом болгон. Адегенде анын баасын 25 %га көтөрүштү, андан кийин жаңы бааны 20 %га төмөндөтүштү. Азыр товар канча сом турат?",
+        "options": [
+          {
+            "id": "A",
+            "text": "750"
+          },
+          {
+            "id": "B",
+            "text": "800"
+          },
+          {
+            "id": "C",
+            "text": "840"
+          },
+          {
+            "id": "D",
+            "text": "1000"
+          },
+          {
+            "id": "E",
+            "text": "1200"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "6–7-класстардын программасы: пайыздар, удаалаш пайыздык өзгөрүү",
+          "author": "hand:pipeline-author (орусчадан которулган)"
+        },
+        "review": {
+          "status": "draft",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Пайплайндын тесттери үчүн мисал (котормо); ачкычы кол менен текшерилди."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:ecc7e1525af0f05a69de8cc5c0329e96be7fe23dee2e01e523c6cd655f76935d",
+        "created_at": "2026-11-02T00:00:00.000Z",
+        "updated_at": "2026-11-02T00:00:00.000Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Ар бир пайыз учурдагы баадан эсептелет. 25 %га көтөргөндөн кийин: $800 \\cdot 1{,}25 = 1000$ сом. 20 %га төмөндөткөндөн кийин: $1000 \\cdot 0{,}8 = 800$ сом.",
+        "wrong_option_notes": {
+          "A": "Экинчи кадамда 20 %дын ордуна 25 % алынды: $1000 \\cdot 0{,}75 = 750$.",
+          "C": "Пайыздарды жөн эле бири-биринен кемитип ($25 - 20 = 5$), баштапкы баага 5 % кошушту; бирок экинчи пайыз жаңы баадан эсептелет.",
+          "D": "Бул биринчи өзгөрүүдөн кийинки баа гана.",
+          "E": "Экинчи кадамда баа төмөндөтүлбөй, көтөрүлдү: $1000 \\cdot 1{,}2 = 1200$."
+        },
+        "solution_steps": [
+          "25 %га көтөрүү: $800 \\cdot 1{,}25 = 1000$.",
+          "20 %га төмөндөтүү: $1000 \\cdot 0{,}8 = 800$.",
+          "Жооп: 800 сом."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "sample",
+        "generated_by": "hand:pipeline-author",
+        "prompt_version": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+/**
+ * firebase-admin (v14, modular) adapter for the import stage. Loaded lazily
+ * only by `import --commit`, so dry runs and tests need no credentials.
+ * Credentials: Application Default Credentials (GOOGLE_APPLICATION_CREDENTIALS
+ * pointing to a service-account JSON kept outside the repo, or
+ * `gcloud auth application-default login`).
+ */
+import type { CollectionName, FirestorePort } from './importer';
+
+export const DEFAULT_PROJECT_ID = 'knowleg-33f36';
+
+export interface PipelineFirestore extends FirestorePort {
+  /** Read-only export of up to `limit` documents of any collection (e.g. the legacy `questions`) for dedup --against. */
+  exportCollection(collection: string, limit: number): Promise<Array<Record<string, unknown>>>;
+}
+
+/** Firestore values → JSON-safe values (Timestamps → ISO strings, references → paths). */
+function plain(v: unknown): unknown {
+  if (Array.isArray(v)) return v.map(plain);
+  if (v && typeof v === 'object') {
+    const o = v as { toDate?: () => Date; path?: unknown; firestore?: unknown };
+    if (typeof o.toDate === 'function') return o.toDate().toISOString();
+    if (typeof o.path === 'string' && o.firestore) return o.path;
+    return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, plain(x)]));
+  }
+  return v;
+}
+
+export async function openFirestore(projectId: string): Promise<PipelineFirestore> {
+  const { initializeApp, applicationDefault, getApps } = await import('firebase-admin/app');
+  const { getFirestore, Timestamp, FieldValue } = await import('firebase-admin/firestore');
+  const app = getApps()[0] ?? initializeApp({ credential: applicationDefault(), projectId });
+  const db = getFirestore(app);
+
+  const convert = (v: unknown): unknown => {
+    if (Array.isArray(v)) return v.map(convert);
+    if (v && typeof v === 'object') {
+      const o = v as Record<string, unknown>;
+      if (typeof o.__timestamp === 'string') return Timestamp.fromDate(new Date(o.__timestamp));
+      if (o.__server_timestamp === true) return FieldValue.serverTimestamp();
+      return Object.fromEntries(Object.entries(o).map(([k, x]) => [k, convert(x)]));
+    }
+    return v;
+  };
+
+  return {
+    async exportCollection(collection: string, limit: number) {
+      // Read-only paging by document id; Timestamps become ISO strings.
+      const out: Array<Record<string, unknown>> = [];
+      let last: string | null = null;
+      while (out.length < limit) {
+        let q = db.collection(collection).orderBy('__name__').limit(Math.min(500, limit - out.length));
+        if (last) q = q.startAfter(last);
+        const snap = await q.get();
+        if (snap.empty) break;
+        for (const d of snap.docs) out.push({ id: d.id, ...(plain(d.data()) as Record<string, unknown>) });
+        last = snap.docs[snap.docs.length - 1]!.id;
+      }
+      return out;
+    },
+    async getExisting(collection: CollectionName, ids: string[]) {
+      const out = new Map<string, Record<string, unknown>>();
+      for (let i = 0; i < ids.length; i += 300) {
+        const refs = ids.slice(i, i + 300).map((id) => db.collection(collection).doc(id));
+        if (!refs.length) continue;
+        const snaps = await db.getAll(...refs);
+        for (const s of snaps) if (s.exists) out.set(s.id, s.data() ?? {});
+      }
+      return out;
+    },
+    async commitBatch(writes) {
+      if (writes.length > 400) throw new Error('batch larger than 400 writes');
+      const batch = db.batch();
+      for (const w of writes) batch.set(db.collection(w.collection).doc(w.id), convert(w.data) as Record<string, unknown>, { merge: w.merge });
+      await batch.commit();
+    },
+  };
+}

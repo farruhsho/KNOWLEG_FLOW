@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^v_[a-z0-9_]+$"
+    },
+    "variant": {
+      "type": "object",
+      "properties": {
+        "blueprint_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_.-]*$"
+        },
+        "blueprint_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "title": {
+          "type": "object",
+          "properties": {
+            "ru": {
+              "type": "string"
+            },
+            "ky": {
+              "type": "string"
+            },
+            "en": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "ru",
+            "ky",
+            "en"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "in_review",
+            "published",
+            "archived"
+          ]
+        },
+        "sections": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "section_id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9_.-]*$"
+              },
+              "question_ids": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "section_id",
+              "question_ids"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "content_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "difficulty_label": {
+          "type": "string",
+          "enum": [
+            "standard",
+            "advanced"
+          ]
+        },
+        "created_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "published_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stats": {
+          "type": "object",
+          "properties": {
+            "attempts": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "avg_percent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "attempts",
+            "avg_percent"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "blueprint_id",
+        "blueprint_version",
+        "number",
+        "title",
+        "language",
+        "status",
+        "sections",
+        "content_version",
+        "difficulty_label",
+        "created_by",
+        "published_at",
+        "published_by",
+        "stats"
+      ],
+      "additionalProperties": false
+    },
+    "assembly": {
+      "type": "object",
+      "properties": {
+        "assembled_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "allow_unapproved": {
+          "type": "boolean"
+        },
+        "allow_reuse": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "assembled_at",
+        "seed",
+        "allow_unapproved",
+        "allow_reuse"
+      ],
+      "additionalProperties": {}
+    }
+  },
+  "required": [
+    "id",
+    "variant",
+    "assembly"
+  ],
+  "additionalProperties": false
+}

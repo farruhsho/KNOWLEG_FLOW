@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "correct": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ]
+    },
+    "explanation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "wrong_option_notes": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ]
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "solution_steps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "correct",
+    "explanation",
+    "wrong_option_notes",
+    "solution_steps"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_chemistry_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "chemistry",
+          "order": 1,
+          "subject_id": "chemistry",
+          "duration_minutes": 80,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_chemistry_2026/chemistry/chemistry",
+              "section_id": "chemistry",
+              "part_id": "chemistry",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "chemistry.general",
+                  "subject_id": "chemistry",
+                  "title_ru": "Общая химия",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "chemistry.general.atom_structure",
+                    "chemistry.general.periodic_law",
+                    "chemistry.general.chemical_bond",
+                    "chemistry.general.rate_equilibrium"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.inorganic",
+                  "subject_id": "chemistry",
+                  "title_ru": "Неорганическая химия",
+                  "grades": [
+                    8,
+                    10
+                  ],
+                  "weight": 10,
+                  "target": 10,
+                  "min": 7,
+                  "max": 13,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 5,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "chemistry.inorganic.compound_classes",
+                    "chemistry.inorganic.metals",
+                    "chemistry.inorganic.nonmetals"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.organic",
+                  "subject_id": "chemistry",
+                  "title_ru": "Органическая химия",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 10,
+                  "target": 10,
+                  "min": 7,
+                  "max": 13,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 5,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "chemistry.organic.hydrocarbons",
+                    "chemistry.organic.oxygen_compounds",
+                    "chemistry.organic.nitrogen_compounds"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.solutions_reactions",
+                  "subject_id": "chemistry",
+                  "title_ru": "Растворы и химические реакции",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "chemistry.solutions_reactions.dissociation",
+                    "chemistry.solutions_reactions.redox",
+                    "chemistry.solutions_reactions.concentration"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.calculations",
+                  "subject_id": "chemistry",
+                  "title_ru": "Расчётные задачи",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "chemistry.calculations.moles",
+                    "chemistry.calculations.mass_fraction",
+                    "chemistry.calculations.by_equation"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "chemistry",
+          "order": 1,
+          "subject_id": "chemistry",
+          "duration_minutes": 80,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_chemistry_2026/chemistry/chemistry",
+              "section_id": "chemistry",
+              "part_id": "chemistry",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "chemistry.general",
+                  "subject_id": "chemistry",
+                  "title_ru": "Общая химия",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "chemistry.general.atom_structure",
+                    "chemistry.general.periodic_law",
+                    "chemistry.general.chemical_bond",
+                    "chemistry.general.rate_equilibrium"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.inorganic",
+                  "subject_id": "chemistry",
+                  "title_ru": "Неорганическая химия",
+                  "grades": [
+                    8,
+                    10
+                  ],
+                  "weight": 10,
+                  "target": 10,
+                  "min": 7,
+                  "max": 13,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 5,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "chemistry.inorganic.compound_classes",
+                    "chemistry.inorganic.metals",
+                    "chemistry.inorganic.nonmetals"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.organic",
+                  "subject_id": "chemistry",
+                  "title_ru": "Органическая химия",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 10,
+                  "target": 10,
+                  "min": 7,
+                  "max": 13,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 5,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "chemistry.organic.hydrocarbons",
+                    "chemistry.organic.oxygen_compounds",
+                    "chemistry.organic.nitrogen_compounds"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.solutions_reactions",
+                  "subject_id": "chemistry",
+                  "title_ru": "Растворы и химические реакции",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "chemistry.solutions_reactions.dissociation",
+                    "chemistry.solutions_reactions.redox",
+                    "chemistry.solutions_reactions.concentration"
+                  ]
+                },
+                {
+                  "topic_id": "chemistry.calculations",
+                  "subject_id": "chemistry",
+                  "title_ru": "Расчётные задачи",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 3,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "chemistry.calculations.moles",
+                    "chemistry.calculations.mass_fraction",
+                    "chemistry.calculations.by_equation"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}
