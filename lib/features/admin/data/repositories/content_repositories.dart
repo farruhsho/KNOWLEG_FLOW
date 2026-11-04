@@ -256,6 +256,13 @@ class MediaTooLargeException implements Exception {
   const MediaTooLargeException(this.maxBytes);
 }
 
+/// The file type is not one storage.rules accepts for content media (SVG can
+/// carry scripts and is refused on purpose — AUTH-ADM-08).
+class UnsupportedMediaTypeException implements Exception {
+  final String extension;
+  const UnsupportedMediaTypeException(this.extension);
+}
+
 /// Storage uploads to `exam_media/{questionId}/` and `lesson_media/{lessonId}/`
 /// (ARCHITECTURE.md §1: images ≤ 5 MB, PDF ≤ 20 MB).
 class MediaRepository {
@@ -264,6 +271,30 @@ class MediaRepository {
 
   static const int maxImageBytes = 5 * 1024 * 1024;
   static const int maxPdfBytes = 20 * 1024 * 1024;
+
+  /// Content types storage.rules accepts for CMS uploads (raster images and
+  /// PDF). Anything else is refused before uploading with a clear message.
+  static const Set<String> allowedContentTypes = {
+    'image/png',
+    'image/jpeg',
+    'image/webp',
+    'image/gif',
+    'application/pdf',
+  };
+
+  /// Checks type and size before any network call; returns the content type.
+  /// Throws [UnsupportedMediaTypeException] / [MediaTooLargeException].
+  static String validateUpload(String fileName, int sizeBytes) {
+    final type = contentTypeFor(fileName);
+    if (!allowedContentTypes.contains(type)) {
+      final dot = fileName.lastIndexOf('.');
+      throw UnsupportedMediaTypeException(
+          dot < 0 ? '' : fileName.substring(dot + 1).toLowerCase());
+    }
+    final max = type == 'application/pdf' ? maxPdfBytes : maxImageBytes;
+    if (sizeBytes > max) throw MediaTooLargeException(max);
+    return type;
+  }
 
   static String contentTypeFor(String fileName) {
     final ext = fileName.split('.').last.toLowerCase();
@@ -296,9 +327,7 @@ class MediaRepository {
     required String fileName,
     required Uint8List bytes,
   }) async {
-    final type = contentTypeFor(fileName);
-    final max = type == 'application/pdf' ? maxPdfBytes : maxImageBytes;
-    if (bytes.lengthInBytes > max) throw MediaTooLargeException(max);
+    final type = validateUpload(fileName, bytes.lengthInBytes);
     final path =
         '$folder/$ownerId/${DateTime.now().millisecondsSinceEpoch}_${_safeName(fileName)}';
     await _storage.ref(path).putData(bytes, SettableMetadata(contentType: type));

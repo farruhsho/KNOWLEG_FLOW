@@ -225,6 +225,18 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
     }
   }
 
+  /// Re-targets the variant to the current blueprint version without touching
+  /// its sections (CP-09): the server rejects a version mismatch, and the
+  /// structural checks already run against the current blueprint.
+  void _resync(BlueprintSpec b) {
+    final l = AppLocalizations.of(context)!;
+    setState(() {
+      _v = _v!.resyncedTo(b);
+      _dirty = true;
+    });
+    showAdminSnack(context, l.adminVariantResyncDone(b.version));
+  }
+
   Future<void> _save() async {
     final l = AppLocalizations.of(context)!;
     final number = int.tryParse(_number.text.trim());
@@ -304,6 +316,9 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
     final blueprints = ref.watch(adminBlueprintsProvider);
     final role = ref.watch(adminRoleProvider);
     final canPublish = role?.can(AdminPermission.publishVariants) ?? false;
+    // Only publish_variants holders may write exam_variants (rules); everyone
+    // else gets a read-only view (AUTH-ADM-05).
+    final canWrite = role?.canWriteVariants ?? false;
     return FutureBuilder<VariantDoc?>(
       future: _load,
       builder: (context, snap) {
@@ -322,13 +337,15 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
           body = const AdminLoadingView();
         } else if (snap.data == null) {
           body = AdminEmptyView(message: l.adminErrNotFound);
+        } else if (_isNew && !canWrite) {
+          body = const AdminForbiddenView();
         } else {
           _init(snap.data!);
           final bp = _bp(blueprints.requireValue);
           if (bp != null) {
             report = validateVariant(blueprint: bp, variant: _v!.toDraft(), questions: _infos);
           }
-          body = _form(l, blueprints.requireValue, bp, report);
+          body = _form(l, blueprints.requireValue, bp, report, canWrite: canWrite);
         }
         final published = _v?.isPublished ?? false;
         final publishReady = !_isNew && !_dirty && !_loadingInfos && _infoError == null &&
@@ -347,7 +364,7 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
                         onPressed: _busy || !publishReady ? null : () => _publish(true),
                         child: Text(l.adminVariantPublish),
                       ),
-              if (_v != null && !published)
+              if (_v != null && !published && canWrite)
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: FilledButton(onPressed: _busy ? null : _save, child: Text(l.adminSave)),
@@ -361,15 +378,39 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
   }
 
   Widget _form(AppLocalizations l, List<BlueprintSpec> blueprints, BlueprintSpec? bp,
-      VariantValidationReport? report) {
+      VariantValidationReport? report, {required bool canWrite}) {
     final locale = Localizations.localeOf(context).languageCode;
     final v = _v!;
-    final locked = v.isPublished;
+    final locked = v.isPublished || !canWrite;
+    final outdated = bp != null && v.blueprintVersion != bp.version;
     return AdminPageBody(
       maxWidth: 1000,
       children: [
-        if (locked)
+        if (!canWrite)
+          AdminCard(child: Text(l.adminVariantReadOnly, style: TextStyle(color: context.tokens.textSecondary)))
+        else if (v.isPublished)
           AdminCard(child: Text(l.adminVariantsErrPublished, style: TextStyle(color: context.tokens.warning))),
+        if (outdated && !locked)
+          AdminCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l.adminVpBlueprintVersion(bp.version, v.blueprintVersion),
+                    style: TextStyle(color: context.tokens.danger)),
+                const SizedBox(height: AppSpacing.xs),
+                Text(l.adminVariantResyncHelp, style: TextStyle(color: context.tokens.textSecondary)),
+                const SizedBox(height: AppSpacing.sm),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton.icon(
+                    onPressed: _busy ? null : () => _resync(bp),
+                    icon: const Icon(Icons.sync),
+                    label: Text(l.adminVariantResync(bp.version)),
+                  ),
+                ),
+              ],
+            ),
+          ),
         AdminCard(
           title: l.adminVariantBasics,
           trailing: AdminPill(variantStatusLabel(l, v.status), tone: variantStatusTone(v.status)),
@@ -447,14 +488,17 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
                       style: TextStyle(color: context.tokens.textSecondary)),
                 ),
               const SizedBox(height: AppSpacing.md),
-              LocalizedFields(
-                key: const ValueKey('title'),
-                label: l.adminFieldTitle,
-                initial: _title,
-                onChanged: (t) {
-                  _title = t;
-                  _dirty = true;
-                },
+              IgnorePointer(
+                ignoring: locked,
+                child: LocalizedFields(
+                  key: const ValueKey('title'),
+                  label: l.adminFieldTitle,
+                  initial: _title,
+                  onChanged: (t) {
+                    _title = t;
+                    _dirty = true;
+                  },
+                ),
               ),
             ],
           ),

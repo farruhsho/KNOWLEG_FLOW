@@ -222,6 +222,10 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminAll => 'Все';
 
   @override
+  String get adminAppCheckPlatformNote =>
+      'Бул платформада App Check жок: аны текшерген сервер функциялары (ролдор, кредиттер, жарыялоо, тарифтер, ЖИ долбоорлору) четке кагылышы мүмкүн. App Check менен веб-версияны же Android\'ди колдонуңуз.';
+
+  @override
   String get adminAppTitle => 'ORT Master · CMS';
 
   @override
@@ -287,6 +291,14 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminEdit => 'Редактировать';
 
   @override
+  String get adminErrAppCheckPlatform =>
+      'Сервер сурамды четке какты: бул платформада App Check жок (Windows/Linux же App Check ачкычы жок веб). Админ-панелди App Check менен веб-версиядан же Android\'ден ачыңыз, же ээсинен APP_CHECK_ENFORCE_ADMIN=false коюуну сураныңыз.';
+
+  @override
+  String get adminErrAppCheckRejected =>
+      'Сервер сурамды четке какты (App Check токени жок же жараксыз). Кайра кириңиз; кайталанса, бул түзмөктүн App Check каттоосун текшериңиз.';
+
+  @override
   String adminErrFileTooLarge(int mb) {
     return 'Файл слишком большой (максимум $mb МБ).';
   }
@@ -323,9 +335,21 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminErrUnknown => 'Что-то пошло не так. Повторите попытку.';
 
   @override
+  String adminErrUnsupportedMedia(String ext) {
+    return 'Колдоого алынбаган файл форматы ($ext). Уруксат берилгендер: PNG, JPEG, WEBP, GIF, PDF.';
+  }
+
+  @override
+  String get adminErrUserBanned =>
+      'Бул аккаунт бөгөттөлгөн. Сервердеги аракеттер жеткиликсиз.';
+
+  @override
   String adminErrValidation(String message) {
     return 'Проверка не пройдена: $message';
   }
+
+  @override
+  String get adminExamAddTable => 'Жадыбал кошуу';
 
   @override
   String get adminExamApprove => 'Одобрить';
@@ -336,6 +360,19 @@ class AppLocalizationsKy extends AppLocalizations {
   @override
   String get adminExamChoosePlacement =>
       'Сначала выберите структуру теста и раздел.';
+
+  @override
+  String get adminExamColumnA => 'А мамычасы';
+
+  @override
+  String get adminExamColumnB => 'Б мамычасы';
+
+  @override
+  String get adminExamColumns => 'А / Б мамычалары';
+
+  @override
+  String get adminExamColumnsHelp =>
+      'Чоңдуктарды салыштыруу: салыштырылуучу эки чоңдук. Тапшырманын текстинде жалпы шарт гана жазылат (бош болушу мүмкүн).';
 
   @override
   String adminExamCorrectIs(String id) {
@@ -371,6 +408,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminExamImage => 'Изображение';
+
+  @override
+  String get adminExamIssueColumns =>
+      'А жана Б мамычаларын экөөнү тең толтуруңуз.';
 
   @override
   String get adminExamIssueLanguage => 'Выберите язык (ru, ky или en).';
@@ -429,6 +470,9 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminExamNoImage => 'Изображения нет.';
 
   @override
+  String get adminExamNoTable => 'Жадыбал жок.';
+
+  @override
   String get adminExamPartUnverified =>
       'Это деление на части — допущение (официально не опубликовано).';
 
@@ -449,6 +493,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminExamReject => 'Отклонить';
+
+  @override
+  String get adminExamRemoveTable => 'Жадыбалды өчүрүү';
 
   @override
   String get adminExamReview => 'Проверка';
@@ -507,6 +554,40 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminExamStemLabel => 'Текст вопроса';
+
+  @override
+  String get adminExamTable => 'Жадыбал';
+
+  @override
+  String get adminExamTableAddColumn => 'Мамыча кошуу';
+
+  @override
+  String get adminExamTableAddRow => 'Сап кошуу';
+
+  @override
+  String get adminExamTableCell => 'Уяча';
+
+  @override
+  String get adminExamTableEmpty => 'Жадыбал бош, ал сакталбайт.';
+
+  @override
+  String get adminExamTableHeader => 'Аталыш';
+
+  @override
+  String get adminExamTableHeaderShort => 'Атал.';
+
+  @override
+  String get adminExamTableHelp =>
+      'Аталыштар сабы жана жадыбалдын саптары; уячаларда Markdown жана LaTeX (\$...\$) колдонсо болот. Салыштыруу тапшырмаларында биринчи сапта А жана Б чоңдуктары турат.';
+
+  @override
+  String get adminExamTablePreview => 'Алдын ала көрүү';
+
+  @override
+  String get adminExamTableRemoveColumn => 'Мамычаны өчүрүү';
+
+  @override
+  String get adminExamTableRemoveRow => 'Сапты өчүрүү';
 
   @override
   String get adminExamTranslations => 'Переводы';
@@ -1531,11 +1612,29 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminVariantPublished => 'Опубликован';
 
   @override
+  String get adminVariantReadOnly =>
+      'Көрүү гана: варианттарды супер-админ жана контент-менеджер гана түзүп, оңдой алат.';
+
+  @override
   String get adminVariantReady =>
       'Готов к публикации (сервер проверит ещё раз).';
 
   @override
   String get adminVariantRecheck => 'Проверить заново';
+
+  @override
+  String adminVariantResync(int version) {
+    return 'Түзүмдүн $version-версиясына которуу';
+  }
+
+  @override
+  String adminVariantResyncDone(int version) {
+    return 'Вариант түзүмдүн $version-версиясына которулду. Колдонуу үчүн сактаңыз.';
+  }
+
+  @override
+  String get adminVariantResyncHelp =>
+      'Сервер түзүмдүн учурдагы версиясы боюнча түзүлгөн варианттарды гана жарыялайт. Которуу бардык суроолорду сактайт; андан кийин вариантты сактап, отчетту текшериңиз.';
 
   @override
   String adminVariantServerResult(String status) {

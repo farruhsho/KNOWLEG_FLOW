@@ -217,6 +217,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminAll => 'All';
 
   @override
+  String get adminAppCheckPlatformNote =>
+      'App Check is not available on this platform: server functions that enforce it (roles, credits, publishing, pricing, AI drafts) may be rejected. Use the web build with App Check or Android.';
+
+  @override
   String get adminAppTitle => 'ORT Master · CMS';
 
   @override
@@ -282,6 +286,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminEdit => 'Edit';
 
   @override
+  String get adminErrAppCheckPlatform =>
+      'The server rejected the request: App Check is not available on this platform (Windows/Linux, or web without an App Check key). Open the admin panel in the web build with App Check or on Android, or ask the owner to set APP_CHECK_ENFORCE_ADMIN=false.';
+
+  @override
+  String get adminErrAppCheckRejected =>
+      'The server rejected the request (App Check token missing or invalid). Sign in again; if it repeats, check the App Check registration of this device.';
+
+  @override
   String adminErrFileTooLarge(int mb) {
     return 'File is too large (max $mb MB).';
   }
@@ -319,9 +331,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminErrUnknown => 'Something went wrong. Try again.';
 
   @override
+  String adminErrUnsupportedMedia(String ext) {
+    return 'Unsupported file format ($ext). Allowed: PNG, JPEG, WEBP, GIF, PDF.';
+  }
+
+  @override
+  String get adminErrUserBanned =>
+      'This account is blocked. Server actions are not available.';
+
+  @override
   String adminErrValidation(String message) {
     return 'Validation failed: $message';
   }
+
+  @override
+  String get adminExamAddTable => 'Add table';
 
   @override
   String get adminExamApprove => 'Approve';
@@ -332,6 +356,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminExamChoosePlacement =>
       'Choose the test structure and section first.';
+
+  @override
+  String get adminExamColumnA => 'Column A';
+
+  @override
+  String get adminExamColumnB => 'Column B';
+
+  @override
+  String get adminExamColumns => 'Columns A / B';
+
+  @override
+  String get adminExamColumnsHelp =>
+      'Quantitative comparison: the two quantities to compare. The stem holds only the shared condition (it may be empty).';
 
   @override
   String adminExamCorrectIs(String id) {
@@ -367,6 +404,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminExamImage => 'Image';
+
+  @override
+  String get adminExamIssueColumns => 'Fill in both columns A and B.';
 
   @override
   String get adminExamIssueLanguage => 'Choose the language (ru, ky or en).';
@@ -426,6 +466,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminExamNoImage => 'No image.';
 
   @override
+  String get adminExamNoTable => 'No table.';
+
+  @override
   String get adminExamPartUnverified =>
       'This split into parts is an assumption (not officially published).';
 
@@ -446,6 +489,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminExamReject => 'Reject';
+
+  @override
+  String get adminExamRemoveTable => 'Remove table';
 
   @override
   String get adminExamReview => 'Review';
@@ -504,6 +550,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminExamStemLabel => 'Question text';
+
+  @override
+  String get adminExamTable => 'Table';
+
+  @override
+  String get adminExamTableAddColumn => 'Add column';
+
+  @override
+  String get adminExamTableAddRow => 'Add row';
+
+  @override
+  String get adminExamTableCell => 'Cell';
+
+  @override
+  String get adminExamTableEmpty => 'The table is empty and will not be saved.';
+
+  @override
+  String get adminExamTableHeader => 'Header';
+
+  @override
+  String get adminExamTableHeaderShort => 'Hdr';
+
+  @override
+  String get adminExamTableHelp =>
+      'Header row and body rows; cells accept Markdown and LaTeX (\$...\$). In comparison items the first row holds quantities A and B.';
+
+  @override
+  String get adminExamTablePreview => 'Preview';
+
+  @override
+  String get adminExamTableRemoveColumn => 'Remove column';
+
+  @override
+  String get adminExamTableRemoveRow => 'Remove row';
 
   @override
   String get adminExamTranslations => 'Translations';
@@ -1526,10 +1606,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminVariantPublished => 'Published';
 
   @override
+  String get adminVariantReadOnly =>
+      'Read-only: only a super admin or a content manager can create and edit variants.';
+
+  @override
   String get adminVariantReady => 'Ready to publish (the server checks again).';
 
   @override
   String get adminVariantRecheck => 'Re-check';
+
+  @override
+  String adminVariantResync(int version) {
+    return 'Re-sync to blueprint version $version';
+  }
+
+  @override
+  String adminVariantResyncDone(int version) {
+    return 'The variant now targets blueprint version $version. Save to apply.';
+  }
+
+  @override
+  String get adminVariantResyncHelp =>
+      'The server publishes only variants built for the current blueprint version. Re-syncing keeps every question; then save and check the report.';
 
   @override
   String adminVariantServerResult(String status) {

@@ -5,16 +5,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/backend/backend_contract.dart';
 import '../../../../core/design/tokens.dart';
+import '../../../../core/network/firebase_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../application/paged_list.dart';
 import '../../data/repositories/content_repositories.dart';
 import '../../data/repositories/exam_repositories.dart';
+import '../../domain/callable_errors.dart';
 import '../../domain/review_workflow.dart';
 
 /// Human message for any error the CMS can hit (never a raw stack trace).
-String adminErrorMessage(AppLocalizations l, Object error) {
+///
+/// [appCheckAvailable] defaults to whether this platform activates App Check
+/// ([FirebaseService.supportsAppCheck]); tests pass it explicitly.
+String adminErrorMessage(AppLocalizations l, Object error, {bool? appCheckAvailable}) {
   if (error is FirebaseFunctionsException) {
     final reason = BackendReasons.of(error);
+    switch (classifyAdminCallableError(
+      code: error.code,
+      reason: reason,
+      appCheckAvailable: appCheckAvailable ?? FirebaseService.supportsAppCheck,
+    )) {
+      case AdminCallableIssue.appCheckUnavailable:
+        return l.adminErrAppCheckPlatform;
+      case AdminCallableIssue.appCheckRejected:
+        return l.adminErrAppCheckRejected;
+      case AdminCallableIssue.userBanned:
+        return l.adminErrUserBanned;
+      case null:
+        break;
+    }
     if (reason == BackendReasons.forbiddenRole) return l.adminErrForbidden;
     if (reason == BackendReasons.validationFailed) {
       return l.adminErrValidation(error.message ?? '');
@@ -78,6 +97,9 @@ String adminErrorMessage(AppLocalizations l, Object error) {
   }
   if (error is MediaTooLargeException) {
     return l.adminErrFileTooLarge((error.maxBytes / (1024 * 1024)).round());
+  }
+  if (error is UnsupportedMediaTypeException) {
+    return l.adminErrUnsupportedMedia(error.extension.isEmpty ? '?' : error.extension.toUpperCase());
   }
   if (error is MissingKeyException) return l.adminExamErrApproveNoKey;
   if (error is QuestionNotFoundException) return l.adminErrNotFound;

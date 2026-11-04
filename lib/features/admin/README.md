@@ -26,9 +26,9 @@ Role-based content and operations console for ORT Master KG. Contract:
 | `/admin/lessons`, `/admin/lessons/:id` | Structured lessons (`lessons`) | edit_content |
 | `/admin/questions`, `/admin/questions/:id` | Practice bank (`questions`), CSV/JSON import & export | edit_questions |
 | `/admin/exam-bank`, `/admin/exam-bank/:id` | `exam_questions` + keys + passages, review | edit_questions (approve/reject: review_questions) |
-| `/admin/variants`, `/admin/variants/:id` | Variant builder, publish via `adminPublishVariant` | edit_questions / publish_variants |
+| `/admin/variants`, `/admin/variants/:id` | Variant builder, publish via `adminPublishVariant` | view: edit_questions; create/edit/publish: publish_variants |
 | `/admin/ai-drafts` | `adminAiDraftQuestions` → drafts | super_admin, content_manager, methodologist |
-| `/admin/users`, `/admin/users/:uid` | Users, entitlements, ledger; ban/premium; `adminSetRole`; `adminGrantCredits` | view_users / moderate_users / super_admin |
+| `/admin/users`, `/admin/users/:uid` | Users, entitlements, ledger; ban (moderate_users: only `is_banned`, `ban_reason`, `banned_at`, `banned_by`, `updated_at`); premium, `adminSetRole`, `adminGrantCredits` (super_admin) | view_users / moderate_users / super_admin |
 | `/admin/payments` | Read-only `purchases` | view_payments |
 | `/admin/pricing` | `config/pricing` via `adminUpdatePricing` | manage_pricing |
 | `/admin/logs` | `admin_logs` | super_admin, support |
@@ -53,7 +53,23 @@ presentation/  shell (sidebar ↔ drawer), pages, widgets (Markdown+LaTeX, l10n 
 * Practice questions: one codec, snake_case `type`, `subject_id` + `subjectId`
   mirror; `update()` keeps unknown fields; import commits a new batch per 400.
 * Exam questions: `review.status` draft → ai_verified → methodologist_approved
-  / rejected; content edits by non-reviewers send a question back to draft.
+  / rejected. Edits of review-relevant fields (`ExamQuestionDoc.reviewRelevantFields`:
+  stem, options, passage, image, language, table, type, columns A/B) by
+  non-reviewers send a question back to draft; metadata, explanation and
+  translation links keep the status. Updates write only the changed fields.
+* Tables (`table`) are stored as `{headers, rows: [{cells}]}` (Firestore has no
+  nested arrays); the CMS also reads the wire shape `rows: [[...]]`.
+  Comparison items may carry `column_a` / `column_b`.
+* The CMS never writes `content_hash` (the content pipeline's scheme); every
+  CMS save of a question, key or passage sets `edited_in_cms_at`, which the
+  pipeline treats as "edited outside the pipeline" and does not overwrite.
+* Uploads: PNG, JPEG, WEBP, GIF (≤ 5 MB) and PDF (≤ 20 MB) only — SVG is
+  refused before uploading (storage.rules does not accept it).
+* App Check: where it is not available (Windows/Linux, web built without
+  `APP_CHECK_WEB_SITE_KEY`) the shell shows a notice, and callables rejected for
+  App Check get a dedicated message instead of "no permission".
+* Language: the CMS is Russian-first by design; Kyrgyz ARB values of older
+  `admin*` keys equal the Russian text.
 * No secrets in the client: AI generation, role changes, credits, pricing and
   publishing go through callables.
 

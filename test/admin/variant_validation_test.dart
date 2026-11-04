@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:knowledge_flow/features/admin/data/models/admin_records.dart';
 import 'package:knowledge_flow/features/admin/domain/blueprint_spec.dart';
 import 'package:knowledge_flow/features/admin/domain/review_workflow.dart';
 import 'package:knowledge_flow/features/admin/domain/variant_validation.dart';
@@ -254,7 +255,7 @@ void main() {
       expect(codes(run(en)), contains(VariantProblemCode.languageNotAllowed));
     });
 
-    test('older blueprint version is only a warning', () {
+    test('blueprint version mismatch blocks publishing, like the server (CP-09)', () {
       final old = VariantDraft(
         blueprintId: main.id,
         blueprintVersion: main.version + 1,
@@ -262,8 +263,32 @@ void main() {
         sections: v.draft.sections,
       );
       final r = run(old);
-      expect(r.canPublish, isTrue);
-      expect(r.warnings.map((p) => p.code), [VariantProblemCode.blueprintVersion]);
+      expect(r.canPublish, isFalse);
+      expect(r.errors.map((p) => p.code), [VariantProblemCode.blueprintVersion]);
+      final p = r.errors.single;
+      expect(p.expected, main.version);
+      expect(p.actual, main.version + 1);
+    });
+
+    test('re-sync keeps every section and clears the version error (CP-09)', () {
+      final doc = VariantDoc(
+        id: 'v1',
+        blueprintId: main.id,
+        blueprintVersion: main.version - 1,
+        number: 3,
+        title: const {'ru': 'Вариант 3'},
+        language: 'ru',
+        sections: v.draft.sections,
+      );
+      expect(run(doc.toDraft()).canPublish, isFalse);
+      final synced = doc.resyncedTo(main);
+      expect(synced.blueprintVersion, main.version);
+      expect(synced.sections, same(doc.sections));
+      expect(synced.number, 3);
+      expect(run(synced.toDraft()).canPublish, isTrue);
+      // A different blueprint is never "re-synced" onto this variant.
+      final other = bp('ort_state_language_2026');
+      expect(doc.resyncedTo(other).blueprintVersion, doc.blueprintVersion);
     });
 
     test('a question without part_id is placed by its unique item type', () {

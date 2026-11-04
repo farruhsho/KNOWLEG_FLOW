@@ -8,12 +8,16 @@ library;
 
 import 'dart:convert';
 
-import 'package:crypto/crypto.dart';
-
+import 'exam_table.dart';
 import 'review_workflow.dart';
+
+export 'exam_table.dart' show ExamTableDoc;
 
 const List<String> kExamLanguages = ['ru', 'ky', 'en'];
 const List<String> kExamOptionIds = ['A', 'B', 'C', 'D', 'E'];
+
+/// Blueprint `item_type` / question `type` of comparison items (math part I).
+const String kQuantitativeComparison = 'quantitative_comparison';
 
 String _str(Object? v) => v == null ? '' : v.toString();
 String? _strOrNull(Object? v) {
@@ -144,7 +148,16 @@ class ExamQuestionDoc {
   final List<ExamOption> options;
   final String? passageId;
   final String? imagePath;
-  final Map<String, dynamic>? table;
+
+  /// D2 table (`{headers, rows: [{cells}]}` in Firestore). For pipeline
+  /// quantitative-comparison items both quantities live in `rows[0]`.
+  final ExamTableDoc? table;
+
+  /// Quantitative-comparison columns (`column_a` / `column_b`): the two
+  /// quantities, with any shared condition in [stem]. Produced by
+  /// `adminAiDraftQuestions`, used by the exam payload and the review screen.
+  final String? columnA;
+  final String? columnB;
   final ExamSource source;
   final ExamReview review;
   final int contentVersion;
@@ -167,6 +180,8 @@ class ExamQuestionDoc {
     this.passageId,
     this.imagePath,
     this.table,
+    this.columnA,
+    this.columnB,
     this.source = const ExamSource(),
     this.review = const ExamReview(),
     this.contentVersion = 1,
@@ -192,7 +207,9 @@ class ExamQuestionDoc {
       options: ExamOption.listFrom(raw['options']),
       passageId: _strOrNull(_pick<String>(raw, ['passage_id', 'passageId'])),
       imagePath: _strOrNull(_pick<String>(raw, ['image_path', 'imagePath'])),
-      table: raw['table'] is Map ? Map<String, dynamic>.from(raw['table'] as Map) : null,
+      table: ExamTableDoc.fromAny(raw['table']),
+      columnA: _strOrNull(_pick<String>(raw, ['column_a', 'columnA'])),
+      columnB: _strOrNull(_pick<String>(raw, ['column_b', 'columnB'])),
       source: ExamSource.fromMap(raw['source']),
       review: ExamReview.fromMap(raw['review']),
       contentVersion: _int(raw['content_version'], 1),
@@ -219,6 +236,12 @@ class ExamQuestionDoc {
     bool clearPassage = false,
     String? imagePath,
     bool clearImage = false,
+    ExamTableDoc? table,
+    bool clearTable = false,
+    String? columnA,
+    String? columnB,
+    bool clearColumnA = false,
+    bool clearColumnB = false,
     ExamSource? source,
     ExamReview? review,
     int? contentVersion,
@@ -239,7 +262,9 @@ class ExamQuestionDoc {
         options: options ?? this.options,
         passageId: clearPassage ? null : (passageId ?? this.passageId),
         imagePath: clearImage ? null : (imagePath ?? this.imagePath),
-        table: table,
+        table: clearTable ? null : (table ?? this.table),
+        columnA: clearColumnA ? null : (columnA ?? this.columnA),
+        columnB: clearColumnB ? null : (columnB ?? this.columnB),
         source: source ?? this.source,
         review: review ?? this.review,
         contentVersion: contentVersion ?? this.contentVersion,
@@ -247,8 +272,12 @@ class ExamQuestionDoc {
         updatedAt: updatedAt,
       );
 
-  /// Content fields written to `exam_questions/{id}`. `review`, timestamps and
-  /// `created_*` are added by the repository.
+  /// Content fields written to `exam_questions/{id}`. `review`, timestamps,
+  /// `created_*` and [kEditedInCmsAtField] are added by the repository.
+  ///
+  /// `content_hash` is deliberately absent (decision D11): it belongs to the
+  /// content pipeline's hash scheme, so the CMS never rewrites it; CMS edits
+  /// are flagged with [kEditedInCmsAtField] instead (CP-04).
   Map<String, dynamic> toContentFields() => {
         'subject_id': subjectId,
         'section_id': sectionId,
@@ -263,35 +292,66 @@ class ExamQuestionDoc {
         'options': [for (final o in options) o.toMap()],
         'passage_id': passageId,
         'image_path': imagePath,
-        'table': table,
+        'table': (table == null || table!.isBlank) ? null : table!.toFirestore(),
+        'column_a': columnA,
+        'column_b': columnB,
         'source': source.toMap(),
         'content_version': contentVersion,
-        'content_hash': contentHash,
       };
 
-  /// True when the student-visible content differs from [other].
+  /// Fields students see (or that change how an item reads): editing any of
+  /// them invalidates a review, so a non-reviewer's save resets the status to
+  /// `draft` ([ReviewWorkflow.statusAfterContentEdit]). Mirrors the
+  /// `exam_questions` update rule in firestore.rules (AUTH-ADM-04); other
+  /// fields (topic, difficulty, part, source, translation group) keep the
+  /// review status.
+  static const List<String> reviewRelevantFields = [
+    'stem',
+    'options',
+    'passage_id',
+    'image_path',
+    'language',
+    'table',
+    'type',
+    'column_a',
+    'column_b',
+  ];
+
+  /// The [toContentFields] entries that differ from [original]. An update
+  /// writes only these, so values the CMS merely normalises on read (legacy
+  /// shapes, untouched pipeline fields) are never rewritten.
+  Map<String, dynamic> changedFieldsSince(ExamQuestionDoc original) {
+    final before = original.toContentFields();
+    return {
+      for (final e in toContentFields().entries)
+        if (jsonEncode(e.value) != jsonEncode(before[e.key])) e.key: e.value,
+    };
+  }
+
+  /// True when a review-relevant field ([reviewRelevantFields]) differs from
+  /// [other].
   bool contentDiffers(ExamQuestionDoc other) =>
-      stem != other.stem ||
-      jsonEncode([for (final o in options) o.toMap()]) !=
-          jsonEncode([for (final o in other.options) o.toMap()]) ||
-      passageId != other.passageId ||
-      imagePath != other.imagePath ||
-      language != other.language;
+      changedFieldsSince(other).keys.any(reviewRelevantFields.contains);
+
+  /// Both quantitative-comparison columns are filled.
+  bool get hasColumns =>
+      (columnA?.trim().isNotEmpty ?? false) && (columnB?.trim().isNotEmpty ?? false);
 }
 
-/// `content_hash` = `sha256:` + hex digest over language, stem, options and
-/// the correct key (used by the pipeline for de-duplication).
-String computeContentHash(ExamQuestionDoc q, String correct) {
-  final canonical = jsonEncode({
-    'language': q.language,
-    'stem': q.stem.trim(),
-    'options': [
-      for (final o in q.options) [o.id, o.text.trim()],
-    ],
-    'correct': correct,
-  });
-  return 'sha256:${sha256.convert(utf8.encode(canonical))}';
-}
+/// Marker the CMS sets (server timestamp) on every question, key and passage
+/// it saves. The content pipeline treats such documents as edited outside the
+/// pipeline and does not overwrite them without `--overwrite` (decision D11).
+const String kEditedInCmsAtField = 'edited_in_cms_at';
+
+/// Content fields a CMS save writes to `exam_questions/{id}`: all of them for
+/// a new document, only the changed ones for an update of a loaded
+/// [original]. Never contains `content_hash` or `review` (added separately).
+Map<String, dynamic> examQuestionWriteFields(
+  ExamQuestionDoc q, {
+  required bool isNew,
+  ExamQuestionDoc? original,
+}) =>
+    (isNew || original == null) ? q.toContentFields() : q.changedFieldsSince(original);
 
 class ExamKeyDoc {
   final String correct;
@@ -342,6 +402,17 @@ class ExamKeyDoc {
         'wrong_option_notes': wrongOptionNotes,
         'solution_steps': solutionSteps,
       };
+
+  /// Same stored content as [other] (note order does not matter).
+  bool sameAs(ExamKeyDoc other) {
+    String canon(ExamKeyDoc k) => jsonEncode([
+          k.correct,
+          k.explanation,
+          [for (final id in (k.wrongOptionNotes.keys.toList()..sort())) [id, k.wrongOptionNotes[id]]],
+          k.solutionSteps,
+        ]);
+    return canon(this) == canon(other);
+  }
 }
 
 class ExamPassageDoc {
@@ -399,15 +470,24 @@ abstract final class ExamQuestionIssue {
   static const correctRequired = 'correct_required';
   static const correctNotInOptions = 'correct_not_in_options';
   static const passageRequired = 'passage_required';
+
+  /// Only one of `column_a` / `column_b` is filled (or neither, where the
+  /// columns are required: AI quantitative-comparison drafts).
+  static const columnsIncomplete = 'columns_incomplete';
 }
 
 /// Validates a question + key before saving. [expectedOptions] comes from the
-/// blueprint part (`null` = only "at least two").
+/// blueprint part (`null` = only "at least two"). [requireColumns] demands
+/// both quantitative-comparison columns (AI drafts put the quantities there).
+///
+/// As in the backend's variant validation, an empty stem is accepted when
+/// both columns or an image carry the item.
 List<String> validateExamQuestion(
   ExamQuestionDoc q,
   ExamKeyDoc key, {
   int? expectedOptions,
   bool needsPassage = false,
+  bool requireColumns = false,
 }) {
   final issues = <String>[];
   if (q.sectionId.isEmpty || q.subjectId.isEmpty) {
@@ -416,7 +496,14 @@ List<String> validateExamQuestion(
   if (q.topicId.isEmpty) issues.add(ExamQuestionIssue.topicRequired);
   if (!kExamLanguages.contains(q.language)) issues.add(ExamQuestionIssue.languageInvalid);
   if (q.difficulty < 1 || q.difficulty > 3) issues.add(ExamQuestionIssue.difficultyRange);
-  if (q.stem.trim().isEmpty) issues.add(ExamQuestionIssue.stemRequired);
+  if (q.stem.trim().isEmpty && !q.hasColumns && q.imagePath == null) {
+    issues.add(ExamQuestionIssue.stemRequired);
+  }
+  final hasA = q.columnA?.trim().isNotEmpty ?? false;
+  final hasB = q.columnB?.trim().isNotEmpty ?? false;
+  if (hasA != hasB || (requireColumns && !(hasA && hasB))) {
+    issues.add(ExamQuestionIssue.columnsIncomplete);
+  }
   final countOk =
       expectedOptions != null ? q.options.length == expectedOptions : q.options.length >= 2;
   if (!countOk) issues.add(ExamQuestionIssue.optionsCount);
@@ -434,16 +521,23 @@ List<String> validateExamQuestion(
   return issues;
 }
 
-/// One draft returned by `adminAiDraftQuestions` (`{drafts: [question без id + key]}`).
+/// One draft returned by `adminAiDraftQuestions`:
+/// `{question: {...question fields}, key: {...}, valid}` (ARCHITECTURE.md §3).
 class AiDraft {
   final ExamQuestionDoc question;
   final ExamKeyDoc key;
-  const AiDraft(this.question, this.key);
+
+  /// The server's own quick check (`valid`); `null` when it was not sent.
+  final bool? serverValid;
+  const AiDraft(this.question, this.key, {this.serverValid});
 }
 
 /// Parses a draft tolerantly; missing metadata falls back to the request
 /// parameters. The result is always `review.status == draft` with
 /// `source.kind == 'ai'` — AI output is never trusted as approved.
+///
+/// The question fields are read from the nested `question` map the callable
+/// returns (CP-03); a flat map is still accepted.
 AiDraft parseAiDraft(
   Map raw, {
   required String id,
@@ -455,10 +549,12 @@ AiDraft parseAiDraft(
   required String language,
   required String type,
 }) {
-  final parsed = ExamQuestionDoc.fromMap(id, raw);
+  final qRaw = raw['question'] is Map ? raw['question'] as Map : raw;
+  final parsed = ExamQuestionDoc.fromMap(id, qRaw);
   final keyRaw = raw['key'] is Map ? raw['key'] as Map : raw;
   final key = ExamKeyDoc.fromMap(keyRaw);
-  final rawDifficulty = raw['difficulty'];
+  final rawDifficulty = qRaw['difficulty'];
+  final valid = raw['valid'];
   final q = ExamQuestionDoc(
     id: id,
     subjectId: parsed.subjectId.isEmpty ? subjectId : parsed.subjectId,
@@ -470,10 +566,14 @@ AiDraft parseAiDraft(
         ? parsed.difficulty
         : difficulty,
     language: parsed.language.isEmpty ? language : parsed.language,
-    type: raw['type'] == null ? type : parsed.type,
+    type: qRaw['type'] == null ? type : parsed.type,
     stem: parsed.stem,
     options: parsed.options,
     passageId: parsed.passageId,
+    imagePath: parsed.imagePath,
+    table: parsed.table,
+    columnA: parsed.columnA,
+    columnB: parsed.columnB,
     source: ExamSource(
       kind: 'ai',
       basis: parsed.source.basis,
@@ -481,5 +581,5 @@ AiDraft parseAiDraft(
     ),
     review: const ExamReview(status: ReviewStatus.draft),
   );
-  return AiDraft(q, key);
+  return AiDraft(q, key, serverValid: valid is bool ? valid : null);
 }
