@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,41 +30,96 @@ final userStatsProvider = StreamProvider<UserStats?>((ref) {
 final latestExamProvider = StreamProvider<LatestExamSummary?>((ref) {
   final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value(null);
-  return _latestCompletedAttempt(FirebaseService.firestore, uid);
-});
-
-Stream<LatestExamSummary?> _latestCompletedAttempt(
-  FirebaseFirestore db,
-  String uid,
-) async* {
-  final attempts = db.collection(Collections.examAttempts);
-  try {
-    // Needs the composite index (uid ASC, status ASC, completed_at DESC).
-    final query = attempts
+  final attempts = FirebaseService.firestore.collection(Collections.examAttempts);
+  List<AttemptDoc> docs(QuerySnapshot<Map<String, dynamic>> s) =>
+      [for (final d in s.docs) (id: d.id, data: d.data())];
+  return latestCompletedAttempt(
+    // Composite index (uid ASC, status ASC, completed_at DESC).
+    primary: () => attempts
         .where('uid', isEqualTo: uid)
         .where('status', isEqualTo: 'completed')
         .orderBy('completed_at', descending: true)
-        .limit(1);
-    await for (final snap in query.snapshots()) {
-      if (snap.docs.isEmpty) {
-        yield null;
-      } else {
-        final doc = snap.docs.first;
-        yield LatestExamSummary.fromDoc(doc.id, doc.data());
-      }
-    }
-  } on FirebaseException catch (e) {
-    if (e.code != 'failed-precondition') rethrow;
-    // Index not deployed yet: single-field query, sorted on the client.
-    final snap = await attempts.where('uid', isEqualTo: uid).limit(50).get();
-    final completed = snap.docs
-        .map((d) => LatestExamSummary.fromDoc(d.id, d.data()))
-        .whereType<LatestExamSummary>()
-        .toList()
-      ..sort((a, b) => (b.completedAt ?? DateTime(0))
-          .compareTo(a.completedAt ?? DateTime(0)));
-    yield completed.isEmpty ? null : completed.first;
+        .limit(1)
+        .snapshots()
+        .map(docs),
+    // Index (uid ASC, completed_at DESC). Only completed attempts have a
+    // completed_at, so the newest ones are completed; still live.
+    fallback: () => attempts
+        .where('uid', isEqualTo: uid)
+        .orderBy('completed_at', descending: true)
+        .limit(_fallbackLimit)
+        .snapshots()
+        .map(docs),
+    // No composite index at all: one unordered read, sorted here.
+    lastResort: () => attempts.where('uid', isEqualTo: uid).limit(50).get().then(docs),
+  );
+});
+
+const _fallbackLimit = 10;
+
+/// One `exam_attempts` document: id + data.
+typedef AttemptDoc = ({String id, Map<String, dynamic> data});
+
+/// Newest completed attempt among [docs] (by completed_at), or null.
+LatestExamSummary? pickLatestCompleted(Iterable<AttemptDoc> docs) {
+  LatestExamSummary? best;
+  for (final d in docs) {
+    final s = LatestExamSummary.fromDoc(d.id, d.data);
+    if (s == null) continue;
+    final at = s.completedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    final bestAt = best?.completedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    if (best == null || at.isAfter(bestAt)) best = s;
   }
+  return best;
+}
+
+bool _missingIndex(Object e) => e is FirebaseException && e.code == 'failed-precondition';
+
+/// Live latest completed attempt (EXAM-04 / GAM-X4 / UX-09).
+///
+/// Uses [primary] (needs the composite index). If that index is missing it
+/// stays live on [fallback] (ordered by completed_at, existing index)
+/// instead of a single stale read; [lastResort] is used only if neither
+/// index exists.
+Stream<LatestExamSummary?> latestCompletedAttempt({
+  required Stream<List<AttemptDoc>> Function() primary,
+  required Stream<List<AttemptDoc>> Function() fallback,
+  required Future<List<AttemptDoc>> Function() lastResort,
+}) =>
+    _switchOnMissingIndex(
+      primary,
+      () => _switchOnMissingIndex(fallback, () => Stream.fromFuture(lastResort())),
+    ).map(pickLatestCompleted);
+
+/// Events of [first]; if it fails because an index is missing, continues
+/// with [next]. Unlike an `async*` + `await for` chain, cancelling the result
+/// cancels the live Firestore listener immediately.
+Stream<T> _switchOnMissingIndex<T>(Stream<T> Function() first, Stream<T> Function() next) {
+  late final StreamController<T> out;
+  StreamSubscription<T>? sub;
+  void listen(Stream<T> source, {required bool canSwitch}) {
+    sub = source.listen(
+      out.add,
+      onError: (Object e, StackTrace st) {
+        if (canSwitch && _missingIndex(e)) {
+          final old = sub;
+          listen(next(), canSwitch: false);
+          old?.cancel();
+        } else {
+          out.addError(e, st);
+        }
+      },
+      onDone: out.close,
+    );
+  }
+
+  out = StreamController<T>(
+    onListen: () => listen(first(), canSwitch: true),
+    onPause: () => sub?.pause(),
+    onResume: () => sub?.resume(),
+    onCancel: () => sub?.cancel(),
+  );
+  return out.stream;
 }
 
 /// The recommendation shown in the "Next step" card. Loading while either

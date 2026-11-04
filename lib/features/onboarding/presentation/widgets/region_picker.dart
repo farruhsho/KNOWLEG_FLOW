@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/design/tokens.dart';
+import '../../../../core/utils/content_locale.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/region_model.dart';
 import '../../data/kg_regions_provider.dart';
 
 /// Oblast → district picker backed by `assets/data/kg_regions.json`.
-/// The district is optional.
+/// The district is optional. Names are shown in the UI language (UX-11);
+/// the values passed to [onChanged] stay the canonical stored names.
 class RegionPicker extends ConsumerWidget {
   const RegionPicker({
     super.key,
@@ -84,15 +86,13 @@ class _RegionFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final lang = contentLanguageOf(context);
     final oblasts = regions.map((r) => r.oblast).toList();
     final selectedOblast = oblasts.contains(oblast) ? oblast : null;
-    final districts = selectedOblast == null
-        ? const <String>[]
-        : regions
-            .firstWhere((r) => r.oblast == selectedOblast)
-            .districts
-            .map((d) => d.name)
-            .toList();
+    final districtData = selectedOblast == null
+        ? const <DistrictData>[]
+        : regions.firstWhere((r) => r.oblast == selectedOblast).districts;
+    final districts = districtData.map((d) => d.name).toList();
     final selectedDistrict = districts.contains(district) ? district : null;
 
     return Column(
@@ -104,10 +104,10 @@ class _RegionFields extends StatelessWidget {
           isExpanded: true,
           decoration: InputDecoration(labelText: l.shellRegionOblast),
           items: [
-            for (final name in oblasts)
+            for (final r in regions)
               DropdownMenuItem(
-                value: name,
-                child: Text(name, overflow: TextOverflow.ellipsis),
+                value: r.oblast,
+                child: Text(r.label(lang), overflow: TextOverflow.ellipsis),
               ),
           ],
           onChanged: enabled ? (value) => onChanged(value, null) : null,
@@ -122,10 +122,10 @@ class _RegionFields extends StatelessWidget {
             helperText: l.shellOptional,
           ),
           items: [
-            for (final name in districts)
+            for (final d in districtData)
               DropdownMenuItem(
-                value: name,
-                child: Text(name, overflow: TextOverflow.ellipsis),
+                value: d.name,
+                child: Text(d.label(lang), overflow: TextOverflow.ellipsis),
               ),
           ],
           onChanged: enabled && districts.isNotEmpty

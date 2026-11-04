@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -267,12 +268,14 @@ String _areaName(
   String topicId,
   Map<String, Map<String, String>>? titles,
   String languageCode,
+  TopicNames names,
 ) {
   final area = topicArea(topicId);
   final byLang = titles?[area];
   final title = byLang?[languageCode] ?? byLang?['ru'];
   if (title != null && title.isNotEmpty) return title;
-  return area.replaceAll('_', ' ');
+  // Curriculum name, never the raw id (UX-02).
+  return names.label(area, languageCode);
 }
 
 /// Rule-based "Next step" recommendation.
@@ -322,7 +325,8 @@ class _NextStepBody extends ConsumerWidget {
       case NextStepKind.weakTopic:
         final titles = ref.watch(examAreaTitlesProvider).valueOrNull;
         final lang = ref.watch(localeProvider.select((x) => x.languageCode));
-        body = l.shellNextWeakTopic(_areaName(step.topicId!, titles, lang));
+        final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
+        body = l.shellNextWeakTopic(_areaName(step.topicId!, titles, lang, names));
         action = l.shellNextOpenLearn;
         onTap = () => context.go(RoutePaths.learn);
       case NextStepKind.practice:
@@ -461,6 +465,15 @@ class ReminderPromptCard extends ConsumerStatefulWidget {
 class _ReminderPromptCardState extends ConsumerState<ReminderPromptCard> {
   bool _hidden = false;
   bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Keep this device's reminder token current (once per app session).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(reminderSettingsProvider).refreshRegistration();
+    });
+  }
 
   Future<void> _enable() async {
     final l = AppLocalizations.of(context)!;

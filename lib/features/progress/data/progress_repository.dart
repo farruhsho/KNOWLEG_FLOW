@@ -13,6 +13,7 @@ import '../../../shared/models/user_stats_model.dart';
 import '../../../shared/services/data_exception.dart';
 import '../../../shared/services/firebase_data_service.dart';
 import '../../../shared/services/gamification_service.dart';
+import '../../../shared/services/mistakes_service.dart';
 
 /// Everything the progress screen shows, from real sources only.
 class ProgressSnapshot {
@@ -88,6 +89,9 @@ class ProgressRepository {
     }
   }
 
+  /// Due = unresolved and next_review_at <= now. Querying the due range
+  /// (index resolved ASC, next_review_at ASC) counts exactly the due items,
+  /// whatever the size of the queue (GAM-X1).
   Future<int> _dueMistakes(String uid) async {
     try {
       final snap = await _db
@@ -95,13 +99,11 @@ class ProgressRepository {
           .doc(uid)
           .collection(Collections.userMistakeItems)
           .where('resolved', isEqualTo: false)
-          .limit(300)
+          .where('next_review_at', isLessThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
+          .orderBy('next_review_at')
+          .limit(MistakesService.openLimit)
           .get();
-      final now = DateTime.now();
-      return snap.docs.where((d) {
-        final next = JsonRead.date(d.data(), ['next_review_at']);
-        return next == null || !next.isAfter(now);
-      }).length;
+      return snap.docs.length;
     } catch (e, st) {
       reportError(e, st, reason: 'learn.progress.mistakes');
       return 0;

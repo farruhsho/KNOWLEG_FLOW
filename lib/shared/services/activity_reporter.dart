@@ -5,6 +5,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/backend/backend_contract.dart';
+import '../../core/network/firebase_service.dart';
 import '../../core/utils/app_log.dart';
 import '../../core/utils/json_read.dart';
 
@@ -99,6 +100,12 @@ class ActivityReporter {
   bool _lastFailureTransient = false;
 
   Future<ActivityResult?> _send(ActivityEvent event, {required bool queueOnFailure}) async {
+    if (!FirebaseService.supportsCallables) {
+      // No App Check on this platform (Windows/Linux, web without a site
+      // key): the server would reject the call, and retrying cannot help.
+      _lastFailureTransient = false;
+      return null;
+    }
     try {
       final res = await BackendFunctions.callable(
         BackendFunctions.recordActivity,

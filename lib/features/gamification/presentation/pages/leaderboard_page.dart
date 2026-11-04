@@ -1,20 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/utils/bishkek_time.dart';
 import '../../../../core/utils/content_locale.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/leaderboard_model.dart';
-import '../../../../shared/models/subject_model.dart';
-import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/services/leaderboard_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
+import '../../domain/subject_boards.dart';
 
 /// Leaderboards precomputed by the server (GAM-17): weekly (ISO week in
 /// Asia/Bishkek), all time, and weekly per subject. Top 50 by XP plus the
 /// viewer's own position.
+///
+/// What counts (D10): weekly and all-time boards get all server-awarded XP
+/// (mock exams plus the capped lesson/practice XP); subject boards get mock
+/// exam XP only, keyed by the blueprint subject id ([SubjectBoards]).
 class LeaderboardPage extends StatelessWidget {
   const LeaderboardPage({super.key});
 
@@ -51,7 +56,10 @@ class LeaderboardPage extends StatelessWidget {
 class _BoardView extends StatefulWidget {
   final String boardId;
   final Widget? header;
-  const _BoardView({super.key, required this.boardId, this.header});
+
+  /// Subject boards count mock-exam XP only, so their hints differ.
+  final bool examOnly;
+  const _BoardView({super.key, required this.boardId, this.header, this.examOnly = false});
 
   @override
   State<_BoardView> createState() => _BoardViewState();
@@ -99,7 +107,11 @@ class _BoardViewState extends State<_BoardView> with AutomaticKeepAliveClientMix
         } else {
           final page = snap.data!;
           body = page.top.isEmpty
-              ? EmptyView(icon: Icons.leaderboard_outlined, message: l.learnLeaderboardEmpty, subtitle: l.learnLeaderboardEmptyBody)
+              ? EmptyView(
+                  icon: Icons.leaderboard_outlined,
+                  message: l.learnLeaderboardEmpty,
+                  subtitle: widget.examOnly ? l.learnLeaderboardSubjectEmptyBody : l.learnLeaderboardEmptyBody,
+                )
               : _list(context, l, page);
         }
         if (widget.header == null) return body;
@@ -132,7 +144,10 @@ class _BoardViewState extends State<_BoardView> with AutomaticKeepAliveClientMix
               child: page.mine == null
                   ? Padding(
                       padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Text(l.learnLeaderboardNotRanked, style: Theme.of(context).textTheme.bodySmall),
+                      child: Text(
+                        widget.examOnly ? l.learnLeaderboardSubjectNotRanked : l.learnLeaderboardNotRanked,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     )
                   : _EntryTile(rank: page.myRank, entry: page.mine!, isMe: true),
             ),
@@ -170,66 +185,61 @@ class _EntryTile extends StatelessWidget {
   }
 }
 
-class _SubjectBoards extends StatefulWidget {
+class _SubjectBoards extends ConsumerStatefulWidget {
   const _SubjectBoards();
 
   @override
-  State<_SubjectBoards> createState() => _SubjectBoardsState();
+  ConsumerState<_SubjectBoards> createState() => _SubjectBoardsState();
 }
 
-class _SubjectBoardsState extends State<_SubjectBoards> with AutomaticKeepAliveClientMixin {
-  late Future<List<SubjectModel>> _subjects;
-  String? _selected;
+class _SubjectBoardsState extends ConsumerState<_SubjectBoards> with AutomaticKeepAliveClientMixin {
+  String _selected = SubjectBoards.ids.first;
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    _subjects = FirebaseDataService().getSubjects();
-  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final l = AppLocalizations.of(context)!;
     final lang = contentLanguageOf(context);
-    return FutureBuilder<List<SubjectModel>>(
-      future: _subjects,
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) return LoadingView(message: l.loading);
-        if (snap.hasError) {
-          return ErrorView.forError(context, snap.error, onRetry: () {
-            setState(() => _subjects = FirebaseDataService().getSubjects());
-          });
-        }
-        final subjects = snap.data ?? const <SubjectModel>[];
-        if (subjects.isEmpty) return EmptyView(message: l.learnNoSubjectsTitle);
-        final selected = _selected ?? subjects.first.id;
-        final picker = SingleChildScrollView(
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
+    final theme = Theme.of(context);
+    final picker = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
           child: Row(
             children: [
-              for (final s in subjects)
+              for (final id in SubjectBoards.ids)
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: ChoiceChip(
-                    label: Text(s.getTitle(lang)),
-                    selected: s.id == selected,
-                    onSelected: (_) => setState(() => _selected = s.id),
+                    key: ValueKey('subject-board-$id'),
+                    label: Text(SubjectBoards.label(id, names: names, lang: lang, mainTestLabel: l.examCatalogMainTitle)),
+                    selected: id == _selected,
+                    onSelected: (_) => setState(() => _selected = id),
                   ),
                 ),
             ],
           ),
-        );
-        return _BoardView(
-          key: ValueKey(selected),
-          boardId: BishkekTime.subjectWeeklyBoardId(selected, DateTime.now()),
-          header: picker,
-        );
-      },
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xs, AppSpacing.lg, 0),
+          child: Text(
+            l.learnLeaderboardSubjectHint,
+            style: theme.textTheme.bodySmall?.copyWith(color: context.tokens.textSecondary),
+          ),
+        ),
+      ],
+    );
+    return _BoardView(
+      key: ValueKey(_selected),
+      boardId: SubjectBoards.weeklyBoardId(_selected, DateTime.now()),
+      header: picker,
+      examOnly: true,
     );
   }
 }

@@ -2087,7 +2087,10 @@
   "learnLeaderboardBySubject": "By subject",
   "learnLeaderboardEmpty": "The leaderboard is empty",
   "learnLeaderboardEmptyBody": "It will fill up as students earn XP.",
-  "learnLeaderboardNotRanked": "You're not on this board yet. XP from studying is added automatically.",
+  "learnLeaderboardNotRanked": "You're not on this board yet. XP from lessons, practice and mock exams is added automatically.",
+  "learnLeaderboardSubjectEmptyBody": "It will fill up as students complete mock exams in this test.",
+  "learnLeaderboardSubjectHint": "Only this week's XP from mock exams in the selected test counts here.",
+  "learnLeaderboardSubjectNotRanked": "You're not on this board yet. Only XP from mock exams in this test counts here.",
   "learnLeaderboardTitle": "Leaderboard",
   "learnLeaderboardWeekly": "Weekly",
   "learnLeaderboardYou": "{name} (you)",
@@ -2172,6 +2175,7 @@
     }
   },
   "learnMistakeFromExam": "Question from a mock exam",
+  "learnMistakeMarkReviewed": "Mark as reviewed",
   "learnMistakeOpenReview": "Review",
   "learnMistakePractice": "Practise",
   "learnMistakeQuestion": "Question",
@@ -2185,6 +2189,7 @@
     }
   },
   "learnMistakeReviewToday": "due today",
+  "learnMistakeReviewedPrompt": "Reviewed this question? Mark it and it will come back later.",
   "learnMistakeWrongCount": "wrong: {n}",
   "@learnMistakeWrongCount": {
     "placeholders": {

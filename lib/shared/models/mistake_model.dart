@@ -49,8 +49,14 @@ class MistakeItem {
     );
   }
 
-  /// Only practice-sourced items may be written by the client (rules).
+  /// Only practice-sourced items may be written by the client in full
+  /// (rules). Exam items accept just a schedule update, see
+  /// MistakesService.reviewExamItem / markExamResolved.
   bool get clientWritable => source == MistakeSource.practice;
+
+  /// Exam items can be reviewed (opened in the attempt review) and moved
+  /// along the schedule, but not re-practised in the app.
+  bool get isExam => source == MistakeSource.exam;
 
   bool isDue(DateTime now) =>
       !resolved && (nextReviewAt == null || !nextReviewAt!.isAfter(now));

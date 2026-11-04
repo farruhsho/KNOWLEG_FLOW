@@ -70,9 +70,9 @@ void main() {
     expect(find.textContaining('Не является официальным баллом ОРТ'), findsOneWidget);
     expect(find.textContaining('из 200'), findsNothing);
     expect(find.text('Начислено XP: 103'), findsOneWidget);
-    await tester.scrollUntilVisible(find.textContaining('Повтори «'), 200,
+    await tester.scrollUntilVisible(find.textContaining('Повторите «'), 200,
         scrollable: find.byType(Scrollable).first);
-    expect(find.textContaining('Повтори «'), findsOneWidget,
+    expect(find.textContaining('Повторите «'), findsOneWidget,
         reason: 'plain-language recommendation for the weak topic');
     // State-language level explanation is only for state_language blueprints.
     expect(find.text('Как выдаётся официальный результат'), findsNothing);
