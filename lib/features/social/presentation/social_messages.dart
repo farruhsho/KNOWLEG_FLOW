@@ -29,6 +29,8 @@ extension SocialL10n on AppLocalizations {
           _ => socialErrorAlreadyDone,
         };
       case SocialFailureKind.rateLimited:
+        // Promo codes and friend/group codes (`code_attempts`, §9.7) alike:
+        // a daily attempt limit, so the text names no particular code.
         return socialErrorRateLimited;
       case SocialFailureKind.referralNotAllowed:
         return socialErrorReferralNotAllowed;
@@ -38,10 +40,18 @@ extension SocialL10n on AppLocalizations {
           SocialAction.groupJoin || SocialAction.groupCreate => socialErrorGroupLimit,
           _ => socialErrorLimitGeneric,
         };
+      case SocialFailureKind.groupFull:
+        return socialErrorGroupFull;
       case SocialFailureKind.notGroupOwner:
         return socialErrorNotGroupOwner;
       case SocialFailureKind.ownCode:
         return socialErrorOwnCode;
+      case SocialFailureKind.ownerHasMembers:
+        return socialGroupOwnerCannotLeave;
+      case SocialFailureKind.removedFromGroup:
+        return socialErrorRemovedFromGroup;
+      case SocialFailureKind.profileMissing:
+        return socialErrorProfileMissing;
       case SocialFailureKind.banned:
         return socialErrorBanned;
       case SocialFailureKind.notSignedIn:

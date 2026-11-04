@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/design/tokens.dart';
@@ -10,14 +12,16 @@ import 'social_widgets.dart';
 /// answer inline. Returns what [submit] returned, or null when cancelled.
 ///
 /// [validate] runs first on the normalised code and returns an error text
-/// for an obviously malformed code (no server call is made then).
+/// for an obviously malformed code (no server call is made then). It may be
+/// async (e.g. waiting for the student's own code); the dialog is busy
+/// meanwhile, and a [validate] that throws counts as "no objection".
 Future<T?> showCodeEntryDialog<T>(
   BuildContext context, {
   required String title,
   required String actionLabel,
   required SocialAction action,
   required Future<T> Function(String code) submit,
-  String? Function(String code)? validate,
+  FutureOr<String?> Function(String code)? validate,
   String? hint,
   int maxLength = SocialCodes.maxInputLength,
   String? initialCode,
@@ -59,7 +63,7 @@ class _CodeEntryDialog<T> extends StatefulWidget {
   final String actionLabel;
   final SocialAction action;
   final Future<T> Function(String code) submit;
-  final String? Function(String code)? validate;
+  final FutureOr<String?> Function(String code)? validate;
   final String? hint;
   final int maxLength;
   final String? initialCode;
@@ -86,9 +90,27 @@ class _CodeEntryDialogState<T> extends State<_CodeEntryDialog<T>> {
     if (_busy) return;
     final l = AppLocalizations.of(context)!;
     final code = SocialCodes.normalize(_controller.text);
-    final invalid = widget.validate?.call(code);
+    final check = widget.validate?.call(code);
+    String? invalid;
+    if (check is Future<String?>) {
+      setState(() {
+        _busy = true;
+        _error = null;
+      });
+      try {
+        invalid = await check;
+      } catch (_) {
+        invalid = null; // The server checks again anyway.
+      }
+      if (!mounted) return;
+    } else {
+      invalid = check;
+    }
     if (invalid != null) {
-      setState(() => _error = invalid);
+      setState(() {
+        _busy = false;
+        _error = invalid;
+      });
       return;
     }
     setState(() {

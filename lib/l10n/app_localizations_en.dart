@@ -5034,6 +5034,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'A group code is 4 to 12 Latin letters and digits.';
 
   @override
+  String get socialErrorGroupFull =>
+      'This group is full: it already has 500 members, the maximum.';
+
+  @override
   String get socialErrorGroupLimit => 'Limit reached: at most 5 groups.';
 
   @override
@@ -5064,6 +5068,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not available on this platform. Use the Android app.';
 
   @override
+  String get socialErrorProfileMissing =>
+      'Your profile is still being set up. Try again in a minute.';
+
+  @override
   String get socialErrorPromoAlreadyRedeemed =>
       'You have already used this promo code.';
 
@@ -5086,6 +5094,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get socialErrorReferralNotAllowed =>
       'A friend\'s code can only be entered by a new account: before your first completed mock exam or credits being added.';
+
+  @override
+  String get socialErrorRemovedFromGroup =>
+      'The owner removed you from this group, so you cannot join it again.';
 
   @override
   String get socialErrorValidation =>
@@ -5185,6 +5197,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get socialGroupNameLabel => 'Group name';
+
+  @override
+  String get socialGroupNameLength =>
+      'The name must be 2 to 60 characters long.';
 
   @override
   String get socialGroupNotFound => 'This group is no longer available to you.';

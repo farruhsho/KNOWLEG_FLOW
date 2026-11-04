@@ -194,4 +194,61 @@ void main() {
     await tester.pump();
     expect(find.text('Код друга HJK234'), findsNothing);
   });
+
+  testWidgets('home card: my own code (known on this device) is caught without a server call', (tester) async {
+    await pumpSocial(
+      tester,
+      const Scaffold(body: PendingReferralCard()),
+      repo: repo,
+      prefs: {
+        'social_pending_referral_code_v1': 'K7M2QX',
+        'social_my_referral_code_v1:me': 'K7M2QX',
+      },
+    );
+    await tester.tap(find.byKey(const ValueKey('pending_referral_apply')));
+    await tester.pump();
+    expect(find.text('Это ваш собственный код. Введите код друга.'), findsOneWidget);
+    expect(repo.appliedCodes, isEmpty);
+    expect(repo.referralGetCodeCalls, 0, reason: 'the check uses only a code already known');
+    expect(find.byKey(const ValueKey('pending_referral_apply')), findsNothing);
+  });
+
+  testWidgets('home card: server reasons in details.why (own code, already referred)', (tester) async {
+    await pumpSocial(
+      tester,
+      const Scaffold(body: PendingReferralCard()),
+      repo: repo,
+      prefs: {'social_pending_referral_code_v1': 'HJK234'},
+    );
+    repo.referralApplyError = FirebaseFunctionsException(
+      message: 'x',
+      code: 'failed-precondition',
+      details: {'reason': 'REFERRAL_NOT_ALLOWED', 'why': 'already_referred'},
+    );
+    await tester.tap(find.byKey(const ValueKey('pending_referral_apply')));
+    await tester.pump();
+    await tester.pump();
+    expect(repo.appliedCodes, ['HJK234']);
+    expect(find.text('Вы уже вводили код друга. Это можно сделать только один раз.'), findsOneWidget);
+    expect(find.textContaining('только в новом аккаунте'), findsNothing);
+    expect(find.byKey(const ValueKey('pending_referral_apply')), findsNothing, reason: 'retrying cannot help');
+  });
+
+  testWidgets('home card: own code rejected by the server (code not known on this device)', (tester) async {
+    await pumpSocial(
+      tester,
+      const Scaffold(body: PendingReferralCard()),
+      repo: repo,
+      prefs: {'social_pending_referral_code_v1': 'HJK234'},
+    );
+    repo.referralApplyError = FirebaseFunctionsException(
+      message: 'x',
+      code: 'failed-precondition',
+      details: {'reason': 'REFERRAL_NOT_ALLOWED', 'why': 'own_code'},
+    );
+    await tester.tap(find.byKey(const ValueKey('pending_referral_apply')));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Это ваш собственный код. Введите код друга.'), findsOneWidget);
+  });
 }

@@ -5091,6 +5091,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Код группы — от 4 до 12 латинских букв и цифр.';
 
   @override
+  String get socialErrorGroupFull =>
+      'В группе уже 500 участников — это максимум. Вступить нельзя.';
+
+  @override
   String get socialErrorGroupLimit => 'Достигнут лимит: не больше 5 групп.';
 
   @override
@@ -5122,6 +5126,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Недоступно на этой платформе. Используйте приложение для Android.';
 
   @override
+  String get socialErrorProfileMissing =>
+      'Профиль ещё создаётся. Повторите через минуту.';
+
+  @override
   String get socialErrorPromoAlreadyRedeemed =>
       'Вы уже использовали этот промокод.';
 
@@ -5144,6 +5152,10 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get socialErrorReferralNotAllowed =>
       'Код друга можно ввести только в новом аккаунте: до первого завершённого пробного экзамена или зачисления кредитов.';
+
+  @override
+  String get socialErrorRemovedFromGroup =>
+      'Владелец исключил вас из этой группы, поэтому вступить в неё снова нельзя.';
 
   @override
   String get socialErrorValidation =>
@@ -5242,6 +5254,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get socialGroupNameLabel => 'Название группы';
+
+  @override
+  String get socialGroupNameLength => 'Название — от 2 до 60 символов.';
 
   @override
   String get socialGroupNotFound => 'Эта группа вам больше недоступна.';

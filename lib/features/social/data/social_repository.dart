@@ -252,7 +252,7 @@ class FirebaseSocialRepository implements SocialRepository {
   @override
   Stream<List<GroupMember>> watchMembers(String groupId) => _guardStream(_group(groupId)
       .collection(Collections.groupMembers)
-      .limit(300)
+      .limit(StudyGroup.maxMembers)
       .snapshots()
       .map((s) => [for (final d in s.docs) GroupMember.fromMap(d.id, d.data())]
         ..sort((a, b) {
@@ -273,7 +273,7 @@ class FirebaseSocialRepository implements SocialRepository {
   @override
   Stream<List<AssignmentSubmission>> watchSubmissions(String groupId, String assignmentId) =>
       _guardStream(_submissions(groupId, assignmentId)
-          .limit(300)
+          .limit(StudyGroup.maxMembers)
           .snapshots()
           .map((s) => [for (final d in s.docs) AssignmentSubmission.fromMap(d.id, d.data())]));
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../application/social_providers.dart';
+import '../../domain/social_codes.dart';
 import '../../domain/social_failure.dart';
 import '../social_messages.dart';
 import 'social_widgets.dart';
@@ -30,8 +31,22 @@ class _PendingReferralCardState extends ConsumerState<PendingReferralCard> {
     SocialFailureKind.ownCode,
   };
 
+  /// The student's own code when it is already known on this device (no
+  /// server call just for this check; the server rejects it too).
+  String? _knownOwnCode() {
+    final loaded = ref.read(myReferralCodeProvider).valueOrNull;
+    if (loaded != null && loaded.isNotEmpty) return loaded;
+    final uid = ref.read(socialUidProvider);
+    return uid == null ? null : ref.read(referralLocalStoreProvider).cachedCode(uid);
+  }
+
   Future<void> _apply(String code) async {
     final l = AppLocalizations.of(context)!;
+    final mine = _knownOwnCode();
+    if (mine != null && SocialCodes.normalize(mine) == SocialCodes.normalize(code)) {
+      setState(() => _failure = SocialFailureKind.ownCode);
+      return;
+    }
     setState(() {
       _busy = true;
       _failure = null;

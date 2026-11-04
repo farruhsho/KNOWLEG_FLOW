@@ -11,6 +11,9 @@ import 'social_fakes.dart';
 FirebaseFunctionsException _reason(String reason) =>
     FirebaseFunctionsException(message: 'x', code: 'failed-precondition', details: {'reason': reason});
 
+FirebaseFunctionsException _details(Map<String, Object> details) =>
+    FirebaseFunctionsException(message: 'x', code: 'failed-precondition', details: details);
+
 const _owned = StudyGroup(id: 'g1', name: '11 «Б», школа № 5', ownerUid: 'me', joinCode: 'JOIN11', memberCount: 3);
 const _joined = StudyGroup(id: 'g2', name: 'Учебный центр «Билим»', ownerUid: 'teacher', joinCode: 'BILIM2', memberCount: 12);
 
@@ -105,6 +108,26 @@ void main() {
       await tester.pump();
       expect(find.text('Достигнут лимит: не больше 5 групп.'), findsOneWidget);
 
+      // The group is full: not the "5 groups" limit (§9.7).
+      repo.groupJoinError = _details({'reason': 'LIMIT_REACHED', 'what': 'group_members', 'limit': 500});
+      await tester.tap(find.byKey(const ValueKey('group_join_submit')));
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('В группе уже 500 участников — это максимум. Вступить нельзя.'), findsOneWidget);
+      expect(find.text('Достигнут лимит: не больше 5 групп.'), findsNothing);
+
+      repo.groupJoinError = _details({'reason': 'VALIDATION_FAILED', 'why': 'removed_from_group'});
+      await tester.tap(find.byKey(const ValueKey('group_join_submit')));
+      await tester.pump();
+      await tester.pump();
+      expect(find.textContaining('исключил вас из этой группы'), findsOneWidget);
+
+      repo.groupJoinError = _details({'reason': 'RATE_LIMITED', 'what': 'code_attempts'});
+      await tester.tap(find.byKey(const ValueKey('group_join_submit')));
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Слишком много попыток за сегодня. Попробуйте завтра.'), findsOneWidget);
+
       repo.groupJoinError = null;
       await tester.tap(find.byKey(const ValueKey('group_join_submit')));
       await tester.pumpAndSettle();
@@ -121,7 +144,14 @@ void main() {
 
       await tester.tap(find.byKey(const ValueKey('group_create_submit')));
       await tester.pump();
-      expect(find.text('Введите название до 60 символов.'), findsOneWidget);
+      expect(find.text('Название — от 2 до 60 символов.'), findsOneWidget);
+      expect(repo.createdGroups, isEmpty);
+
+      // One character (after trimming) is too short for the server too.
+      await tester.enterText(find.byKey(const ValueKey('group_name_field')), '  А  ');
+      await tester.tap(find.byKey(const ValueKey('group_create_submit')));
+      await tester.pump();
+      expect(find.text('Название — от 2 до 60 символов.'), findsOneWidget);
       expect(repo.createdGroups, isEmpty);
 
       await tester.enterText(find.byKey(const ValueKey('group_name_field')), '  10   «А» ');
@@ -347,5 +377,82 @@ void main() {
     await pumpSocial(tester, const GroupDetailPage(groupId: 'gone'), repo: repo, now: _now);
     await tester.pump();
     expect(find.text('Эта группа вам больше недоступна.'), findsOneWidget);
+  });
+
+  testWidgets('owner leave refused by the server (owner_has_members): the owner-cannot-leave text', (tester) async {
+    // The cached member count is stale (1), so the client lets the owner try.
+    const g = StudyGroup(id: 'g3', name: 'Кружок', ownerUid: 'me', joinCode: 'KRUJOK', memberCount: 1);
+    final repo = FakeSocialRepository(
+      profile: const SocialProfile(uid: 'me', groupIds: ['g3']),
+      groups: const [g],
+      members: const {
+        'g3': [GroupMember(uid: 'me', displayName: 'Учитель', role: GroupRole.owner)],
+      },
+    );
+    addTearDown(repo.dispose);
+    repo.groupLeaveError = FirebaseFunctionsException(
+      message: 'x',
+      code: 'failed-precondition',
+      details: {'reason': 'VALIDATION_FAILED', 'why': 'owner_has_members'},
+    );
+    await pumpSocial(tester, const GroupDetailPage(groupId: 'g3'), repo: repo, now: _now);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('group_menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Выйти из группы'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Выйти из группы'));
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Владелец может выйти, только когда в группе не останется других участников.'), findsOneWidget);
+    expect(repo.leftGroups, isEmpty);
+  });
+
+  testWidgets('owner assigns quick practice: saved with an empty ref_id (§9.7)', (tester) async {
+    final repo = _repo();
+    addTearDown(repo.dispose);
+    await pumpSocial(tester, const GroupDetailPage(groupId: 'g1'), repo: repo, now: _now);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('assignment_add')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('assignment_kind_practice')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('assignment_pick_target')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Быстрая практика (любой предмет)'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('assignment_title_field')), 'Быстрая практика');
+    await tester.ensureVisible(find.byKey(const ValueKey('assignment_save')));
+    await tester.tap(find.byKey(const ValueKey('assignment_save')));
+    await tester.pumpAndSettle();
+    final (_, draft) = repo.createdAssignments.single;
+    expect(draft.kind, AssignmentKind.practice);
+    expect(draft.refId, '');
+    expect(find.text('Задание добавлено'), findsOneWidget);
+  });
+
+  group('limits shared with the server (ARCHITECTURE §9.7)', () {
+    test('group name: 2..60 after collapsing whitespace, counted like the server', () {
+      expect(kGroupNameMinLength, 2);
+      expect(kGroupNameMaxLength, 60);
+      expect(normalizeGroupName('  10   «А» '), '10 «А»');
+      expect(normalizeGroupName('a\u0001b'), 'a b', reason: 'control characters become spaces, as on the server');
+      expect(normalizeGroupName(' \t\n '), isEmpty);
+      // UTF-16 code units, as JS `length`: an emoji counts as 2.
+      expect(normalizeGroupName('😀').length, 2);
+    });
+
+    test('member and submission lists are read up to the member cap', () {
+      expect(StudyGroup.maxMembers, 500);
+    });
+
+    test('quick practice: a practice assignment may have an empty ref_id, other kinds may not', () {
+      final due = DateTime(2026, 11, 11);
+      expect(AssignmentDraft(title: 'Быстрая практика', kind: AssignmentKind.practice, refId: '', dueAt: due).isValid,
+          isTrue);
+      expect(AssignmentDraft(title: 'Урок', kind: AssignmentKind.lesson, refId: '', dueAt: due).isValid, isFalse);
+      expect(AssignmentDraft(title: 'Вариант', kind: AssignmentKind.examVariant, refId: ' ', dueAt: due).isValid,
+          isFalse);
+    });
   });
 }
