@@ -112,6 +112,12 @@ abstract class AppLocalizations {
   /// **'Delete account permanently'**
   String get accountDeleteButton;
 
+  /// Shown when the confirmation word has letters missing from a Russian keyboard; {word} is the plain-letter form
+  ///
+  /// In en, this message translates to:
+  /// **'You can also type {word}'**
+  String accountDeleteConfirmAlt(String word);
+
   /// No description provided for @accountDeleteConfirmLabel.
   ///
   /// In en, this message translates to:
@@ -208,6 +214,12 @@ abstract class AppLocalizations {
   /// **'Delete account'**
   String get accountDeleteTitle;
 
+  /// No description provided for @accountDeleteUnavailablePlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion isn\'t available on this platform. Open the app on an Android device to delete your account.'**
+  String get accountDeleteUnavailablePlatform;
+
   /// No description provided for @accountDeleteWarningBody.
   ///
   /// In en, this message translates to:
@@ -262,6 +274,12 @@ abstract class AppLocalizations {
   /// **'Too many attempts. Wait a few minutes and try again.'**
   String get accountErrorTooManyRequests;
 
+  /// No description provided for @accountErrorUnauthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'The server couldn\'t verify this app or your session. Update the app, sign in again and retry.'**
+  String get accountErrorUnauthenticated;
+
   /// No description provided for @accountErrorUnknown.
   ///
   /// In en, this message translates to:
@@ -315,6 +333,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password'**
   String get accountReauthPassword;
+
+  /// No description provided for @accountReauthSignInAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in again'**
+  String get accountReauthSignInAgain;
 
   /// No description provided for @accountReauthTitle.
   ///
@@ -3058,6 +3082,12 @@ abstract class AppLocalizations {
   /// **'Buy {title} for {price}'**
   String billingBuySemantics(String title, String price);
 
+  /// No description provided for @billingCreditHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit history'**
+  String get billingCreditHistoryTitle;
+
   /// No description provided for @billingCreditRule.
   ///
   /// In en, this message translates to:
@@ -3127,13 +3157,13 @@ abstract class AppLocalizations {
   /// No description provided for @billingExternalInfo.
   ///
   /// In en, this message translates to:
-  /// **'Access to additional tests can be purchased on our website.'**
+  /// **'Credits on your account are shown here.'**
   String get billingExternalInfo;
 
   /// No description provided for @billingExternalNote.
   ///
   /// In en, this message translates to:
-  /// **'Purchased credits appear here automatically.'**
+  /// **'Your balance updates automatically.'**
   String get billingExternalNote;
 
   /// No description provided for @billingFreeExamAvailable.
@@ -3147,6 +3177,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free mock exam already used'**
   String get billingFreeExamUsed;
+
+  /// Free mock exams the account still has (config/pricing.free_exams_per_user minus used)
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 free mock exam left} other{{count} free mock exams left}}'**
+  String billingFreeExamsLeft(int count);
 
   /// No description provided for @billingHistoryError.
   ///
@@ -3243,6 +3279,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added by support'**
   String get billingReasonAdminGrant;
+
+  /// No description provided for @billingReasonCreditsAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits added'**
+  String get billingReasonCreditsAdded;
 
   /// No description provided for @billingReasonExamStart.
   ///
@@ -3399,6 +3441,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Purchases are unavailable'**
   String get billingUnavailableTitle;
+
+  /// No description provided for @billingUnsupportedPlatformBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tests can be bought in the Android app through Google Play. Your balance is the same on every device.'**
+  String get billingUnsupportedPlatformBody;
+
+  /// No description provided for @billingUnsupportedPlatformTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases aren\'t available here'**
+  String get billingUnsupportedPlatformTitle;
 
   /// No description provided for @biology.
   ///
@@ -7618,6 +7672,12 @@ abstract class AppLocalizations {
   /// **'How can I help?'**
   String get tutorEmptyTitle;
 
+  /// No description provided for @tutorErrorBanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is restricted, so the AI tutor isn\'t available. If you think this is a mistake, contact support.'**
+  String get tutorErrorBanned;
+
   /// No description provided for @tutorErrorDisabled.
   ///
   /// In en, this message translates to:
@@ -7779,6 +7839,12 @@ abstract class AppLocalizations {
   /// **'Tell me your exam date and weak subjects.'**
   String get tutorHintStudyPlan;
 
+  /// No description provided for @tutorMessageTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'The message is too long ({count}/{max} characters). Shorten it to send.'**
+  String tutorMessageTooLong(int count, int max);
+
   /// No description provided for @tutorModeChat.
   ///
   /// In en, this message translates to:
@@ -7844,6 +7910,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI tutor'**
   String get tutorTitle;
+
+  /// No description provided for @tutorUnavailablePlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI tutor isn\'t available on this platform. Use the Android app.'**
+  String get tutorUnavailablePlatform;
 
   /// No description provided for @tutorYou.
   ///

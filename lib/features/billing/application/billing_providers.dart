@@ -13,6 +13,12 @@ import 'billing_service.dart';
 /// Build-time billing mode (`--dart-define=BILLING_MODE=play|external`).
 final billingModeProvider = Provider<BillingMode>((ref) => BillingMode.current);
 
+/// Whether this build may show purchase buttons, prices or "buy" wording.
+/// False in `BILLING_MODE=external` (consumption-only Play build): every
+/// screen must then drop its purchase call-to-action and must not route to
+/// the store as a way to pay (ARCHITECTURE §5, Play payments policy).
+final canSellProvider = Provider<bool>((ref) => ref.watch(billingModeProvider).sellsInApp);
+
 /// Whether this platform can talk to Google Play Billing at all.
 final playBillingPlatformProvider = Provider<bool>((ref) => isPlayBillingPlatform);
 

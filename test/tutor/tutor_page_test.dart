@@ -39,6 +39,7 @@ void main() {
     required Widget home,
     Brightness brightness = Brightness.light,
     String locale = 'ru',
+    bool available = true,
   }) async {
     // Small phone: 360 x 640 dp.
     tester.view.physicalSize = const Size(1080, 1920);
@@ -49,6 +50,7 @@ void main() {
       overrides: [
         tutorApiProvider.overrideWithValue(api),
         tutorUidProvider.overrideWith((ref) => Stream<String?>.value('user-1')),
+        tutorAvailableProvider.overrideWithValue(available),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -150,6 +152,56 @@ void main() {
       expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
     });
 
+    testWidgets('composer: counter near the limit, error and no send above it (D13)', (tester) async {
+      final api = _FakeTutorApi([const TutorReply('ok')]);
+      await pumpApp(tester, api: api, home: const TutorPage());
+
+      await tester.enterText(find.byType(TextField), 'a' * 1900);
+      await tester.pump();
+      expect(find.text('1900/2000'), findsOneWidget);
+      expect(tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.send_rounded)).onPressed,
+          isNotNull);
+
+      // Typing is not cut off at the limit, but sending is blocked.
+      await tester.enterText(find.byType(TextField), 'a' * 2001);
+      await tester.pump();
+      expect(find.textContaining('2001/2000'), findsOneWidget);
+      expect(tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.send_rounded)).onPressed,
+          isNull);
+      await tester.tap(find.byIcon(Icons.send_rounded));
+      await tester.pump();
+      expect(api.requests, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('banned account: clear message and input disabled', (tester) async {
+      final api = _FakeTutorApi([
+        FirebaseFunctionsException(
+            code: 'permission-denied', message: 'banned', details: {'reason': 'USER_BANNED'}),
+      ]);
+      await pumpApp(tester, api: api, home: const TutorPage());
+      await tester.enterText(find.byType(TextField), 'Вопрос');
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.send_rounded));
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.textContaining('Ваш аккаунт ограничен'), findsWidgets);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+    });
+
+    testWidgets('platform without App Check: "not available" state, nothing is sent (D7)',
+        (tester) async {
+      final api = _FakeTutorApi([const TutorReply('ok')]);
+      await pumpApp(tester, api: api, home: const TutorPage(), available: false);
+
+      expect(find.text('ИИ-репетитор недоступен на этой платформе. Воспользуйтесь Android-приложением.'),
+          findsOneWidget);
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
+      expect(api.requests, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('dark mode on a small phone renders without overflow', (tester) async {
       final api = _FakeTutorApi([
         const TutorReply('# План\n1. **Алгебра** — '
@@ -218,6 +270,97 @@ void main() {
       expect(req.language, 'ru');
       expect(req.message, contains('A) 3'));
       expect(find.text('Вы прибавили неверно.'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    QuestionModel longQuestion({int stemRepeat = 90, int optionRepeat = 25, int optionCount = 5}) =>
+        QuestionModel(
+          id: 'q_long',
+          subjectId: 'reading',
+          sectionId: 'reading',
+          stem: {'ru': 'Прочитайте текст. ' * stemRepeat},
+          options: [
+            for (var i = 0; i < optionCount; i++)
+              OptionModel(
+                id: String.fromCharCode(65 + i),
+                text: {'ru': 'Вариант ${String.fromCharCode(65 + i)}: ${'длинный ответ ' * optionRepeat}'},
+              ),
+          ],
+          correctAnswer: 'C',
+          type: QuestionType.singleChoice,
+          difficulty: 2,
+          explanation: const {},
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+          createdBy: 'test',
+        );
+
+    Future<void> openExplainer(WidgetTester tester, _FakeTutorApi api, QuestionModel q,
+        {bool available = true}) async {
+      await pumpApp(
+        tester,
+        api: api,
+        available: available,
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: TextButton(
+                onPressed: () => AIExplainerModal.show(context, question: q, userAnswer: 'A'),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('long reading question: the explain request fits the 2000-char limit (D13)',
+        (tester) async {
+      // Stem ~1600 + 5 options of ~360 chars: the untrimmed prompt is ~3.6k.
+      final api = _FakeTutorApi([const TutorReply('Разбор.')]);
+      await openExplainer(tester, api, longQuestion());
+      await tester.ensureVisible(find.text('Объяснить мою ошибку'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Объяснить мою ошибку'));
+      await tester.pump();
+      await tester.pump();
+
+      final req = api.requests.single;
+      expect(req.message.length, lessThanOrEqualTo(TutorRequest.maxMessageChars));
+      expect(req.toPayload()['message'], req.message.trim());
+      for (final id in ['A', 'B', 'C', 'D', 'E']) {
+        expect(req.message, contains('$id) Вариант $id'));
+      }
+      expect(req.message, contains('Мой ответ: A'));
+      expect(req.message, contains('Правильный ответ: C'));
+      expect(req.questionId, 'q_long');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('buildExplainPrompt stays within the limit for huge questions', (tester) async {
+      await pumpApp(tester, api: _FakeTutorApi([const TutorReply('x')]), home: const SizedBox());
+      for (final code in ['ru', 'ky', 'en']) {
+        final l10n = await AppLocalizations.delegate.load(Locale(code));
+        final prompt = buildExplainPrompt(
+          l10n,
+          question: longQuestion(stemRepeat: 2000, optionRepeat: 200, optionCount: 12),
+          languageCode: code,
+          userAnswer: 'Z' * 5000,
+        );
+        expect(prompt.length, lessThanOrEqualTo(TutorRequest.maxMessageChars), reason: code);
+        expect(prompt, contains('L) Вариант L'), reason: code);
+      }
+    });
+
+    testWidgets('platform without App Check: no AI buttons, a clear note instead (D7)',
+        (tester) async {
+      final api = _FakeTutorApi([const TutorReply('x')]);
+      await openExplainer(tester, api, question, available: false);
+      expect(find.text('Объяснить мою ошибку'), findsNothing);
+      expect(find.textContaining('недоступен на этой платформе'), findsOneWidget);
+      expect(api.requests, isEmpty);
       expect(tester.takeException(), isNull);
     });
   });

@@ -84,7 +84,10 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
       await _service.deleteAccount();
     } on AccountDeleteException catch (e) {
       if (e.failure != AccountDeleteFailure.requiresRecentLogin) rethrow;
-      // Token too old for the backend: prove identity once more, then retry.
+      // The server wants a sign-in from the last few minutes
+      // (REQUIRES_RECENT_LOGIN): prove identity once more, then retry once.
+      // Without an in-app re-auth method the error offers "Sign in again".
+      if (_service.methods().isEmpty) rethrow;
       if (!await _reauthenticate()) {
         throw const AccountDeleteException(AccountDeleteFailure.canceled);
       }
@@ -96,6 +99,15 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
     context.go(RoutePaths.splash);
   }
 
+  /// Signs out so the user can sign in fresh (new `auth_time`) and return.
+  Future<void> _signInAgain() async {
+    setState(() => _busy = true);
+    await _service.signOutForFreshSignIn();
+    if (!mounted) return;
+    setState(() => _busy = false);
+    context.go(RoutePaths.login);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -103,7 +115,9 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
     final tokens = context.tokens;
     final g = AppSpacing.gutter(context);
     final signedIn = _service.currentUser != null;
+    final available = ref.watch(accountDeletionAvailableProvider);
     final word = l10n.accountDeleteConfirmWord;
+    final plainWord = deleteConfirmationPlainForm(word);
 
     return PopScope(
       canPop: !_busy,
@@ -165,6 +179,26 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
                   onPressed: () => context.go(RoutePaths.login),
                   child: Text(l10n.accountDeleteGoToLogin),
                 ),
+              ] else if (!available) ...[
+                // No App Check provider here (Windows/Linux, web without a
+                // site key): accountDelete would be rejected (D7).
+                DecoratedBox(
+                  decoration: BoxDecoration(color: tokens.surfaceMuted, borderRadius: AppRadii.mdAll),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.phone_android_outlined, color: theme.colorScheme.onSurfaceVariant),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Text(l10n.accountDeleteUnavailablePlatform,
+                              style: theme.textTheme.bodyMedium),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ] else ...[
                 TextField(
                   controller: _confirm,
@@ -172,7 +206,10 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
                   autocorrect: false,
                   enableSuggestions: false,
                   textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(labelText: l10n.accountDeleteConfirmLabel(word)),
+                  decoration: InputDecoration(
+                    labelText: l10n.accountDeleteConfirmLabel(word),
+                    helperText: plainWord == null ? null : l10n.accountDeleteConfirmAlt(plainWord),
+                  ),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: AppSpacing.md),
@@ -183,6 +220,17 @@ class _AccountDeletePageState extends ConsumerState<AccountDeletePage> {
                       style: theme.textTheme.bodyMedium?.copyWith(color: tokens.danger),
                     ),
                   ),
+                  if (_error == AccountDeleteFailure.requiresRecentLogin) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: OutlinedButton.icon(
+                        onPressed: _busy ? null : _signInAgain,
+                        icon: const Icon(Icons.login),
+                        label: Text(l10n.accountReauthSignInAgain),
+                      ),
+                    ),
+                  ],
                 ],
                 const SizedBox(height: AppSpacing.lg),
                 ValueListenableBuilder<TextEditingValue>(
@@ -222,6 +270,7 @@ String _errorText(AppLocalizations l10n, AccountDeleteFailure f) => switch (f) {
       AccountDeleteFailure.tooManyRequests => l10n.accountErrorTooManyRequests,
       AccountDeleteFailure.network => l10n.accountErrorNetwork,
       AccountDeleteFailure.requiresRecentLogin => l10n.accountErrorRecentLogin,
+      AccountDeleteFailure.unauthenticated => l10n.accountErrorUnauthenticated,
       AccountDeleteFailure.userMismatch => l10n.accountErrorUserMismatch,
       AccountDeleteFailure.googleFailed => l10n.accountErrorGoogle,
       AccountDeleteFailure.serviceUnavailable => l10n.accountErrorService,

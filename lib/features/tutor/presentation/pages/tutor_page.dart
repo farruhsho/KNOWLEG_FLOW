@@ -46,7 +46,9 @@ class _TutorPageState extends ConsumerState<TutorPage> {
   void _send() {
     final s = ref.read(tutorChatProvider);
     final text = _input.text;
-    if (text.trim().isEmpty || s.sending || s.blockingFailure != null) return;
+    final length = text.trim().length;
+    if (length == 0 || length > TutorRequest.maxMessageChars) return;
+    if (s.sending || s.blockingFailure != null || !ref.read(tutorAvailableProvider)) return;
     _input.clear();
     ref.read(tutorChatProvider.notifier).send(text, language: _language);
   }
@@ -56,6 +58,7 @@ class _TutorPageState extends ConsumerState<TutorPage> {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(tutorChatProvider);
     final notifier = ref.read(tutorChatProvider.notifier);
+    final available = ref.watch(tutorAvailableProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -87,11 +90,17 @@ class _TutorPageState extends ConsumerState<TutorPage> {
                       onRetry: (id) => notifier.retry(id, language: _language),
                     ),
             ),
-            if (state.blockingFailure != null) _BlockingBanner(failure: state.blockingFailure!),
+            if (!available)
+              _BlockingBanner(
+                text: l10n.tutorUnavailablePlatform,
+                icon: Icons.phone_android_outlined,
+              )
+            else if (state.blockingFailure != null)
+              _BlockingBanner(text: l10n.tutorFailureMessage(state.blockingFailure!)),
             _Composer(
               controller: _input,
               hint: l10n.tutorModeHint(state.mode),
-              enabled: state.blockingFailure == null,
+              enabled: available && state.blockingFailure == null,
               sending: state.sending,
               remainingToday: state.remainingToday,
               onSend: _send,
@@ -366,13 +375,13 @@ class _ThinkingBubble extends StatelessWidget {
 }
 
 class _BlockingBanner extends StatelessWidget {
-  const _BlockingBanner({required this.failure});
+  const _BlockingBanner({required this.text, this.icon = Icons.hourglass_empty});
 
-  final TutorFailure failure;
+  final String text;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final g = AppSpacing.gutter(context);
     final t = context.tokens;
     return Padding(
@@ -384,11 +393,13 @@ class _BlockingBanner extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.hourglass_empty, size: 20, color: t.warning),
+              Icon(icon, size: 20, color: t.warning),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(l10n.tutorFailureMessage(failure),
-                    style: Theme.of(context).textTheme.bodyMedium),
+                child: Semantics(
+                  liveRegion: true,
+                  child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+                ),
               ),
             ],
           ),
@@ -436,39 +447,47 @@ class _Composer extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                 child: Text(l10n.tutorRemainingToday(remainingToday!), style: theme.textTheme.bodySmall),
               ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: controller,
-                    enabled: enabled,
-                    minLines: 1,
-                    maxLines: 5,
-                    maxLength: TutorRequest.maxMessageChars,
-                    textInputAction: TextInputAction.newline,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      hintText: hint,
-                      hintMaxLines: 2,
-                      counterText: '',
-                      isDense: true,
+            // The server limit (D13) applies to the trimmed text. Typing is
+            // not cut off — a long paste or prefill stays editable — but the
+            // counter appears near the limit and sending is blocked above it.
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller,
+              builder: (context, value, _) {
+                const max = TutorRequest.maxMessageChars;
+                final length = value.text.trim().length;
+                final tooLong = length > max;
+                final nearLimit = length >= (max * 0.9).floor();
+                final canSend = enabled && !sending && length > 0 && !tooLong;
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        enabled: enabled,
+                        minLines: 1,
+                        maxLines: 5,
+                        textInputAction: TextInputAction.newline,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: hint,
+                          hintMaxLines: 2,
+                          isDense: true,
+                          helperText: nearLimit && !tooLong ? '$length/$max' : null,
+                          errorText: tooLong ? l10n.tutorMessageTooLong(length, max) : null,
+                          errorMaxLines: 3,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                ValueListenableBuilder<TextEditingValue>(
-                  valueListenable: controller,
-                  builder: (context, value, _) {
-                    final canSend = enabled && !sending && value.text.trim().isNotEmpty;
-                    return IconButton.filled(
+                    const SizedBox(width: AppSpacing.xs),
+                    IconButton.filled(
                       tooltip: l10n.tutorSend,
                       onPressed: canSend ? onSend : null,
                       icon: const Icon(Icons.send_rounded),
-                    );
-                  },
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

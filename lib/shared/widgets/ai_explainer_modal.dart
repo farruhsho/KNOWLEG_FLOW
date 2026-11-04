@@ -58,6 +58,48 @@ class AIExplainerModal extends ConsumerStatefulWidget {
   ConsumerState<AIExplainerModal> createState() => _AIExplainerModalState();
 }
 
+/// Size budgets (UTF-16 code units) for [buildExplainPrompt].
+const int explainPromptStemBudget = 600;
+const int explainPromptOptionsBudget = 800;
+const int explainPromptOptionMax = 150;
+const int explainPromptAnswerBudget = 100;
+
+/// The "explain my mistake" message for [question], always within
+/// [TutorRequest.maxMessageChars] (the server rejects longer messages).
+///
+/// The stem is cut to [explainPromptStemBudget]; all options share
+/// [explainPromptOptionsBudget] (at most [explainPromptOptionMax] each); the
+/// final text is clipped as a last resort.
+String buildExplainPrompt(
+  AppLocalizations l10n, {
+  required QuestionModel question,
+  required String languageCode,
+  required String userAnswer,
+}) {
+  String pick(Map<String, String> m) =>
+      m[languageCode] ?? m['ru'] ?? (m.isEmpty ? '' : m.values.first);
+
+  final stemText = question.stem.isEmpty ? '' : question.getStem(languageCode).trim();
+  final stem = clipTutorText(stemText, explainPromptStemBudget, ellipsis: true);
+
+  final count = question.options.isEmpty ? 1 : question.options.length;
+  final perOption = (explainPromptOptionsBudget ~/ count).clamp(20, explainPromptOptionMax);
+  final options = question.options
+      .map((o) => '${o.id}) ${clipTutorText(pick(o.text).trim(), perOption, ellipsis: true)}')
+      .join('\n');
+
+  final answer = userAnswer.trim().isEmpty
+      ? l10n.tutorExplainerNoAnswer
+      : clipTutorText(userAnswer.trim(), explainPromptAnswerBudget, ellipsis: true);
+  final correct = clipTutorText(question.correctAnswer.trim(), explainPromptAnswerBudget, ellipsis: true);
+
+  return clipTutorText(
+    l10n.tutorExplainPrompt(stem, options, answer, correct),
+    TutorRequest.maxMessageChars,
+    ellipsis: true,
+  );
+}
+
 enum _AiPhase { idle, loading, done, failed }
 
 class _AIExplainerModalState extends ConsumerState<AIExplainerModal> {
@@ -68,14 +110,16 @@ class _AIExplainerModalState extends ConsumerState<AIExplainerModal> {
 
   String get _lang => Localizations.localeOf(context).languageCode;
 
-  String _prompt(AppLocalizations l10n) {
-    final q = widget.question;
-    final options = q.options
-        .map((o) => '${o.id}) ${o.text[_lang] ?? o.text['ru'] ?? (o.text.isEmpty ? '' : o.text.values.first)}')
-        .join('\n');
-    final userAnswer = widget.userAnswer.trim().isEmpty ? l10n.tutorExplainerNoAnswer : widget.userAnswer;
-    return l10n.tutorExplainPrompt(_stem(), options, userAnswer, q.correctAnswer);
-  }
+  /// The `explain_mistake` message. It must fit the server's
+  /// [TutorRequest.maxMessageChars] (D13), so the stem and options are cut to
+  /// a budget: with a questionId the server adds the full question, options
+  /// and reference answer itself, and the excerpt only anchors the request.
+  String _prompt(AppLocalizations l10n) => buildExplainPrompt(
+        l10n,
+        question: widget.question,
+        languageCode: _lang,
+        userAnswer: widget.userAnswer,
+      );
 
   String _stem() => widget.question.stem.isEmpty ? '' : widget.question.getStem(_lang);
 
@@ -130,6 +174,7 @@ class _AIExplainerModalState extends ConsumerState<AIExplainerModal> {
     final accentBg = isCorrect ? tokens.successContainer : tokens.dangerContainer;
     final explanation = q.getExplanation(_lang);
     final canOpenChat = GoRouter.maybeOf(context) != null;
+    final aiAvailable = ref.watch(tutorAvailableProvider);
 
     return Dialog(
       shape: const RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
@@ -199,6 +244,7 @@ class _AIExplainerModalState extends ConsumerState<AIExplainerModal> {
               if (!isCorrect) ...[
                 const SizedBox(height: AppSpacing.lg),
                 _AiSection(
+                  available: aiAvailable,
                   phase: _phase,
                   reply: _reply,
                   remaining: _remaining,
@@ -243,6 +289,7 @@ class _AIExplainerModalState extends ConsumerState<AIExplainerModal> {
 
 class _AiSection extends StatelessWidget {
   const _AiSection({
+    required this.available,
     required this.phase,
     required this.reply,
     required this.remaining,
@@ -251,6 +298,8 @@ class _AiSection extends StatelessWidget {
     required this.onOpenChat,
   });
 
+  /// False where `aiTutor` cannot be called (no App Check provider, D7).
+  final bool available;
   final _AiPhase phase;
   final String? reply;
   final int? remaining;
@@ -264,6 +313,23 @@ class _AiSection extends StatelessWidget {
     final theme = Theme.of(context);
     final tokens = context.tokens;
     final blocked = failure?.blocksInput ?? false;
+
+    if (!available) {
+      return DecoratedBox(
+        decoration: BoxDecoration(color: tokens.surfaceMuted, borderRadius: AppRadii.mdAll),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.phone_android_outlined, size: 20, color: theme.colorScheme.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(child: Text(l10n.tutorUnavailablePlatform, style: theme.textTheme.bodyMedium)),
+            ],
+          ),
+        ),
+      );
+    }
 
     return DecoratedBox(
       decoration: BoxDecoration(

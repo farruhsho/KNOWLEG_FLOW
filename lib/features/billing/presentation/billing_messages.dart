@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../application/billing_service.dart';
 import '../domain/billing_records.dart';
+import '../domain/entitlements.dart';
 import '../domain/pricing_config.dart';
 
 /// Localised copy for billing states and issues.
@@ -38,14 +39,27 @@ extension BillingL10n on AppLocalizations {
         PurchaseRecordState.invalid || PurchaseRecordState.unknown => billingStateInvalid,
       };
 
-  String billingLedgerReasonLabel(LedgerReason r) => switch (r) {
-        LedgerReason.purchase => billingReasonPurchase,
+  /// [neutral]: `BILLING_MODE=external` wording, which never mentions buying.
+  String billingLedgerReasonLabel(LedgerReason r, {bool neutral = false}) => switch (r) {
+        LedgerReason.purchase => neutral ? billingReasonCreditsAdded : billingReasonPurchase,
         LedgerReason.examStart => billingReasonExamStart,
         LedgerReason.refund => billingReasonRefund,
         LedgerReason.adminGrant => billingReasonAdminGrant,
         LedgerReason.freeFirst => billingReasonFreeFirst,
         LedgerReason.other => billingReasonOther,
       };
+
+  /// Free-exam status for the balance card (D14): remaining =
+  /// `config/pricing.free_exams_per_user` − `free_exams_used_count`.
+  /// Null when the account never had free exams (allowance 0, none used).
+  String? billingFreeExamsLine(Entitlements e) {
+    final left = e.freeExamsRemaining;
+    if (left > 0) {
+      return e.freeExamsAllowed == 1 ? billingFreeExamAvailable : billingFreeExamsLeft(left);
+    }
+    if (e.freeExamsUsedCount > 0) return billingFreeExamUsed;
+    return null;
+  }
 
   /// "1 тест" / "5 тестов", or the `config/pricing` label override.
   String billingProductTitle(PricingConfig pricing, String productId, String languageCode) =>

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/backend/callable_platform.dart';
 import '../data/tutor_api.dart';
 import '../domain/tutor_models.dart';
 
@@ -29,12 +30,15 @@ class TutorChatState {
 
   bool get hasContext => questionId != null || attemptId != null;
 
+  /// [replaceContext]: take [questionId] and [attemptId] as given, nulls
+  /// included, instead of keeping the current values for nulls.
   TutorChatState copyWith({
     List<TutorMessage>? messages,
     TutorMode? mode,
     String? questionId,
     String? attemptId,
     bool clearContext = false,
+    bool replaceContext = false,
     bool? sending,
     int? remainingToday,
     TutorFailure? blockingFailure,
@@ -43,8 +47,16 @@ class TutorChatState {
       TutorChatState(
         messages: messages ?? this.messages,
         mode: mode ?? this.mode,
-        questionId: clearContext ? null : (questionId ?? this.questionId),
-        attemptId: clearContext ? null : (attemptId ?? this.attemptId),
+        questionId: clearContext
+            ? null
+            : replaceContext
+                ? questionId
+                : (questionId ?? this.questionId),
+        attemptId: clearContext
+            ? null
+            : replaceContext
+                ? attemptId
+                : (attemptId ?? this.attemptId),
         sending: sending ?? this.sending,
         remainingToday: remainingToday ?? this.remainingToday,
         blockingFailure: clearBlocking ? null : (blockingFailure ?? this.blockingFailure),
@@ -72,10 +84,18 @@ class TutorChatController extends StateNotifier<TutorChatState> {
   }
 
   /// Applies route arguments (question / attempt context and mode).
+  ///
+  /// Context is replaced as a whole: when the arguments carry a question or
+  /// an attempt, any earlier questionId/attemptId is dropped. Otherwise an
+  /// exam attemptId left over from "Ask tutor" on an exam review would be
+  /// sent together with a later practice questionId, and the server would
+  /// look for that question in the exam attempt and find no context.
   void applyArgs(TutorArgs args) {
     if (args.isEmpty) return;
+    final hasContext = args.questionId != null || args.attemptId != null;
     state = state.copyWith(
       mode: args.mode ?? state.mode,
+      replaceContext: hasContext,
       questionId: args.questionId,
       attemptId: args.attemptId,
     );
@@ -105,6 +125,8 @@ class TutorChatController extends StateNotifier<TutorChatState> {
   Future<bool> send(String text, {required String language}) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty || state.sending || state.blockingFailure != null) return false;
+    // The server rejects longer messages; never send a silently cut one.
+    if (trimmed.length > TutorRequest.maxMessageChars) return false;
     final userMsg = TutorMessage(id: _nextId(), role: TutorRole.user, text: trimmed, at: _clock());
     final history = state.messages;
     state = state.copyWith(messages: [...history, userMsg], sending: true);
@@ -161,6 +183,11 @@ class TutorChatController extends StateNotifier<TutorChatState> {
 }
 
 final tutorApiProvider = Provider<TutorApi>((ref) => const CallableTutorApi());
+
+/// Whether `aiTutor` can be called from this platform (App Check, D7). On
+/// Windows/Linux, and on web builds without a reCAPTCHA site key, the tutor
+/// shows a "not available on this platform" state instead of failing.
+final tutorAvailableProvider = Provider<bool>((ref) => callablesSupportedOnThisPlatform);
 
 /// Signed-in uid; the chat is rebuilt (cleared) whenever it changes.
 final tutorUidProvider = StreamProvider<String?>((ref) {

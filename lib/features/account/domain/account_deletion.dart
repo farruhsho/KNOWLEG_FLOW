@@ -17,23 +17,74 @@ List<ReauthMethod> reauthMethodsFor(Iterable<String> providerIds, {String? email
   ];
 }
 
-/// Typed confirmation: case-insensitive, surrounding spaces ignored.
+/// Kyrgyz letters that a standard Russian (ЙЦУКЕН) keyboard lacks, mapped to
+/// the plain Cyrillic letter people type instead (UX-10).
+const Map<String, String> _plainLetters = {
+  'Ө': 'О',
+  'Ү': 'У',
+  'Ң': 'Н',
+  'Ё': 'Е',
+};
+
+/// Upper-cases [s], drops surrounding spaces, collapses inner whitespace and
+/// replaces Ө/Ү/Ң/Ё with О/У/Н/Е, so the Kyrgyz word can be typed on a
+/// Russian keyboard.
+String normalizeDeleteConfirmation(String s) {
+  final upper = s.trim().toUpperCase().replaceAll(RegExp(r'\s+'), ' ');
+  final out = StringBuffer();
+  for (final rune in upper.runes) {
+    final ch = String.fromCharCode(rune);
+    out.write(_plainLetters[ch] ?? ch);
+  }
+  return out.toString();
+}
+
+/// Confirmation words accepted in every locale, so a user is never stuck on
+/// a keyboard layout: the English and Russian words and the Kyrgyz one.
+const Set<String> deleteConfirmationWordsAnyLocale = {'DELETE', 'УДАЛИТЬ', 'ӨЧҮРҮҮ'};
+
+/// Typed confirmation: case-insensitive, surrounding spaces ignored, Kyrgyz
+/// letters may be typed as their Russian-keyboard look-alikes (ОЧУРУУ for
+/// ӨЧҮРҮҮ). The localized [word] and [deleteConfirmationWordsAnyLocale] are
+/// accepted.
 bool isDeleteConfirmationValid(String typed, String word) {
-  final a = typed.trim().toUpperCase();
-  return a.isNotEmpty && a == word.trim().toUpperCase();
+  final a = normalizeDeleteConfirmation(typed);
+  if (a.isEmpty) return false;
+  if (a == normalizeDeleteConfirmation(word)) return true;
+  return deleteConfirmationWordsAnyLocale.any((w) => a == normalizeDeleteConfirmation(w));
+}
+
+/// The Russian-keyboard spelling of [word] when it differs from [word]
+/// (e.g. ОЧУРУУ for ӨЧҮРҮҮ), else null. Shown as a hint under the field.
+String? deleteConfirmationPlainForm(String word) {
+  final plain = normalizeDeleteConfirmation(word);
+  return plain == word.trim().toUpperCase() ? null : plain;
 }
 
 enum AccountDeleteFailure {
   wrongPassword,
   tooManyRequests,
   network,
+
+  /// The server wants a sign-in from the last few minutes
+  /// (`details.reason == REQUIRES_RECENT_LOGIN`, decision D9), or Firebase
+  /// Auth itself asked for one.
   requiresRecentLogin,
+
+  /// The callable answered `unauthenticated`: the session or the App Check
+  /// token was not accepted. Not a recent-login problem, so no re-auth loop.
+  unauthenticated,
   userMismatch,
   canceled,
   googleFailed,
   serviceUnavailable,
   signedOut,
   unknown;
+
+  /// `details.reason` of `accountDelete` when the sign-in is too old (D9).
+  /// Must equal the REQUIRES_RECENT_LOGIN entry of `BackendReasons` and
+  /// functions/src/domain/reasons.ts.
+  static const requiresRecentLoginReason = 'REQUIRES_RECENT_LOGIN';
 
   static AccountDeleteFailure from(Object e) {
     if (e is AccountDeleteException) return e.failure;
@@ -65,15 +116,13 @@ enum AccountDeleteFailure {
       return unknown;
     }
     if (e is FirebaseFunctionsException) {
-      final reason = BackendReasons.of(e);
-      final msg = (e.message ?? '').toLowerCase();
-      if (reason == 'REQUIRES_RECENT_LOGIN' ||
-          reason == 'RECENT_LOGIN_REQUIRED' ||
-          e.code == 'unauthenticated' ||
-          (e.code == 'failed-precondition' && msg.contains('recent'))) {
-        return requiresRecentLogin;
-      }
+      // Only the explicit reason triggers re-auth + retry. A bare
+      // `unauthenticated` (e.g. a missing App Check token on web/desktop)
+      // can't be fixed by signing in again and must not loop.
+      if (BackendReasons.of(e) == requiresRecentLoginReason) return requiresRecentLogin;
       switch (e.code) {
+        case 'unauthenticated':
+          return unauthenticated;
         case 'unavailable':
         case 'deadline-exceeded':
           return network;

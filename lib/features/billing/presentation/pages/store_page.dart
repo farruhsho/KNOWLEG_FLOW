@@ -52,7 +52,9 @@ class _StorePageState extends ConsumerState<StorePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final sellsInApp = ref.watch(billingModeProvider.select((m) => m.sellsInApp));
+    final sellsInApp = ref.watch(canSellProvider);
+    // Play Billing (and so purchase verification) exists only on Android.
+    final playPlatform = ref.watch(playBillingPlatformProvider);
     final gutter = AppSpacing.gutter(context);
     final signedIn = ref.watch(billingUidProvider.select((u) => u.valueOrNull != null));
 
@@ -62,7 +64,7 @@ class _StorePageState extends ConsumerState<StorePage> {
         actions: [
           if (signedIn)
             IconButton(
-              tooltip: l10n.billingHistoryTooltip,
+              tooltip: sellsInApp ? l10n.billingHistoryTooltip : l10n.billingCreditHistoryTitle,
               icon: const Icon(Icons.receipt_long_outlined),
               onPressed: () => context.push(RoutePaths.transactions),
             ),
@@ -70,18 +72,27 @@ class _StorePageState extends ConsumerState<StorePage> {
       ),
       // The purchase status sits outside the scroll view so it stays visible
       // wherever the user had scrolled to before tapping a product.
-      bottomNavigationBar: sellsInApp ? const _PurchaseStatus() : null,
+      bottomNavigationBar: sellsInApp && playPlatform ? const _PurchaseStatus() : null,
       body: ListView(
         padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.xxxl),
         children: [
           const _BalanceSection(),
           const SizedBox(height: AppSpacing.xl),
-          if (sellsInApp) ...const [
+          if (sellsInApp && playPlatform) ...const [
             _ProductsSection(),
             SizedBox(height: AppSpacing.sm),
             _RestoreButton(),
             SizedBox(height: AppSpacing.lg),
             _HonestCopy(),
+          ] else if (sellsInApp) ...[
+            // Web / desktop / iOS: no Google Play Billing on this platform.
+            BillingMessage(
+              icon: Icons.phone_android_outlined,
+              title: l10n.billingUnsupportedPlatformTitle,
+              message: l10n.billingUnsupportedPlatformBody,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const _HonestCopy(),
           ] else
             const _ExternalInfo(),
         ],
@@ -130,6 +141,7 @@ class _BalanceCard extends StatelessWidget {
     final theme = Theme.of(context);
     final tokens = context.tokens;
     final free = entitlements.hasFreeExam;
+    final freeLine = l10n.billingFreeExamsLine(entitlements);
     return BillingCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,24 +153,21 @@ class _BalanceCard extends StatelessWidget {
             l10n.billingCreditsCount(entitlements.credits),
             style: theme.textTheme.headlineMedium,
           ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                free ? Icons.card_giftcard_outlined : Icons.check_circle_outline,
-                size: 20,
-                color: free ? tokens.success : tokens.textTertiary,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  free ? l10n.billingFreeExamAvailable : l10n.billingFreeExamUsed,
-                  style: theme.textTheme.bodyMedium,
+          if (freeLine != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  free ? Icons.card_giftcard_outlined : Icons.check_circle_outline,
+                  size: 20,
+                  color: free ? tokens.success : tokens.textTertiary,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(child: Text(freeLine, style: theme.textTheme.bodyMedium)),
+              ],
+            ),
+          ],
           const SizedBox(height: AppSpacing.sm),
           Text(l10n.billingCreditRule, style: theme.textTheme.bodySmall),
         ],

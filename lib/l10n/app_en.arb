@@ -2,6 +2,15 @@
   "@@locale": "en",
   "aboutApp": "About App",
   "accountDeleteButton": "Delete account permanently",
+  "accountDeleteConfirmAlt": "You can also type {word}",
+  "@accountDeleteConfirmAlt": {
+    "description": "Shown when the confirmation word has letters missing from a Russian keyboard; {word} is the plain-letter form",
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
   "accountDeleteConfirmLabel": "To confirm, type {word}",
   "@accountDeleteConfirmLabel": {
     "placeholders": {
@@ -28,6 +37,7 @@
   "accountDeleteKeptPurchases": "Anonymized purchase records (date, product, amount, order number) without your name or email. We need them for financial reporting, refunds and fraud prevention.",
   "accountDeleteSignedOut": "Sign in to delete your account.",
   "accountDeleteTitle": "Delete account",
+  "accountDeleteUnavailablePlatform": "Account deletion isn't available on this platform. Open the app on an Android device to delete your account.",
   "accountDeleteWarningBody": "Your account and learning data will be permanently deleted. You won't be able to restore them.",
   "accountDeleteWarningTitle": "This can't be undone",
   "accountDeleteWhatDeletedTitle": "What will be deleted",
@@ -37,6 +47,7 @@
   "accountErrorRecentLogin": "For security, please sign in again and repeat.",
   "accountErrorService": "Account deletion is temporarily unavailable. Try again later.",
   "accountErrorTooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+  "accountErrorUnauthenticated": "The server couldn't verify this app or your session. Update the app, sign in again and retry.",
   "accountErrorUnknown": "Couldn't delete the account. Try again.",
   "accountErrorUserMismatch": "That's a different account. Sign in with the account you want to delete.",
   "accountErrorWrongPassword": "Wrong password.",
@@ -53,6 +64,7 @@
   },
   "accountReauthGoogle": "Continue with Google",
   "accountReauthPassword": "Password",
+  "accountReauthSignInAgain": "Sign in again",
   "accountReauthTitle": "Confirm it's you",
   "adminAccountMenu": "Account",
   "adminActivate": "Activate",
@@ -1006,6 +1018,7 @@
       }
     }
   },
+  "billingCreditHistoryTitle": "Credit history",
   "billingCreditRule": "1 credit = 1 full mock exam",
   "billingCreditsCount": "{count, plural, =1{1 credit} other{{count} credits}}",
   "@billingCreditsCount": {
@@ -1025,10 +1038,19 @@
   "billingErrorStore": "Google Play returned an error. Try again.",
   "billingErrorStoreUnavailable": "Google Play is unavailable right now. Try again later.",
   "billingErrorVerifyDeferred": "We couldn't confirm the purchase yet. We'll retry automatically, and your payment won't be lost.",
-  "billingExternalInfo": "Access to additional tests can be purchased on our website.",
-  "billingExternalNote": "Purchased credits appear here automatically.",
+  "billingExternalInfo": "Credits on your account are shown here.",
+  "billingExternalNote": "Your balance updates automatically.",
   "billingFreeExamAvailable": "Your first full mock exam is free",
   "billingFreeExamUsed": "Free mock exam already used",
+  "billingFreeExamsLeft": "{count, plural, =1{1 free mock exam left} other{{count} free mock exams left}}",
+  "@billingFreeExamsLeft": {
+    "description": "Free mock exams the account still has (config/pricing.free_exams_per_user minus used)",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "billingHistoryError": "Couldn't load the history.",
   "billingHistoryTooltip": "Purchase history",
   "billingHonestNoGuarantee": "Mock exams help you practise; they don't guarantee an ORT result.",
@@ -1067,6 +1089,7 @@
   "billingProductsTitle": "Buy mock exams",
   "billingPurchasesEmpty": "No purchases yet.",
   "billingReasonAdminGrant": "Added by support",
+  "billingReasonCreditsAdded": "Credits added",
   "billingReasonExamStart": "Mock exam started",
   "billingReasonFreeFirst": "Free first exam",
   "billingReasonOther": "Balance change",
@@ -1093,6 +1116,8 @@
   "billingTransactionsTitle": "Purchase history",
   "billingUnavailableBody": "Google Play billing isn't available on this device. Make sure Google Play is installed and you're signed in to it.",
   "billingUnavailableTitle": "Purchases are unavailable",
+  "billingUnsupportedPlatformBody": "Tests can be bought in the Android app through Google Play. Your balance is the same on every device.",
+  "billingUnsupportedPlatformTitle": "Purchases aren't available here",
   "biology": "Biology",
   "buyTest": "Buy Test",
   "cancel": "Cancel",
@@ -2908,6 +2933,7 @@
   "tutorDisclaimer": "AI can make mistakes. Check important steps with your textbook or teacher.",
   "tutorEmptyBody": "Choose a mode above and ask a question. I explain the reasoning instead of just giving the answer.",
   "tutorEmptyTitle": "How can I help?",
+  "tutorErrorBanned": "Your account is restricted, so the AI tutor isn't available. If you think this is a mistake, contact support.",
   "tutorErrorDisabled": "The AI tutor is temporarily unavailable.",
   "tutorErrorExamInProgress": "The tutor can't help during an active exam. Finish the attempt, then review your mistakes here.",
   "tutorErrorNetwork": "No connection. Check the internet and try again.",
@@ -2965,6 +2991,17 @@
   "tutorHintPractice": "Name a topic — I'll suggest similar tasks.",
   "tutorHintStepByStep": "Describe the problem — we'll solve it step by step.",
   "tutorHintStudyPlan": "Tell me your exam date and weak subjects.",
+  "tutorMessageTooLong": "The message is too long ({count}/{max} characters). Shorten it to send.",
+  "@tutorMessageTooLong": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "tutorModeChat": "Free question",
   "tutorModeExplainMistake": "Explain a mistake",
   "tutorModeGrammar": "Grammar",
@@ -2983,6 +3020,7 @@
   "tutorSend": "Send",
   "tutorThinking": "The tutor is thinking…",
   "tutorTitle": "AI tutor",
+  "tutorUnavailablePlatform": "The AI tutor isn't available on this platform. Use the Android app.",
   "tutorYou": "You",
   "weakTopics": "Weak Topics",
   "welcome": "Welcome",

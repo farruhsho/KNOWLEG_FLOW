@@ -15,6 +15,11 @@ class AppLocalizationsKy extends AppLocalizations {
   String get accountDeleteButton => 'Аккаунтту биротоло өчүрүү';
 
   @override
+  String accountDeleteConfirmAlt(String word) {
+    return '$word деп жазсаңыз да болот';
+  }
+
+  @override
   String accountDeleteConfirmLabel(String word) {
     return 'Ырастоо үчүн $word деп жазыңыз';
   }
@@ -74,6 +79,10 @@ class AppLocalizationsKy extends AppLocalizations {
   String get accountDeleteTitle => 'Аккаунтту өчүрүү';
 
   @override
+  String get accountDeleteUnavailablePlatform =>
+      'Бул платформада аккаунтту өчүрүү жеткиликсиз. Аккаунтту өчүрүү үчүн тиркемени Android түзмөгүндө ачыңыз.';
+
+  @override
   String get accountDeleteWarningBody =>
       'Аккаунтуңуз жана окуу маалыматтарыңыз биротоло өчүрүлөт. Аларды калыбына келтирүү мүмкүн болбойт.';
 
@@ -108,6 +117,10 @@ class AppLocalizationsKy extends AppLocalizations {
       'Аракеттер өтө көп. Бир нече мүнөт күтүп, кайталаңыз.';
 
   @override
+  String get accountErrorUnauthenticated =>
+      'Сервер тиркемени же сеансыңызды текшере алган жок. Тиркемени жаңыртып, кайра кирип, кайталаңыз.';
+
+  @override
   String get accountErrorUnknown =>
       'Аккаунтту өчүрүү мүмкүн болбоду. Дагы бир жолу аракет кылыңыз.';
 
@@ -138,6 +151,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get accountReauthPassword => 'Сырсөз';
+
+  @override
+  String get accountReauthSignInAgain => 'Кайра кирүү';
 
   @override
   String get accountReauthTitle => 'Бул сиз экениңизди ырастаңыз';
@@ -1679,6 +1695,9 @@ class AppLocalizationsKy extends AppLocalizations {
   }
 
   @override
+  String get billingCreditHistoryTitle => 'Кредиттердин тарыхы';
+
+  @override
   String get billingCreditRule => '1 кредит = 1 толук сынамык экзамен';
 
   @override
@@ -1729,11 +1748,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get billingExternalInfo =>
-      'Кошумча тесттерге жеткиликтүүлүктү биздин сайттан сатып алса болот.';
+      'Аккаунтуңуздагы кредиттер ушул жерде көрсөтүлөт.';
 
   @override
-  String get billingExternalNote =>
-      'Сатып алынган кредиттер бул жерде автоматтык түрдө пайда болот.';
+  String get billingExternalNote => 'Баланс автоматтык түрдө жаңыланып турат.';
 
   @override
   String get billingFreeExamAvailable =>
@@ -1741,6 +1759,16 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get billingFreeExamUsed => 'Акысыз сынамык экзамен колдонулуп бүткөн';
+
+  @override
+  String billingFreeExamsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count акысыз сынамык экзамен калды',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get billingHistoryError => 'Тарыхты жүктөө мүмкүн болбоду.';
@@ -1809,6 +1837,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get billingReasonAdminGrant => 'Колдоо кызматы кошту';
+
+  @override
+  String get billingReasonCreditsAdded => 'Кредиттер кошулду';
 
   @override
   String get billingReasonExamStart => 'Сынамык экзамен башталды';
@@ -1892,6 +1923,14 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get billingUnavailableTitle => 'Сатып алуу жеткиликсиз';
+
+  @override
+  String get billingUnsupportedPlatformBody =>
+      'Тесттерди Android тиркемесинде Google Play аркылуу сатып алса болот. Баланс бардык түзмөктөрдө бирдей.';
+
+  @override
+  String get billingUnsupportedPlatformTitle =>
+      'Бул жерде сатып алуу жеткиликсиз';
 
   @override
   String get biology => 'Биология';
@@ -4376,6 +4415,10 @@ class AppLocalizationsKy extends AppLocalizations {
   String get tutorEmptyTitle => 'Кантип жардам берейин?';
 
   @override
+  String get tutorErrorBanned =>
+      'Аккаунтуңуз чектелген, ошондуктан ЖИ-репетитор жеткиликсиз. Эгер бул ката болсо, колдоо кызматына жазыңыз.';
+
+  @override
   String get tutorErrorDisabled => 'ЖИ-репетитор убактылуу жеткиликсиз.';
 
   @override
@@ -4478,6 +4521,11 @@ class AppLocalizationsKy extends AppLocalizations {
       'Экзамендин күнүн жана начар предметтериңизди жазыңыз.';
 
   @override
+  String tutorMessageTooLong(int count, int max) {
+    return 'Билдирүү өтө узун ($count/$max белги). Жөнөтүү үчүн аны кыскартыңыз.';
+  }
+
+  @override
   String get tutorModeChat => 'Эркин суроо';
 
   @override
@@ -4511,6 +4559,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get tutorTitle => 'ЖИ-репетитор';
+
+  @override
+  String get tutorUnavailablePlatform =>
+      'ЖИ-репетитор бул платформада жеткиликсиз. Android тиркемесин колдонуңуз.';
 
   @override
   String get tutorYou => 'Сиз';

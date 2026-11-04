@@ -32,7 +32,27 @@ class ProductPresentation {
 class PricingConfig {
   final Map<String, ProductPresentation> products;
 
-  const PricingConfig(this.products);
+  /// Free full mock exams per account (`free_exams_per_user`). Display hint:
+  /// the server applies the same value in `examStart`.
+  final int freeExamsPerUser;
+
+  const PricingConfig(this.products, {this.freeExamsPerUser = defaultFreeExamsPerUser});
+
+  /// Server default when `config/pricing.free_exams_per_user` is missing or
+  /// invalid (functions/src/handlers/exam.ts `readPricingFreeExams`).
+  static const int defaultFreeExamsPerUser = 1;
+
+  /// Largest value the server accepts (`adminUpdatePricing`, `examStart`).
+  static const int maxFreeExamsPerUser = 5;
+
+  /// Mirrors the server: an integer 0..5, anything else means the default.
+  static int parseFreeExamsPerUser(Object? raw) {
+    if (raw is num && raw.isFinite && raw == raw.truncateToDouble()) {
+      final v = raw.toInt();
+      if (v >= 0 && v <= maxFreeExamsPerUser) return v;
+    }
+    return defaultFreeExamsPerUser;
+  }
 
   static const _defaultCredits = <String, int>{
     BillingProducts.examSingle: 1,
@@ -110,6 +130,8 @@ class PricingConfig {
         put(FirestoreValues.readString(m['product_id'] ?? m['productId'] ?? m['id']), m);
       }
     }
-    return PricingConfig(result);
+    // Same lookup as the server: snake_case first, camelCase as a fallback.
+    final Object? free = data?['free_exams_per_user'] ?? data?['freeExamsPerUser'];
+    return PricingConfig(result, freeExamsPerUser: parseFreeExamsPerUser(free));
   }
 }
