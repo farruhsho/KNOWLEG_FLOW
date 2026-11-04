@@ -19,7 +19,7 @@ export interface EntitlementState {
   debt_credits: number;
 }
 
-export type LedgerReason = 'purchase' | 'exam_start' | 'refund' | 'admin_grant' | 'free_first';
+export type LedgerReason = 'purchase' | 'exam_start' | 'refund' | 'admin_grant' | 'free_first' | 'promo' | 'referral';
 
 export interface LedgerEntry {
   delta: number;
@@ -190,4 +190,20 @@ export function applyAdminDelta(ent: EntitlementState, delta: number): AdminAdju
   const applied = credits - ent.credits;
   const next = { ...ent, credits };
   return { entitlement: next, applied, ledger: { delta: applied, balance_after: credits, reason: 'admin_grant' } };
+}
+
+export interface BonusApplication {
+  entitlement: EntitlementState;
+  ledger: LedgerEntry;
+}
+
+/**
+ * Free credits from a promo code or a referral reward (ARCHITECTURE §9):
+ * added to the balance as-is (they are gifts, not purchases, so they neither
+ * count as lifetime purchases nor settle refund debt).
+ */
+export function applyBonusCredits(ent: EntitlementState, credits: number, reason: 'promo' | 'referral'): BonusApplication {
+  if (!Number.isInteger(credits) || credits <= 0) throw new Error('applyBonusCredits: credits must be > 0');
+  const next: EntitlementState = { ...ent, credits: ent.credits + credits };
+  return { entitlement: next, ledger: { delta: credits, balance_after: next.credits, reason } };
 }

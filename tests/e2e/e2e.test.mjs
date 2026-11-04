@@ -19,7 +19,7 @@ import { getAuth as adminAuth } from 'firebase-admin/auth';
 
 import { initializeApp, deleteApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, terminate } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, terminate, Timestamp } from 'firebase/firestore';
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from 'firebase/functions';
 
 const PROJECT = process.env.GCLOUD_PROJECT || 'demo-ort-e2e';
@@ -114,6 +114,7 @@ before(async () => {
   await db.doc('config/pricing').set({ free_exams_per_user: 1, products: { exam_single: { credits: 1 }, exam_pack_5: { credits: 5 }, exam_pack_10: { credits: 10 } } });
   mainSections = await seedVariant(mainBp, 'e2e_main_ru_1', 'ru');
   await seedVariant(chemBp, 'e2e_chem_ru_1', 'ru');
+  await db.doc('lessons/e2e_lesson_1').set({ id: 'e2e_lesson_1', subjectId: 'math', order: 1, title: { ru: 'E2E урок', ky: 'E2E сабак' } });
 
   const adminUser = await auth.createUser({ email: ADMIN.email, password: ADMIN.password, emailVerified: true });
   await auth.setCustomUserClaims(adminUser.uid, { role: 'super_admin' });
@@ -141,6 +142,16 @@ after(async () => {
     await deleteApp(app).catch(() => {});
   }
 });
+
+/** topic_id seedQuestions gives the k-th question of a blueprint section (mirrors the fixture above). */
+function e2eTopic(section, k) {
+  let offset = 0;
+  for (const part of section.parts) {
+    if (k < offset + part.question_count) return `${section.subject_area}.e2e_topic_${(k - offset) % 3}`;
+    offset += part.question_count;
+  }
+  return null;
+}
 
 // ---------------------------------------------------------------- the student journey
 
@@ -201,6 +212,13 @@ test('sections are forward-only and the attempt completes with an honest result'
   let last;
   for (const [i, sec] of mainSections.entries()) {
     const answers = {};
+    // Per-question seconds (ARCHITECTURE §9.5): topic *_0 questions take 90 s,
+    // the others 20 s, so every *.e2e_topic_0 topic is "slow" (> 1.5 × median 20 s).
+    const timings = { not_in_this_section: 10 };
+    const bpSection = mainBp.sections.find((s) => s.id === sec.section_id);
+    sec.question_ids.forEach((qid, k) => {
+      timings[qid] = e2eTopic(bpSection, k).endsWith('_0') ? 90 : 20;
+    });
     sec.question_ids.forEach((qid, k) => {
       if (k % 5 === 4) { expectedSkipped++; return; } // leave every 5th unanswered
       const isQc = sec.section_id === 'math' && k < 30;
@@ -208,7 +226,7 @@ test('sections are forward-only and the attempt completes with an honest result'
       answers[qid] = right ? (isQc ? 'B' : 'A') : 'C';
       if (right) expectedCorrect++;
     });
-    last = await call('examSubmitSection')({ attemptId, sectionId: sec.section_id, answers, flags: [], clientElapsedSec: 60 });
+    last = await call('examSubmitSection')({ attemptId, sectionId: sec.section_id, answers, flags: [], clientElapsedSec: 60, timings });
     if (i < mainSections.length - 1) {
       assert.equal(last.completed, false);
       assert.equal(last.next.section.sectionId, mainSections[i + 1].section_id);
@@ -222,6 +240,14 @@ test('sections are forward-only and the attempt completes with an honest result'
   assert.equal(r.incorrect, 150 - expectedCorrect - expectedSkipped);
   assert.equal(r.sections.length, 4);
   assert.ok(r.xp_awarded > 0);
+  // Timings -> topic_time_avg / slow_topics (ARCHITECTURE §9.5).
+  assert.equal(r.topic_time_avg['math.e2e_topic_0'], 90);
+  assert.equal(r.topic_time_avg['math.e2e_topic_1'], 20);
+  assert.ok(r.slow_topics.includes('math.e2e_topic_0') && r.slow_topics.includes('reading.e2e_topic_0'), r.slow_topics.join());
+  assert.ok(r.slow_topics.every((t) => t.endsWith('.e2e_topic_0')), r.slow_topics.join());
+  const mathAnswers = (await getDoc(doc(cDb, 'exam_attempts', attemptId, 'answers', 'math'))).data();
+  assert.equal(mathAnswers.timings[mainSections[0].question_ids[0]], 90);
+  assert.equal(mathAnswers.timings.not_in_this_section, undefined, 'foreign question ids are dropped');
   // A completed section cannot be reopened: a re-submit is either refused or
   // replayed idempotently, and never changes the stored result.
   let replay = null;
@@ -292,6 +318,184 @@ test('an admin credit grant unlocks exactly one paid attempt', async () => {
   assert.ok(ledger.size >= 3, 'free_first, admin_grant and exam_start are all in the ledger');
 });
 
+// ---------------------------------------------------------------- phase 3 (ARCHITECTURE §9)
+
+const FRIEND = { email: 'friend.e2e@example.test', password: 'e2e-Fr1end-Passw0rd!' };
+const NEWBIE = { email: 'newbie.e2e@example.test', password: 'e2e-N3wbie-Passw0rd!' };
+let friendUid;
+let newbieUid;
+let friendCode;
+let groupId;
+
+async function signInAs(user) {
+  await signOut(cAuth);
+  await signInWithEmailAndPassword(cAuth, user.email, user.password);
+  await cAuth.currentUser.getIdToken(true);
+}
+
+/** Signs up a new student and creates the profile the way the app does. */
+async function signUp(user, name, language) {
+  await signOut(cAuth);
+  const cred = await createUserWithEmailAndPassword(cAuth, user.email, user.password);
+  await setDoc(doc(cDb, 'users', cred.user.uid), {
+    name, email: user.email, grade: 11, preferred_language: language, role: 'student',
+    subscription: { tier: 'free', expires_at: null }, created_at: serverTimestamp(),
+  });
+  return cred.user.uid;
+}
+
+test('promo codes: the admin creates one, a student redeems it once (ALREADY_REDEEMED after)', async () => {
+  await signInAs(ADMIN);
+  const up = await call('adminUpsertPromoCode')({ code: 'e2e-welcome', credits: 2, maxRedemptions: 10, expiresAt: null, active: true, note: 'e2e' });
+  assert.equal(up.ok, true);
+  assert.equal(up.code, 'E2EWELCOME');
+  const promo = (await getDoc(doc(cDb, 'promo_codes', 'E2EWELCOME'))).data();
+  assert.deepEqual([promo.credits, promo.redemptions, promo.active, promo.max_redemptions], [2, 0, true, 10]);
+  await expectReason(call('adminUpsertPromoCode')({ code: 'AB', credits: 1, active: true }), 'VALIDATION_FAILED');
+  const logs = await getDocs(query(collection(cDb, 'admin_logs'), where('action', '==', 'create_promo_code')));
+  assert.equal(logs.size, 1, 'admin action is logged');
+
+  await signInAs(STUDENT);
+  await expectReason(call('adminUpsertPromoCode')({ code: 'FREECREDITS', credits: 10, active: true }), 'FORBIDDEN_ROLE');
+  await expectDenied(getDoc(doc(cDb, 'promo_codes', 'E2EWELCOME')));
+  const before = (await getDoc(doc(cDb, 'entitlements', studentUid))).data().credits;
+  const red = await call('promoRedeem')({ code: 'e2ewelcome' });
+  assert.deepEqual(red, { credits: 2, balance: before + 2 });
+  await expectReason(call('promoRedeem')({ code: 'E2EWELCOME' }), 'ALREADY_REDEEMED');
+  await expectReason(call('promoRedeem')({ code: 'NOSUCHCODE' }), 'CODE_INVALID');
+  const ledger = await getDocs(query(collection(cDb, 'entitlements', studentUid, 'ledger'), where('reason', '==', 'promo')));
+  assert.equal(ledger.size, 1);
+  assert.equal(ledger.docs[0].data().delta, 2);
+  assert.equal((await db.doc('promo_codes/E2EWELCOME').get()).get('redemptions'), 1);
+  const attempts = await db.collection('promo_attempts').where('uid', '==', studentUid).get();
+  assert.equal(attempts.docs[0]?.get('count'), 3, 'every attempt is counted (10/day cap)');
+});
+
+test('referrals: get a code, apply it once; REFERRAL_NOT_ALLOWED after an exam or for your own code', async () => {
+  friendUid = await signUp(FRIEND, 'E2E Friend', 'ru');
+  const { code } = await call('referralGetCode')({});
+  assert.match(code, /^[A-HJ-NP-Z2-9]{6}$/);
+  friendCode = code;
+  assert.equal((await call('referralGetCode')({})).code, code, 'idempotent');
+  assert.equal((await getDoc(doc(cDb, 'users', friendUid))).data().referral_code, code);
+  await expectDenied(getDoc(doc(cDb, 'referral_codes', code)));
+  await expectReason(call('referralApply')({ code }), 'REFERRAL_NOT_ALLOWED');
+
+  // The main student already completed an exam.
+  await signInAs(STUDENT);
+  await expectReason(call('referralApply')({ code }), 'REFERRAL_NOT_ALLOWED');
+  await expectReason(call('referralApply')({ code: 'ZZZZZZ' }), 'CODE_INVALID');
+
+  // A fresh account may apply it, exactly once (a retry is idempotent).
+  newbieUid = await signUp(NEWBIE, 'E2E Newbie', 'ky');
+  assert.deepEqual(await call('referralApply')({ code: code.toLowerCase() }), { ok: true });
+  assert.deepEqual(await call('referralApply')({ code }), { ok: true });
+  assert.equal((await getDoc(doc(cDb, 'users', newbieUid))).data().referred_by, friendUid);
+  await expectDenied(setDoc(doc(cDb, 'users', newbieUid), { referred_by: null }, { merge: true }));
+
+  await signInAs(FRIEND);
+  const items = await getDocs(collection(cDb, 'referrals', friendUid, 'items'));
+  assert.deepEqual(items.docs.map((d) => [d.id, d.data().status, d.data().display_name]), [[newbieUid, 'joined', 'E2E Newbie']]);
+});
+
+test('friendAdd: by the friend\'s referral code, idempotent, never yourself', async () => {
+  await signInAs(STUDENT);
+  const r = await call('friendAdd')({ code: friendCode });
+  assert.equal(r.friendUid, friendUid);
+  await call('friendAdd')({ code: friendCode });
+  const list = await getDocs(collection(cDb, 'friends', studentUid, 'list'));
+  assert.deepEqual(list.docs.map((d) => [d.id, d.data().display_name]), [[friendUid, 'E2E Friend']]);
+  await expectDenied(setDoc(doc(cDb, 'friends', studentUid, 'list', newbieUid), { display_name: 'x', added_at: serverTimestamp() }));
+  const own = (await call('referralGetCode')({})).code;
+  await expectReason(call('friendAdd')({ code: own }), 'VALIDATION_FAILED');
+  await expectReason(call('friendAdd')({ code: 'not a code' }), 'CODE_INVALID');
+});
+
+test('groups: create, join, owner assignment, member submission, leagues, leave', async () => {
+  await signInAs(FRIEND);
+  const g = await call('groupCreate')({ name: '  11 «А»   класс ' });
+  groupId = g.groupId;
+  assert.match(g.joinCode, /^[A-HJ-NP-Z2-9]{6}$/);
+  const group = (await getDoc(doc(cDb, 'groups', groupId))).data();
+  assert.deepEqual([group.name, group.owner_uid, group.member_count, group.join_code], ['11 «А» класс', friendUid, 1, g.joinCode]);
+  // The owner publishes homework with the exact §9.3 map.
+  const aRef = doc(collection(cDb, 'groups', groupId, 'assignments'));
+  await setDoc(aRef, {
+    title: 'Вариант 1: математика', kind: 'exam_variant', ref_id: 'e2e_main_ru_1',
+    due_at: Timestamp.fromMillis(Date.now() + 7 * 864e5), created_by: friendUid, created_at: serverTimestamp(),
+  });
+
+  // Non-members see nothing.
+  await signInAs(NEWBIE);
+  await expectDenied(getDoc(doc(cDb, 'groups', groupId)));
+  await expectDenied(getDoc(aRef));
+  await expectReason(call('groupJoin')({ code: 'ZZZZZZ' }), 'CODE_INVALID');
+
+  await signInAs(STUDENT);
+  await setDoc(doc(cDb, 'users', studentUid), { region: { oblast: 'Чуйская область', district: 'Аламединский район', settlement: '' } }, { merge: true });
+  const j = await call('groupJoin')({ code: g.joinCode.toLowerCase() });
+  assert.equal(j.groupId, groupId);
+  assert.equal((await call('groupJoin')({ code: g.joinCode })).groupId, groupId, 'idempotent');
+  assert.equal((await getDoc(doc(cDb, 'groups', groupId))).data().member_count, 2);
+  assert.deepEqual((await getDoc(doc(cDb, 'users', studentUid))).data().group_ids, [groupId]);
+  const members = await getDocs(collection(cDb, 'groups', groupId, 'members'));
+  assert.deepEqual(members.docs.map((d) => d.data().role).sort(), ['member', 'owner']);
+  assert.equal((await getDoc(aRef)).data().kind, 'exam_variant');
+  await expectDenied(setDoc(doc(collection(cDb, 'groups', groupId, 'assignments')), {
+    title: 'x', kind: 'lesson', ref_id: 'l', due_at: null, created_by: studentUid, created_at: serverTimestamp(),
+  }));
+  await setDoc(doc(cDb, 'groups', groupId, 'assignments', aRef.id, 'submissions', studentUid), { done_at: serverTimestamp(), score_percent: 72.5 });
+  await expectDenied(setDoc(doc(cDb, 'groups', groupId, 'assignments', aRef.id, 'submissions', friendUid), { done_at: serverTimestamp() }));
+  await expectReason(call('groupRemoveMember')({ groupId, uid: friendUid }), 'NOT_GROUP_OWNER');
+
+  // League fan-out + study time: lesson XP reaches the region and group weekly boards.
+  const act = await call('recordActivity')({ kind: 'lesson_completed', refId: 'e2e_lesson_1', seconds: 300 });
+  assert.ok(act.xpAwarded >= 20);
+  assert.equal(act.stats.study_seconds_total, 300);
+  const stats = (await getDoc(doc(cDb, 'user_stats', studentUid))).data();
+  assert.deepEqual([stats.study_seconds_total, stats.study_seconds_today], [300, 300]);
+  await expectReason(call('recordActivity')({ kind: 'lesson_completed', refId: 'e2e_lesson_1', seconds: 4000 }), 'VALIDATION_FAILED');
+  const boards = (await db.collectionGroup('entries').where('uid', '==', studentUid).get()).docs.map((d) => d.ref.parent.parent.id);
+  assert.ok(boards.some((b) => b.startsWith('region_chuy_weekly_')), boards.join());
+  assert.ok(boards.some((b) => b.startsWith(`group_${groupId}_weekly_`)), boards.join());
+
+  // The owner reads every submission and cannot leave while members remain.
+  await signInAs(FRIEND);
+  const subs = await getDocs(collection(cDb, 'groups', groupId, 'assignments', aRef.id, 'submissions'));
+  assert.deepEqual(subs.docs.map((d) => [d.id, d.data().score_percent]), [[studentUid, 72.5]]);
+  await expectReason(call('groupLeave')({ groupId }), 'VALIDATION_FAILED');
+
+  await signInAs(STUDENT);
+  assert.deepEqual(await call('groupLeave')({ groupId }), { ok: true });
+  await expectDenied(getDoc(doc(cDb, 'groups', groupId)));
+  assert.deepEqual((await getDoc(doc(cDb, 'users', studentUid))).data().group_ids, []);
+  assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 1);
+});
+
+test('adminSendNotification: dry run counts recipients per audience (send_notifications only)', async () => {
+  await signInAs(STUDENT);
+  await setDoc(doc(cDb, 'users', studentUid), { fcm_tokens: ['e2e-token-student'] }, { merge: true });
+  const msg = { title: { ru: 'Новый вариант', ky: 'Жаңы вариант' }, body: { ru: 'Попробуйте сегодня', ky: 'Бүгүн байкап көрүңүз' } };
+  await expectReason(call('adminSendNotification')({ ...msg, audience: { kind: 'all' }, dryRun: true }), 'FORBIDDEN_ROLE');
+  await signInAs(NEWBIE);
+  await setDoc(doc(cDb, 'users', newbieUid), { fcm_tokens: ['e2e-token-newbie-1', 'e2e-token-newbie-2'] }, { merge: true });
+
+  await signInAs(ADMIN);
+  const send = (audience) => call('adminSendNotification')({ ...msg, audience, dryRun: true });
+  const all = await send({ kind: 'all' });
+  assert.deepEqual([all.recipients, all.tokens, all.sent, all.failed, all.notificationId, all.dryRun], [2, 3, 0, 0, null, true]);
+  assert.equal((await send({ kind: 'language', value: 'ky' })).recipients, 1);
+  assert.equal((await send({ kind: 'language', value: 'ru' })).recipients, 1);
+  assert.equal((await send({ kind: 'region', value: 'chuy' })).recipients, 1);
+  assert.equal((await send({ kind: 'region', value: 'naryn' })).recipients, 0);
+  assert.equal((await send({ kind: 'group', value: groupId })).recipients, 0, 'only the owner (no device) is left in the group');
+  await expectReason(send({ kind: 'planet', value: 'mars' }), 'VALIDATION_FAILED');
+  await expectReason(call('adminSendNotification')({ title: { ru: '' }, body: msg.body, audience: { kind: 'all' }, dryRun: true }), 'VALIDATION_FAILED');
+  assert.equal((await getDocs(collection(cDb, 'notifications'))).size, 0, 'dry runs leave no history');
+
+  await signInAs(STUDENT);
+});
+
 test('practice XP is server-awarded and capped (recordActivity)', async () => {
   const before = (await getDoc(doc(cDb, 'user_stats', studentUid))).data().xp;
   const r = await call('recordActivity')({ kind: 'practice_answered', refId: 'quiz_e2e_1', correct: 5, count: 10 });
@@ -315,6 +519,28 @@ test('account deletion removes the account and its data (Google Play requirement
   }
   const attempts = await db.collection('exam_attempts').where('uid', '==', studentUid).get();
   assert.equal(attempts.size, 0, 'attempts deleted');
+  // Phase 3 data: friends, own referral code, promo attempt counters.
+  assert.equal((await db.collection(`friends/${studentUid}/list`).get()).size, 0, 'friend list deleted');
+  assert.equal((await db.collection('referral_codes').where('uid', '==', studentUid).get()).size, 0, 'referral code released');
+  assert.equal((await db.collection('promo_attempts').where('uid', '==', studentUid).get()).size, 0, 'promo attempts deleted');
   // The still-valid ID token can no longer claim anything.
   await assert.rejects(call('examStart')({ variantId: 'e2e_main_ru_1' }));
+});
+
+test('deleting a group owner deletes the group, its join code, referral data and the invitee item', async () => {
+  // NEWBIE joins FRIEND's group first, so the cleanup of other members is exercised.
+  await signInAs(FRIEND);
+  const joinCode = (await getDoc(doc(cDb, 'groups', groupId))).data().join_code;
+  await signInAs(NEWBIE);
+  await call('groupJoin')({ code: joinCode });
+  assert.deepEqual((await getDoc(doc(cDb, 'users', newbieUid))).data().group_ids, [groupId]);
+
+  await signInAs(FRIEND);
+  assert.equal((await call('accountDelete')({})).ok, true);
+  assert.equal((await db.doc(`groups/${groupId}`).get()).exists, false, 'owned group deleted');
+  assert.equal((await db.collection(`groups/${groupId}/assignments`).get()).size, 0, 'assignments deleted');
+  assert.equal((await db.doc(`group_join_codes/${joinCode}`).get()).exists, false, 'join code released');
+  assert.equal((await db.doc(`referral_codes/${friendCode}`).get()).exists, false, 'referral code released');
+  assert.equal((await db.collection(`referrals/${friendUid}/items`).get()).size, 0, 'referral items deleted');
+  assert.deepEqual((await db.doc(`users/${newbieUid}`).get()).get('group_ids'), [], 'other members cleaned');
 });

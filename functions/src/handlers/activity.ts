@@ -1,5 +1,5 @@
 /**
- * recordActivity {kind: lesson_completed|practice_answered, refId, correct?, count?}
+ * recordActivity {kind: lesson_completed|practice_answered, refId, correct?, count?, seconds?}
  *   -> {xpAwarded, stats}
  *
  * XP is computed and stored only here (ARCHITECTURE §1.7), idempotently via
@@ -7,13 +7,21 @@
  * client (the legacy practice bank is client-readable, so it cannot be
  * verified); its impact is bounded by the 200 XP/day cap. Awarded XP also
  * goes to the weekly and all-time leaderboards (decision D10; subject boards
- * stay exam-only). A 0 award (daily cap reached) writes nothing.
+ * stay exam-only). A 0 award (daily cap reached) writes no XP (no xp_events,
+ * no leaderboard entry).
+ *
+ * `seconds` (0..3600, ARCHITECTURE §9.5) is study time spent on the lesson /
+ * practice: it is added to user_stats.study_seconds_total and
+ * study_seconds_today (Bishkek day, ≤ 24 h) on every valid call, including
+ * duplicates and capped calls, because time spent is real even when no XP is
+ * due. It never affects XP or leaderboards.
  */
 import '../config';
 import { onCall } from 'firebase-functions/v2/https';
 import { activityEventId, dailyLessonTarget, isActivityKind, practiceCorrectCount, shouldPersistAward } from '../domain/activity';
 import { DomainError, Reasons } from '../domain/reasons';
-import { applyLessonCompleted, applyPracticeCorrect, parseStats, statsView } from '../domain/xp';
+import { parseActivitySeconds } from '../domain/timings';
+import { applyLessonCompleted, applyPracticeCorrect, applyStudySeconds, parseStats, statsView, type UserStats } from '../domain/xp';
 import { callableOptions, db, FieldValue, payload, reqId, requireActiveUser, wrap } from './common';
 import { addLeaderboardXp, profileFromUserDoc, statsRef, statsToDoc, xpEventRef } from './gamification';
 
@@ -41,6 +49,7 @@ export const recordActivity = onCall(
       throw new DomainError(Reasons.VALIDATION_FAILED, 'kind must be lesson_completed or practice_answered');
     }
     const refId = reqId(data['refId'], 'refId', true);
+    const seconds = parseActivitySeconds(data['seconds']);
     const nowMs = Date.now();
 
     let ref = refId;
@@ -56,12 +65,29 @@ export const recordActivity = onCall(
     return db().runTransaction(async (tx) => {
       const [eventSnap, statsSnap] = await tx.getAll(xpEventRef(uid, eventId), statsRef(uid));
       const stats = parseStats(statsSnap!.data());
-      if (eventSnap!.exists) return { xpAwarded: 0, stats: statsView(stats), duplicate: true };
+      /** Study time only (no XP): writes the three study fields when seconds > 0. */
+      const studyOnly = (): UserStats => {
+        if (seconds <= 0) return stats;
+        const studied = applyStudySeconds(stats, seconds, nowMs).stats;
+        tx.set(
+          statsRef(uid),
+          {
+            study_seconds_total: studied.study_seconds_total,
+            study_seconds_today: studied.study_seconds_today,
+            study_day: studied.study_day,
+            updated_at: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+        return studied;
+      };
+      if (eventSnap!.exists) return { xpAwarded: 0, stats: statsView(studyOnly()), duplicate: true };
       const award = kind === 'lesson_completed' ? applyLessonCompleted(stats, nowMs) : applyPracticeCorrect(stats, correctCount, nowMs);
       if (!shouldPersistAward(award.total)) {
-        // Daily practice cap reached (or nothing correct): no event, no stats write.
-        return { xpAwarded: 0, stats: statsView(stats), capped: kind === 'practice_answered' && correctCount > 0 };
+        // Daily practice cap reached (or nothing correct): no event, no XP write.
+        return { xpAwarded: 0, stats: statsView(studyOnly()), capped: kind === 'practice_answered' && correctCount > 0 };
       }
+      if (seconds > 0) award.stats = applyStudySeconds(award.stats, seconds, nowMs).stats;
       const toLeaderboard = !leaderboardProfile.banned;
       tx.set(xpEventRef(uid, eventId), {
         kind,

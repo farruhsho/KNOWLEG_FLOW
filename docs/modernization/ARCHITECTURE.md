@@ -577,3 +577,83 @@ Application Default Credentials функции, приглашённый в Play
   по темам, предупреждение о риске потери мотивации (нет активности ≥ 3 дней или
   падение результата за два последних экзамена) с объяснением причины.
 
+### 9.6 Уточнения реализации (бэкенд, 2026-11-05)
+
+Решения, принятые при реализации функций и правил (контракт выше не меняется,
+это дополнения там, где он молчал):
+
+* **Коды ошибок HttpsError:** `CODE_INVALID` → not-found, `CODE_EXPIRED` →
+  failed-precondition, `CODE_EXHAUSTED` → resource-exhausted, `ALREADY_REDEEMED` →
+  already-exists, `RATE_LIMITED` / `LIMIT_REACHED` → resource-exhausted,
+  `REFERRAL_NOT_ALLOWED` → failed-precondition, `NOT_GROUP_OWNER` → permission-denied.
+  Клиент различает их по `details.reason`.
+* **Коды:** реферальный код и код вступления в группу — 6 символов из того же
+  алфавита; уникальность — служебные документы `referral_codes/{code}` и
+  `group_join_codes/{code}` (`{group_id, created_at}`, клиентам доступа нет). Ввод
+  нормализуется: верхний регистр, без пробелов и дефисов.
+* **referralApply:** `REFERRAL_NOT_ALLOWED` с `details.why` = `own_code` |
+  `already_referred` | `has_exams` | `has_purchases`; повтор с тем же кодом — `{ok: true}`
+  (идемпотентно); неизвестный код или удалённый владелец — `CODE_INVALID`. Документ
+  `referrals/{referrerUid}` = `{joined_total, rewarded_total, month_key, month_rewarded}` —
+  счётчики (читает пригласивший); в `items/{uid}` дополнительно `referrer_rewarded`,
+  `referrer_capped`.
+* **Награда за реферала:** тестовые покупки (license testers) не награждают; при
+  исчерпанном месячном лимите пригласившего приглашённый всё равно получает +1, а
+  элемент получает `referrer_capped: true`; удалённый пригласивший пропускается. Ledger:
+  `ref: referral_{uid другого}`, `referral_role: referee|referrer`. Возврат покупки
+  реферальные кредиты не отзывает. Промо- и реферальные кредиты — подарок: не входят в
+  `lifetime_credits_purchased` и не гасят `debt_credits`.
+* **promoRedeem:** порядок проверок — лимит попыток → неизвестный/неактивный код
+  (`CODE_INVALID`) → уже активирован → истёк (`now >= expires_at`) → исчерпан. Каждая
+  попытка (и неудачная) учитывается в `promo_attempts/{uid}_{yyyy-mm-dd}` =
+  `{uid, day, count}`. Ledger `ref: promo_{CODE}`. `adminUpsertPromoCode` отвечает
+  `{ok, code, created}`; при обновлении `redemptions`, `created_*` сохраняются.
+* **friendAdd** отвечает `{ok, friendUid, displayName}`; дружба односторонняя,
+  повтор идемпотентен, свой код — `VALIDATION_FAILED` (`why: self`).
+* **Группы:** владелец — тоже участник (`members/{uid}.role == 'owner'`, gid в его
+  `group_ids`), поэтому «≤ 5 своих» и «≤ 5 членств» проверяются оба. В документ
+  участника добавлено поле `uid` (для очистки при удалении аккаунта); в группе не больше
+  500 участников (`LIMIT_REACHED`). `groupJoin` отвечает `{groupId, name}` и идемпотентен.
+  Владелец, оставшийся единственным участником, выходит — группа удаляется вместе с
+  заданиями и кодом; при других участниках — `VALIDATION_FAILED` (failed-precondition,
+  `why: owner_has_members`). `groupRemoveMember` для несуществующей группы —
+  `NOT_GROUP_OWNER`. Выход/исключение удаляют запись участника в групповой лиге текущей
+  недели. Забаненный пользователь не создаёт и не вступает в группы, но выйти может.
+* **Задания:** кроме полей §9.3 разрешены необязательные `description` (≤ 1000) и
+  `updated_at`; `due_at` может быть `null`; `kind` ∈ lesson/practice/exam_variant;
+  `created_by` = владелец, `created_by`/`created_at` неизменяемы; забаненный владелец
+  не создаёт и не правит задания. Отметка: `score_percent` может быть `null`; участник
+  может удалить свою отметку.
+* **Лиги:** id региона берётся из `users/{uid}.region` (карта приложения
+  `{oblast, district, settlement}`: `oblast` сопоставляется с `kg_regions.json`; также
+  принимается строка-id/название и старое поле `region_id`). Доски `region_*` и `group_*`
+  читаются любым вошедшим, как все рейтинги (id группы знают только участники).
+* **adminSendNotification:** ответ дополнительно содержит `tokens`, `pruned`, `dryRun`;
+  при `dryRun` — только подсчёт, `notificationId: null`, без истории и вне дневного
+  лимита. Лимит 3 рассылки в сутки (Бишкек) — `RATE_LIMITED`, счётчик
+  `notification_quota/{yyyy-mm-dd}`. `audience.value`: язык `ru|ky`; регион — id из
+  `kg_regions.json` (название тоже принимается); группа должна существовать. В
+  `title`/`body` один из языков может быть пустым — берётся другой. Аудитория выбирается
+  постраничным обходом `users` по id документа с фильтрацией в коде (составной индекс не
+  нужен; та же логика региона/языка, что у лиг и напоминаний); для `group` читаются
+  только участники. История `notifications/{id}`: `{title, body, audience, status:
+  sending|sent|failed, recipients, tokens, sent, failed, pruned, day, created_by,
+  created_by_role, created_at, completed_at}`.
+* **config/achievements:** `titles`, `descriptions` — map, `disabled` — list (≤ 100);
+  удалять документ нельзя.
+* **Тайминги экзамена:** некорректные элементы `timings` (чужой вопрос, вне
+  `0..длительность`, не число) отбрасываются, а не отклоняют сдачу раздела; не-объект —
+  `VALIDATION_FAILED`. Значения округляются до целых секунд. «Медиана по попытке» —
+  медиана времени по всем вопросам попытки, у которых есть тайминг; `topic_time_avg`
+  округляется до 0,1 с; `slow_topics` упорядочены от самой медленной темы. Разделы,
+  закрытые сервером по истечении времени, таймингов не имеют.
+* **recordActivity `seconds`:** вне 0..3600 — `VALIDATION_FAILED`; время учёбы
+  засчитывается и тогда, когда XP = 0 (повтор, дневной лимит) — XP-правило D10 не
+  меняется; `study_seconds_today` относится к дню `user_stats.study_day` и ограничено 24 ч.
+* **Профиль обязателен:** `referralApply`, `groupCreate`, `groupJoin` требуют существующий
+  `users/{uid}` (иначе `VALIDATION_FAILED`, failed-precondition, `why: profile_missing` —
+  клиент повторяет после создания профиля): сервер никогда не создаёт `users/{uid}` сам,
+  иначе `ensureProfile` клиента не создал бы профиль при регистрации.
+* **accountDelete** дополнительно удаляет `friends/{uid}`, `referrals/{uid}`, свой
+  `referral_codes`, `promo_attempts`, элемент пригласившего о пользователе и членство в
+  группах (свои группы удаляются, у остальных участников чистится `group_ids`).

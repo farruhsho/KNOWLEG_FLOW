@@ -7,6 +7,7 @@
  * wrong answers): the official ORT conversion formula is not published, so
  * the result is always flagged as unofficial (`disclaimer_key`).
  */
+import type { TopicTimeResult } from './timings';
 
 export interface ScoringSection {
   section_id: string;
@@ -204,9 +205,18 @@ export interface ExamResult {
   xp_awarded: number;
   leaderboard_eligible: boolean;
   disclaimer_key: 'exam_result_unofficial';
+  /** Mean seconds per topic over the timed questions (ARCHITECTURE §9.5); {} without timings. */
+  topic_time_avg: Record<string, number>;
+  /** Topics slower than 1.5 × the attempt's median question time, slowest first. */
+  slow_topics: string[];
 }
 
-export function buildExamResult(score: ExamScore, xpAwarded: number, leaderboardEligible: boolean): ExamResult {
+export function buildExamResult(
+  score: ExamScore,
+  xpAwarded: number,
+  leaderboardEligible: boolean,
+  times: TopicTimeResult = { topic_time_avg: {}, slow_topics: [] },
+): ExamResult {
   return {
     correct: score.correct,
     total: score.total,
@@ -221,5 +231,7 @@ export function buildExamResult(score: ExamScore, xpAwarded: number, leaderboard
     xp_awarded: xpAwarded,
     leaderboard_eligible: leaderboardEligible,
     disclaimer_key: 'exam_result_unofficial',
+    topic_time_avg: times.topic_time_avg,
+    slow_topics: times.slow_topics,
   };
 }

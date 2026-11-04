@@ -17,6 +17,9 @@ export const XP_RULES = Object.freeze({
   PRACTICE_DAILY_CAP: 200,
   DAILY_GOAL_BONUS: 10,
   DEFAULT_DAILY_GOAL: 50,
+  /** recordActivity study time: ≤ 3600 s per call, ≤ 24 h per Bishkek day. */
+  STUDY_SECONDS_PER_CALL: 3600,
+  STUDY_SECONDS_DAILY_CAP: 86_400,
 });
 
 /** Sections whose >= 90% results count toward section achievements. */
@@ -67,6 +70,11 @@ export interface UserStats {
   section_90_counts: Record<string, number>;
   /** achievement id -> unlock time (ms). */
   achievements: Record<string, number>;
+  /** Study time reported with recordActivity (ARCHITECTURE §9.5). */
+  study_seconds_total: number;
+  /** Seconds on `study_day` (Bishkek); reset when the day changes. */
+  study_seconds_today: number;
+  study_day: string | null;
 }
 
 export function emptyStats(): UserStats {
@@ -86,6 +94,9 @@ export function emptyStats(): UserStats {
     best_exam_percent: {},
     section_90_counts: {},
     achievements: {},
+    study_seconds_total: 0,
+    study_seconds_today: 0,
+    study_day: null,
   };
 }
 
@@ -107,6 +118,7 @@ export function parseStats(raw: unknown): UserStats {
   if (!isRecord(raw)) return base;
   const last = strOrNull(raw['last_active_day']);
   const goalDay = strOrNull(raw['daily_goal_awarded_day']);
+  const studyDay = strOrNull(raw['study_day']);
   const xp = Math.max(0, int(raw['xp']));
   return {
     xp,
@@ -124,6 +136,9 @@ export function parseStats(raw: unknown): UserStats {
     best_exam_percent: numMap(raw['best_exam_percent']),
     section_90_counts: numMap(raw['section_90_counts']),
     achievements: numMap(raw['achievements']),
+    study_seconds_total: Math.max(0, int(raw['study_seconds_total'])),
+    study_seconds_today: Math.max(0, int(raw['study_seconds_today'])),
+    study_day: isDayKey(studyDay) ? studyDay : null,
   };
 }
 
@@ -285,6 +300,26 @@ export function applyPracticeCorrect(stats: UserStats, correctCount: number, now
   return applyXp(stats, 'practice', n * XP_RULES.PRACTICE_CORRECT, nowMs);
 }
 
+/**
+ * Adds study time reported by recordActivity (`seconds`, 0..3600). The
+ * today counter resets on a new Bishkek day and is capped at 24 h; the total
+ * grows by what was accepted. Independent of XP (a 0-XP call still counts
+ * study time).
+ */
+export function applyStudySeconds(stats: UserStats, seconds: number, nowMs: number): { stats: UserStats; added: number } {
+  const s = cloneStats(stats);
+  const today = bishkekDayKey(nowMs);
+  if (s.study_day !== today) {
+    s.study_day = today;
+    s.study_seconds_today = 0;
+  }
+  const want = Math.max(0, Math.min(XP_RULES.STUDY_SECONDS_PER_CALL, Math.trunc(num(seconds))));
+  const added = Math.max(0, Math.min(want, XP_RULES.STUDY_SECONDS_DAILY_CAP - s.study_seconds_today));
+  s.study_seconds_today += added;
+  s.study_seconds_total += added;
+  return { stats: s, added };
+}
+
 /** Plain JSON view of stats for callable responses. */
 export function statsView(s: UserStats): Record<string, unknown> {
   return {
@@ -300,5 +335,8 @@ export function statsView(s: UserStats): Record<string, unknown> {
     lessons_completed: s.lessons_completed,
     best_exam_percent: s.best_exam_percent,
     achievements: Object.keys(s.achievements),
+    study_seconds_total: s.study_seconds_total,
+    study_seconds_today: s.study_seconds_today,
+    study_day: s.study_day,
   };
 }

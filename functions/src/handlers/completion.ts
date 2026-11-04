@@ -11,6 +11,7 @@ import { isLeaderboardEligible, type AttemptState } from '../domain/exam_session
 import { leaderboardSubjectKey } from '../domain/leaderboard';
 import { buildExamResult, scoreAttempt, wrongOutcomes, type ExamResult } from '../domain/scoring';
 import { round1 } from '../domain/scoring';
+import { aggregateTopicTimes } from '../domain/timings';
 import { DAY_MS } from '../domain/time';
 import { directionKey, type Blueprint, type ExamQuestion, type QuestionKey } from '../domain/types';
 import { applyExamCompletion, parseStats } from '../domain/xp';
@@ -26,6 +27,8 @@ export interface CompletionContext {
   blueprint: Blueprint;
   /** Final answers for every section (sectionId -> qid -> option|null). */
   answersBySection: Record<string, Record<string, string | null>>;
+  /** Per-question seconds reported by the client (sectionId -> qid -> s); ARCHITECTURE §9.5. */
+  timingsBySection?: Record<string, Record<string, number>>;
   nowMs: number;
 }
 
@@ -141,7 +144,10 @@ export function writeCompletion(tx: Transaction, ctx: CompletionContext, reads: 
     );
   }
 
-  const result = buildExamResult(score, xpTotal, eligible);
+  const timings: Record<string, number> = {};
+  for (const s of attempt.sections) Object.assign(timings, ctx.timingsBySection?.[s.section_id] ?? {});
+  const times = aggregateTopicTimes(score.outcomes, timings);
+  const result = buildExamResult(score, xpTotal, eligible, times);
   tx.set(attemptRef(ctx.attemptId), { ...attemptToDoc(attempt), result, updated_at: FieldValue.serverTimestamp() }, { merge: true });
   return result;
 }

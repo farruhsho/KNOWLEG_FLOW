@@ -25,6 +25,7 @@ import { assertRecentLogin, dailyQuestIdRange } from '../domain/access';
 import { sha256Hex } from '../domain/hash';
 import { anonymizedUid } from '../domain/purchase';
 import { callableOptions, db, FieldValue, findAuthUser, requireAuth, wrap } from './common';
+import { removeUserFromGroups } from './groups';
 
 /** Single documents keyed by uid. */
 export const UID_DOCS = [
@@ -39,7 +40,7 @@ export const UID_DOCS = [
 ] as const;
 
 /** Trees (document + all sub-collections) keyed by uid. */
-export const UID_TREES = ['entitlements', 'user_mistakes', 'ai_usage', 'xp_events'] as const;
+export const UID_TREES = ['entitlements', 'user_mistakes', 'ai_usage', 'xp_events', 'friends', 'referrals'] as const;
 
 /** Legacy collections where the owner is a field. */
 export const OWNED_BY_FIELD: ReadonlyArray<readonly [collection: string, field: string]> = [
@@ -83,6 +84,8 @@ async function anonymize(collection: string, field: string, uid: string): Promis
 
 export async function deleteUserData(uid: string): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
+  // Read before users/{uid} is deleted: the referrer's item about this user goes too.
+  const referredBy = (await db().doc(`users/${uid}`).get()).get('referred_by');
   const refs: DocumentReference[] = UID_DOCS.map((c) => db().collection(c).doc(uid));
   const batch = db().batch();
   for (const r of refs) batch.delete(r);
@@ -104,6 +107,20 @@ export async function deleteUserData(uid: string): Promise<Record<string, number
       .where(FieldPath.documentId(), '<', questRange.end),
   );
   counts['leaderboard_entries'] = await deleteQueryTrees(db().collectionGroup('entries').where('uid', '==', uid));
+
+  // Phase 3 (ARCHITECTURE §9): codes, referral item, promo attempt counters, groups.
+  counts['referral_codes'] = await deleteQueryTrees(db().collection('referral_codes').where('uid', '==', uid));
+  if (typeof referredBy === 'string' && referredBy && !referredBy.includes('/')) {
+    await db().doc(`referrals/${referredBy}/items/${uid}`).delete();
+  }
+  const attemptRange = dailyQuestIdRange(uid); // same `${uid}_${day}` id scheme
+  counts['promo_attempts'] = await deleteQueryTrees(
+    db()
+      .collection('promo_attempts')
+      .where(FieldPath.documentId(), '>=', attemptRange.start)
+      .where(FieldPath.documentId(), '<', attemptRange.end),
+  );
+  counts['groups'] = await removeUserFromGroups(uid);
 
   counts['purchases_anonymized'] = await anonymize('purchases', 'uid', uid);
   counts['payments_anonymized'] = await anonymize('payments', 'uid', uid);

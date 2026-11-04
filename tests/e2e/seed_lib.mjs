@@ -97,6 +97,20 @@ export async function seedExamBase(db) {
   });
 }
 
+/**
+ * Phase 3 (ARCHITECTURE §9) demo data: an active promo code `DEMO2026`
+ * (2 credits, up to 1000 redemptions, no expiry) for trying promoRedeem in
+ * the app. Re-running keeps the redemption counter.
+ */
+export async function seedGrowth(db) {
+  const ref = db.doc('promo_codes/DEMO2026');
+  const snap = await ref.get();
+  await ref.set({
+    credits: 2, max_redemptions: 1000, expires_at: null, active: true, note: 'emulator demo code',
+    ...(snap.exists ? {} : { redemptions: 0, created_by: 'seed', created_at: new Date('2026-11-05T00:00:00Z') }),
+  }, { merge: true });
+}
+
 /** Legacy learning collections (subjects, lessons, practice questions) for the Learn tab. */
 export async function seedLearning(db) {
   const seed = JSON.parse(readFileSync(path.join(root, 'firebase_seed_data.json'), 'utf8'));

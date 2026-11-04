@@ -6,6 +6,11 @@
  * transaction that adds the credits, so one token grants at most once. The
  * raw token is kept only in purchases/{id}/private/token (no client access)
  * so a failed consume can be retried later.
+ *
+ * Referral reward (ARCHITECTURE §9.1): the grant transaction also reads
+ * users/{uid}.referred_by and, on the referred user's first non-test paid
+ * grant, adds +1 credit to both accounts (ledger reason 'referral',
+ * handlers/referral.ts) in the same transaction, so it is exactly-once.
  */
 import '../config';
 import type { DocumentData } from 'firebase-admin/firestore';
@@ -28,6 +33,7 @@ import { DomainError, Reasons } from '../domain/reasons';
 import { int, str } from '../domain/types';
 import { callableOptions, db, FieldValue, mapLimit, optString, payload, requireActiveUser, Timestamp, wrap } from './common';
 import { consumePurchase, fetchPurchase, listVoided } from './play';
+import { readReferralReward, writeReferralReward } from './referral';
 
 export type VerifyStatus = 'granted' | 'already_processed' | 'pending' | 'invalid';
 
@@ -152,7 +158,7 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
   // pre.kind === 'grant'
   const entRef = db().doc(`entitlements/${uid}`);
   const granted = await db().runTransaction(async (tx) => {
-    const [snap, entSnap] = await tx.getAll(purchaseRef(tokenId), entRef);
+    const [snap, entSnap, userSnap] = await tx.getAll(purchaseRef(tokenId), entRef, db().doc(`users/${uid}`));
     const decision = decidePurchase({
       purchase: fetched.purchase,
       productId,
@@ -163,7 +169,10 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
     });
     const ent = parseEntitlement(entSnap!.data());
     if (decision.kind !== 'grant') return { status: 'already_processed' as const, credits: ent.credits, consumed: true };
+    // All reads (referral item, referrer counter/profile/entitlement) before the first write.
+    const referral = await readReferralReward(tx, uid, str(userSnap!.get('referred_by')) || null, decision.isTest, Date.now());
     const applied = applyPurchaseGrant(ent, decision.credits);
+    const finalEnt = writeReferralReward(tx, uid, applied.entitlement, referral, tokenId);
     tx.set(purchaseRef(tokenId), {
       uid,
       platform: 'google_play',
@@ -192,7 +201,7 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
     tx.set(
       entRef,
       {
-        credits: applied.entitlement.credits,
+        credits: finalEnt.credits,
         lifetime_credits_purchased: applied.entitlement.lifetime_credits_purchased,
         debt_credits: applied.entitlement.debt_credits,
         updated_at: FieldValue.serverTimestamp(),
@@ -206,7 +215,10 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
       actor_uid: uid,
       at: FieldValue.serverTimestamp(),
     });
-    return { status: 'granted' as const, credits: applied.entitlement.credits, consumed: decision.consumed };
+    if (referral.decision.kind === 'reward') {
+      logger.info('referral rewarded', { uid, referrer: referral.decision.referrerUid, referrerRewarded: referral.decision.rewardReferrer });
+    }
+    return { status: 'granted' as const, credits: finalEnt.credits, consumed: decision.consumed };
   });
 
   if (granted.status === 'granted' && !granted.consumed) await consumeAndMark(tokenId, productId, purchaseToken);
