@@ -105,21 +105,35 @@ export class AnthropicLlm implements LlmClient {
   }
 
   async complete(req: LlmRequest): Promise<LlmResponse> {
-    const base = {
-      model: this.model,
-      max_tokens: req.maxTokens ?? 32000,
-      system: [{ type: 'text' as const, text: req.system, cache_control: { type: 'ephemeral' as const } }],
-      messages: [{ role: 'user' as const, content: req.user }],
-      output_config: { effort: this.effort, format: { type: 'json_schema' as const, schema: req.schema } },
+    // Streaming + finalMessage(): long structured outputs without HTTP
+    // timeouts. No temperature/top_p/top_k; thinking stays adaptive (the
+    // default) and its depth is set with output_config.effort.
+    const system = [{ type: 'text' as const, text: req.system, cache_control: { type: 'ephemeral' as const } }];
+    const messages = [{ role: 'user' as const, content: req.user }];
+    const maxTokens = req.maxTokens ?? 32000;
+    const outputConfig = { effort: this.effort, format: { type: 'json_schema' as const, schema: req.schema } };
+    let message: {
+      content: Array<{ type: string; text?: string }>;
+      stop_reason: string | null;
+      model: string;
+      usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null };
     };
-    let message: { content: Array<{ type: string; text?: string }>; stop_reason: string | null; model: string; usage: { input_tokens: number; output_tokens: number; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null } };
     try {
       if (this.fallbacks) {
+        // Server-side refusal fallback, "default" routing by refusal category.
         message = await this.client.beta.messages
-          .stream({ ...base, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' } as never)
-          .finalMessage() as never;
+          .stream({
+            model: this.model,
+            max_tokens: maxTokens,
+            system,
+            messages,
+            output_config: outputConfig,
+            betas: ['server-side-fallback-2026-07-01'],
+            fallbacks: 'default',
+          })
+          .finalMessage();
       } else {
-        message = (await this.client.messages.stream(base as never).finalMessage()) as never;
+        message = await this.client.messages.stream({ model: this.model, max_tokens: maxTokens, system, messages, output_config: outputConfig }).finalMessage();
       }
     } catch (e) {
       if (e instanceof Anthropic.APIError) throw new LlmError(`Anthropic API error ${e.status ?? ''}: ${e.message}`, 'api');
@@ -129,11 +143,14 @@ export class AnthropicLlm implements LlmClient {
     if (message.stop_reason === 'max_tokens') throw new LlmError('response truncated at max_tokens', 'truncated');
     const text = message.content.filter((b) => b.type === 'text').map((b) => b.text ?? '').join('');
     const u = message.usage;
+    // Cache reads/writes are counted at the full input price: the reported cost is an upper bound.
     const input = u.input_tokens + (u.cache_read_input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0);
+    // Price by the model that actually answered (a fallback model may have served the request).
+    const pricedModel = PRICES_PER_MTOK[message.model] ? message.model : this.model;
     return {
       json: parseJsonText(text),
       model: message.model,
-      usage: { input_tokens: input, output_tokens: u.output_tokens, cost_usd: costUsd(this.model, input, u.output_tokens) },
+      usage: { input_tokens: input, output_tokens: u.output_tokens, cost_usd: costUsd(pricedModel, input, u.output_tokens) },
     };
   }
 }

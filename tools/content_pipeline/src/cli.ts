@@ -3,11 +3,11 @@
  * ORT content pipeline CLI. Run from tools/content_pipeline:
  *   npm run cli -- <stage> [flags]
  * Stages: matrix, generate, verify, translate-check, dedup, assemble, timing,
- * import, validate, registry, lint, review, schemas. See
+ * import, validate, registry, lint, review, review-sync, schemas. See
  * docs/modernization/CONTENT_PIPELINE.md.
  */
 import { existsSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { assembleVariant, usedIds, variantIdFor } from './assemble';
 import { Bank, bankItemsList, lintBank, loadBank, newBankFile, rehashBankFile, saveBankFile } from './bank';
 import { Blueprint, findPart, getBlueprint, loadBlueprints, loadRawBlueprints } from './blueprints';
@@ -15,7 +15,7 @@ import { loadCurriculum } from './curriculum';
 import { dedupRecords, externalDocsFrom, runDedup } from './dedup';
 import { DEFAULT_PROJECT_ID, openFirestore } from './firestore';
 import { convertTranslation, estimateRequestTokens, planGeneration, runGeneration, translationCandidates, translationRequest, TRANSLATION_SYSTEM } from './generate';
-import { buildImportPlan, commitPlan, MAX_BATCH } from './importer';
+import { applyRemoteReviews, buildImportPlan, commitPlan, MAX_BATCH } from './importer';
 import { findRepoRoot, listFiles, nowIso, Paths, pathsFor, readJson, writeJsonAtomic, writeText } from './io';
 import { AnthropicLlm, COST_FLAG, costUsd, CostMeter, DEFAULT_MODEL, LlmClient, LlmError, requirePaidConsent } from './llm';
 import { BlueprintMatrix, buildBlueprintMatrix, describeMatrix, languageMatrix } from './matrix';
@@ -332,7 +332,9 @@ async function cmdDedup(env: Env, o: Opts): Promise<number> {
   const threshold = num(o, 'threshold', 0.85);
   const items = bankItemsList(bank);
   const passages = [...bank.passages.values()].map((v) => v.passage);
-  const external = list(o, 'against').flatMap((p) => externalDocsFrom(readJson(p), relative(env.paths.root, p)));
+  const external = list(o, 'against')
+    .map((p) => resolve(env.paths.root, p))
+    .flatMap((p) => externalDocsFrom(readJson(p), relative(env.paths.root, p).split('\\').join('/')));
   const report = runDedup(items, passages, threshold, external);
   const reportPath = join(env.paths.reports, 'dedup.json');
   writeJsonAtomic(reportPath, { generated_at: nowIso(), ...report });
@@ -497,7 +499,7 @@ async function cmdImport(env: Env, o: Opts): Promise<number> {
   const db = await openFirestore(projectId);
   const report = await commitPlan(plan, db, batchSize);
   env.out(`committed: ${report.written} write(s) in ${report.batches} batch(es); unchanged ${report.unchanged}; published variants left untouched: ${report.skipped_published.join(', ') || '—'}`);
-  for (const c of report.review_conflicts) env.out(`  review kept from Firestore for ${c.id}: remote ${c.remote}, local ${c.local} — run review sync before the next import`);
+  for (const c of report.review_conflicts) env.out(`  review kept from Firestore for ${c.id}: remote ${c.remote}, local ${c.local} — run review-sync before the next import`);
   // Record publication locally so the registry stays honest.
   if (plan.publish) {
     for (const v of loadVariantFiles(env.paths)) {
@@ -569,6 +571,34 @@ async function cmdReview(env: Env, o: Opts): Promise<number> {
   return 0;
 }
 
+/** Pulls methodologist decisions made in the admin panel (exam_questions.review) into the local bank. Reads Firestore only. */
+async function cmdReviewSync(env: Env, o: Opts): Promise<number> {
+  const bank = loadBank(env.paths.bank, { strict: true });
+  const items = selectItems(bank, o);
+  const projectId = str(o, 'project') ?? process.env.GCLOUD_PROJECT ?? DEFAULT_PROJECT_ID;
+  const db = await openFirestore(projectId);
+  const remote = await db.getExisting('exam_questions', items.map((i) => i.id));
+  const updates = applyRemoteReviews(items, remote, nowIso());
+  const touched = new Set(updates.map((u) => bank.items.get(u.id)!.file.path));
+  for (const f of bank.files) if (touched.has(f.path)) saveBankFile(f);
+  for (const u of updates) env.out(`${u.id}: ${u.from} → ${u.to}${u.reviewed_by ? ` (by ${u.reviewed_by})` : ''}`);
+  env.out(`review-sync ${projectId}: ${remote.size} of ${items.length} item(s) found in Firestore, ${updates.length} updated locally`);
+  return 0;
+}
+
+/** Read-only export of existing Firestore content (default: legacy `questions`) for `dedup --against`. */
+async function cmdExportExisting(env: Env, o: Opts): Promise<number> {
+  const collection = str(o, 'collection') ?? 'questions';
+  if (!/^[A-Za-z0-9_]+$/.test(collection)) throw new Error('--collection must be a top-level collection name');
+  const projectId = str(o, 'project') ?? process.env.GCLOUD_PROJECT ?? DEFAULT_PROJECT_ID;
+  const outPath = resolve(env.paths.root, str(o, 'out') ?? join('content', 'external', `${collection}.json`));
+  const db = await openFirestore(projectId);
+  const docs = await db.exportCollection(collection, num(o, 'limit', 50000));
+  writeJsonAtomic(outPath, { exported_at: nowIso(), project_id: projectId, collection, questions: docs });
+  env.out(`exported ${docs.length} document(s) of ${collection} to ${relative(env.paths.root, outPath)} (read-only; keep it out of git if it holds licensed content)`);
+  return 0;
+}
+
 async function cmdSchemas(env: Env): Promise<number> {
   for (const [name, schema] of Object.entries(exportJsonSchemas())) writeJsonAtomic(join(env.paths.schema, `${name}.schema.json`), schema);
   env.out(`JSON Schemas written to ${relative(env.paths.root, env.paths.schema)}`);
@@ -591,7 +621,11 @@ const HELP = `ORT content pipeline — npm run cli -- <stage> [flags]   (all pat
   registry        [--target 100]
   lint            [--fix]
   review          --ids q_..,q_.. --status methodologist_approved|rejected --by <uid> [--notes text] [--from-draft]
+  review-sync     [--blueprint id] [--batch id] [--project ${DEFAULT_PROJECT_ID}]   (reads exam_questions.review from Firestore into the bank)
+  export-existing [--collection questions] [--out content/external/questions.json] [--limit 50000]   (read-only, for dedup --against)
   schemas
+
+  Paid stages never run without ${COST_FLAG}; import never writes without --commit and never deletes.
 `;
 
 export async function main(argv: string[], out: (line: string) => void = (l) => console.log(l)): Promise<number> {
@@ -615,6 +649,8 @@ export async function main(argv: string[], out: (line: string) => void = (l) => 
     registry: cmdRegistry,
     lint: cmdLint,
     review: cmdReview,
+    'review-sync': cmdReviewSync,
+    'export-existing': cmdExportExisting,
     schemas: (e) => cmdSchemas(e),
   };
   const fn = commands[cmd];

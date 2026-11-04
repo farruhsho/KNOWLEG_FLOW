@@ -1,0 +1,4 @@
+# Regenerated on every run (dedup report, import plan): not reviewed in git.
+reports/
+# Read-only exports of existing Firestore content for dedup --against (may hold third-party/licensed text).
+external/

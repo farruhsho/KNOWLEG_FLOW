@@ -1,0 +1,434 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_history_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "history",
+          "order": 1,
+          "subject_id": "history",
+          "duration_minutes": 60,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_history_2026/history/history",
+              "section_id": "history",
+              "part_id": "history",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "history.kg_ancient",
+                  "subject_id": "history",
+                  "title_ru": "Древняя история Кыргызстана",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "history.kg_ancient.saks_usuns",
+                    "history.kg_ancient.yenisei_kyrgyz"
+                  ]
+                },
+                {
+                  "topic_id": "history.kg_medieval",
+                  "subject_id": "history",
+                  "title_ru": "Кыргызстан в Средние века",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "history.kg_medieval.karakhanids",
+                    "history.kg_medieval.mongol_period"
+                  ]
+                },
+                {
+                  "topic_id": "history.kg_new_time",
+                  "subject_id": "history",
+                  "title_ru": "Кокандское ханство и Российская империя",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "history.kg_new_time.kokand",
+                    "history.kg_new_time.russian_empire",
+                    "history.kg_new_time.urkun_1916"
+                  ]
+                },
+                {
+                  "topic_id": "history.kg_soviet",
+                  "subject_id": "history",
+                  "title_ru": "Советский период",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.kg_independence",
+                  "subject_id": "history",
+                  "title_ru": "Независимый Кыргызстан",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_ancient",
+                  "subject_id": "history",
+                  "title_ru": "История Древнего мира",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_medieval",
+                  "subject_id": "history",
+                  "title_ru": "История Средних веков",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_modern",
+                  "subject_id": "history",
+                  "title_ru": "Новая история",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_contemporary",
+                  "subject_id": "history",
+                  "title_ru": "Новейшая история",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "history",
+          "order": 1,
+          "subject_id": "history",
+          "duration_minutes": 60,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_history_2026/history/history",
+              "section_id": "history",
+              "part_id": "history",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "history.kg_ancient",
+                  "subject_id": "history",
+                  "title_ru": "Древняя история Кыргызстана",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "history.kg_ancient.saks_usuns",
+                    "history.kg_ancient.yenisei_kyrgyz"
+                  ]
+                },
+                {
+                  "topic_id": "history.kg_medieval",
+                  "subject_id": "history",
+                  "title_ru": "Кыргызстан в Средние века",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "history.kg_medieval.karakhanids",
+                    "history.kg_medieval.mongol_period"
+                  ]
+                },
+                {
+                  "topic_id": "history.kg_new_time",
+                  "subject_id": "history",
+                  "title_ru": "Кокандское ханство и Российская империя",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "history.kg_new_time.kokand",
+                    "history.kg_new_time.russian_empire",
+                    "history.kg_new_time.urkun_1916"
+                  ]
+                },
+                {
+                  "topic_id": "history.kg_soviet",
+                  "subject_id": "history",
+                  "title_ru": "Советский период",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.kg_independence",
+                  "subject_id": "history",
+                  "title_ru": "Независимый Кыргызстан",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_ancient",
+                  "subject_id": "history",
+                  "title_ru": "История Древнего мира",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_medieval",
+                  "subject_id": "history",
+                  "title_ru": "История Средних веков",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_modern",
+                  "subject_id": "history",
+                  "title_ru": "Новая история",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "history.world_contemporary",
+                  "subject_id": "history",
+                  "title_ru": "Новейшая история",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

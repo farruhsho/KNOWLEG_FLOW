@@ -55,8 +55,17 @@ export function translationPairs(items: BankItem[]): TranslationPair[] {
     if (tg) groups.set(tg, [...(groups.get(tg) ?? []), it]);
   }
   const pairs: TranslationPair[] = [];
+  // The source version first: items made by `generate --translate-from` carry pipeline.translated_from.
+  const isTranslation = (it: BankItem): number => (typeof it.pipeline.translated_from === 'string' ? 1 : 0);
+  const langRank = (it: BankItem): number => ({ ru: 0, ky: 1, en: 2 })[it.question.language];
   for (const g of groups.values()) {
-    const sorted = [...g].sort((x, y) => x.question.created_at.localeCompare(y.question.created_at) || x.id.localeCompare(y.id));
+    const sorted = [...g].sort(
+      (x, y) =>
+        isTranslation(x) - isTranslation(y) ||
+        x.question.created_at.localeCompare(y.question.created_at) ||
+        langRank(x) - langRank(y) ||
+        x.id.localeCompare(y.id),
+    );
     for (let i = 0; i < sorted.length; i++) for (let j = i + 1; j < sorted.length; j++) if (sorted[i]!.question.language !== sorted[j]!.question.language) pairs.push({ a: sorted[i]!, b: sorted[j]! });
   }
   return pairs;

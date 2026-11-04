@@ -8,6 +8,7 @@
  */
 import { Blueprint, BlueprintSection, fixedOptionsFor, sectionsInOrder } from './blueprints';
 import { DifficultyKey, LanguageMatrix } from './matrix';
+import { PASSAGE_DIFFICULTY_TOLERANCE } from './assemble';
 import { ExamPassage, ExamQuestion, ExamQuestionKey, ExamVariant, formatIssues, ItemType } from './schema';
 
 export type Severity = 'error' | 'warning';
@@ -199,7 +200,7 @@ function checkMatrix(
   for (const pm of sm.parts) {
     const inPart = qs.filter(({ id, q }) => (ctx.partOf ? ctx.partOf(id) === pm.part_id : q.type === pm.item_type));
     if (inPart.length === 0) continue;
-    const tol = pm.passage_plan ? (opts.passageDifficultyTolerance ?? 2) : 0;
+    const tol = pm.passage_plan ? (opts.passageDifficultyTolerance ?? PASSAGE_DIFFICULTY_TOLERANCE) : 0;
     for (const d of ['1', '2', '3'] as DifficultyKey[]) {
       const got = inPart.filter(({ q }) => String(q.difficulty) === d).length;
       const want = pm.difficulty_counts[d];
@@ -272,8 +273,9 @@ export function validateVariantSet(
     if (bp.languages.length > 1) {
       const all = new Set([...langs.values()].flatMap((s) => [...s]));
       for (const n of [...all].sort((a, b) => a - b)) {
-        const missing = bp.languages.filter((l) => !langs.get(l)?.has(n));
-        if (missing.length && missing.length < bp.languages.length) {
+        // Languages with no variants at all are already reported as LANGUAGE_MISSING.
+        const missing = bp.languages.filter((l) => langs.has(l) && !langs.get(l)!.has(n));
+        if (missing.length) {
           problems.push({ code: 'LANGUAGE_PAIR_MISSING', severity: 'warning', message: `${bpId}: variant ${n} has no ${missing.join(', ')} version` });
         }
       }

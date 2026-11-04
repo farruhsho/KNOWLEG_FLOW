@@ -237,7 +237,58 @@ export const MERGE: Record<CollectionName, boolean> = {
   exam_variants: true,
 };
 
-const rankOf =(s: unknown): number => (typeof s === 'string' && s in REVIEW_RANK ? REVIEW_RANK[s as ReviewStatus] : 0);
+const rankOf = (s: unknown): number => (typeof s === 'string' && s in REVIEW_RANK ? REVIEW_RANK[s as ReviewStatus] : 0);
+
+// ---------------------------------------------------------------------------
+// review-sync: methodologist decisions made in the admin panel → local bank
+// ---------------------------------------------------------------------------
+
+export interface RemoteReviewUpdate {
+  id: string;
+  from: ReviewStatus;
+  to: ReviewStatus;
+  reviewed_by: string | null;
+}
+
+/** Firestore Timestamp, ISO string or marker → ISO string. */
+function isoOf(v: unknown): string | null {
+  if (typeof v === 'string') return v;
+  if (v && typeof v === 'object') {
+    const o = v as { toDate?: () => Date; __timestamp?: string };
+    if (typeof o.toDate === 'function') return o.toDate().toISOString();
+    if (typeof o.__timestamp === 'string') return o.__timestamp;
+  }
+  return null;
+}
+
+/**
+ * Pulls review decisions from exam_questions documents into local bank items
+ * (in place). A remote review wins when it is a human decision further along
+ * than the local one, or a rejection — and only for the same content (same
+ * content_hash). Never touches Firestore; returns what changed.
+ */
+export function applyRemoteReviews(items: BankItem[], remote: Map<string, Record<string, unknown>>, now: string): RemoteReviewUpdate[] {
+  const updates: RemoteReviewUpdate[] = [];
+  for (const it of items) {
+    const doc = remote.get(it.id);
+    if (!doc || doc.content_hash !== it.question.content_hash) continue;
+    const r = doc.review as { status?: unknown; reviewed_by?: unknown; reviewed_at?: unknown; notes?: unknown } | undefined;
+    const status = r?.status;
+    if (typeof status !== 'string' || !(status in REVIEW_RANK)) continue;
+    const local = it.question.review.status;
+    if (status === local) continue;
+    if (!(status === 'rejected' || rankOf(status) > rankOf(local))) continue;
+    it.question.review = {
+      status: status as ReviewStatus,
+      reviewed_by: typeof r?.reviewed_by === 'string' ? r.reviewed_by : null,
+      reviewed_at: isoOf(r?.reviewed_at),
+      notes: typeof r?.notes === 'string' ? r.notes : it.question.review.notes,
+    };
+    it.question.updated_at = now;
+    updates.push({ id: it.id, from: local, to: status as ReviewStatus, reviewed_by: it.question.review.reviewed_by });
+  }
+  return updates;
+}
 
 export async function commitPlan(plan: ImportPlan, db: FirestorePort, batchSize = MAX_BATCH): Promise<CommitReport> {
   if (batchSize < 1 || batchSize > MAX_BATCH) throw new Error(`batch size must be 1..${MAX_BATCH}`);

@@ -1,0 +1,594 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_math_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "math",
+          "order": 1,
+          "subject_id": "math",
+          "duration_minutes": 80,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_math_2026/math/math",
+              "section_id": "math",
+              "part_id": "math",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "math.algebraic_expressions",
+                  "subject_id": "math",
+                  "title_ru": "Алгебраические выражения",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.algebraic_expressions.polynomials",
+                    "math.algebraic_expressions.short_multiplication",
+                    "math.algebraic_expressions.factoring",
+                    "math.algebraic_expressions.algebraic_fractions",
+                    "math.algebraic_expressions.expressions_with_variables"
+                  ]
+                },
+                {
+                  "topic_id": "math.equations_systems",
+                  "subject_id": "math",
+                  "title_ru": "Уравнения и системы уравнений",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.equations_systems.linear",
+                    "math.equations_systems.quadratic_vieta",
+                    "math.equations_systems.systems",
+                    "math.equations_systems.rational_irrational"
+                  ]
+                },
+                {
+                  "topic_id": "math.inequalities",
+                  "subject_id": "math",
+                  "title_ru": "Неравенства",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.inequalities.linear",
+                    "math.inequalities.quadratic",
+                    "math.inequalities.systems",
+                    "math.inequalities.absolute_value"
+                  ]
+                },
+                {
+                  "topic_id": "math.functions_graphs",
+                  "subject_id": "math",
+                  "title_ru": "Функции и графики",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.functions_graphs.linear",
+                    "math.functions_graphs.quadratic",
+                    "math.functions_graphs.inverse_proportion",
+                    "math.functions_graphs.reading_graphs"
+                  ]
+                },
+                {
+                  "topic_id": "math.sequences",
+                  "subject_id": "math",
+                  "title_ru": "Последовательности и прогрессии",
+                  "grades": [
+                    9,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.sequences.arithmetic",
+                    "math.sequences.geometric",
+                    "math.sequences.patterns"
+                  ]
+                },
+                {
+                  "topic_id": "math.plane_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Планиметрия",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.plane_geometry.angles_parallel",
+                    "math.plane_geometry.triangles",
+                    "math.plane_geometry.quadrilaterals",
+                    "math.plane_geometry.circle",
+                    "math.plane_geometry.areas",
+                    "math.plane_geometry.similarity"
+                  ]
+                },
+                {
+                  "topic_id": "math.solid_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Стереометрия",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.solid_geometry.cuboid",
+                    "math.solid_geometry.prism_pyramid",
+                    "math.solid_geometry.solids_of_revolution",
+                    "math.solid_geometry.volume_surface"
+                  ]
+                },
+                {
+                  "topic_id": "math.data_probability",
+                  "subject_id": "math",
+                  "title_ru": "Данные и вероятность",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.data_probability.charts_tables",
+                    "math.data_probability.averages",
+                    "math.data_probability.probability",
+                    "math.data_probability.combinatorics"
+                  ]
+                },
+                {
+                  "topic_id": "math.trigonometry",
+                  "subject_id": "math",
+                  "title_ru": "Тригонометрия",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.trigonometry.values_identities",
+                    "math.trigonometry.equations",
+                    "math.trigonometry.functions"
+                  ]
+                },
+                {
+                  "topic_id": "math.exponential_logarithmic",
+                  "subject_id": "math",
+                  "title_ru": "Показательная и логарифмическая функции",
+                  "grades": [
+                    11,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.exponential_logarithmic.log_properties",
+                    "math.exponential_logarithmic.equations"
+                  ]
+                },
+                {
+                  "topic_id": "math.calculus",
+                  "subject_id": "math",
+                  "title_ru": "Начала анализа",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.calculus.derivative",
+                    "math.calculus.integral"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "math",
+          "order": 1,
+          "subject_id": "math",
+          "duration_minutes": 80,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_math_2026/math/math",
+              "section_id": "math",
+              "part_id": "math",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "math.algebraic_expressions",
+                  "subject_id": "math",
+                  "title_ru": "Алгебраические выражения",
+                  "grades": [
+                    7,
+                    8
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.algebraic_expressions.polynomials",
+                    "math.algebraic_expressions.short_multiplication",
+                    "math.algebraic_expressions.factoring",
+                    "math.algebraic_expressions.algebraic_fractions",
+                    "math.algebraic_expressions.expressions_with_variables"
+                  ]
+                },
+                {
+                  "topic_id": "math.equations_systems",
+                  "subject_id": "math",
+                  "title_ru": "Уравнения и системы уравнений",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.equations_systems.linear",
+                    "math.equations_systems.quadratic_vieta",
+                    "math.equations_systems.systems",
+                    "math.equations_systems.rational_irrational"
+                  ]
+                },
+                {
+                  "topic_id": "math.inequalities",
+                  "subject_id": "math",
+                  "title_ru": "Неравенства",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.inequalities.linear",
+                    "math.inequalities.quadratic",
+                    "math.inequalities.systems",
+                    "math.inequalities.absolute_value"
+                  ]
+                },
+                {
+                  "topic_id": "math.functions_graphs",
+                  "subject_id": "math",
+                  "title_ru": "Функции и графики",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.functions_graphs.linear",
+                    "math.functions_graphs.quadratic",
+                    "math.functions_graphs.inverse_proportion",
+                    "math.functions_graphs.reading_graphs"
+                  ]
+                },
+                {
+                  "topic_id": "math.sequences",
+                  "subject_id": "math",
+                  "title_ru": "Последовательности и прогрессии",
+                  "grades": [
+                    9,
+                    9
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.sequences.arithmetic",
+                    "math.sequences.geometric",
+                    "math.sequences.patterns"
+                  ]
+                },
+                {
+                  "topic_id": "math.plane_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Планиметрия",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.plane_geometry.angles_parallel",
+                    "math.plane_geometry.triangles",
+                    "math.plane_geometry.quadrilaterals",
+                    "math.plane_geometry.circle",
+                    "math.plane_geometry.areas",
+                    "math.plane_geometry.similarity"
+                  ]
+                },
+                {
+                  "topic_id": "math.solid_geometry",
+                  "subject_id": "math",
+                  "title_ru": "Стереометрия",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.solid_geometry.cuboid",
+                    "math.solid_geometry.prism_pyramid",
+                    "math.solid_geometry.solids_of_revolution",
+                    "math.solid_geometry.volume_surface"
+                  ]
+                },
+                {
+                  "topic_id": "math.data_probability",
+                  "subject_id": "math",
+                  "title_ru": "Данные и вероятность",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                  },
+                  "subtopics": [
+                    "math.data_probability.charts_tables",
+                    "math.data_probability.averages",
+                    "math.data_probability.probability",
+                    "math.data_probability.combinatorics"
+                  ]
+                },
+                {
+                  "topic_id": "math.trigonometry",
+                  "subject_id": "math",
+                  "title_ru": "Тригонометрия",
+                  "grades": [
+                    9,
+                    10
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.trigonometry.values_identities",
+                    "math.trigonometry.equations",
+                    "math.trigonometry.functions"
+                  ]
+                },
+                {
+                  "topic_id": "math.exponential_logarithmic",
+                  "subject_id": "math",
+                  "title_ru": "Показательная и логарифмическая функции",
+                  "grades": [
+                    11,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.exponential_logarithmic.log_properties",
+                    "math.exponential_logarithmic.equations"
+                  ]
+                },
+                {
+                  "topic_id": "math.calculus",
+                  "subject_id": "math",
+                  "title_ru": "Начала анализа",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "math.calculus.derivative",
+                    "math.calculus.integral"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

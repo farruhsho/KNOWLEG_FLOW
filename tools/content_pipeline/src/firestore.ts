@@ -9,7 +9,24 @@ import type { CollectionName, FirestorePort } from './importer';
 
 export const DEFAULT_PROJECT_ID = 'knowleg-33f36';
 
-export async function openFirestore(projectId: string): Promise<FirestorePort> {
+export interface PipelineFirestore extends FirestorePort {
+  /** Read-only export of up to `limit` documents of any collection (e.g. the legacy `questions`) for dedup --against. */
+  exportCollection(collection: string, limit: number): Promise<Array<Record<string, unknown>>>;
+}
+
+/** Firestore values → JSON-safe values (Timestamps → ISO strings, references → paths). */
+function plain(v: unknown): unknown {
+  if (Array.isArray(v)) return v.map(plain);
+  if (v && typeof v === 'object') {
+    const o = v as { toDate?: () => Date; path?: unknown; firestore?: unknown };
+    if (typeof o.toDate === 'function') return o.toDate().toISOString();
+    if (typeof o.path === 'string' && o.firestore) return o.path;
+    return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, plain(x)]));
+  }
+  return v;
+}
+
+export async function openFirestore(projectId: string): Promise<PipelineFirestore> {
   const { initializeApp, applicationDefault, getApps } = await import('firebase-admin/app');
   const { getFirestore, Timestamp, FieldValue } = await import('firebase-admin/firestore');
   const app = getApps()[0] ?? initializeApp({ credential: applicationDefault(), projectId });
@@ -27,6 +44,20 @@ export async function openFirestore(projectId: string): Promise<FirestorePort> {
   };
 
   return {
+    async exportCollection(collection: string, limit: number) {
+      // Read-only paging by document id; Timestamps become ISO strings.
+      const out: Array<Record<string, unknown>> = [];
+      let last: string | null = null;
+      while (out.length < limit) {
+        let q = db.collection(collection).orderBy('__name__').limit(Math.min(500, limit - out.length));
+        if (last) q = q.startAfter(last);
+        const snap = await q.get();
+        if (snap.empty) break;
+        for (const d of snap.docs) out.push({ id: d.id, ...(plain(d.data()) as Record<string, unknown>) });
+        last = snap.docs[snap.docs.length - 1]!.id;
+      }
+      return out;
+    },
     async getExisting(collection: CollectionName, ids: string[]) {
       const out = new Map<string, Record<string, unknown>>();
       for (let i = 0; i < ids.length; i += 300) {

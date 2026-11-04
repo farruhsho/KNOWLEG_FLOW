@@ -31,7 +31,15 @@ export interface AssembleInput {
   now: string;
 }
 
-export type FitTier = 'exact_cells' | 'exact_totals' | 'topic_ranges' | 'passages';
+export type FitTier = 'exact_cells' | 'exact_totals' | 'topic_ranges' | 'difficulty_tolerance' | 'passages';
+
+/**
+ * In parts that mix passage groups and standalone items, the passage groups
+ * cannot be split freely, so the standalone remainder may miss the exact
+ * difficulty columns; it may then deviate by this much per level (the same
+ * tolerance validateVariant applies to passage parts).
+ */
+export const PASSAGE_DIFFICULTY_TOLERANCE = 2;
 
 export interface AssembleResult {
   ok: boolean;
@@ -160,7 +168,14 @@ function pickPassageGroups(ctx: PartContext, pool: BankItem[]): { groups: BankIt
 }
 
 /** Chooses standalone items for one part with the flow tiers; returns them in easy→hard order. */
-function pickStandalone(ctx: PartContext, pool: BankItem[], count: number, diffTarget: DifficultyCounts | null, topicAdjust: Map<string, number>): BankItem[] | null {
+function pickStandalone(
+  ctx: PartContext,
+  pool: BankItem[],
+  count: number,
+  diffTarget: DifficultyCounts | null,
+  topicAdjust: Map<string, number>,
+  diffTolerance = 0,
+): BankItem[] | null {
   const { input, part } = ctx;
   if (count === 0) return [];
   const topics = part.topics;
@@ -192,6 +207,15 @@ function pickStandalone(ctx: PartContext, pool: BankItem[], count: number, diffT
     lo: avail.map((r) => r.map(() => 0)),
     hi: avail,
   });
+  if (exactCols && diffTolerance > 0) {
+    tiers.push({
+      tier: 'difficulty_tolerance',
+      rows: topics.map((t) => ({ lo: Math.max(0, t.min - adj(t.topic_id)), hi: Math.max(0, t.max - adj(t.topic_id)) })),
+      cols: exactCols.map((c) => ({ lo: Math.max(0, c.lo - diffTolerance), hi: c.hi + diffTolerance })),
+      lo: avail.map((r) => r.map(() => 0)),
+      hi: avail,
+    });
+  }
   for (const tier of tiers) {
     const feasibleCells = tier.lo.every((r, i) => r.every((lo, j) => lo <= avail[i]![j]!));
     if (!feasibleCells) continue;
@@ -265,7 +289,7 @@ export function assembleVariant(input: AssembleInput): AssembleResult {
           const ok = Object.values(adjusted).every((v) => v >= 0) && adjusted['1'] + adjusted['2'] + adjusted['3'] === remainder;
           diffTarget = ok ? adjusted : null;
         }
-        standalone = pickStandalone(ctx, pool, remainder, diffTarget, topicAdjust);
+        standalone = pickStandalone(ctx, pool, remainder, diffTarget, topicAdjust, passageQuestions > 0 ? PASSAGE_DIFFICULTY_TOLERANCE : 0);
         if (!standalone) continue;
         if (!plan || passageQuestions === 0) fit[part.slot] = ctx.selectedTier ?? 'topic_ranges';
       }

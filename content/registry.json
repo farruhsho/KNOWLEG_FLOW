@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-11-02T00:00:00.000Z",
+  "target_per_direction": 100,
+  "rows": [
+    {
+      "blueprint_id": "ort_main_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 150,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 12,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 12
+      }
+    },
+    {
+      "blueprint_id": "ort_main_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 150,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 4,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 4
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_chemistry_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_chemistry_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_biology_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_biology_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_physics_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_physics_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_math_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_math_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_history_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_history_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_english_2026",
+      "language": "en",
+      "target_variants": 100,
+      "items_per_variant": 50,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_kyrgyz_lit_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_subject_russian_lit_2026",
+      "language": "ru",
+      "target_variants": 100,
+      "items_per_variant": 40,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    },
+    {
+      "blueprint_id": "ort_state_language_2026",
+      "language": "ky",
+      "target_variants": 100,
+      "items_per_variant": 50,
+      "variants": {
+        "drafted": 0,
+        "ai_verified": 0,
+        "approved": 0,
+        "published": 0,
+        "archived": 0
+      },
+      "items": {
+        "draft": 0,
+        "ai_verified": 0,
+        "methodologist_approved": 0,
+        "rejected": 0,
+        "total": 0
+      }
+    }
+  ],
+  "directions": [
+    {
+      "blueprint_id": "ort_main_2026",
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_chemistry_2026",
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_biology_2026",
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_physics_2026",
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_math_2026",
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_history_2026",
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_english_2026",
+      "languages": [
+        "en"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_kyrgyz_lit_2026",
+      "languages": [
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_subject_russian_lit_2026",
+      "languages": [
+        "ru"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    },
+    {
+      "blueprint_id": "ort_state_language_2026",
+      "languages": [
+        "ky"
+      ],
+      "target_numbers": 100,
+      "approved_numbers": 0,
+      "published_numbers": 0
+    }
+  ],
+  "totals": {
+    "target_variants": 1600,
+    "drafted": 0,
+    "ai_verified": 0,
+    "approved": 0,
+    "published": 0,
+    "items": 16,
+    "approved_items": 0,
+    "target_numbers": 1000,
+    "approved_numbers": 0,
+    "published_numbers": 0
+  }
+}
