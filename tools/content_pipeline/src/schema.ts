@@ -62,6 +62,11 @@ export const PassageId = z.string().regex(/^p_[0-9a-f]{20}$/, 'expected p_<20 he
 export const QuestionOption = z.strictObject({ id: OptionId, text: NonEmpty });
 export type QuestionOption = z.infer<typeof QuestionOption>;
 
+/**
+ * Bank / in-memory shape: `rows` is string[][] (also what the content hash
+ * covers). Firestore cannot store an array inside an array, so the import
+ * stage writes `rows: [{cells: [...]}]` (importer.ts toStoredTable).
+ */
 export const QuestionTable = z
   .strictObject({
     headers: z.array(z.string()).min(1),

@@ -1,4 +1,7 @@
+import assert from 'node:assert/strict';
 import { assembleVariant, usedIds } from '../src/assemble';
+import { PipelineFirestore } from '../src/firestore';
+import { CollectionName, MAX_BATCH, nestedArrayPaths } from '../src/importer';
 import { BankItem, BankPassage, Language, VariantFile } from '../src/schema';
 import { ValidationContext } from '../src/validate';
 import { real, realBlueprint, realMatrix, T0 } from './fixtures';
@@ -44,4 +47,42 @@ export function assembleMany(
     else failures.push(res.problems);
   }
   return { files, failures };
+}
+
+/**
+ * In-memory FirestorePort. Like the real backend it rejects a whole batch
+ * that holds an array inside an array (INVALID_ARGUMENT at commit time).
+ */
+export class FakeFirestore implements PipelineFirestore {
+  readonly docs = new Map<string, Record<string, unknown>>();
+  readonly batches: number[] = [];
+  get(collection: CollectionName, id: string): Record<string, unknown> | undefined {
+    return this.docs.get(`${collection}/${id}`);
+  }
+  set(collection: CollectionName, id: string, data: Record<string, unknown>): void {
+    this.docs.set(`${collection}/${id}`, data);
+  }
+  async exportCollection(): Promise<Array<Record<string, unknown>>> {
+    return [];
+  }
+  async getExisting(collection: CollectionName, ids: string[]): Promise<Map<string, Record<string, unknown>>> {
+    const out = new Map<string, Record<string, unknown>>();
+    for (const id of ids) {
+      const d = this.docs.get(`${collection}/${id}`);
+      if (d) out.set(id, structuredClone(d));
+    }
+    return out;
+  }
+  async commitBatch(writes: Array<{ collection: CollectionName; id: string; data: Record<string, unknown>; merge: boolean }>): Promise<void> {
+    assert.ok(writes.length <= MAX_BATCH);
+    for (const w of writes) {
+      const bad = nestedArrayPaths(w.data);
+      if (bad.length) throw new Error(`INVALID_ARGUMENT: Cannot convert an array value in an array value (${w.collection}/${w.id} ${bad[0]})`);
+    }
+    this.batches.push(writes.length);
+    for (const w of writes) {
+      const k = `${w.collection}/${w.id}`;
+      this.docs.set(k, w.merge ? { ...(this.docs.get(k) ?? {}), ...structuredClone(w.data) } : structuredClone(w.data));
+    }
+  }
 }

@@ -7,12 +7,19 @@ import { main, parseArgs } from '../src/cli';
 import { readJson, writeJsonAtomic } from '../src/io';
 import { BankFile, VariantFile } from '../src/schema';
 import { captureOut, syntheticBank, tempRepo } from './fixtures';
+import { FakeFirestore } from './helpers';
 
 const BP = 'ort_subject_chemistry_2026';
 
 async function run(root: string, ...args: string[]): Promise<{ code: number; text: string }> {
   const { out, lines } = captureOut();
   const code = await main([...args, '--root', root], out);
+  return { code, text: lines.join('\n') };
+}
+
+async function runDb(db: FakeFirestore, root: string, ...args: string[]): Promise<{ code: number; text: string }> {
+  const { out, lines } = captureOut();
+  const code = await main([...args, '--root', root], out, { openFirestore: async () => db });
   return { code, text: lines.join('\n') };
 }
 
@@ -90,6 +97,61 @@ describe('cli', () => {
     await assert.rejects(() => run(root, 'review', '--ids', id, '--status', 'ai_verified', '--by', 'uid_m'), /humans set/);
     const afterReject = await run(root, 'validate');
     assert.equal(afterReject.code, 1, 'a rejected item blocks its variant');
+  });
+
+  it('import --commit never changes an existing variant status; review-sync pulls admin-panel statuses; edits made there are reported (CP-04, CP-10)', async () => {
+    const root = tempRepo();
+    const bank = syntheticBank(BP, 'ru', 2, { spare: 1 });
+    const bankFile: BankFile = { schema_version: 1, batch: { id: 'synth', kind: 'sample', created_at: '2026-11-01T00:00:00.000Z', note: 'test' }, passages: bank.passages, items: bank.items };
+    writeJsonAtomic(join(root, 'content', 'bank', 'synth', 'items.json'), bankFile);
+    assert.equal((await run(root, 'assemble', '--blueprint', BP, '--language', 'ru', '--count', '2')).code, 0);
+    const id1 = `v_${BP}_ru_001`;
+    const id2 = `v_${BP}_ru_002`;
+    const p1 = join(root, 'content', 'variants', BP, 'ru', `${id1}.json`);
+    const p2 = join(root, 'content', 'variants', BP, 'ru', `${id2}.json`);
+    const db = new FakeFirestore();
+
+    const first = await runDb(db, root, 'import', '--blueprint', BP, '--commit');
+    assert.equal(first.code, 0, first.text);
+    assert.equal(db.get('exam_variants', id1)!.status, 'draft');
+
+    // --publish does not flip variants that already exist in Firestore, and the local files stay honest.
+    const pub = await runDb(db, root, 'import', '--blueprint', BP, '--publish', '--published-by', 'uid_admin', '--commit');
+    assert.equal(pub.code, 0, pub.text);
+    assert.ok(pub.text.includes(`publish in the admin panel, adminPublishVariant): ${id1}, ${id2}`), pub.text);
+    assert.equal(db.get('exam_variants', id1)!.status, 'draft');
+    assert.equal(VariantFile.parse(readJson(p1)).variant.status, 'draft');
+
+    // The admin panel unpublishes 001 and publishes 002.
+    Object.assign(db.get('exam_variants', id1)!, { status: 'archived', archived_by: 'uid_admin' });
+    Object.assign(db.get('exam_variants', id2)!, { status: 'published', published_at: '2026-11-03T10:00:00.000Z', published_by: 'uid_admin' });
+    const sync = await runDb(db, root, 'review-sync', '--blueprint', BP);
+    assert.equal(sync.code, 0, sync.text);
+    assert.ok(sync.text.includes(`${id1}: draft → archived`), sync.text);
+    assert.equal(VariantFile.parse(readJson(p1)).variant.status, 'archived');
+    const f2 = VariantFile.parse(readJson(p2)).variant;
+    assert.deepEqual([f2.status, f2.published_by, f2.published_at], ['published', 'uid_admin', '2026-11-03T10:00:00.000Z']);
+
+    const again = await runDb(db, root, 'import', '--blueprint', BP, '--publish', '--published-by', 'uid_admin', '--commit');
+    assert.equal(again.code, 0, again.text);
+    assert.ok(again.text.includes(`skipped ${id1}: archived`), again.text);
+    assert.equal(db.get('exam_variants', id1)!.status, 'archived', 'an archived variant is never revived');
+    const rebuild = await run(root, 'assemble', '--blueprint', BP, '--language', 'ru', '--numbers', '1');
+    assert.match(rebuild.text, /archived variants are never rebuilt/);
+    assert.equal(VariantFile.parse(readJson(p1)).variant.status, 'archived');
+
+    // A question edited in the admin panel is reported, not reverted, until --overwrite.
+    const qid = f2.sections[0]!.question_ids[0]!;
+    Object.assign(db.get('exam_questions', qid)!, { stem: 'Правка методиста', edited_in_cms_at: '2026-11-03T11:00:00.000Z' });
+    const conflict = await runDb(db, root, 'import', '--blueprint', BP, '--all-items', '--commit');
+    assert.equal(conflict.code, 0, conflict.text);
+    assert.ok(conflict.text.includes('NOT overwritten (cms_conflicts)'), conflict.text);
+    assert.equal(db.get('exam_questions', qid)!.stem, 'Правка методиста');
+    const report = readJson<{ cms_conflicts: Array<{ collection: string; id: string }> }>(join(root, 'content', 'reports', 'import-report.json'));
+    assert.deepEqual(report.cms_conflicts.map((c) => `${c.collection}/${c.id}`), [`exam_questions/${qid}`, `exam_question_keys/${qid}`]);
+    const over = await runDb(db, root, 'import', '--blueprint', BP, '--all-items', '--commit', '--overwrite');
+    assert.ok(over.text.includes(`OVERWRITTEN exam_questions/${qid}`), over.text);
+    assert.notEqual(db.get('exam_questions', qid)!.stem, 'Правка методиста');
   });
 
   it('paid stages without the flag only print a plan and never call the API', async () => {
