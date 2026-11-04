@@ -1,176 +1,60 @@
-# 🎓 ORT Master KG - Admin Panel
+# Admin CMS (`lib/features/admin`)
 
-**Production-ready админ панель** для управления контентом, пользователями и AI генерацией вопросов.
+Role-based content and operations console for ORT Master KG. Contract:
+`docs/modernization/ARCHITECTURE.md` (§1 collections, §2 roles, §3 callables).
 
----
+## Access
 
-## 🚀 Quick Start
+* Sign-in: `/admin/login` → Firebase Auth email/password → role from the custom
+  claim `getIdTokenResult(true).claims['role']`; fallback `users/{uid}.role ==
+  'admin'` (= `super_admin`). Only a valid admin role sets
+  `adminVerified` (`lib/core/routes/admin_session.dart`) and starts
+  `adminSessionProvider` / `adminRoleProvider`
+  (`lib/providers/admin_access_provider.dart`).
+* Roles and the permission matrix: `domain/admin_role.dart` (exactly §2).
+  Section visibility: `domain/admin_nav.dart`. Screens hide actions the role
+  cannot perform; Firestore rules and the callables enforce the same matrix.
+* Every `/admin/*` route re-checks the verified session (`admin_routes.dart`).
 
-```bash
-# 1. Install dependencies
-flutter pub get
+## Routes (`adminRoutes`)
 
-# 2. Configure Firebase
-# Add your google-services.json / GoogleService-Info.plist
+| Path | Screen | Who |
+|---|---|---|
+| `/admin/login` | Sign-in, password reset | everyone |
+| `/admin/dashboard` | `count()` counters, shortcuts | view_stats |
+| `/admin/subjects` | Subjects & inline topics | edit_content |
+| `/admin/lessons`, `/admin/lessons/:id` | Structured lessons (`lessons`) | edit_content |
+| `/admin/questions`, `/admin/questions/:id` | Practice bank (`questions`), CSV/JSON import & export | edit_questions |
+| `/admin/exam-bank`, `/admin/exam-bank/:id` | `exam_questions` + keys + passages, review | edit_questions (approve/reject: review_questions) |
+| `/admin/variants`, `/admin/variants/:id` | Variant builder, publish via `adminPublishVariant` | edit_questions / publish_variants |
+| `/admin/ai-drafts` | `adminAiDraftQuestions` → drafts | super_admin, content_manager, methodologist |
+| `/admin/users`, `/admin/users/:uid` | Users, entitlements, ledger; ban/premium; `adminSetRole`; `adminGrantCredits` | view_users / moderate_users / super_admin |
+| `/admin/payments` | Read-only `purchases` | view_payments |
+| `/admin/pricing` | `config/pricing` via `adminUpdatePricing` | manage_pricing |
+| `/admin/logs` | `admin_logs` | super_admin, support |
 
-# 3. Run the app
-flutter run
+`/admin/generate-questions` (old template generator) redirects to AI drafts.
 
-# 4. Navigate to admin
-# /admin/login
-```
-
----
-
-## ✨ Features
-
-### 📊 Content Management
-- **Subjects Manager** - CRUD операции, поиск, bulk действия
-- **Questions Manager** - продвинутая фильтрация, статистика
-- **Export/Import** - JSON формат
-
-### 🤖 AI Features
-- **Claude 3.5 Sonnet** - автоматическая генерация вопросов
-- **Multi-language** - ru/ky/en
-- **Duplicate Detection** - Levenshtein алгоритм
-- **Batch Generation** - 1-20 вопросов за раз
-
-### 👥 User Management
-- **User List** - фильтры (All/Premium/Free/Banned)
-- **Premium System** - управление подписками
-- **Ban System** - блокировка пользователей
-- **Bulk Operations** - массовые действия
-- **Statistics** - активность, точность, тесты
-
-### 🎨 Design
-- **Material 3** - современный дизайн
-- **Responsive** - mobile/tablet/desktop
-- **Animations** - плавные переходы
-- **Dark Mode Ready** - готово к темной теме
-
----
-
-## 📁 Structure
+## Layout
 
 ```
-lib/features/admin/
-├── data/
-│   ├── models/          # Data models
-│   ├── repositories/    # Data access
-│   └── services/        # External services (AI)
-├── presentation/
-│   ├── pages/          # Screens
-│   └── widgets/        # Reusable components
-└── core/theme/         # Design system
+domain/        pure Dart: roles, nav, blueprints, variant validation, codecs
+data/          Firebase handles, callables, repositories (paginated, count())
+application/   Riverpod providers, cursor-paginated list notifier
+presentation/  shell (sidebar ↔ drawer), pages, widgets (Markdown+LaTeX, l10n fields)
 ```
 
----
+## Data rules kept for compatibility
 
-## 🔧 Technologies
+* Subjects: doc id == subject id; writes the fields the student
+  `SubjectModel` requires; delete = deactivate unless nothing references it.
+* Lessons: structured snake_case fields plus legacy mirrors (`id`,
+  `subjectId`, `content`, `order`, `createdAt` ISO string).
+* Practice questions: one codec, snake_case `type`, `subject_id` + `subjectId`
+  mirror; `update()` keeps unknown fields; import commits a new batch per 400.
+* Exam questions: `review.status` draft → ai_verified → methodologist_approved
+  / rejected; content edits by non-reviewers send a question back to draft.
+* No secrets in the client: AI generation, role changes, credits, pricing and
+  publishing go through callables.
 
-- **Flutter** - UI framework
-- **Firebase** - Backend (Auth, Firestore)
-- **Claude AI** - Question generation
-- **Riverpod** - State management
-- **Material 3** - Design system
-
----
-
-## 📊 Statistics
-
-- **21 files** created
-- **6,000+ lines** of code
-- **5 phases** completed
-- **100% type-safe**
-
----
-
-## 🔐 Security
-
-- Firebase Auth integration
-- Role-based access control
-- Secure API key handling
-- Input validation
-- Error handling
-
----
-
-## 💰 AI Costs
-
-- **~$0.003** per question
-- **Very affordable** for bulk generation
-- **Claude 3.5 Sonnet** - best quality
-
----
-
-## 📚 Documentation
-
-- [Integration Guide](INTEGRATION_GUIDE.md) - Как подключить
-- [Admin Panel Summary](ADMIN_PANEL_SUMMARY.md) - Полный обзор
-- [Walkthrough](walkthrough.md) - Детальная документация
-- [Task Breakdown](task.md) - Прогресс разработки
-
----
-
-## 🎯 Usage
-
-### AI Question Generation
-```dart
-final request = AiQuestionRequest(
-  subjectId: 'math',
-  topic: 'Квадратные уравнения',
-  difficulty: 2,
-  count: 5,
-  language: 'ru',
-);
-
-final response = await aiService.generateQuestions(request);
-```
-
-### User Management
-```dart
-// Filter premium users
-final users = ref.watch(
-  usersProvider(UsersFilter(isPremium: true))
-);
-
-// Bulk ban
-await repository.bulkBanUsers(ids, true);
-```
-
----
-
-## 🚀 Deployment
-
-```bash
-# Web
-flutter build web --release
-firebase deploy --only hosting
-
-# Android
-flutter build apk --release
-
-# iOS
-flutter build ios --release
-```
-
----
-
-## ✅ Checklist
-
-- [x] Design system
-- [x] Authentication
-- [x] Dashboard
-- [x] Content management
-- [x] AI generation
-- [x] User management
-- [ ] Analytics (optional)
-- [ ] Audit logs (optional)
-
----
-
-## 🎉 Ready for Production!
-
-**Админ панель полностью функциональна и готова к использованию.**
-
-Created with ❤️ for ORT Master KG
+Tests: `flutter test test/admin`.
