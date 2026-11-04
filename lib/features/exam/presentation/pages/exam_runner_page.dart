@@ -168,7 +168,15 @@ class _ExamRunnerPageState extends ConsumerState<ExamRunnerPage>
     return PopScope(
       canPop: phase == ExamPhase.completed,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _confirmExit();
+        if (didPop) return;
+        // Same as the close button: the "timer keeps running, answers are
+        // saved" dialog only makes sense once an attempt is loaded. On the
+        // loading / load-failure screen, back just leaves.
+        if (hasSession) {
+          _confirmExit();
+        } else {
+          _leave();
+        }
       },
       child: Scaffold(
         body: SafeArea(

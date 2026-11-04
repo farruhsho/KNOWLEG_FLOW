@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/content/topic_names.dart';
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../domain/exam_blueprint.dart';
@@ -9,8 +10,10 @@ import '../../domain/exam_payload.dart';
 import '../../domain/exam_question.dart';
 import '../providers/exam_providers.dart';
 import '../widgets/exam_common.dart';
+import '../widgets/exam_labels.dart';
 import '../widgets/option_tile.dart';
 import '../widgets/passage_panel.dart';
+import '../widgets/question_view.dart';
 import '../widgets/rich_stem.dart';
 
 enum _ReviewFilter { all, wrong, flagged }
@@ -29,7 +32,10 @@ List<List<QuestionOption>> reviewOptions(
         if (item.options.isNotEmpty || bp == null) return item.options;
         final section = bp.sectionById(item.sectionId);
         if (section == null) return item.options;
-        final part = section.partForIndex(pos);
+        final part = section.parts
+                .where((p) => p.id == item.partId)
+                .firstOrNull ??
+            section.partForIndex(pos);
         return [
           for (final o in part.fixedOptions)
             QuestionOption(id: o.id, text: o.text.resolve(language)),
@@ -59,6 +65,8 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
         ref.watch(examLocalFlagsProvider(widget.attemptId)).valueOrNull ?? const {};
     // Blueprint and exam language of the attempt (for fixed options).
     final resultData = ref.watch(examResultProvider(widget.attemptId)).valueOrNull;
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
+    final ui = context.uiLang;
     return Scaffold(
       appBar: AppBar(title: Text(l.examReviewTitle)),
       body: async.when(
@@ -125,6 +133,12 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
                           options: options[visible[i].$1 - 1],
                           flagged: flagged(visible[i].$2),
                           attemptId: widget.attemptId,
+                          subtitle: reviewItemContext(
+                            visible[i].$2,
+                            names: names,
+                            lang: ui,
+                            blueprint: resultData?.blueprint,
+                          ),
                         ),
                       ),
               ),
@@ -136,6 +150,30 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
   }
 }
 
+/// "Section · topic" line of a review card, in the student's language
+/// (never raw ids such as `math.arithmetic`). Empty when nothing is known.
+String reviewItemContext(
+  ReviewItem item, {
+  required TopicNames names,
+  required String lang,
+  ExamBlueprint? blueprint,
+}) {
+  final parts = <String>[
+    if ((blueprint?.sections.length ?? 0) > 1 && item.sectionId.isNotEmpty)
+      examSectionName(item.sectionId,
+          names: names, lang: lang, blueprint: blueprint),
+    if (item.topicId != null && item.topicId!.isNotEmpty)
+      examTopicName(item.topicId!,
+          names: names, lang: lang, blueprint: blueprint),
+  ];
+  // "Математика · Математика" when the topic is only known by its area.
+  final unique = <String>[];
+  for (final p in parts) {
+    if (p.isNotEmpty && !unique.contains(p)) unique.add(p);
+  }
+  return unique.join(' · ');
+}
+
 class _ReviewCard extends StatelessWidget {
   final int number;
   final ReviewItem item;
@@ -143,12 +181,16 @@ class _ReviewCard extends StatelessWidget {
   final bool flagged;
   final String attemptId;
 
+  /// Section / topic line under the question number.
+  final String subtitle;
+
   const _ReviewCard({
     required this.number,
     required this.item,
     required this.options,
     required this.flagged,
     required this.attemptId,
+    this.subtitle = '',
   });
 
   @override
@@ -176,6 +218,16 @@ class _ReviewCard extends StatelessWidget {
               if (flagged) Icon(Icons.flag_rounded, size: 18, color: tokens.warning),
             ],
           ),
+          if (subtitle.isNotEmpty)
+            Padding(
+              padding: const EdgeInsetsDirectional.only(
+                  start: 20 + AppSpacing.sm, top: AppSpacing.xxs),
+              child: Text(
+                subtitle,
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: tokens.textSecondary),
+              ),
+            ),
           if (item.passage != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Theme(
@@ -203,6 +255,13 @@ class _ReviewCard extends StatelessWidget {
           if (item.table != null) ...[
             const SizedBox(height: AppSpacing.sm),
             ExamTable.fromQuestion(item.table!),
+          ],
+          if (item.hasComparisonColumns) ...[
+            const SizedBox(height: AppSpacing.sm),
+            ComparisonColumns(
+              columnA: item.columnA ?? '',
+              columnB: item.columnB ?? '',
+            ),
           ],
           const SizedBox(height: AppSpacing.md),
           for (final o in options) ...[

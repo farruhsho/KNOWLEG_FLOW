@@ -2055,11 +2055,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get examErrorAttemptNotFound => 'This attempt was not found.';
 
   @override
+  String get examErrorBanned =>
+      'Your account has been blocked by a moderator, so tests are not available. If you think this is a mistake, contact support.';
+
+  @override
   String get examErrorGeneric => 'Something went wrong. Please try again.';
 
   @override
   String get examErrorNetwork =>
       'No connection. Check the internet and try again.';
+
+  @override
+  String get examErrorPlatformUnsupported =>
+      'Practice tests are not available on this device. Open the app on your phone (Android or iPhone) or in a web browser.';
 
   @override
   String get examErrorSignIn => 'Sign in to take exams.';
@@ -2202,6 +2210,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get examNextSectionTitle => 'Next section';
 
   @override
+  String get examNoCreditsAvailable => 'No credits available';
+
+  @override
   String get examNoQuestions =>
       'This section has no questions. Please contact support.';
 
@@ -2249,6 +2260,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examPassage => 'Text';
+
+  @override
+  String get examPlatformUnsupportedShort => 'Not available on this device';
 
   @override
   String get examPassageHide => 'Hide text';

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
+import '../../../billing/application/billing_providers.dart';
 import '../../../billing/domain/entitlements.dart';
 import '../../data/exam_remote_datasource.dart';
 import '../../domain/exam_attempt.dart';
@@ -103,7 +104,11 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
       if (f.kind == ExamFailureKind.noEntitlement) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(l.examCostNeedCredit)));
-        context.push(RoutePaths.store);
+        // A consumption-only build (BILLING_MODE=external) never routes to
+        // a purchase screen.
+        if (ref.read(billingModeProvider).sellsInApp) {
+          context.push(RoutePaths.store);
+        }
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,6 +135,8 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
     final status = ref.watch(
         variantStatusesProvider.select((m) => m[v.id] ?? VariantAttemptStatus.none));
     final ent = ref.watch(entitlementsProvider);
+    final sellsInApp = ref.watch(billingModeProvider.select((m) => m.sellsInApp));
+    final platformSupported = ref.watch(examCallablesSupportedProvider);
     final scratchSections = bp.sections
         .where((s) => s.allowScratchpad)
         .map((s) => s.title.resolve(ui))
@@ -146,6 +153,10 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
           child: ListView(
             padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.xxl),
             children: [
+              if (!platformSupported) ...[
+                const ExamPlatformNotice(),
+                const SizedBox(height: AppSpacing.lg),
+              ],
               Text(bp.title.resolve(ui), style: theme.textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.xs),
               Text(
@@ -255,6 +266,8 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
           starting: _starting,
           status: status,
           entitlements: ent.valueOrNull,
+          sellsInApp: sellsInApp,
+          platformSupported: platformSupported,
           onStart: _start,
           onResume: _resume,
         ),
@@ -267,6 +280,13 @@ class _BottomAction extends StatelessWidget {
   final bool starting;
   final VariantAttemptStatus status;
   final Entitlements? entitlements;
+
+  /// False in a consumption-only build (BILLING_MODE=external): no purchase
+  /// button, only a neutral disabled state when there are no credits.
+  final bool sellsInApp;
+
+  /// False on Windows / Linux (no App Check, contract D7).
+  final bool platformSupported;
   final VoidCallback onStart;
   final ValueChanged<String> onResume;
 
@@ -274,6 +294,8 @@ class _BottomAction extends StatelessWidget {
     required this.starting,
     required this.status,
     required this.entitlements,
+    required this.sellsInApp,
+    required this.platformSupported,
     required this.onStart,
     required this.onResume,
   });
@@ -292,6 +314,13 @@ class _BottomAction extends StatelessWidget {
         ),
         label: Text(l.examStarting),
       );
+    } else if (!platformSupported) {
+      button = FilledButton.icon(
+        key: const ValueKey('exam_platform_unsupported_button'),
+        onPressed: null,
+        icon: const Icon(Icons.phonelink_off_rounded),
+        label: Text(l.examPlatformUnsupportedShort),
+      );
     } else if (status.isInProgress) {
       button = FilledButton.icon(
         onPressed: () => onResume(status.inProgressAttemptId!),
@@ -299,11 +328,18 @@ class _BottomAction extends StatelessWidget {
         label: Text(l.examContinue),
       );
     } else if (entitlements != null && !entitlements!.canStartExam) {
-      button = FilledButton.icon(
-        onPressed: () => context.push(RoutePaths.store),
-        icon: const Icon(Icons.shopping_bag_outlined),
-        label: Text(l.examBuyToStart),
-      );
+      button = sellsInApp
+          ? FilledButton.icon(
+              onPressed: () => context.push(RoutePaths.store),
+              icon: const Icon(Icons.shopping_bag_outlined),
+              label: Text(l.examBuyToStart),
+            )
+          : FilledButton.icon(
+              key: const ValueKey('exam_no_credits_button'),
+              onPressed: null,
+              icon: const Icon(Icons.lock_outline_rounded),
+              label: Text(l.examNoCreditsAvailable),
+            );
     } else {
       button = FilledButton.icon(
         key: const ValueKey('exam_start_button'),

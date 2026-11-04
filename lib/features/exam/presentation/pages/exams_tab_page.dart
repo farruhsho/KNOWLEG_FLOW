@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
+import '../../../billing/application/billing_providers.dart';
 import '../../../billing/domain/entitlements.dart';
 import '../../domain/exam_attempt.dart';
 import '../../domain/exam_blueprint.dart';
@@ -69,6 +70,10 @@ class ExamCatalogView extends ConsumerWidget {
           child: ListView(
             padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.huge),
             children: [
+              if (!ref.watch(examCallablesSupportedProvider)) ...[
+                const ExamPlatformNotice(),
+                const SizedBox(height: AppSpacing.lg),
+              ],
               const ExamResumeBanner(),
               Text(l.examCatalogIntro,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -133,6 +138,11 @@ class _EntitlementCard extends ConsumerWidget {
                     ? l.examEntitlementCredits(e.credits)
                     : l.examEntitlementNone;
     final needsPurchase = e != null && !e.canStartExam;
+    // BILLING_MODE=external (consumption-only build): balance and neutral
+    // text only — no "Buy" button, no route to a purchase screen
+    // (ARCHITECTURE §5, Google Play payments policy).
+    final sellsInApp =
+        ref.watch(billingModeProvider.select((m) => m.sellsInApp));
     return ExamCard(
       color: tokens.xpContainer,
       borderColor: tokens.xpContainer,
@@ -152,16 +162,18 @@ class _EntitlementCard extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(width: AppSpacing.sm),
-          needsPurchase
-              ? FilledButton(
-                  onPressed: () => context.push(RoutePaths.store),
-                  child: Text(l.examBuy),
-                )
-              : TextButton(
-                  onPressed: () => context.push(RoutePaths.store),
-                  child: Text(l.examBuy),
-                ),
+          if (sellsInApp) ...[
+            const SizedBox(width: AppSpacing.sm),
+            needsPurchase
+                ? FilledButton(
+                    onPressed: () => context.push(RoutePaths.store),
+                    child: Text(l.examBuy),
+                  )
+                : TextButton(
+                    onPressed: () => context.push(RoutePaths.store),
+                    child: Text(l.examBuy),
+                  ),
+          ],
         ],
       ),
     );

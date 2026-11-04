@@ -23,7 +23,14 @@ class QuestionOption {
   Map<String, dynamic> toJson() => {'id': id, 'text': text};
 }
 
-/// Simple table attached to a question: `{headers: [...], rows: [[...]]}`.
+/// Simple table attached to a question.
+///
+/// Two shapes are accepted (contract D2): the callable wire shape
+/// `{headers: [...], rows: [[...]]}` and the Firestore storage shape
+/// `{headers: [...], rows: [{cells: [...]}]}` (Firestore cannot hold an array
+/// inside an array). A row may also be a map keyed by column index
+/// (`{"0": "a", "1": "b"}`). [toJson] always writes the wire shape, which is
+/// what the local Hive copy stores.
 @immutable
 class QuestionTable {
   final List<String> headers;
@@ -35,14 +42,72 @@ class QuestionTable {
     final m = asJsonMap(json);
     if (m.isEmpty) return null;
     final headers = asJsonList(m['headers']).map((e) => asString(e) ?? '').toList();
-    final rows = asJsonList(m['rows'])
-        .map((r) => asJsonList(r).map((c) => asString(c) ?? '').toList())
-        .toList();
+    final rows = <List<String>>[
+      for (final r in _rowList(m['rows'])) _cells(r),
+    ];
     if (headers.isEmpty && rows.isEmpty) return null;
     return QuestionTable(headers: headers, rows: rows);
   }
 
+  /// `rows` as a list; a map keyed by row index is ordered by that index.
+  static List<Object?> _rowList(Object? raw) {
+    if (raw is List) return raw;
+    if (raw is Map) return _indexedValues(asJsonMap(raw));
+    return const [];
+  }
+
+  static List<String> _cells(Object? row) {
+    if (row is List) return [for (final c in row) asString(c) ?? ''];
+    if (row is Map) {
+      final m = asJsonMap(row);
+      final cells = m['cells'];
+      if (cells is List) return [for (final c in cells) asString(c) ?? ''];
+      return [for (final c in _indexedValues(m)) asString(c) ?? ''];
+    }
+    final single = asString(row);
+    return single == null ? const [] : [single];
+  }
+
+  /// Values of a map whose keys are integer indices, in index order;
+  /// non-index keys are ignored.
+  static List<Object?> _indexedValues(Map<String, dynamic> m) {
+    final entries = [
+      for (final e in m.entries)
+        if (int.tryParse(e.key) != null) (int.parse(e.key), e.value),
+    ]..sort((a, b) => a.$1.compareTo(b.$1));
+    return [for (final e in entries) e.$2];
+  }
+
   Map<String, dynamic> toJson() => {'headers': headers, 'rows': rows};
+}
+
+/// Keys that may carry a question's image, most specific first (contract
+/// D3): callables send a Storage path in `imagePath` (and an https URL, if
+/// any, in `imageUrl`); stored documents use `image_path`.
+const List<String> examImageKeys = ['imageUrl', 'image_url', 'imagePath', 'image_path'];
+
+/// Image reference (https URL or Storage path such as
+/// `exam_media/q1/fig.png`) of a question or review item, or null. Blank
+/// values are ignored so an empty `imageUrl` does not hide `imagePath`.
+String? examImageReference(Map<String, dynamic> m) {
+  for (final k in examImageKeys) {
+    final v = asString(m[k])?.trim();
+    if (v != null && v.isNotEmpty) return v;
+  }
+  return null;
+}
+
+/// Quantitative-comparison quantities (column A, column B) of a question or
+/// review item: `columnA`/`columnB` (callables), `column_a`/`column_b`
+/// (stored documents) or a `columns: {a, b}` map.
+(String?, String?) examComparisonColumns(Map<String, dynamic> m) {
+  final columns = asJsonMap(m['columns']);
+  return (
+    asString(pick(m, const ['columnA', 'column_a'])) ??
+        asString(columns['a'] ?? columns['A']),
+    asString(pick(m, const ['columnB', 'column_b'])) ??
+        asString(columns['b'] ?? columns['B']),
+  );
 }
 
 /// One question of the current section as delivered by the server (never
@@ -53,6 +118,9 @@ class ExamQuestion {
   final String stem;
   final List<QuestionOption> options;
   final String? passageId;
+
+  /// Image reference: an https URL or a Storage path, resolved to a download
+  /// URL by `examImageUrlResolverProvider` when shown.
   final String? imageUrl;
   final QuestionTable? table;
   final String? topicId;
@@ -81,7 +149,7 @@ class ExamQuestion {
 
   factory ExamQuestion.fromJson(Object? json) {
     final m = asJsonMap(json);
-    final columns = asJsonMap(m['columns']);
+    final (columnA, columnB) = examComparisonColumns(m);
     final options = asJsonList(m['options']);
     return ExamQuestion(
       id: asString(pick(m, const ['id', 'questionId', 'question_id'])) ?? '',
@@ -91,14 +159,12 @@ class ExamQuestion {
           QuestionOption.fromJson(options[i], i),
       ],
       passageId: asString(pick(m, const ['passageId', 'passage_id'])),
-      imageUrl: asString(pick(m, const ['imageUrl', 'image_url', 'image_path'])),
+      imageUrl: examImageReference(m),
       table: QuestionTable.fromJson(m['table']),
       topicId: asString(pick(m, const ['topicId', 'topic_id'])),
       partId: asString(pick(m, const ['partId', 'part_id'])),
-      columnA: asString(pick(m, const ['columnA', 'column_a'])) ??
-          asString(columns['a'] ?? columns['A']),
-      columnB: asString(pick(m, const ['columnB', 'column_b'])) ??
-          asString(columns['b'] ?? columns['B']),
+      columnA: columnA,
+      columnB: columnB,
     );
   }
 

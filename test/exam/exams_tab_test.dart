@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:knowledge_flow/core/design/tokens.dart';
+import 'package:knowledge_flow/features/billing/application/billing_providers.dart';
+import 'package:knowledge_flow/features/billing/domain/billing_mode.dart';
 import 'package:knowledge_flow/features/billing/domain/entitlements.dart';
 import 'package:knowledge_flow/features/exam/data/exam_catalog_repository.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_attempt.dart';
@@ -167,6 +169,44 @@ void main() {
     await tester.scrollUntilVisible(find.text('Государственный язык'), 300,
         scrollable: scrollable);
     expect(find.text('Государственный язык'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('BILLING_MODE=external: balance only, no Buy button (BILL-EXT-01)',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_app([
+      ...overrides(const Entitlements(
+          freeExamUsed: true, credits: 0, lifetimeCreditsPurchased: 1)),
+      billingModeProvider.overrideWithValue(BillingMode.external),
+    ]));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Кредитов нет'), findsOneWidget, reason: 'balance is still shown');
+    expect(find.textContaining('Купить'), findsNothing);
+    expect(find.text('Buy'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Windows / Linux build: platform notice above the catalog (D7)',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(_app([
+      ...overrides(Entitlements.initial),
+      examCallablesSupportedProvider.overrideWithValue(false),
+    ]));
+    await tester.pump();
+    await tester.pump();
+    expect(find.byKey(const ValueKey('exam_platform_notice')), findsOneWidget);
+    expect(find.textContaining('На этом устройстве пробные тесты недоступны'),
+        findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

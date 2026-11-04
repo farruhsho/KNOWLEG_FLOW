@@ -3718,6 +3718,12 @@ abstract class AppLocalizations {
   /// **'This attempt was not found.'**
   String get examErrorAttemptNotFound;
 
+  /// Exam mode: the backend rejected the request with USER_BANNED
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been blocked by a moderator, so tests are not available. If you think this is a mistake, contact support.'**
+  String get examErrorBanned;
+
   /// Exam mode
   ///
   /// In en, this message translates to:
@@ -3729,6 +3735,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No connection. Check the internet and try again.'**
   String get examErrorNetwork;
+
+  /// Exam mode: desktop builds (Windows/Linux) cannot call the exam functions
+  ///
+  /// In en, this message translates to:
+  /// **'Practice tests are not available on this device. Open the app on your phone (Android or iPhone) or in a web browser.'**
+  String get examErrorPlatformUnsupported;
 
   /// Exam mode
   ///
@@ -3964,6 +3976,12 @@ abstract class AppLocalizations {
   /// **'Next section'**
   String get examNextSectionTitle;
 
+  /// Exam intro: disabled start button when there are no credits and the build does not sell in the app (neutral, no purchase wording)
+  ///
+  /// In en, this message translates to:
+  /// **'No credits available'**
+  String get examNoCreditsAvailable;
+
   /// Exam mode
   ///
   /// In en, this message translates to:
@@ -4047,6 +4065,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Text'**
   String get examPassage;
+
+  /// Exam intro: disabled start button on Windows/Linux desktop builds
+  ///
+  /// In en, this message translates to:
+  /// **'Not available on this device'**
+  String get examPlatformUnsupportedShort;
 
   /// Exam mode
   ///

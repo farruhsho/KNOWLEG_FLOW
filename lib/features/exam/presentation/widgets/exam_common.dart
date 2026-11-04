@@ -24,7 +24,19 @@ String examFailureMessage(AppLocalizations l, Object? error) {
     ExamFailureKind.attemptNotFound => l.examErrorAttemptNotFound,
     ExamFailureKind.unauthenticated => l.examErrorSignIn,
     ExamFailureKind.noEntitlement => l.examCostNeedCredit,
+    ExamFailureKind.userBanned => l.examErrorBanned,
+    ExamFailureKind.platformUnsupported => l.examErrorPlatformUnsupported,
     _ => l.examErrorGeneric,
+  };
+}
+
+IconData _failureIcon(Object? error) {
+  final kind = error is ExamFailure ? error.kind : ExamFailureKind.unknown;
+  return switch (kind) {
+    ExamFailureKind.network => Icons.wifi_off_rounded,
+    ExamFailureKind.userBanned => Icons.block_rounded,
+    ExamFailureKind.platformUnsupported => Icons.phonelink_off_rounded,
+    _ => Icons.error_outline_rounded,
   };
 }
 
@@ -123,14 +135,14 @@ class ExamMessageView extends StatelessWidget {
     VoidCallback? onRetry,
   }) {
     final l = context.l10n;
+    // A ban or an unsupported platform does not go away on retry.
+    final terminal = error is ExamFailure && error.kind.isTerminal;
     return ExamMessageView(
       key: key,
-      icon: error is ExamFailure && error.kind == ExamFailureKind.network
-          ? Icons.wifi_off_rounded
-          : Icons.error_outline_rounded,
+      icon: _failureIcon(error),
       message: examFailureMessage(l, error),
-      actionLabel: onRetry == null ? null : l.examRetry,
-      onAction: onRetry,
+      actionLabel: onRetry == null || terminal ? null : l.examRetry,
+      onAction: terminal ? null : onRetry,
       isError: true,
     );
   }
@@ -171,6 +183,38 @@ class ExamMessageView extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Shown where an exam can be started when this platform cannot call the
+/// exam functions (Windows / Linux desktop: no App Check provider).
+class ExamPlatformNotice extends StatelessWidget {
+  const ExamPlatformNotice({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    return Container(
+      key: const ValueKey('exam_platform_notice'),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: tokens.warningContainer,
+        borderRadius: AppRadii.mdAll,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.phonelink_off_rounded, size: 20, color: tokens.warning),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              context.l10n.examErrorPlatformUnsupported,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -12,6 +12,14 @@ import '../../domain/exam_session.dart';
 /// One-shot messages for the runner UI (snackbars).
 enum ExamRunnerNotice { fiveMinutesLeft, oneMinuteLeft, autoSubmitted }
 
+/// Sink for non-fatal errors the runner cannot show to the user (draft
+/// autosave failures). Wired to crash reporting in the app.
+typedef ExamErrorReporter = void Function(
+    Object error, StackTrace? stack, String reason);
+
+void _debugReport(Object error, StackTrace? stack, String reason) =>
+    debugPrint('exam: $reason failed ($error)');
+
 @immutable
 class ExamRunnerState {
   final bool loading;
@@ -74,6 +82,7 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   final ExamDraftSink _drafts;
   final ExamClock _clock;
   final String? _uid;
+  final ExamErrorReporter _reportError;
   final Duration tickInterval;
   final Duration draftInterval;
   final Duration retryInterval;
@@ -81,6 +90,11 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   Timer? _ticker;
   Timer? _draftTimer;
   bool _draftDirty = false;
+  int _draftFailureCount = 0;
+
+  /// Sections whose draft failure was already reported (one report per
+  /// section, so a persistent denial does not flood crash reporting).
+  final Set<String> _draftFailureReported = {};
   bool _submitting = false;
   DateTime? _lastAutoRetry;
   Future<void> _saveChain = Future.value();
@@ -92,6 +106,7 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     required ExamDraftSink drafts,
     required ExamClock clock,
     String? uid,
+    ExamErrorReporter reportError = _debugReport,
     this.tickInterval = const Duration(seconds: 1),
     this.draftInterval = const Duration(seconds: 20),
     this.retryInterval = const Duration(seconds: 15),
@@ -101,6 +116,7 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
         _drafts = drafts,
         _clock = clock,
         _uid = uid,
+        _reportError = reportError,
         super(const ExamRunnerState()) {
     if (autoLoad) load();
   }
@@ -297,15 +313,46 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
       for (final q in s.questions)
         if (s.flags.contains(q.id)) q.id,
     ];
-    // Firestore queues the write offline; never block the UI on it.
-    unawaited(_drafts
-        .writeDraft(
-          attemptId: s.attemptId,
-          sectionId: s.section.sectionId,
-          answers: answers,
-          flags: flags,
-        )
-        .catchError((Object e) => debugPrint('exam: draft write failed ($e)')));
+    final sectionId = s.section.sectionId;
+    // Firestore queues the write offline; never block the UI on it. The Hive
+    // copy is authoritative, so a failure changes nothing locally: the draft
+    // is marked dirty again (retried on the next interval) and reported.
+    unawaited(_writeDraft(s.attemptId, sectionId, answers, flags));
+  }
+
+  Future<void> _writeDraft(String attemptId, String sectionId,
+      Map<String, String> answers, List<String> flags) async {
+    try {
+      await _drafts.writeDraft(
+        attemptId: attemptId,
+        sectionId: sectionId,
+        answers: answers,
+        flags: flags,
+      );
+      _draftFailureReported.remove(sectionId);
+    } catch (e, st) {
+      _onDraftWriteFailed(sectionId, e, st);
+    }
+  }
+
+  /// Number of draft writes that failed (diagnostics / tests).
+  int get draftFailures => _draftFailureCount;
+
+  void _onDraftWriteFailed(String sectionId, Object error, StackTrace stack) {
+    _draftFailureCount++;
+    if (_draftFailureReported.add(sectionId)) {
+      _reportError(error, stack, 'exam_draft_write');
+    } else {
+      debugPrint('exam: draft write failed again ($error)');
+    }
+    if (!mounted) return;
+    final s = state.session;
+    // Retry on the next draft tick while the same section is still open.
+    if (s != null &&
+        s.phase == ExamPhase.inSection &&
+        s.section.sectionId == sectionId) {
+      _draftDirty = true;
+    }
   }
 
   // -------------------------------------------------------------- timers

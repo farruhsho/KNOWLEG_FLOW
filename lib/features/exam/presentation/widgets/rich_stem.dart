@@ -231,26 +231,33 @@ class ExamImage extends ConsumerWidget {
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
         );
-    Widget failed() => Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: tokens.surfaceMuted,
+    Widget failed({bool retry = false}) => Material(
+          color: tokens.surfaceMuted,
+          borderRadius: AppRadii.mdAll,
+          child: InkWell(
             borderRadius: AppRadii.mdAll,
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.broken_image_outlined, color: tokens.textTertiary),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(context.l10n.examImageError,
-                    style: Theme.of(context).textTheme.bodySmall),
+            // Storage lookups that failed are not cached: tapping asks again.
+            onTap: retry ? () => ref.invalidate(examImageUrlProvider(url)) : null,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Row(
+                children: [
+                  Icon(Icons.broken_image_outlined, color: tokens.textTertiary),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(context.l10n.examImageError,
+                        style: Theme.of(context).textTheme.bodySmall),
+                  ),
+                  if (retry)
+                    Icon(Icons.refresh_rounded, size: 20, color: tokens.textSecondary),
+                ],
               ),
-            ],
+            ),
           ),
         );
     return resolved.when(
       loading: placeholder,
-      error: (_, __) => failed(),
+      error: (_, __) => failed(retry: true),
       data: (u) => u == null
           ? failed()
           : Semantics(
