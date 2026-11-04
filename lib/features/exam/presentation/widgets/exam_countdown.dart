@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' show FontFeature;
 
 import 'package:flutter/material.dart';
 
@@ -84,6 +83,9 @@ class _ExamCountdownState extends State<ExamCountdown> {
     final base = widget.style ?? Theme.of(context).textTheme.titleMedium!;
     final text = Text(
       formatExamDuration(_left),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.fade,
       style: base.copyWith(
         color: fg,
         fontFeatures: const [FontFeature.tabularFigures()],
@@ -101,7 +103,7 @@ class _ExamCountdownState extends State<ExamCountdown> {
                 children: [
                   Icon(Icons.timer_outlined, size: 18, color: fg),
                   const SizedBox(width: AppSpacing.xs),
-                  text,
+                  Flexible(child: text),
                 ],
               ),
       ),

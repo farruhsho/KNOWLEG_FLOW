@@ -70,13 +70,15 @@ void main() {
       expect(s.remaining(t0), const Duration(minutes: 10));
       expect(s.remaining(t0.add(const Duration(minutes: 4))), const Duration(minutes: 6));
       // The deadline in device time is 10 min after t0, not 11.5.
-      expect(s.localDeadline(), t0.add(const Duration(minutes: 10)));
+      expect(s.localDeadline().millisecondsSinceEpoch,
+          t0.add(const Duration(minutes: 10)).millisecondsSinceEpoch);
     });
 
     test('negative skew (device ahead of server) is corrected too', () {
       final s = start(skewMs: -120000);
       expect(s.remaining(t0), const Duration(minutes: 10));
-      expect(s.localDeadline(), t0.add(const Duration(minutes: 10)));
+      expect(s.localDeadline().millisecondsSinceEpoch,
+          t0.add(const Duration(minutes: 10)).millisecondsSinceEpoch);
     });
 
     test('warnings fire once at 5 and 1 minute', () {

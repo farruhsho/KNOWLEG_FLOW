@@ -885,6 +885,870 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get clear;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Exams'**
+  String get examTabTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Mock ORT'**
+  String get examMockTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get examLoading;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get examRetry;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get examErrorGeneric;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check the internet and try again.'**
+  String get examErrorNetwork;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'This variant is not available right now.'**
+  String get examErrorVariantUnavailable;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'This attempt was not found.'**
+  String get examErrorAttemptNotFound;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to take exams.'**
+  String get examErrorSignIn;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 question} other{{count} questions}}'**
+  String examQuestionsCount(int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String examMinutesCount(int minutes);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 section} other{{count} sections}}'**
+  String examSectionsCount(int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Section {index} of {count}'**
+  String examSectionLabel(int index, int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Russian'**
+  String get examLangRu;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Kyrgyz'**
+  String get examLangKy;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get examLangEn;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Full timed tests in the official ORT format.'**
+  String get examCatalogIntro;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Main test'**
+  String get examCatalogMainTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Subject tests'**
+  String get examCatalogSubjectsTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'State language'**
+  String get examCatalogStateLanguageTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No exams are available yet.'**
+  String get examCatalogEmpty;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get examHistoryAction;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Test language'**
+  String get examLanguageLabel;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Only in {language}'**
+  String examOnlyLanguage(String language);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Your first test is free'**
+  String get examEntitlementFree;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Credits: {count}'**
+  String examEntitlementCredits(int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No credits left'**
+  String get examEntitlementNone;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'One credit = one full test. Continuing an unfinished test is free.'**
+  String get examEntitlementHint;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get examBuy;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Variants'**
+  String get examVariants;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Variant {number}'**
+  String examVariantTitle(int number);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Not started'**
+  String get examVariantNotStarted;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get examVariantInProgress;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Best: {percent}%'**
+  String examVariantBest(String percent);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get examVariantAdvanced;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No variants in this language yet. New ones are added regularly.'**
+  String get examVariantsEmpty;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get examShowMore;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Structure'**
+  String get examIntroStructure;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get examIntroRules;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get examIntroCost;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Test language: {language}'**
+  String examIntroLanguage(String language);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get examTotal;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'The official split between these parts is not published; this is an approximation.'**
+  String get examPartAssumption;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Sections go strictly in order. A finished section is closed — you cannot return to it.'**
+  String get examRuleForwardOnly;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Inside a section you can move between questions freely and mark them to come back later.'**
+  String get examRuleFreeNavigation;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Each section has its own timer. You will be warned 5 minutes and 1 minute before the end; at zero the section is submitted automatically.'**
+  String get examRuleTimer;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Calculators are not allowed.'**
+  String get examRuleNoCalculator;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Scratch paper is allowed in: {sections}.'**
+  String examRuleScratchpad(String sections);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'If you leave the app, the timer keeps running. Your answers are saved on the device.'**
+  String get examRuleKeepsRunning;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Free — this is your first test'**
+  String get examCostFree;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'1 credit (you have {credits})'**
+  String examCostCredit(int credits);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'You need 1 credit to start this test.'**
+  String get examCostNeedCredit;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Free — you are continuing your attempt'**
+  String get examCostResume;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Start test'**
+  String get examStart;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get examContinue;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Buy a test'**
+  String get examBuyToStart;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your test…'**
+  String get examStarting;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Practice result. Not an official ORT score.'**
+  String get examDisclaimerFallback;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Time left'**
+  String get examTimeLeftLabel;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Question {current} of {total}'**
+  String examQuestionOf(int current, int total);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Answered {answered} of {total}'**
+  String examAnsweredOf(int answered, int total);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Mark for review'**
+  String get examFlag;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Remove mark'**
+  String get examUnflag;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get examPrevious;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get examNext;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Questions'**
+  String get examPalette;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Clear answer'**
+  String get examClearAnswer;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Leave test'**
+  String get examExit;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Finish section'**
+  String get examFinishSection;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Finish “{section}”?'**
+  String examFinishSectionTitle(String section);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Unanswered: {count}'**
+  String examFinishSectionUnanswered(int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Marked for review: {count}'**
+  String examFinishSectionFlagged(int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'After finishing you cannot return to this section.'**
+  String get examFinishSectionWarning;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get examFinishSectionConfirm;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Keep working'**
+  String get examKeepWorking;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the test?'**
+  String get examExitTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'The section timer keeps running on the server while you are away. Your answers are saved — you can continue from the home screen.'**
+  String get examExitBody;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Stay'**
+  String get examExitStay;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Leave'**
+  String get examExitLeave;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'5 minutes left in this section'**
+  String get examWarningFive;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'1 minute left — the section will be submitted automatically'**
+  String get examWarningOne;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Time is up. The section has been submitted.'**
+  String get examAutoSubmitted;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting the section…'**
+  String get examSubmitting;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No connection'**
+  String get examOfflineTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers are saved on this device. The next section starts only after the server receives this one.'**
+  String get examOfflineBody;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'We will also retry automatically.'**
+  String get examOfflineAutoRetry;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Offline — answers are saved on the device'**
+  String get examOfflineBadge;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Answered'**
+  String get examPaletteAnswered;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Marked'**
+  String get examPaletteFlagged;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Not answered'**
+  String get examPaletteUnanswered;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get examPaletteCurrent;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Column A'**
+  String get examColumnA;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Column B'**
+  String get examColumnB;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get examPassage;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Show text'**
+  String get examPassageShow;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Hide text'**
+  String get examPassageHide;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'The image could not be loaded'**
+  String get examImageError;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'This section has no questions. Please contact support.'**
+  String get examNoQuestions;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Option {letter}'**
+  String examOptionSemantics(String letter);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Section submitted'**
+  String get examSectionDone;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Next section'**
+  String get examNextSectionTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'The timer of this section is already running:'**
+  String get examNextSectionTimeRunning;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Start section'**
+  String get examStartSection;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Test finished. Loading your result…'**
+  String get examFinishedLoading;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get examResultTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'{correct} of {total} correct'**
+  String examResultScore(int correct, int total);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Correct'**
+  String get examResultCorrect;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong'**
+  String get examResultIncorrect;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get examResultSkipped;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong or skipped'**
+  String get examResultWrongOrSkipped;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'By section'**
+  String get examResultBySection;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'What to review'**
+  String get examResultWeak;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Strong topics'**
+  String get examResultStrong;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No weak topics found — great job!'**
+  String get examResultNoWeak;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Review “{topic}”: go back to the theory and solve 10–15 practice questions on it.'**
+  String examResultRecommendation(String topic);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'{correct} of {total}'**
+  String examResultTopicScore(int correct, int total);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'XP earned: {xp}'**
+  String examResultXp(int xp);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Some sections were closed late, so this attempt does not count for the leaderboard.'**
+  String get examResultNotEligible;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'How the official result works'**
+  String get examResultLevelsTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'The official result of the state language test is a level from 1 to 4. The level boundaries are not published, so the app shows only your percentage of correct answers and does not guess your level.'**
+  String get examResultLevelsBody;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Review answers'**
+  String get examResultReview;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'To exams'**
+  String get examResultToExams;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'The result is still being calculated. Try again in a few seconds.'**
+  String get examResultPending;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Answer review'**
+  String get examReviewTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get examReviewFilterAll;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Mistakes'**
+  String get examReviewFilterWrong;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Marked'**
+  String get examReviewFilterFlagged;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Your answer: {answer}'**
+  String examReviewYourAnswer(String answer);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Correct answer: {answer}'**
+  String examReviewCorrectAnswer(String answer);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'no answer'**
+  String get examReviewNoAnswer;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Explanation'**
+  String get examReviewExplanation;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the AI tutor'**
+  String get examReviewAskTutor;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here for this filter.'**
+  String get examReviewEmpty;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Question {number}'**
+  String examReviewQuestionNumber(int number);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Exam history'**
+  String get examHistoryTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'No finished tests yet. Your results will appear here.'**
+  String get examHistoryEmpty;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Last: {percent}%'**
+  String examHistoryLast(String percent);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts: {count}'**
+  String examHistoryAttempts(int count);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'+{delta}% vs previous'**
+  String examHistoryTrendUp(String delta);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'−{delta}% vs previous'**
+  String examHistoryTrendDown(String delta);
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Same as previous'**
+  String get examHistoryTrendSame;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Unfinished test'**
+  String get examResumeTitle;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Section time is up'**
+  String get examResumeTimeUp;
+
+  /// Exam mode
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to be submitted'**
+  String get examResumeAwaitingSubmit;
 }
 
 class _AppLocalizationsDelegate

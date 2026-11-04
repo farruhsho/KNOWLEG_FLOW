@@ -175,23 +175,27 @@ class _LanguageSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = context.l10n;
     final lang = ref.watch(examLanguageProvider);
-    return Row(
+    void select(String code) =>
+        ref.read(examLanguageProvider.notifier).state = code;
+    // Wrap (not Row) so the label and choices reflow on narrow phones and
+    // with large text scaling instead of overflowing.
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.xs,
       children: [
-        Flexible(
+        Padding(
+          padding: const EdgeInsetsDirectional.only(end: AppSpacing.xs),
           child: Text(l.examLanguageLabel,
               style: Theme.of(context).textTheme.labelLarge),
         ),
-        const SizedBox(width: AppSpacing.md),
-        SegmentedButton<String>(
-          showSelectedIcon: false,
-          segments: [
-            ButtonSegment(value: 'ru', label: Text(l.examLangRu)),
-            ButtonSegment(value: 'ky', label: Text(l.examLangKy)),
-          ],
-          selected: {lang},
-          onSelectionChanged: (s) =>
-              ref.read(examLanguageProvider.notifier).state = s.first,
-        ),
+        for (final code in const ['ru', 'ky'])
+          ChoiceChip(
+            key: ValueKey('exam_lang_$code'),
+            label: Text(examLanguageName(l, code)),
+            selected: lang == code,
+            onSelected: (_) => select(code),
+          ),
       ],
     );
   }

@@ -45,7 +45,7 @@ void main() {
   });
 
   test('survives closing and reopening the box (app kill)', () async {
-    var s = session().answer('q1', 'D', now: t0);
+    final s = session().answer('q1', 'D', now: t0);
     await ExamLocalStore().save(s, includeContent: true, savedAtMs: 10);
     await Hive.close();
 
@@ -84,7 +84,14 @@ void main() {
     restored = (await store.load('att1'))!;
     expect(restored.result!.xpAwarded, 103);
 
+    // Pruning drops the question content but keeps result and records.
+    await store.pruneContent('att1');
+    expect(await store.load('att1'), isNull);
+    expect((await store.loadResult('att1'))!.xpAwarded, 103);
+    expect((await store.sectionRecords('att1')).keys, contains('math'));
+
     await store.remove('att1');
+    expect(await store.loadResult('att1'), isNull);
     expect(await store.load('att1'), isNull);
   });
 

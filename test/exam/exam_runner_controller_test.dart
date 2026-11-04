@@ -156,5 +156,6 @@ void main() {
     await c.pendingWrites;
     expect(c.state.session!.phase, ExamPhase.completed);
     expect(store.saved!.result!.percent, 60.0);
+    expect(store.prunes, 1, reason: 'question content dropped after completion');
   });
 }

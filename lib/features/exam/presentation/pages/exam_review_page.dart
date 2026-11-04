@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
+import '../../domain/exam_blueprint.dart';
 import '../../domain/exam_payload.dart';
+import '../../domain/exam_question.dart';
 import '../providers/exam_providers.dart';
 import '../widgets/exam_common.dart';
 import '../widgets/option_tile.dart';
@@ -12,6 +14,29 @@ import '../widgets/passage_panel.dart';
 import '../widgets/rich_stem.dart';
 
 enum _ReviewFilter { all, wrong, flagged }
+
+/// Options to show for each review item. Quantitative-comparison items may
+/// come without their own options (they use the blueprint's four fixed
+/// answers), so those are filled in from the part the question belongs to.
+List<List<QuestionOption>> reviewOptions(
+    List<ReviewItem> items, ExamBlueprint? bp, String language) {
+  final positionInSection = <String, int>{};
+  return [
+    for (final item in items)
+      () {
+        final pos = positionInSection[item.sectionId] ?? 0;
+        positionInSection[item.sectionId] = pos + 1;
+        if (item.options.isNotEmpty || bp == null) return item.options;
+        final section = bp.sectionById(item.sectionId);
+        if (section == null) return item.options;
+        final part = section.partForIndex(pos);
+        return [
+          for (final o in part.fixedOptions)
+            QuestionOption(id: o.id, text: o.text.resolve(language)),
+        ];
+      }(),
+  ];
+}
 
 /// Per-question review of a completed attempt (RoutePaths.examReview).
 class ExamReviewPage extends ConsumerStatefulWidget {
@@ -32,6 +57,8 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
     final async = ref.watch(examReviewProvider(widget.attemptId));
     final localFlags =
         ref.watch(examLocalFlagsProvider(widget.attemptId)).valueOrNull ?? const {};
+    // Blueprint and exam language of the attempt (for fixed options).
+    final resultData = ref.watch(examResultProvider(widget.attemptId)).valueOrNull;
     return Scaffold(
       appBar: AppBar(title: Text(l.examReviewTitle)),
       body: async.when(
@@ -43,6 +70,11 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
         ),
         data: (items) {
           bool flagged(ReviewItem i) => i.flagged ?? localFlags.contains(i.questionId);
+          final options = reviewOptions(
+            items,
+            resultData?.blueprint,
+            resultData?.attempt?.language ?? context.uiLang,
+          );
           final indexed = [for (var i = 0; i < items.length; i++) (i + 1, items[i])];
           final visible = indexed.where((e) => switch (_filter) {
                 _ReviewFilter.all => true,
@@ -90,6 +122,7 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
                         itemBuilder: (context, i) => _ReviewCard(
                           number: visible[i].$1,
                           item: visible[i].$2,
+                          options: options[visible[i].$1 - 1],
                           flagged: flagged(visible[i].$2),
                           attemptId: widget.attemptId,
                         ),
@@ -106,12 +139,14 @@ class _ExamReviewPageState extends ConsumerState<ExamReviewPage> {
 class _ReviewCard extends StatelessWidget {
   final int number;
   final ReviewItem item;
+  final List<QuestionOption> options;
   final bool flagged;
   final String attemptId;
 
   const _ReviewCard({
     required this.number,
     required this.item,
+    required this.options,
     required this.flagged,
     required this.attemptId,
   });
@@ -170,7 +205,7 @@ class _ReviewCard extends StatelessWidget {
             ExamTable.fromQuestion(item.table!),
           ],
           const SizedBox(height: AppSpacing.md),
-          for (final o in item.options) ...[
+          for (final o in options) ...[
             ExamOptionTile(
               letter: o.id,
               text: o.text,

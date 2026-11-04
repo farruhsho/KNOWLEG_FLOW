@@ -404,4 +404,527 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get clear => 'Очистить';
+
+  @override
+  String get examTabTitle => 'Экзамены';
+
+  @override
+  String get examMockTitle => 'Пробный ОРТ';
+
+  @override
+  String get examLoading => 'Загрузка…';
+
+  @override
+  String get examRetry => 'Повторить';
+
+  @override
+  String get examErrorGeneric => 'Что-то пошло не так. Попробуйте ещё раз.';
+
+  @override
+  String get examErrorNetwork =>
+      'Нет соединения. Проверьте интернет и повторите.';
+
+  @override
+  String get examErrorVariantUnavailable => 'Этот вариант сейчас недоступен.';
+
+  @override
+  String get examErrorAttemptNotFound => 'Попытка не найдена.';
+
+  @override
+  String get examErrorSignIn => 'Войдите в аккаунт, чтобы проходить экзамены.';
+
+  @override
+  String examQuestionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count вопроса',
+      many: '$count вопросов',
+      few: '$count вопроса',
+      one: '$count вопрос',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String examMinutesCount(int minutes) {
+    return '$minutes мин';
+  }
+
+  @override
+  String examSectionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count раздела',
+      many: '$count разделов',
+      few: '$count раздела',
+      one: '$count раздел',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String examSectionLabel(int index, int count) {
+    return 'Раздел $index из $count';
+  }
+
+  @override
+  String get examLangRu => 'Русский';
+
+  @override
+  String get examLangKy => 'Кыргызский';
+
+  @override
+  String get examLangEn => 'Английский';
+
+  @override
+  String get examCatalogIntro =>
+      'Полные пробные тесты в формате и по времени ОРТ.';
+
+  @override
+  String get examCatalogMainTitle => 'Основной тест';
+
+  @override
+  String get examCatalogSubjectsTitle => 'Предметные тесты';
+
+  @override
+  String get examCatalogStateLanguageTitle => 'Государственный язык';
+
+  @override
+  String get examCatalogEmpty => 'Экзамены пока недоступны.';
+
+  @override
+  String get examHistoryAction => 'История';
+
+  @override
+  String get examLanguageLabel => 'Язык теста';
+
+  @override
+  String examOnlyLanguage(String language) {
+    return 'Только: $language';
+  }
+
+  @override
+  String get examEntitlementFree => 'Первый тест бесплатно';
+
+  @override
+  String examEntitlementCredits(int count) {
+    return 'Кредитов: $count';
+  }
+
+  @override
+  String get examEntitlementNone => 'Кредитов нет';
+
+  @override
+  String get examEntitlementHint =>
+      'Один кредит — один полный тест. Продолжение незавершённого теста бесплатно.';
+
+  @override
+  String get examBuy => 'Купить';
+
+  @override
+  String get examVariants => 'Варианты';
+
+  @override
+  String examVariantTitle(int number) {
+    return 'Вариант $number';
+  }
+
+  @override
+  String get examVariantNotStarted => 'Не начат';
+
+  @override
+  String get examVariantInProgress => 'В процессе';
+
+  @override
+  String examVariantBest(String percent) {
+    return 'Лучший: $percent%';
+  }
+
+  @override
+  String get examVariantAdvanced => 'Повышенный';
+
+  @override
+  String get examVariantsEmpty =>
+      'Вариантов на этом языке пока нет. Новые добавляются регулярно.';
+
+  @override
+  String get examShowMore => 'Показать ещё';
+
+  @override
+  String get examIntroStructure => 'Структура';
+
+  @override
+  String get examIntroRules => 'Правила';
+
+  @override
+  String get examIntroCost => 'Стоимость';
+
+  @override
+  String examIntroLanguage(String language) {
+    return 'Язык теста: $language';
+  }
+
+  @override
+  String get examTotal => 'Итого';
+
+  @override
+  String get examPartAssumption =>
+      'Официальное деление на эти части не опубликовано — это приближение.';
+
+  @override
+  String get examRuleForwardOnly =>
+      'Разделы идут строго по порядку. Завершённый раздел закрывается — вернуться к нему нельзя.';
+
+  @override
+  String get examRuleFreeNavigation =>
+      'Внутри раздела можно свободно переходить между вопросами и отмечать их, чтобы вернуться позже.';
+
+  @override
+  String get examRuleTimer =>
+      'У каждого раздела свой таймер. За 5 минут и за 1 минуту до конца будет предупреждение, а при нуле раздел отправится автоматически.';
+
+  @override
+  String get examRuleNoCalculator => 'Калькулятором пользоваться нельзя.';
+
+  @override
+  String examRuleScratchpad(String sections) {
+    return 'Черновик можно использовать в разделах: $sections.';
+  }
+
+  @override
+  String get examRuleKeepsRunning =>
+      'Если выйти из приложения, таймер продолжит идти. Ответы сохраняются на устройстве.';
+
+  @override
+  String get examCostFree => 'Бесплатно — это ваш первый тест';
+
+  @override
+  String examCostCredit(int credits) {
+    return '1 кредит (у вас $credits)';
+  }
+
+  @override
+  String get examCostNeedCredit => 'Чтобы начать тест, нужен 1 кредит.';
+
+  @override
+  String get examCostResume => 'Бесплатно — вы продолжаете свою попытку';
+
+  @override
+  String get examStart => 'Начать тест';
+
+  @override
+  String get examContinue => 'Продолжить';
+
+  @override
+  String get examBuyToStart => 'Купить тест';
+
+  @override
+  String get examStarting => 'Готовим тест…';
+
+  @override
+  String get examDisclaimerFallback =>
+      'Учебный результат. Не является официальным баллом ОРТ.';
+
+  @override
+  String get examTimeLeftLabel => 'Осталось времени';
+
+  @override
+  String examQuestionOf(int current, int total) {
+    return 'Вопрос $current из $total';
+  }
+
+  @override
+  String examAnsweredOf(int answered, int total) {
+    return 'Отвечено $answered из $total';
+  }
+
+  @override
+  String get examFlag => 'Отметить';
+
+  @override
+  String get examUnflag => 'Снять отметку';
+
+  @override
+  String get examPrevious => 'Назад';
+
+  @override
+  String get examNext => 'Далее';
+
+  @override
+  String get examPalette => 'Вопросы';
+
+  @override
+  String get examClearAnswer => 'Сбросить ответ';
+
+  @override
+  String get examExit => 'Выйти из теста';
+
+  @override
+  String get examFinishSection => 'Завершить раздел';
+
+  @override
+  String examFinishSectionTitle(String section) {
+    return 'Завершить раздел «$section»?';
+  }
+
+  @override
+  String examFinishSectionUnanswered(int count) {
+    return 'Без ответа: $count';
+  }
+
+  @override
+  String examFinishSectionFlagged(int count) {
+    return 'Отмечено для проверки: $count';
+  }
+
+  @override
+  String get examFinishSectionWarning =>
+      'После завершения вернуться к этому разделу будет нельзя.';
+
+  @override
+  String get examFinishSectionConfirm => 'Завершить';
+
+  @override
+  String get examKeepWorking => 'Продолжить раздел';
+
+  @override
+  String get examExitTitle => 'Выйти из теста?';
+
+  @override
+  String get examExitBody =>
+      'Пока вас нет, таймер раздела продолжает идти на сервере. Ответы сохранены — продолжить можно с главного экрана.';
+
+  @override
+  String get examExitStay => 'Остаться';
+
+  @override
+  String get examExitLeave => 'Выйти';
+
+  @override
+  String get examWarningFive => 'До конца раздела осталось 5 минут';
+
+  @override
+  String get examWarningOne =>
+      'Осталась 1 минута — раздел отправится автоматически';
+
+  @override
+  String get examAutoSubmitted => 'Время вышло. Раздел отправлен.';
+
+  @override
+  String get examSubmitting => 'Отправляем раздел…';
+
+  @override
+  String get examOfflineTitle => 'Нет соединения';
+
+  @override
+  String get examOfflineBody =>
+      'Ответы сохранены на устройстве. Следующий раздел начнётся только после того, как сервер примет этот.';
+
+  @override
+  String get examOfflineAutoRetry => 'Мы также повторим попытку автоматически.';
+
+  @override
+  String get examOfflineBadge => 'Нет сети — ответы сохраняются на устройстве';
+
+  @override
+  String get examPaletteAnswered => 'Отвечено';
+
+  @override
+  String get examPaletteFlagged => 'Отмечено';
+
+  @override
+  String get examPaletteUnanswered => 'Без ответа';
+
+  @override
+  String get examPaletteCurrent => 'Текущий';
+
+  @override
+  String get examColumnA => 'Колонка А';
+
+  @override
+  String get examColumnB => 'Колонка Б';
+
+  @override
+  String get examPassage => 'Текст';
+
+  @override
+  String get examPassageShow => 'Показать текст';
+
+  @override
+  String get examPassageHide => 'Скрыть текст';
+
+  @override
+  String get examImageError => 'Не удалось загрузить изображение';
+
+  @override
+  String get examNoQuestions =>
+      'В этом разделе нет вопросов. Напишите в поддержку.';
+
+  @override
+  String examOptionSemantics(String letter) {
+    return 'Вариант ответа $letter';
+  }
+
+  @override
+  String get examSectionDone => 'Раздел принят';
+
+  @override
+  String get examNextSectionTitle => 'Следующий раздел';
+
+  @override
+  String get examNextSectionTimeRunning => 'Время этого раздела уже идёт:';
+
+  @override
+  String get examStartSection => 'Начать раздел';
+
+  @override
+  String get examFinishedLoading => 'Тест завершён. Загружаем результат…';
+
+  @override
+  String get examResultTitle => 'Результат';
+
+  @override
+  String examResultScore(int correct, int total) {
+    return '$correct из $total верно';
+  }
+
+  @override
+  String get examResultCorrect => 'Верно';
+
+  @override
+  String get examResultIncorrect => 'Неверно';
+
+  @override
+  String get examResultSkipped => 'Пропущено';
+
+  @override
+  String get examResultWrongOrSkipped => 'Неверно или пропущено';
+
+  @override
+  String get examResultBySection => 'По разделам';
+
+  @override
+  String get examResultWeak => 'Что повторить';
+
+  @override
+  String get examResultStrong => 'Сильные темы';
+
+  @override
+  String get examResultNoWeak => 'Слабых тем не найдено — отличная работа!';
+
+  @override
+  String examResultRecommendation(String topic) {
+    return 'Повтори «$topic»: вернись к теории и реши 10–15 тренировочных заданий по этой теме.';
+  }
+
+  @override
+  String examResultTopicScore(int correct, int total) {
+    return '$correct из $total';
+  }
+
+  @override
+  String examResultXp(int xp) {
+    return 'Начислено XP: $xp';
+  }
+
+  @override
+  String get examResultNotEligible =>
+      'Часть разделов закрыта с опозданием, поэтому попытка не учитывается в рейтинге.';
+
+  @override
+  String get examResultLevelsTitle => 'Как выдаётся официальный результат';
+
+  @override
+  String get examResultLevelsBody =>
+      'Официальный результат теста по государственному языку — уровень от 1 до 4. Границы уровней не опубликованы, поэтому приложение показывает только процент верных ответов и не угадывает уровень.';
+
+  @override
+  String get examResultReview => 'Разбор ответов';
+
+  @override
+  String get examResultToExams => 'К экзаменам';
+
+  @override
+  String get examResultPending =>
+      'Результат ещё считается. Попробуйте через несколько секунд.';
+
+  @override
+  String get examReviewTitle => 'Разбор ответов';
+
+  @override
+  String get examReviewFilterAll => 'Все';
+
+  @override
+  String get examReviewFilterWrong => 'Ошибки';
+
+  @override
+  String get examReviewFilterFlagged => 'Отмеченные';
+
+  @override
+  String examReviewYourAnswer(String answer) {
+    return 'Ваш ответ: $answer';
+  }
+
+  @override
+  String examReviewCorrectAnswer(String answer) {
+    return 'Правильный ответ: $answer';
+  }
+
+  @override
+  String get examReviewNoAnswer => 'нет ответа';
+
+  @override
+  String get examReviewExplanation => 'Объяснение';
+
+  @override
+  String get examReviewAskTutor => 'Спросить AI-репетитора';
+
+  @override
+  String get examReviewEmpty => 'По этому фильтру ничего нет.';
+
+  @override
+  String examReviewQuestionNumber(int number) {
+    return 'Вопрос $number';
+  }
+
+  @override
+  String get examHistoryTitle => 'История экзаменов';
+
+  @override
+  String get examHistoryEmpty =>
+      'Завершённых тестов пока нет. Здесь появятся ваши результаты.';
+
+  @override
+  String examHistoryLast(String percent) {
+    return 'Последний: $percent%';
+  }
+
+  @override
+  String examHistoryAttempts(int count) {
+    return 'Попыток: $count';
+  }
+
+  @override
+  String examHistoryTrendUp(String delta) {
+    return '+$delta% к прошлому';
+  }
+
+  @override
+  String examHistoryTrendDown(String delta) {
+    return '−$delta% к прошлому';
+  }
+
+  @override
+  String get examHistoryTrendSame => 'Как в прошлый раз';
+
+  @override
+  String get examResumeTitle => 'Незавершённый тест';
+
+  @override
+  String get examResumeTimeUp => 'Время раздела вышло';
+
+  @override
+  String get examResumeAwaitingSubmit => 'Ожидает отправки';
 }

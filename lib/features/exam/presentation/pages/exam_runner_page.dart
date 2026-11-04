@@ -106,11 +106,13 @@ class _ExamRunnerPageState extends ConsumerState<ExamRunnerPage>
     }
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(
-        content: Text(text),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 5),
-      ));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(text),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+        ),
+      );
   }
 
   @override
@@ -144,15 +146,21 @@ class _ExamRunnerPageState extends ConsumerState<ExamRunnerPage>
     } else {
       body = switch (phase!) {
         ExamPhase.inSection => _InSectionView(
-            attemptId: widget.attemptId,
-            onExit: _confirmExit,
-          ),
-        ExamPhase.submitting =>
-          ExamLoadingView(message: context.l10n.examSubmitting),
-        ExamPhase.submitPending => _SubmitPendingView(attemptId: widget.attemptId),
-        ExamPhase.sectionIntro => _SectionIntroView(attemptId: widget.attemptId),
-        ExamPhase.completed =>
-          ExamLoadingView(message: context.l10n.examFinishedLoading),
+          attemptId: widget.attemptId,
+          onExit: _confirmExit,
+        ),
+        ExamPhase.submitting => ExamLoadingView(
+          message: context.l10n.examSubmitting,
+        ),
+        ExamPhase.submitPending => _SubmitPendingView(
+          attemptId: widget.attemptId,
+        ),
+        ExamPhase.sectionIntro => _SectionIntroView(
+          attemptId: widget.attemptId,
+        ),
+        ExamPhase.completed => ExamLoadingView(
+          message: context.l10n.examFinishedLoading,
+        ),
       };
     }
 
@@ -196,8 +204,9 @@ class _InSectionView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = examRunnerControllerProvider(attemptId);
-    final hasQuestions =
-        ref.watch(provider.select((s) => s.session?.hasQuestions ?? false));
+    final hasQuestions = ref.watch(
+      provider.select((s) => s.session?.hasQuestions ?? false),
+    );
     final offline = ref.watch(provider.select((s) => s.offline));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -227,14 +236,18 @@ class _OfflineStrip extends StatelessWidget {
     return Container(
       color: tokens.warningContainer,
       padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg, vertical: AppSpacing.xs + 2),
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xs + 2,
+      ),
       child: Row(
         children: [
           Icon(Icons.cloud_off_rounded, size: 16, color: tokens.warning),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
-            child: Text(context.l10n.examOfflineBadge,
-                style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              context.l10n.examOfflineBadge,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ),
         ],
       ),
@@ -270,7 +283,11 @@ class _RunnerHeader extends ConsumerWidget {
         border: Border(bottom: BorderSide(color: tokens.border)),
       ),
       padding: const EdgeInsets.fromLTRB(
-          AppSpacing.xs, AppSpacing.xs, AppSpacing.lg, AppSpacing.sm),
+        AppSpacing.xs,
+        AppSpacing.xs,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -295,7 +312,9 @@ class _RunnerHeader extends ConsumerWidget {
                       showPart
                           ? part.title.resolve(lang)
                           : l.examSectionLabel(
-                              session.sectionIndex + 1, session.sectionCount),
+                              session.sectionIndex + 1,
+                              session.sectionCount,
+                            ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall,
@@ -316,14 +335,23 @@ class _RunnerHeader extends ConsumerWidget {
             padding: const EdgeInsets.only(left: AppSpacing.md),
             child: Row(
               children: [
-                Text(
-                  l.examQuestionOf(index + 1, total),
-                  style: theme.textTheme.labelMedium,
+                Expanded(
+                  child: Text(
+                    l.examQuestionOf(index + 1, total),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelMedium,
+                  ),
                 ),
-                const Spacer(),
-                Text(
-                  l.examAnsweredOf(answered, total),
-                  style: theme.textTheme.labelSmall,
+                const SizedBox(width: AppSpacing.sm),
+                Flexible(
+                  child: Text(
+                    l.examAnsweredOf(answered, total),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: theme.textTheme.labelSmall,
+                  ),
                 ),
               ],
             ),
@@ -368,12 +396,15 @@ class _ExamQuestionAreaState extends ConsumerState<ExamQuestionArea> {
   @override
   Widget build(BuildContext context) {
     final provider = examRunnerControllerProvider(widget.attemptId);
-    final index = ref.watch(provider.select((s) => s.session?.currentIndex ?? 0));
+    final index = ref.watch(
+      provider.select((s) => s.session?.currentIndex ?? 0),
+    );
     final session = ref.read(provider).session!;
     if (!session.hasQuestions) return const SizedBox.shrink();
     final question = session.questions[index];
-    final selected =
-        ref.watch(provider.select((s) => s.session?.answers[question.id]));
+    final selected = ref.watch(
+      provider.select((s) => s.session?.answers[question.id]),
+    );
     final controller = ref.read(provider.notifier);
     final passage = session.passageFor(question);
     ref.listen<int?>(provider.select((s) => s.session?.currentIndex), (_, __) {
@@ -408,11 +439,20 @@ class _RunnerBottomBar extends ConsumerWidget {
     final provider = examRunnerControllerProvider(attemptId);
     final l = context.l10n;
     final tokens = context.tokens;
-    final index = ref.watch(provider.select((s) => s.session?.currentIndex ?? 0));
-    final total = ref.watch(provider.select((s) => s.session?.questionCount ?? 0));
-    final qid = ref.watch(provider.select((s) => s.session?.currentQuestion?.id));
-    final flagged = ref.watch(provider.select(
-        (s) => qid != null && (s.session?.flags.contains(qid) ?? false)));
+    final index = ref.watch(
+      provider.select((s) => s.session?.currentIndex ?? 0),
+    );
+    final total = ref.watch(
+      provider.select((s) => s.session?.questionCount ?? 0),
+    );
+    final qid = ref.watch(
+      provider.select((s) => s.session?.currentQuestion?.id),
+    );
+    final flagged = ref.watch(
+      provider.select(
+        (s) => qid != null && (s.session?.flags.contains(qid) ?? false),
+      ),
+    );
     final controller = ref.read(provider.notifier);
     final isLast = index >= total - 1;
     return Container(
@@ -421,7 +461,9 @@ class _RunnerBottomBar extends ConsumerWidget {
         border: Border(top: BorderSide(color: tokens.border)),
       ),
       padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         children: [
           IconButton(
@@ -447,9 +489,13 @@ class _RunnerBottomBar extends ConsumerWidget {
           Expanded(
             child: isLast
                 ? FilledButton(
-                    onPressed: () => confirmFinishSection(context, ref, attemptId),
-                    child: Text(l.examFinishSection,
-                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                    onPressed: () =>
+                        confirmFinishSection(context, ref, attemptId),
+                    child: Text(
+                      l.examFinishSection,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   )
                 : FilledButton.tonal(
                     onPressed: controller.next,
@@ -457,8 +503,11 @@ class _RunnerBottomBar extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Flexible(
-                          child: Text(l.examNext,
-                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                          child: Text(
+                            l.examNext,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.xs),
                         const Icon(Icons.chevron_right_rounded, size: 20),
@@ -474,7 +523,10 @@ class _RunnerBottomBar extends ConsumerWidget {
 
 /// Bottom sheet with the question palette and "Finish section".
 Future<void> showExamPaletteSheet(
-    BuildContext context, WidgetRef ref, String attemptId) {
+  BuildContext context,
+  WidgetRef ref,
+  String attemptId,
+) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -503,20 +555,25 @@ class _PaletteSheet extends ConsumerWidget {
       var start = 0;
       for (final p in parts) {
         if (start >= cells.length) break;
-        groups.add(PaletteGroup(
-          title: p.title.resolve(session.language),
-          start: start,
-          count: p.questionCount,
-        ));
+        groups.add(
+          PaletteGroup(
+            title: p.title.resolve(session.language),
+            start: start,
+            count: p.questionCount,
+          ),
+        );
         start += p.questionCount;
       }
       if (start < cells.length) {
-        groups.add(PaletteGroup(title: '', start: start, count: cells.length - start));
+        groups.add(
+          PaletteGroup(title: '', start: start, count: cells.length - start),
+        );
       }
     }
     return ConstrainedBox(
       constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * 0.85),
+        maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -531,7 +588,11 @@ class _PaletteSheet extends ConsumerWidget {
           Flexible(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.lg),
+                AppSpacing.xl,
+                AppSpacing.md,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
               child: QuestionPalette(
                 cells: cells,
                 groups: groups,
@@ -544,7 +605,11 @@ class _PaletteSheet extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.lg),
+              AppSpacing.xl,
+              0,
+              AppSpacing.xl,
+              AppSpacing.lg,
+            ),
             child: OutlinedButton.icon(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -562,7 +627,10 @@ class _PaletteSheet extends ConsumerWidget {
 
 /// Confirmation listing unanswered / marked counts; finishing is final.
 Future<void> confirmFinishSection(
-    BuildContext context, WidgetRef ref, String attemptId) async {
+  BuildContext context,
+  WidgetRef ref,
+  String attemptId,
+) async {
   final provider = examRunnerControllerProvider(attemptId);
   final session = ref.read(provider).session;
   if (session == null || session.phase != ExamPhase.inSection) return;
@@ -571,22 +639,31 @@ Future<void> confirmFinishSection(
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text(l.examFinishSectionTitle(
-          session.sectionSpec.title.resolve(session.language))),
+      title: Text(
+        l.examFinishSectionTitle(
+          session.sectionSpec.title.resolve(session.language),
+        ),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l.examFinishSectionUnanswered(session.unansweredCount),
-              style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                    color: session.unansweredCount > 0 ? tokens.danger : null,
-                  )),
+          Text(
+            l.examFinishSectionUnanswered(session.unansweredCount),
+            style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
+              color: session.unansweredCount > 0 ? tokens.danger : null,
+            ),
+          ),
           const SizedBox(height: AppSpacing.xs),
-          Text(l.examFinishSectionFlagged(session.flaggedCount),
-              style: Theme.of(ctx).textTheme.bodyLarge),
+          Text(
+            l.examFinishSectionFlagged(session.flaggedCount),
+            style: Theme.of(ctx).textTheme.bodyLarge,
+          ),
           const SizedBox(height: AppSpacing.md),
-          Text(l.examFinishSectionWarning,
-              style: Theme.of(ctx).textTheme.bodyMedium),
+          Text(
+            l.examFinishSectionWarning,
+            style: Theme.of(ctx).textTheme.bodyMedium,
+          ),
         ],
       ),
       actions: [
@@ -646,9 +723,14 @@ class _SectionIntroView extends ConsumerWidget {
     final spec = session.sectionSpec;
     final lang = session.language;
     final calculators = session.blueprint.rules.calculatorsAllowed;
-    return SingleChildScrollView(
+    final gutter = AppSpacing.gutter(context);
+    // The primary action stays pinned at the bottom so it is reachable on a
+    // small phone without scrolling past the rules.
+    final details = SingleChildScrollView(
       padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.gutter(context), vertical: AppSpacing.lg),
+        horizontal: gutter,
+        vertical: AppSpacing.lg,
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
@@ -660,26 +742,38 @@ class _SectionIntroView extends ConsumerWidget {
                   Icon(Icons.check_circle_rounded, color: tokens.success),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
-                    child: Text(l.examSectionDone,
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(color: tokens.success)),
+                    child: Text(
+                      l.examSectionDone,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: tokens.success,
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.xl),
-              Text(l.examNextSectionTitle.toUpperCase(),
-                  style: theme.textTheme.labelSmall),
+              Text(
+                l.examNextSectionTitle.toUpperCase(),
+                style: theme.textTheme.labelSmall,
+              ),
               const SizedBox(height: AppSpacing.xs),
-              Text(spec.title.resolve(lang), style: theme.textTheme.headlineSmall),
+              Text(
+                spec.title.resolve(lang),
+                style: theme.textTheme.headlineSmall,
+              ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 [
-                  l.examSectionLabel(session.sectionIndex + 1, session.sectionCount),
+                  l.examSectionLabel(
+                    session.sectionIndex + 1,
+                    session.sectionCount,
+                  ),
                   l.examQuestionsCount(spec.questionCount),
                   l.examMinutesCount(spec.durationMinutes),
                 ].join(' · '),
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: tokens.textSecondary),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: tokens.textSecondary,
+                ),
               ),
               if (spec.parts.length > 1) ...[
                 const SizedBox(height: AppSpacing.md),
@@ -698,20 +792,34 @@ class _SectionIntroView extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _RuleLine(icon: Icons.lock_outline_rounded, text: l.examRuleForwardOnly),
-                    _RuleLine(icon: Icons.swap_horiz_rounded, text: l.examRuleFreeNavigation),
+                    _RuleLine(
+                      icon: Icons.lock_outline_rounded,
+                      text: l.examRuleForwardOnly,
+                    ),
+                    _RuleLine(
+                      icon: Icons.swap_horiz_rounded,
+                      text: l.examRuleFreeNavigation,
+                    ),
                     if (!calculators)
-                      _RuleLine(icon: Icons.calculate_outlined, text: l.examRuleNoCalculator),
+                      _RuleLine(
+                        icon: Icons.calculate_outlined,
+                        text: l.examRuleNoCalculator,
+                      ),
                     if (spec.allowScratchpad)
                       _RuleLine(
                         icon: Icons.edit_note_rounded,
-                        text: l.examRuleScratchpad(spec.title.resolve(context.uiLang)),
+                        text: l.examRuleScratchpad(
+                          spec.title.resolve(context.uiLang),
+                        ),
                       ),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text(l.examNextSectionTimeRunning, style: theme.textTheme.bodyMedium),
+              Text(
+                l.examNextSectionTimeRunning,
+                style: theme.textTheme.bodyMedium,
+              ),
               const SizedBox(height: AppSpacing.xs),
               Align(
                 alignment: AlignmentDirectional.centerStart,
@@ -721,17 +829,44 @@ class _SectionIntroView extends ConsumerWidget {
                   style: theme.textTheme.headlineSmall,
                 ),
               ),
-              const SizedBox(height: AppSpacing.xl),
-              FilledButton.icon(
-                key: const ValueKey('start_section_button'),
-                onPressed: () => ref.read(provider.notifier).startSection(),
-                icon: const Icon(Icons.play_arrow_rounded),
-                label: Text(l.examStartSection),
-              ),
             ],
           ),
         ),
       ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: details),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(top: BorderSide(color: tokens.border)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              gutter,
+              AppSpacing.md,
+              gutter,
+              AppSpacing.md,
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    key: const ValueKey('start_section_button'),
+                    onPressed: () => ref.read(provider.notifier).startSection(),
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: Text(l.examStartSection),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -750,7 +885,9 @@ class _RuleLine extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: context.tokens.textSecondary),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
+          Expanded(
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+          ),
         ],
       ),
     );

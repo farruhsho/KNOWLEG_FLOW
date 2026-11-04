@@ -67,7 +67,12 @@ class MemoryExamStore implements ExamLocalStore {
       saved?.submitted ?? const {};
 
   @override
-  Future<void> pruneContent(String attemptId) async {}
+  Future<ExamResult?> loadResult(String attemptId) async => saved?.result;
+
+  int prunes = 0;
+
+  @override
+  Future<void> pruneContent(String attemptId) async => prunes++;
 
   @override
   Future<void> remove(String attemptId) async => saved = null;

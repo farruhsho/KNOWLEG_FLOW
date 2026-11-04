@@ -174,9 +174,13 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
                           Expanded(
                             child: Text(l.examTotal, style: theme.textTheme.titleSmall),
                           ),
-                          Text(
-                            '${l.examQuestionsCount(bp.totalQuestions)} · ${l.examMinutesCount(bp.totalMinutes)}',
-                            style: theme.textTheme.titleSmall,
+                          const SizedBox(width: AppSpacing.sm),
+                          Flexible(
+                            child: Text(
+                              '${l.examQuestionsCount(bp.totalQuestions)} · ${l.examMinutesCount(bp.totalMinutes)}',
+                              textAlign: TextAlign.end,
+                              style: theme.textTheme.titleSmall,
+                            ),
                           ),
                         ],
                       ),
@@ -221,7 +225,7 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
                             ? l.examCostResume
                             : ent.when(
                                 loading: () => l.examLoading,
-                                error: (_, __) => l.examCostCredit(0),
+                                error: (_, __) => l.examEntitlementHint,
                                 data: (e) => e.hasFreeExam
                                     ? l.examCostFree
                                     : e.credits > 0

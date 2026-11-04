@@ -204,6 +204,11 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
         await _store.save(session,
             includeContent: content,
             savedAtMs: _clock().millisecondsSinceEpoch);
+        // A finished attempt no longer needs its question content on the
+        // device; the small state record (result, flags) is kept.
+        if (session.phase == ExamPhase.completed) {
+          await _store.pruneContent(session.attemptId);
+        }
       } catch (e) {
         debugPrint('exam: local save failed ($e)');
       }

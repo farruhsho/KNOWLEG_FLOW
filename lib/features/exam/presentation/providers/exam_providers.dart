@@ -152,10 +152,12 @@ final variantStatusesProvider =
   return VariantAttemptStatus.fromAttempts(attempts);
 });
 
-/// Unfinished attempts saved on this device for the current user.
+/// Unfinished attempts saved on this device for the current user. Nothing
+/// while signed out, so a shared device never shows someone else's attempt.
 final localUnfinishedAttemptsProvider =
-    FutureProvider<List<LocalAttemptInfo>>((ref) {
+    FutureProvider<List<LocalAttemptInfo>>((ref) async {
   final uid = ref.watch(examUidProvider);
+  if (uid == null) return const [];
   return ref.watch(examLocalStoreProvider).listUnfinished(uid: uid);
 });
 
@@ -292,7 +294,7 @@ final examResultProvider =
   ExamResult? localResult;
   try {
     records = await store.sectionRecords(attemptId);
-    localResult = (await store.load(attemptId))?.result;
+    localResult = await store.loadResult(attemptId);
   } catch (_) {}
   AttemptSummary? attempt;
   ExamFailure? failure;

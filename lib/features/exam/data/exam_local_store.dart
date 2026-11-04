@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+import '../domain/exam_payload.dart';
 import '../domain/exam_session.dart';
 import '../domain/json_utils.dart';
 import '../domain/localized_text.dart';
@@ -136,6 +137,15 @@ class ExamLocalStore {
       out[rec.sectionId] = rec;
     }
     return out;
+  }
+
+  /// Server result of a finished attempt as saved locally (needs only the
+  /// small state record, so it survives [pruneContent]).
+  Future<ExamResult?> loadResult(String attemptId) async {
+    final box = await _boxFuture;
+    final state = _decode(box.get('$_statePrefix$attemptId'));
+    final result = state?['result'];
+    return result is Map ? ExamResult.fromJson(result) : null;
   }
 
   /// Drops the (large) question content of a finished attempt but keeps its

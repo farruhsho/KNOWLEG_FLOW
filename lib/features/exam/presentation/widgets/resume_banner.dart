@@ -40,42 +40,62 @@ class ExamResumeBanner extends ConsumerWidget {
         color: scheme.primaryContainer,
         borderColor: scheme.primary.withValues(alpha: 0.35),
         onTap: () => context.push(RoutePaths.examRunFor(info.attemptId)),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Icon(Icons.play_circle_fill_rounded, color: scheme.primary, size: 32),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.examResumeTitle,
-                      style: theme.textTheme.labelSmall
-                          ?.copyWith(color: scheme.onPrimaryContainer)),
-                  Text(title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(color: scheme.onPrimaryContainer)),
-                  if (subtitle.isNotEmpty)
-                    Text(subtitle, style: theme.textTheme.bodySmall),
-                  const SizedBox(height: AppSpacing.xxs),
-                  if (deadline != null)
-                    expired
-                        ? Text(l.examResumeTimeUp,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.play_circle_fill_rounded,
+                    color: scheme.primary, size: 32),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l.examResumeTitle,
+                          style: theme.textTheme.labelSmall
+                              ?.copyWith(color: scheme.onPrimaryContainer)),
+                      Text(title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall
+                              ?.copyWith(color: scheme.onPrimaryContainer)),
+                      if (subtitle.isNotEmpty)
+                        Text(subtitle,
                             style: theme.textTheme.bodySmall
-                                ?.copyWith(color: tokens.danger))
-                        : ExamCountdown(
-                            deadline: deadline,
-                            clock: clock,
-                            style: theme.textTheme.labelLarge,
-                          ),
-                ],
-              ),
+                                ?.copyWith(color: scheme.onPrimaryContainer)),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: AppSpacing.sm),
-            FilledButton(
-              onPressed: () => context.push(RoutePaths.examRunFor(info.attemptId)),
-              child: Text(l.examContinue),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: deadline == null
+                      ? const SizedBox.shrink()
+                      : expired
+                          ? Text(l.examResumeTimeUp,
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: tokens.danger))
+                          : Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: ExamCountdown(
+                                deadline: deadline,
+                                clock: clock,
+                                style: theme.textTheme.labelLarge,
+                              ),
+                            ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                FilledButton(
+                  onPressed: () =>
+                      context.push(RoutePaths.examRunFor(info.attemptId)),
+                  child: Text(l.examContinue),
+                ),
+              ],
             ),
           ],
         ),
