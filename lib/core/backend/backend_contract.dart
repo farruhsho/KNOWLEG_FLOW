@@ -20,6 +20,18 @@ abstract final class BackendFunctions {
   static const String adminUpdatePricing = 'adminUpdatePricing';
   static const String adminAiDraftQuestions = 'adminAiDraftQuestions';
 
+  // Phase 3 (ARCHITECTURE §9).
+  static const String referralGetCode = 'referralGetCode';
+  static const String referralApply = 'referralApply';
+  static const String promoRedeem = 'promoRedeem';
+  static const String adminUpsertPromoCode = 'adminUpsertPromoCode';
+  static const String friendAdd = 'friendAdd';
+  static const String groupCreate = 'groupCreate';
+  static const String groupJoin = 'groupJoin';
+  static const String groupLeave = 'groupLeave';
+  static const String groupRemoveMember = 'groupRemoveMember';
+  static const String adminSendNotification = 'adminSendNotification';
+
   static FirebaseFunctions get instance =>
       FirebaseFunctions.instanceFor(region: region);
 
@@ -54,6 +66,16 @@ abstract final class BackendReasons {
   /// (failed-precondition): re-authenticate, then retry once.
   static const requiresRecentLogin = 'REQUIRES_RECENT_LOGIN';
 
+  // Phase 3 (ARCHITECTURE §9).
+  static const codeInvalid = 'CODE_INVALID';
+  static const codeExpired = 'CODE_EXPIRED';
+  static const codeExhausted = 'CODE_EXHAUSTED';
+  static const alreadyRedeemed = 'ALREADY_REDEEMED';
+  static const rateLimited = 'RATE_LIMITED';
+  static const referralNotAllowed = 'REFERRAL_NOT_ALLOWED';
+  static const limitReached = 'LIMIT_REACHED';
+  static const notGroupOwner = 'NOT_GROUP_OWNER';
+
   /// Extracts `details.reason` from a callable error, if present.
   static String? of(Object error) {
     if (error is FirebaseFunctionsException) {
@@ -82,6 +104,17 @@ abstract final class Collections {
   static const adminLogs = 'admin_logs';
   static const userMistakes = 'user_mistakes';
   static const userMistakeItems = 'items'; // sub-collection of user_mistakes
+
+  // Phase 3 (ARCHITECTURE §9).
+  static const referrals = 'referrals';
+  static const referralItems = 'items'; // sub-collection of referrals
+  static const friends = 'friends';
+  static const friendList = 'list'; // sub-collection of friends
+  static const groups = 'groups';
+  static const groupMembers = 'members'; // sub-collection of groups
+  static const groupAssignments = 'assignments'; // sub-collection of groups
+  static const assignmentSubmissions = 'submissions'; // sub-collection of assignments
+  static const notifications = 'notifications';
 }
 
 /// Google Play product ids (consumables). Credits per product live

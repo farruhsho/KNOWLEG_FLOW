@@ -16,9 +16,9 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          # Use the stable channel (Dart >= 3.9.2) instead of pinning 3.16.0,
-          # which shipped Dart ~3.2 and broke `flutter pub get` against the
-          # pubspec sdk constraint ^3.9.2 (CI-01).
+          # Pinned to the version the branch was verified with (analyze, tests,
+          # gen-l10n output). The old 3.16.0 pin broke pub get (CI-01).
+          flutter-version: 3.38.7
           channel: stable
           cache: true
 
@@ -27,6 +27,9 @@ jobs:
 
       - name: Analyze code
         run: flutter analyze
+
+      - name: Localization files are up to date
+        run: flutter gen-l10n && git diff --exit-code lib/l10n
 
       - name: Run tests with coverage
         run: flutter test --coverage
@@ -95,50 +98,67 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          # Pinned to the version the branch was verified with (analyze, tests, gen-l10n output).
+          flutter-version: 3.38.7
           channel: stable
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      # google-services.json and the upload keystore are not in git; provide
-      # them as base64 repository secrets. Without the keystore the bundle is
-      # signed with the debug key (fine as a CI artifact, NOT uploadable).
+      # google-services.json and the upload keystore are not in git. With the
+      # repository secrets set, CI builds the signed release bundle; without
+      # them it still proves the Android build compiles (debug APK with a
+      # placeholder Firebase config, never uploadable).
       - name: Restore Firebase config and signing key
+        id: android-secrets
         env:
           GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
           UPLOAD_KEYSTORE_BASE64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
           KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
         run: |
-          if [ -z "$GOOGLE_SERVICES_JSON_BASE64" ]; then echo "::error::secret GOOGLE_SERVICES_JSON_BASE64 is missing"; exit 1; fi
-          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
+          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GOOGLE_SERVICES_JSON_BASE64 is not set: compile check only (debug APK, placeholder Firebase config)"
+            echo '{"project_info":{"project_number":"000000000000","project_id":"ci-placeholder","storage_bucket":"ci-placeholder.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:000000000000:android:0000000000000000","android_client_info":{"package_name":"com.example.knowledge_flow"}},"oauth_client":[],"api_key":[{"current_key":"ci-placeholder"}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}}],"configuration_version":"1"}' > android/app/google-services.json
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          fi
           if [ -n "$UPLOAD_KEYSTORE_BASE64" ] && [ -n "$KEY_PROPERTIES" ]; then
             echo "$UPLOAD_KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
-            printf '%s
-' "$KEY_PROPERTIES" > android/key.properties
-          else
-            echo "::warning::no upload keystore secrets: bundle will be debug-signed"
+            printf '%s\n' "$KEY_PROPERTIES" > android/key.properties
           fi
 
-      - name: Build App Bundle
+      - name: Build App Bundle (release)
+        if: steps.android-secrets.outputs.release == 'true'
         run: flutter build appbundle --release --dart-define=BILLING_MODE=${{ vars.BILLING_MODE || 'external' }}
 
+      - name: Build debug APK (compile check)
+        if: steps.android-secrets.outputs.release != 'true'
+        run: flutter build apk --debug
+
       - name: Upload App Bundle
+        if: steps.android-secrets.outputs.release == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: release-aab
           path: build/app/outputs/bundle/release/app-release.aab
 
   # Build iOS
+  # iOS is not a release target yet (docs/modernization/TZ.md): informational.
   build-ios:
     needs: analyze-test
     runs-on: macos-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          # Pinned to the version the branch was verified with (analyze, tests, gen-l10n output).
+          flutter-version: 3.38.7
           channel: stable
           cache: true
 

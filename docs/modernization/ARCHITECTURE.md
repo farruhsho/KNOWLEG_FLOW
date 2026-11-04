@@ -492,3 +492,88 @@ Application Default Credentials функции, приглашённый в Play
 | D13 | Длина сообщения AI-репетитору ≤ 2000 символов (клиент и сервер). |
 | D14 | Число бесплатных экзаменов — `config/pricing.free_exams_per_user` (по умолчанию 1); клиент показывает остаток по `entitlements.free_exams_used_count`. |
 
+---
+
+## 9. Фаза 3: рост, социальные функции, аналитика (контракт, 2026-11-05)
+
+Все записи ниже делает только сервер (callable), если не сказано иное. Новые
+причины ошибок: `CODE_INVALID`, `CODE_EXPIRED`, `CODE_EXHAUSTED`,
+`ALREADY_REDEEMED`, `RATE_LIMITED`, `REFERRAL_NOT_ALLOWED`, `LIMIT_REACHED`,
+`NOT_GROUP_OWNER`.
+
+### 9.1 Рефералы
+
+| Объект | Поля |
+|---|---|
+| `users/{uid}.referral_code` (привилегированное поле) | 6 символов из `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` |
+| `referral_codes/{code}` | `{uid, created_at}` — клиентам чтение запрещено |
+| `users/{uid}.referred_by` (привилегированное) | uid пригласившего |
+| `referrals/{referrerUid}/items/{uid}` | `{status: joined/rewarded, joined_at, rewarded_at?, display_name}` — читает пригласивший |
+
+* `referralGetCode {}` → `{code}`: идемпотентно создаёт код.
+* `referralApply {code}` → `{ok}`: один раз на аккаунт; свой код нельзя; только
+  пока у пользователя нет завершённых экзаменов и покупок (`REFERRAL_NOT_ALLOWED`).
+* Награда: при **первом начислении кредитов за оплаченную покупку** приглашённого
+  (`billingVerifyPurchase` grant) оба получают +1 кредит (ledger `reason: 'referral'`),
+  статус `rewarded`. Не больше 20 наград пригласившему за календарный месяц
+  (Бишкек). Идемпотентно по uid приглашённого.
+
+### 9.2 Промокоды
+
+`promo_codes/{CODE}` (id в верхнем регистре, 4–20 символов `A-Z0-9`):
+`{credits: 1..10, max_redemptions: int|null, redemptions: int, expires_at: Timestamp|null, active: bool, note, created_by, created_at}`;
+`promo_codes/{CODE}/redemptions/{uid}` = `{at}`. Клиентам чтение запрещено
+(админ-роли с `grant_credits` читают).
+
+* `promoRedeem {code}` → `{credits, balance}`: транзакция, один раз на
+  пользователя, ledger `reason: 'promo'`; не более 10 попыток в сутки
+  (`RATE_LIMITED`), счётчик `promo_attempts/{uid}_{yyyy-mm-dd}`.
+* `adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt? (ms), active, note}` —
+  только super_admin (`grant_credits`), пишет `admin_logs`.
+* Промокод — не способ оплаты, доступен в обоих режимах `BILLING_MODE`.
+
+### 9.3 Лиги: регион, друзья, группы, домашние задания
+
+* Регион: тот же XP, что и в недельном рейтинге (D10), дополнительно пишется в
+  `leaderboards/region_{regionId}_weekly_{YYYY}-W{ww}/entries/{uid}`, если у
+  пользователя задан `users/{uid}.region` (id из `assets/data/kg_regions.json`).
+* Друзья: `friends/{uid}/list/{friendUid}` = `{display_name, added_at}`;
+  владелец читает и удаляет; создаёт только `friendAdd {code}` (по
+  `referral_code` друга), максимум 50. Рейтинг друзей клиент собирает из
+  недельных записей друзей и своей.
+* Группы (класс, учебный центр): `groups/{gid}` = `{name, owner_uid, join_code, member_count, created_at}`;
+  `groups/{gid}/members/{uid}` = `{display_name, role: owner/member, joined_at}`;
+  `users/{uid}.group_ids` (привилегированное, ≤ 5). Читают участники группы.
+  `groupCreate {name}` → `{groupId, joinCode}` (≤ 5 своих групп),
+  `groupJoin {code}` → `{groupId}`, `groupLeave {groupId}` (владелец не может
+  выйти, пока есть участники), `groupRemoveMember {groupId, uid}` (владелец).
+  XP пишется и в `leaderboards/group_{gid}_weekly_{YYYY}-W{ww}/entries/{uid}`.
+* Домашние задания (FR-LRN-6): `groups/{gid}/assignments/{aid}` =
+  `{title, kind: lesson/practice/exam_variant, ref_id, due_at, created_by, created_at}` —
+  создаёт и удаляет владелец группы (правила), читают участники;
+  `groups/{gid}/assignments/{aid}/submissions/{uid}` = `{done_at, score_percent?}` —
+  участник пишет только свою запись, владелец читает все.
+
+### 9.4 Рассылки и достижения (админ)
+
+* `adminSendNotification {title:{ru,ky}, body:{ru,ky}, audience:{kind: all/language/region/group, value?}, dryRun?}` →
+  `{recipients, sent, failed, notificationId}`; право `send_notifications`;
+  получатели — пользователи с `fcm_tokens` (язык по `preferred_language`),
+  пачки ≤ 500, невалидные токены удаляются; не больше 3 рассылок в сутки;
+  история в `notifications/{id}` (читают админ-роли).
+* `config/achievements` = `{titles: {id: {ru, ky}}, descriptions: {id: {ru, ky}}, disabled: [id]}` —
+  пишут роли с `manage_achievements` напрямую (правила), читают все вошедшие.
+  Пороги и логика начисления остаются в коде сервера.
+
+### 9.5 Расширенная аналитика
+
+* `examSubmitSection` принимает `timings: {questionId: seconds}` (целые от 0 до
+  длительности раздела); хранятся в `answers/{sectionId}.timings`; `ExamResult`
+  получает `topic_time_avg: {topicId: seconds}` и `slow_topics: [topicId]`
+  (среднее время по теме > 1,5 × медианы по попытке).
+* `recordActivity` принимает `seconds` (0..3600) для практики и уроков;
+  `user_stats.study_seconds_total` и `study_seconds_today` (день по Бишкеку).
+* Клиент: «Частые ошибки» (топ тем по `wrong_count` из `user_mistakes`), время
+  по темам, предупреждение о риске потери мотивации (нет активности ≥ 3 дней или
+  падение результата за два последних экзамена) с объяснением причины.
+

@@ -248,7 +248,7 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: scheme.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
         titleTextStyle: text.headlineSmall,
         contentTextStyle: text.bodyMedium,
       ),
@@ -264,7 +264,7 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: scheme.inverseSurface,
         contentTextStyle: text.bodyMedium?.copyWith(color: scheme.onInverseSurface),
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.mdAll),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdAll),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,

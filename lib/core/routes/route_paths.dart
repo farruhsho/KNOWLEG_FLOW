@@ -49,6 +49,13 @@ abstract final class RoutePaths {
   // Gamification
   static const achievements = '/achievements';
   static const leaderboard = '/leaderboard';
+  static const mistakes = '/mistakes';
+
+  // Social & growth (ARCHITECTURE §9)
+  static const invite = '/invite';
+  static const groups = '/groups';
+  static const groupDetail = '/groups/:groupId';
+  static String groupById(String groupId) => '/groups/$groupId';
 
   // Settings & account
   static const settings = '/settings';
@@ -57,4 +64,7 @@ abstract final class RoutePaths {
   // Admin (lib/features/admin) — everything under /admin is gated by the router.
   static const adminLogin = '/admin/login';
   static const adminDashboard = '/admin/dashboard';
+  static const adminNotifications = '/admin/notifications';
+  static const adminPromoCodes = '/admin/promo-codes';
+  static const adminAchievements = '/admin/achievements';
 }
