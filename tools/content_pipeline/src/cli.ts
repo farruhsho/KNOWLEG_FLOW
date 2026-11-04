@@ -13,9 +13,9 @@ import { Bank, bankItemsList, lintBank, loadBank, newBankFile, rehashBankFile, s
 import { Blueprint, findPart, getBlueprint, loadBlueprints, loadRawBlueprints } from './blueprints';
 import { loadCurriculum } from './curriculum';
 import { dedupRecords, externalDocsFrom, runDedup } from './dedup';
-import { DEFAULT_PROJECT_ID, openFirestore } from './firestore';
+import { DEFAULT_PROJECT_ID, openFirestore, PipelineFirestore } from './firestore';
 import { convertTranslation, estimateRequestTokens, planGeneration, runGeneration, translationCandidates, translationRequest, TRANSLATION_SYSTEM } from './generate';
-import { applyRemoteReviews, buildImportPlan, commitPlan, MAX_BATCH } from './importer';
+import { applyRemoteReviews, applyRemoteVariantStatuses, buildImportPlan, commitPlan, MAX_BATCH } from './importer';
 import { findRepoRoot, listFiles, nowIso, Paths, pathsFor, readJson, writeJsonAtomic, writeText } from './io';
 import { AnthropicLlm, COST_FLAG, costUsd, CostMeter, DEFAULT_MODEL, LlmClient, LlmError, requirePaidConsent } from './llm';
 import { BlueprintMatrix, buildBlueprintMatrix, describeMatrix, languageMatrix } from './matrix';
@@ -31,7 +31,7 @@ type Opts = Record<string, string | boolean | string[]>;
 
 const BOOLEAN_FLAGS = new Set([
   'plan', 'i-understand-this-costs-money', 'force', 'mark', 'allow-unapproved', 'allow-reuse', 'dry-run', 'commit', 'publish',
-  'all-items', 'require-languages', 'fix', 'api', 'from-draft', 'no-fallbacks', 'local-only', 'help', 'json',
+  'all-items', 'require-languages', 'fix', 'api', 'from-draft', 'no-fallbacks', 'local-only', 'help', 'json', 'overwrite',
 ]);
 
 export function parseArgs(argv: string[]): { cmd: string; opts: Opts } {
@@ -77,6 +77,12 @@ function lang(o: Opts, required = true): Language | undefined {
 interface Env {
   paths: Paths;
   out: (line: string) => void;
+  /** Opens Firestore (firebase-admin); tests pass a fake. */
+  openDb: (projectId: string) => Promise<PipelineFirestore>;
+}
+
+export interface CliDeps {
+  openFirestore?: (projectId: string) => Promise<PipelineFirestore>;
 }
 
 function loadVariantFiles(paths: Paths): Array<{ path: string; file: VariantFile }> {
@@ -397,6 +403,10 @@ async function cmdAssemble(env: Env, o: Opts): Promise<number> {
       env.out(`skip ${id}: published variants are never rebuilt (archive it and use a new number)`);
       continue;
     }
+    if (existing && existing.file.variant.status === 'archived') {
+      env.out(`skip ${id}: archived variants are never rebuilt (the id stays withdrawn in Firestore; use a new number)`);
+      continue;
+    }
     const others = [...variantFiles.filter((v) => v.file.id !== id).map((v) => v.file), ...built];
     const used = usedIds(others, itemMap);
     const seed = str(o, 'seed') ?? `${bp.id}|${language}|${n}`;
@@ -496,15 +506,27 @@ async function cmdImport(env: Env, o: Opts): Promise<number> {
     env.out(`DRY RUN — nothing written. Plan: ${relative(env.paths.root, planPath)}. Add --commit to write (no deletes are ever issued).`);
     return 0;
   }
-  const db = await openFirestore(projectId);
-  const report = await commitPlan(plan, db, batchSize);
-  env.out(`committed: ${report.written} write(s) in ${report.batches} batch(es); unchanged ${report.unchanged}; published variants left untouched: ${report.skipped_published.join(', ') || '—'}`);
-  for (const c of report.review_conflicts) env.out(`  review kept from Firestore for ${c.id}: remote ${c.remote}, local ${c.local} — run review-sync before the next import`);
-  // Record publication locally so the registry stays honest.
-  if (plan.publish) {
+  const db = await env.openDb(projectId);
+  const overwrite = bool(o, 'overwrite');
+  const report = await commitPlan(plan, db, { batchSize, overwrite });
+  writeJsonAtomic(join(env.paths.reports, 'import-report.json'), { generated_at: nowIso(), project_id: projectId, overwrite, ...report });
+  env.out(`committed: ${report.written} write(s) in ${report.batches} batch(es); unchanged ${report.unchanged}`);
+  env.out(`  published variants left untouched: ${report.skipped_published.join(', ') || '—'}`);
+  if (report.skipped_archived.length) env.out(`  archived (unpublished in the admin panel) variants left untouched: ${report.skipped_archived.join(', ')}; run review-sync`);
+  if (report.published.length) env.out(`  published (new in Firestore): ${report.published.join(', ')}`);
+  if (report.publish_in_admin.length) env.out(`  already in Firestore, status not changed (publish in the admin panel, adminPublishVariant): ${report.publish_in_admin.join(', ')}`);
+  for (const b of report.publish_blocked) env.out(`  ${b.id} written as draft, not published: ${b.reason}`);
+  for (const c of report.review_conflicts) env.out(`  review kept from Firestore for ${c.id}: remote ${c.remote}, local ${c.local}; run review-sync before the next import`);
+  for (const c of report.overwritten) env.out(`  OVERWRITTEN ${c.collection}/${c.id}: ${c.reason}`);
+  if (report.cms_conflicts.length) {
+    env.out(`  ${report.cms_conflicts.length} document(s) edited outside the pipeline were NOT overwritten (cms_conflicts):`);
+    for (const c of report.cms_conflicts) env.out(`    ${c.collection}/${c.id}: ${c.reason}`);
+    env.out('  Port the edit into content/bank (git), or rerun with --overwrite to discard it. Details: content/reports/import-report.json');
+  }
+  // Record publication locally so the registry stays honest: only variants this run created as published.
+  if (report.published.length) {
     for (const v of loadVariantFiles(env.paths)) {
-      const note = plan.variants.find((x) => x.id === v.file.id);
-      if (note?.status === 'published' && !report.skipped_published.includes(v.file.id) && v.file.variant.status !== 'published') {
+      if (report.published.includes(v.file.id) && v.file.variant.status !== 'published') {
         v.file.variant.status = 'published';
         v.file.variant.published_at = nowIso();
         v.file.variant.published_by = str(o, 'published-by') ?? 'pipeline';
@@ -571,18 +593,40 @@ async function cmdReview(env: Env, o: Opts): Promise<number> {
   return 0;
 }
 
-/** Pulls methodologist decisions made in the admin panel (exam_questions.review) into the local bank. Reads Firestore only. */
+/**
+ * Pulls decisions made in the admin panel into the local files: methodologist
+ * reviews (exam_questions.review) into the bank, and variant statuses set by
+ * adminPublishVariant (archived / published) into content/variants. Reads Firestore only.
+ */
 async function cmdReviewSync(env: Env, o: Opts): Promise<number> {
   const bank = loadBank(env.paths.bank, { strict: true });
   const items = selectItems(bank, o);
   const projectId = str(o, 'project') ?? process.env.GCLOUD_PROJECT ?? DEFAULT_PROJECT_ID;
-  const db = await openFirestore(projectId);
-  const remote = await db.getExisting('exam_questions', items.map((i) => i.id));
-  const updates = applyRemoteReviews(items, remote, nowIso());
+  const db = await env.openDb(projectId);
+  const ids = items.map((i) => i.id);
+  const remote = await db.getExisting('exam_questions', ids);
+  const remoteKeys = await db.getExisting('exam_question_keys', ids);
+  const { updates, cms_conflicts } = applyRemoteReviews(items, remote, nowIso(), remoteKeys);
   const touched = new Set(updates.map((u) => bank.items.get(u.id)!.file.path));
   for (const f of bank.files) if (touched.has(f.path)) saveBankFile(f);
   for (const u of updates) env.out(`${u.id}: ${u.from} → ${u.to}${u.reviewed_by ? ` (by ${u.reviewed_by})` : ''}`);
-  env.out(`review-sync ${projectId}: ${remote.size} of ${items.length} item(s) found in Firestore, ${updates.length} updated locally`);
+  for (const c of cms_conflicts) env.out(`${c.id}: review not pulled, edited outside the pipeline (${c.reason})`);
+  env.out(`review-sync ${projectId}: ${remote.size} of ${items.length} item(s) found in Firestore, ${updates.length} updated locally, ${cms_conflicts.length} edited outside the pipeline`);
+
+  const bpIds = list(o, 'blueprint');
+  const language = lang(o, false);
+  const variantFiles = loadVariantFiles(env.paths).filter(
+    (v) => (!bpIds.length || bpIds.includes(v.file.variant.blueprint_id)) && (!language || v.file.variant.language === language),
+  );
+  const remoteVariants = await db.getExisting('exam_variants', variantFiles.map((v) => v.file.id));
+  const vs = applyRemoteVariantStatuses(variantFiles.map((v) => v.file), remoteVariants, nowIso());
+  for (const u of vs.updates) {
+    const v = variantFiles.find((x) => x.file.id === u.id)!;
+    writeJsonAtomic(v.path, v.file);
+    env.out(`${u.id}: ${u.from} → ${u.to} (from Firestore)`);
+  }
+  for (const id of vs.mismatched) env.out(`${id}: published in Firestore with other questions than the local file; status not pulled`);
+  env.out(`variants: ${remoteVariants.size} of ${variantFiles.length} found in Firestore, ${vs.updates.length} status(es) updated locally`);
   return 0;
 }
 
@@ -592,7 +636,7 @@ async function cmdExportExisting(env: Env, o: Opts): Promise<number> {
   if (!/^[A-Za-z0-9_]+$/.test(collection)) throw new Error('--collection must be a top-level collection name');
   const projectId = str(o, 'project') ?? process.env.GCLOUD_PROJECT ?? DEFAULT_PROJECT_ID;
   const outPath = resolve(env.paths.root, str(o, 'out') ?? join('content', 'external', `${collection}.json`));
-  const db = await openFirestore(projectId);
+  const db = await env.openDb(projectId);
   const docs = await db.exportCollection(collection, num(o, 'limit', 50000));
   writeJsonAtomic(outPath, { exported_at: nowIso(), project_id: projectId, collection, questions: docs });
   env.out(`exported ${docs.length} document(s) of ${collection} to ${relative(env.paths.root, outPath)} (read-only; keep it out of git if it holds licensed content)`);
@@ -617,25 +661,26 @@ const HELP = `ORT content pipeline — npm run cli -- <stage> [flags]   (all pat
   assemble        --blueprint id --language l [--count 1 | --numbers 1-5] [--allow-unapproved] [--allow-reuse] [--seed s] [--dry-run]
   timing          [--blueprint id] [--language l] [--margin 0.1]
   validate        [--blueprint id] [--language l] [--publish] [--allow-reuse] [--require-languages]
-  import          [--blueprint id ...] [--all-items] [--publish --published-by uid] [--project ${DEFAULT_PROJECT_ID}] [--batch-size 400] [--commit]
+  import          [--blueprint id ...] [--all-items] [--publish --published-by uid] [--project ${DEFAULT_PROJECT_ID}] [--batch-size 400] [--commit] [--overwrite]
+                  (--overwrite also replaces questions/keys/passages/draft variants edited in the admin panel; never a variant's status)
   registry        [--target 100]
   lint            [--fix]
   review          --ids q_..,q_.. --status methodologist_approved|rejected --by <uid> [--notes text] [--from-draft]
-  review-sync     [--blueprint id] [--batch id] [--project ${DEFAULT_PROJECT_ID}]   (reads exam_questions.review from Firestore into the bank)
+  review-sync     [--blueprint id] [--batch id] [--project ${DEFAULT_PROJECT_ID}]   (reads exam_questions.review and exam_variants.status from Firestore into content/)
   export-existing [--collection questions] [--out content/external/questions.json] [--limit 50000]   (read-only, for dedup --against)
   schemas
 
   Paid stages never run without ${COST_FLAG}; import never writes without --commit and never deletes.
 `;
 
-export async function main(argv: string[], out: (line: string) => void = (l) => console.log(l)): Promise<number> {
+export async function main(argv: string[], out: (line: string) => void = (l) => console.log(l), deps: CliDeps = {}): Promise<number> {
   const { cmd, opts } = parseArgs(argv);
   if (cmd === 'help' || bool(opts, 'help')) {
     out(HELP);
     return 0;
   }
   const root = str(opts, 'root') ?? findRepoRoot();
-  const env: Env = { paths: pathsFor(root), out };
+  const env: Env = { paths: pathsFor(root), out, openDb: deps.openFirestore ?? openFirestore };
   const commands: Record<string, (e: Env, o: Opts) => Promise<number>> = {
     matrix: cmdMatrix,
     generate: cmdGenerate,

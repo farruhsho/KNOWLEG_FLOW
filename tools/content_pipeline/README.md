@@ -17,5 +17,8 @@ npm run cli -- help
   API without `--i-understand-this-costs-money`; the key comes only from the
   operator's `ANTHROPIC_API_KEY`.
 * `import` is a dry run unless `--commit`; it writes in batches of ≤ 400 and
-  never deletes.
+  never deletes. It never changes the status of a variant that already exists
+  in Firestore, never overwrites documents edited in the admin panel
+  (reported as `cms_conflicts`) unless `--overwrite`, and stores
+  `table.rows` as `[{cells: [...]}]` (Firestore cannot hold nested arrays).
 * `gen_blueprints_2026.js` regenerates `assets/data/exam_blueprints.json`.

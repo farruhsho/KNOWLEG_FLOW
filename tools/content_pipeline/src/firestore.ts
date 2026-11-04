@@ -5,7 +5,7 @@
  * pointing to a service-account JSON kept outside the repo, or
  * `gcloud auth application-default login`).
  */
-import type { CollectionName, FirestorePort } from './importer';
+import { nestedArrayPaths, type CollectionName, type FirestorePort } from './importer';
 
 export const DEFAULT_PROJECT_ID = 'knowleg-33f36';
 
@@ -70,6 +70,9 @@ export async function openFirestore(projectId: string): Promise<PipelineFirestor
     },
     async commitBatch(writes) {
       if (writes.length > 400) throw new Error('batch larger than 400 writes');
+      // Firestore rejects an array inside an array only at commit (INVALID_ARGUMENT), after earlier batches went through: fail before.
+      const bad = writes.flatMap((w) => nestedArrayPaths(w.data).map((p) => `${w.collection}/${w.id} ${p}`));
+      if (bad.length) throw new Error(`Firestore cannot store an array inside an array: ${bad.slice(0, 5).join('; ')}`);
       const batch = db.batch();
       for (const w of writes) batch.set(db.collection(w.collection).doc(w.id), convert(w.data) as Record<string, unknown>, { merge: w.merge });
       await batch.commit();
