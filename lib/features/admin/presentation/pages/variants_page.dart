@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../../providers/admin_access_provider.dart';
 import '../../application/admin_providers.dart';
 import '../../data/models/admin_records.dart';
 import '../../data/repositories/exam_repositories.dart';
@@ -50,12 +51,17 @@ class _VariantsPageState extends ConsumerState<VariantsPage> {
     final byId = {for (final b in blueprints) b.id: b};
     final state = ref.watch(variantsPageProvider(_f));
     final notifier = ref.read(variantsPageProvider(_f).notifier);
+    // Methodologists see variants read-only: the rules allow exam_variants
+    // writes only to publish_variants holders (AUTH-ADM-05).
+    final canWrite = ref.watch(adminRoleProvider)?.canWriteVariants ?? false;
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _open('new'),
-        icon: const Icon(Icons.add),
-        label: Text(l.adminVariantsNew),
-      ),
+      floatingActionButton: canWrite
+          ? FloatingActionButton.extended(
+              onPressed: () => _open('new'),
+              icon: const Icon(Icons.add),
+              label: Text(l.adminVariantsNew),
+            )
+          : null,
       body: Column(
         children: [
           AdminFilterBar(children: [

@@ -430,6 +430,12 @@ abstract class AppLocalizations {
   /// **'All'**
   String get adminAll;
 
+  /// No description provided for @adminAppCheckPlatformNote.
+  ///
+  /// In en, this message translates to:
+  /// **'App Check is not available on this platform: server functions that enforce it (roles, credits, publishing, pricing, AI drafts) may be rejected. Use the web build with App Check or Android.'**
+  String get adminAppCheckPlatformNote;
+
   /// No description provided for @adminAppTitle.
   ///
   /// In en, this message translates to:
@@ -550,6 +556,18 @@ abstract class AppLocalizations {
   /// **'Edit'**
   String get adminEdit;
 
+  /// No description provided for @adminErrAppCheckPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'The server rejected the request: App Check is not available on this platform (Windows/Linux, or web without an App Check key). Open the admin panel in the web build with App Check or on Android, or ask the owner to set APP_CHECK_ENFORCE_ADMIN=false.'**
+  String get adminErrAppCheckPlatform;
+
+  /// No description provided for @adminErrAppCheckRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server rejected the request (App Check token missing or invalid). Sign in again; if it repeats, check the App Check registration of this device.'**
+  String get adminErrAppCheckRejected;
+
   /// No description provided for @adminErrFileTooLarge.
   ///
   /// In en, this message translates to:
@@ -610,11 +628,29 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Try again.'**
   String get adminErrUnknown;
 
+  /// No description provided for @adminErrUnsupportedMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported file format ({ext}). Allowed: PNG, JPEG, WEBP, GIF, PDF.'**
+  String adminErrUnsupportedMedia(String ext);
+
+  /// No description provided for @adminErrUserBanned.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is blocked. Server actions are not available.'**
+  String get adminErrUserBanned;
+
   /// No description provided for @adminErrValidation.
   ///
   /// In en, this message translates to:
   /// **'Validation failed: {message}'**
   String adminErrValidation(String message);
+
+  /// No description provided for @adminExamAddTable.
+  ///
+  /// In en, this message translates to:
+  /// **'Add table'**
+  String get adminExamAddTable;
 
   /// No description provided for @adminExamApprove.
   ///
@@ -633,6 +669,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose the test structure and section first.'**
   String get adminExamChoosePlacement;
+
+  /// No description provided for @adminExamColumnA.
+  ///
+  /// In en, this message translates to:
+  /// **'Column A'**
+  String get adminExamColumnA;
+
+  /// No description provided for @adminExamColumnB.
+  ///
+  /// In en, this message translates to:
+  /// **'Column B'**
+  String get adminExamColumnB;
+
+  /// No description provided for @adminExamColumns.
+  ///
+  /// In en, this message translates to:
+  /// **'Columns A / B'**
+  String get adminExamColumns;
+
+  /// No description provided for @adminExamColumnsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantitative comparison: the two quantities to compare. The stem holds only the shared condition (it may be empty).'**
+  String get adminExamColumnsHelp;
 
   /// No description provided for @adminExamCorrectIs.
   ///
@@ -687,6 +747,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Image'**
   String get adminExamImage;
+
+  /// No description provided for @adminExamIssueColumns.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in both columns A and B.'**
+  String get adminExamIssueColumns;
 
   /// No description provided for @adminExamIssueLanguage.
   ///
@@ -790,6 +856,12 @@ abstract class AppLocalizations {
   /// **'No image.'**
   String get adminExamNoImage;
 
+  /// No description provided for @adminExamNoTable.
+  ///
+  /// In en, this message translates to:
+  /// **'No table.'**
+  String get adminExamNoTable;
+
   /// No description provided for @adminExamPartUnverified.
   ///
   /// In en, this message translates to:
@@ -831,6 +903,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reject'**
   String get adminExamReject;
+
+  /// No description provided for @adminExamRemoveTable.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove table'**
+  String get adminExamRemoveTable;
 
   /// No description provided for @adminExamReview.
   ///
@@ -933,6 +1011,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Question text'**
   String get adminExamStemLabel;
+
+  /// No description provided for @adminExamTable.
+  ///
+  /// In en, this message translates to:
+  /// **'Table'**
+  String get adminExamTable;
+
+  /// No description provided for @adminExamTableAddColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Add column'**
+  String get adminExamTableAddColumn;
+
+  /// No description provided for @adminExamTableAddRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Add row'**
+  String get adminExamTableAddRow;
+
+  /// No description provided for @adminExamTableCell.
+  ///
+  /// In en, this message translates to:
+  /// **'Cell'**
+  String get adminExamTableCell;
+
+  /// No description provided for @adminExamTableEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The table is empty and will not be saved.'**
+  String get adminExamTableEmpty;
+
+  /// No description provided for @adminExamTableHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get adminExamTableHeader;
+
+  /// No description provided for @adminExamTableHeaderShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Hdr'**
+  String get adminExamTableHeaderShort;
+
+  /// No description provided for @adminExamTableHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Header row and body rows; cells accept Markdown and LaTeX (\$...\$). In comparison items the first row holds quantities A and B.'**
+  String get adminExamTableHelp;
+
+  /// No description provided for @adminExamTablePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get adminExamTablePreview;
+
+  /// No description provided for @adminExamTableRemoveColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove column'**
+  String get adminExamTableRemoveColumn;
+
+  /// No description provided for @adminExamTableRemoveRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove row'**
+  String get adminExamTableRemoveRow;
 
   /// No description provided for @adminExamTranslations.
   ///
@@ -2812,6 +2956,12 @@ abstract class AppLocalizations {
   /// **'Published'**
   String get adminVariantPublished;
 
+  /// No description provided for @adminVariantReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only: only a super admin or a content manager can create and edit variants.'**
+  String get adminVariantReadOnly;
+
   /// No description provided for @adminVariantReady.
   ///
   /// In en, this message translates to:
@@ -2823,6 +2973,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Re-check'**
   String get adminVariantRecheck;
+
+  /// No description provided for @adminVariantResync.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-sync to blueprint version {version}'**
+  String adminVariantResync(int version);
+
+  /// No description provided for @adminVariantResyncDone.
+  ///
+  /// In en, this message translates to:
+  /// **'The variant now targets blueprint version {version}. Save to apply.'**
+  String adminVariantResyncDone(int version);
+
+  /// No description provided for @adminVariantResyncHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The server publishes only variants built for the current blueprint version. Re-syncing keeps every question; then save and check the report.'**
+  String get adminVariantResyncHelp;
 
   /// No description provided for @adminVariantServerResult.
   ///

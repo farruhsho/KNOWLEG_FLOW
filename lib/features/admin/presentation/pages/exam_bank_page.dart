@@ -165,6 +165,8 @@ class _ExamBankPageState extends ConsumerState<ExamBankPage> {
                   AdminPill(q.language.toUpperCase(), tone: AdminTone.info),
                   if (q.translationGroupId != null) AdminPill(l.adminExamHasTranslation),
                   if (q.source.kind == 'ai') AdminPill(l.adminExamSourceAi, tone: AdminTone.warning),
+                  if (q.table != null) AdminPill(l.adminExamTable),
+                  if (q.hasColumns) AdminPill(l.adminExamColumns),
                 ],
                 onTap: () => _open(q.id),
               ),

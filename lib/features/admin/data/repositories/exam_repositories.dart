@@ -77,6 +77,13 @@ class ExamBankRepository {
 
   /// Writes question + key atomically. [review] is the status after this
   /// edit (see [ReviewWorkflow.statusAfterContentEdit]).
+  ///
+  /// With [original] (the document as loaded) an update writes only the
+  /// fields that changed, and with [originalKey] the key is written only when
+  /// it changed — so a metadata-only edit never touches review-relevant
+  /// fields (AUTH-ADM-04). `content_hash` is never written (D11); every save
+  /// sets [kEditedInCmsAtField] so the content pipeline does not silently
+  /// revert it (CP-04). A save without any change writes nothing.
   Future<void> save(
     ExamQuestionDoc q,
     ExamKeyDoc key, {
@@ -84,12 +91,17 @@ class ExamBankRepository {
     required String actor,
     required ReviewStatus review,
     bool reviewChanged = false,
+    ExamQuestionDoc? original,
+    ExamKeyDoc? originalKey,
   }) async {
+    final fields = examQuestionWriteFields(q, isNew: isNew, original: original);
+    final writeKey = isNew || originalKey == null || !key.sameAs(originalKey);
+    if (!isNew && fields.isEmpty && !reviewChanged && !writeKey) return;
     final batch = _db.batch();
-    final fields = q.toContentFields()
-      ..['content_hash'] = computeContentHash(q, key.correct)
+    fields
       ..['updated_at'] = FieldValue.serverTimestamp()
-      ..['updated_by'] = actor;
+      ..['updated_by'] = actor
+      ..[kEditedInCmsAtField] = FieldValue.serverTimestamp();
     if (isNew || reviewChanged) {
       // Saving content is never a review decision: an automatic reset (content
       // edited by a non-reviewer) clears the previous reviewer.
@@ -108,11 +120,14 @@ class ExamBankRepository {
     } else {
       batch.update(_questions.doc(q.id), fields);
     }
-    batch.set(_keys.doc(q.id), {
-      ...key.toMap(),
-      'updated_at': FieldValue.serverTimestamp(),
-      'updated_by': actor,
-    });
+    if (writeKey) {
+      batch.set(_keys.doc(q.id), {
+        ...key.toMap(),
+        'updated_at': FieldValue.serverTimestamp(),
+        'updated_by': actor,
+        kEditedInCmsAtField: FieldValue.serverTimestamp(),
+      });
+    }
     await batch.commit();
   }
 
@@ -192,6 +207,7 @@ class ExamBankRepository {
         ...p.toMap(),
         'updated_at': FieldValue.serverTimestamp(),
         'updated_by': actor,
+        kEditedInCmsAtField: FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
   // --- Variant support ------------------------------------------------------
@@ -251,7 +267,7 @@ class ExamBankRepository {
         final q = d.question;
         batch.set(_questions.doc(q.id), {
           ...q.toContentFields(),
-          'content_hash': computeContentHash(q, d.key.correct),
+          kEditedInCmsAtField: FieldValue.serverTimestamp(),
           'review': {
             'status': ReviewStatus.draft.wire,
             'reviewed_by': null,
@@ -267,6 +283,7 @@ class ExamBankRepository {
           ...d.key.toMap(),
           'updated_at': FieldValue.serverTimestamp(),
           'updated_by': actor,
+          kEditedInCmsAtField: FieldValue.serverTimestamp(),
         });
         ids.add(q.id);
       }

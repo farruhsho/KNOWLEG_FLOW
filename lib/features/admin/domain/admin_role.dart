@@ -125,6 +125,15 @@ enum AdminRole {
   /// Roles that may call `adminAiDraftQuestions` (§3) — the same set as
   /// [AdminPermission.editQuestions].
   bool get canDraftWithAi => can(AdminPermission.editQuestions);
+
+  /// Premium (`users.subscription`) changes are super_admin only (decision
+  /// D5): moderators may write the ban fields and nothing else.
+  bool get canSetPremium => this == AdminRole.superAdmin;
+
+  /// Creating / editing `exam_variants` documents — the rules allow it only
+  /// to `publish_variants` holders (super_admin, content_manager).
+  /// Methodologists may open variants read-only (AUTH-ADM-05).
+  bool get canWriteVariants => can(AdminPermission.publishVariants);
 }
 
 /// Resolves the effective admin role after sign-in.

@@ -6,11 +6,17 @@ import 'save_file_web.dart' if (dart.library.io) 'save_file_native.dart' as impl
 
 typedef PickedFile = ({String name, Uint8List bytes});
 
+/// Raster formats storage.rules accepts (`FileType.image` would also offer
+/// SVG, which the rules refuse — AUTH-ADM-08).
+const List<String> kPickableImageExtensions = ['png', 'jpg', 'jpeg', 'webp', 'gif'];
+
 /// Picks one file and returns its bytes (works on web, mobile and desktop).
+/// `images: true` limits the picker to [kPickableImageExtensions].
 Future<PickedFile?> pickFileBytes({List<String>? extensions, bool images = false}) async {
+  final allowed = images ? kPickableImageExtensions : extensions;
   final result = await FilePicker.platform.pickFiles(
-    type: images ? FileType.image : (extensions == null ? FileType.any : FileType.custom),
-    allowedExtensions: images ? null : extensions,
+    type: allowed == null ? FileType.any : FileType.custom,
+    allowedExtensions: allowed,
     withData: true,
   );
   final file = result?.files.singleOrNull;

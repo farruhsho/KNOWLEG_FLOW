@@ -162,10 +162,12 @@ VariantValidationReport validateVariant({
   final problems = <VariantProblem>[];
   final counts = <SectionCount>[];
 
+  // An error, as on the server: adminPublishVariant rejects a variant built
+  // for another blueprint version (CP-09). The builder offers a re-sync that
+  // keeps the sections.
   if (variant.blueprintVersion != blueprint.version) {
     problems.add(VariantProblem(
       VariantProblemCode.blueprintVersion,
-      severity: ProblemSeverity.warning,
       expected: blueprint.version,
       actual: variant.blueprintVersion,
     ));

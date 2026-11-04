@@ -55,18 +55,44 @@ class UsersRepository {
   Future<Map<String, dynamic>?> stats(String uid) async =>
       (await _db.collection(AdminCollections.userStats).doc(uid).get()).data();
 
-  /// Ban flag on the profile (CMS-15). Enforcement (rules / disabling the Auth
-  /// account) is server-side; the CMS records who did it and why.
-  Future<void> setBanned(String uid, bool banned, {required String actor, String reason = ''}) =>
-      _col.doc(uid).update({
+  /// Fields a moderator may change on `users/{uid}` (decision D5; mirrored by
+  /// the moderator branch of the `users` update rule).
+  static const Set<String> moderatorWritableFields = {
+    'is_banned',
+    'ban_reason',
+    'banned_at',
+    'banned_by',
+    'updated_at',
+  };
+
+  /// The `users/{uid}` update for a ban or unban — only
+  /// [moderatorWritableFields] (AUTH-ADM-02 / SEC-MOD-01). [now] is the
+  /// timestamp value (a server timestamp in production).
+  static Map<String, Object?> banUpdate(
+    bool banned, {
+    required String actor,
+    String reason = '',
+    required Object now,
+  }) =>
+      {
         'is_banned': banned,
         'ban_reason': banned ? reason : null,
         'banned_by': banned ? actor : null,
-        'banned_at': banned ? FieldValue.serverTimestamp() : null,
-      });
+        'banned_at': banned ? now : null,
+        'updated_at': now,
+      };
+
+  /// Ban flag on the profile (CMS-15); the CMS records who did it and why.
+  /// Enforcement is server-side (D5): examStart, aiTutor, recordActivity and
+  /// adminAiDraftQuestions reject banned users with `USER_BANNED`, and banned
+  /// users are left out of leaderboards.
+  Future<void> setBanned(String uid, bool banned, {required String actor, String reason = ''}) =>
+      _col.doc(uid).update(
+          banUpdate(banned, actor: actor, reason: reason, now: FieldValue.serverTimestamp()));
 
   /// Premium = the `subscription` map the student app already reads
   /// (`SubscriptionModel`: tier + expires_at), not a dead `is_premium` flag.
+  /// super_admin only (D5) — see `AdminRole.canSetPremium`.
   Future<void> setPremium(String uid, bool premium, {required String actor, int days = 365}) =>
       _col.doc(uid).update({
         'subscription': premium

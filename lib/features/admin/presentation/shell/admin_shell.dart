@@ -6,6 +6,7 @@ import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/admin_access_provider.dart';
+import '../../application/admin_providers.dart';
 import '../../data/admin_auth_service.dart';
 import '../../domain/admin_nav.dart';
 import '../../domain/admin_role.dart';
@@ -85,9 +86,10 @@ class AdminShell extends ConsumerWidget {
       );
     }
     final current = AdminSection.forPath(location) ?? AdminSection.dashboard;
+    final appCheck = ref.watch(adminAppCheckAvailableProvider);
     return LayoutBuilder(builder: (context, constraints) {
       final wide = constraints.maxWidth >= 1000;
-      final nav = _AdminNav(role: role, current: current, closeOnTap: !wide);
+      final nav = _AdminNav(role: role, current: current, closeOnTap: !wide, appCheck: appCheck);
       return Scaffold(
         appBar: AppBar(
           title: Text(adminSectionLabel(l, current), overflow: TextOverflow.ellipsis),
@@ -111,10 +113,19 @@ class AdminShell extends ConsumerWidget {
 }
 
 class _AdminNav extends StatelessWidget {
-  const _AdminNav({required this.role, required this.current, required this.closeOnTap});
+  const _AdminNav({
+    required this.role,
+    required this.current,
+    required this.closeOnTap,
+    required this.appCheck,
+  });
   final AdminRole role;
   final AdminSection current;
   final bool closeOnTap;
+
+  /// `false` on platforms without App Check (see
+  /// [adminAppCheckAvailableProvider]): server functions may be rejected.
+  final bool appCheck;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +144,25 @@ class _AdminNav extends StatelessWidget {
                 Text(l.adminAppTitle, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
                 AdminPill(adminRoleLabel(l, role), tone: AdminTone.info),
+                if (!appCheck) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.shield_outlined, size: 16, color: context.tokens.warning),
+                      const SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          l.adminAppCheckPlatformNote,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(color: context.tokens.textSecondary),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

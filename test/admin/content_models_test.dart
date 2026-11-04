@@ -66,12 +66,18 @@ void main() {
           isEmpty);
     });
 
-    test('content hash is stable and depends on the key', () {
-      final a = computeContentHash(_q(), 'A');
-      expect(a, startsWith('sha256:'));
-      expect(computeContentHash(_q(), 'A'), a);
-      expect(computeContentHash(_q(), 'B'), isNot(a));
-      expect(computeContentHash(_q(stem: 'Другой'), 'A'), isNot(a));
+    test('the CMS never writes content_hash (pipeline scheme, D11 / CP-04)', () {
+      final loaded = ExamQuestionDoc.fromMap('q1', {
+        ..._q().toContentFields(),
+        'content_hash': 'sha256:pipeline',
+      });
+      expect(loaded.contentHash, 'sha256:pipeline');
+      expect(loaded.toContentFields().containsKey('content_hash'), isFalse);
+      final edited = loaded.copyWith(stem: 'Другой');
+      expect(examQuestionWriteFields(edited, isNew: false, original: loaded),
+          isNot(contains('content_hash')));
+      expect(examQuestionWriteFields(edited, isNew: true), isNot(contains('content_hash')));
+      expect(kEditedInCmsAtField, 'edited_in_cms_at');
     });
 
     test('tolerant reader: camelCase, kg language, Timestamp-like dates', () {
@@ -101,7 +107,7 @@ void main() {
       expect(k.solutionSteps, ['1', '2']);
     });
 
-    test('AI drafts are always saved as draft with source ai', () {
+    test('AI drafts (legacy flat shape) are always saved as draft with source ai', () {
       final d = parseAiDraft(
         {
           'stem': r'Сумма корней $x^2-5x+6=0$?',

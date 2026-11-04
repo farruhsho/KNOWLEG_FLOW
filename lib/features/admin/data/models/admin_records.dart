@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../domain/blueprint_spec.dart';
 import '../../domain/exam_question.dart' show readDateTolerant;
 import '../../domain/localized_text.dart';
 import '../../domain/variant_validation.dart';
@@ -319,4 +320,10 @@ class VariantDoc {
         language: language,
         sections: sections,
       );
+
+  /// Same variant targeting the current version of [blueprint] — sections and
+  /// question ids are kept (CP-09). Only the version changes; the structural
+  /// checks in [validateVariant] decide whether it still fits.
+  VariantDoc resyncedTo(BlueprintSpec blueprint) =>
+      blueprint.id == blueprintId ? copyWith(blueprintVersion: blueprint.version) : this;
 }

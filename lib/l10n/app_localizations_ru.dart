@@ -203,6 +203,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminAll => 'Все';
 
   @override
+  String get adminAppCheckPlatformNote =>
+      'На этой платформе нет App Check: серверные функции с его проверкой (роли, кредиты, публикация, тарифы, черновики ИИ) могут быть отклонены. Используйте веб-версию с App Check или Android.';
+
+  @override
   String get adminAppTitle => 'ORT Master · CMS';
 
   @override
@@ -268,6 +272,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminEdit => 'Редактировать';
 
   @override
+  String get adminErrAppCheckPlatform =>
+      'Сервер отклонил запрос: на этой платформе нет App Check (Windows/Linux или веб без ключа App Check). Откройте админку в веб-версии с App Check или на Android либо попросите владельца выставить APP_CHECK_ENFORCE_ADMIN=false.';
+
+  @override
+  String get adminErrAppCheckRejected =>
+      'Сервер отклонил запрос (токен App Check отсутствует или недействителен). Войдите заново; если повторяется, проверьте регистрацию App Check для этого устройства.';
+
+  @override
   String adminErrFileTooLarge(int mb) {
     return 'Файл слишком большой (максимум $mb МБ).';
   }
@@ -304,9 +316,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminErrUnknown => 'Что-то пошло не так. Повторите попытку.';
 
   @override
+  String adminErrUnsupportedMedia(String ext) {
+    return 'Неподдерживаемый формат файла ($ext). Разрешены: PNG, JPEG, WEBP, GIF, PDF.';
+  }
+
+  @override
+  String get adminErrUserBanned =>
+      'Этот аккаунт заблокирован. Действия на сервере недоступны.';
+
+  @override
   String adminErrValidation(String message) {
     return 'Проверка не пройдена: $message';
   }
+
+  @override
+  String get adminExamAddTable => 'Добавить таблицу';
 
   @override
   String get adminExamApprove => 'Одобрить';
@@ -317,6 +341,19 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get adminExamChoosePlacement =>
       'Сначала выберите структуру теста и раздел.';
+
+  @override
+  String get adminExamColumnA => 'Колонка А';
+
+  @override
+  String get adminExamColumnB => 'Колонка Б';
+
+  @override
+  String get adminExamColumns => 'Колонки А / Б';
+
+  @override
+  String get adminExamColumnsHelp =>
+      'Сравнение величин: две сравниваемые величины. В тексте задания — только общее условие (может быть пустым).';
 
   @override
   String adminExamCorrectIs(String id) {
@@ -352,6 +389,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminExamImage => 'Изображение';
+
+  @override
+  String get adminExamIssueColumns => 'Заполните обе колонки — А и Б.';
 
   @override
   String get adminExamIssueLanguage => 'Выберите язык (ru, ky или en).';
@@ -410,6 +450,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminExamNoImage => 'Изображения нет.';
 
   @override
+  String get adminExamNoTable => 'Таблицы нет.';
+
+  @override
   String get adminExamPartUnverified =>
       'Это деление на части — допущение (официально не опубликовано).';
 
@@ -430,6 +473,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminExamReject => 'Отклонить';
+
+  @override
+  String get adminExamRemoveTable => 'Удалить таблицу';
 
   @override
   String get adminExamReview => 'Проверка';
@@ -488,6 +534,40 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminExamStemLabel => 'Текст вопроса';
+
+  @override
+  String get adminExamTable => 'Таблица';
+
+  @override
+  String get adminExamTableAddColumn => 'Добавить столбец';
+
+  @override
+  String get adminExamTableAddRow => 'Добавить строку';
+
+  @override
+  String get adminExamTableCell => 'Ячейка';
+
+  @override
+  String get adminExamTableEmpty => 'Таблица пустая и не будет сохранена.';
+
+  @override
+  String get adminExamTableHeader => 'Заголовок';
+
+  @override
+  String get adminExamTableHeaderShort => 'Заг.';
+
+  @override
+  String get adminExamTableHelp =>
+      'Строка заголовков и строки таблицы; в ячейках можно Markdown и LaTeX (\$...\$). В заданиях на сравнение первая строка содержит величины А и Б.';
+
+  @override
+  String get adminExamTablePreview => 'Предпросмотр';
+
+  @override
+  String get adminExamTableRemoveColumn => 'Удалить столбец';
+
+  @override
+  String get adminExamTableRemoveRow => 'Удалить строку';
 
   @override
   String get adminExamTranslations => 'Переводы';
@@ -1512,11 +1592,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminVariantPublished => 'Опубликован';
 
   @override
+  String get adminVariantReadOnly =>
+      'Только просмотр: создавать и редактировать варианты могут только супер-админ и контент-менеджер.';
+
+  @override
   String get adminVariantReady =>
       'Готов к публикации (сервер проверит ещё раз).';
 
   @override
   String get adminVariantRecheck => 'Проверить заново';
+
+  @override
+  String adminVariantResync(int version) {
+    return 'Перевести на версию структуры $version';
+  }
+
+  @override
+  String adminVariantResyncDone(int version) {
+    return 'Вариант переведён на версию структуры $version. Сохраните, чтобы применить.';
+  }
+
+  @override
+  String get adminVariantResyncHelp =>
+      'Сервер публикует только варианты, собранные по текущей версии структуры. Перевод сохраняет все вопросы; затем сохраните вариант и проверьте отчёт.';
 
   @override
   String adminVariantServerResult(String status) {

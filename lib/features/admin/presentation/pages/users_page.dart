@@ -297,6 +297,9 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
     final u = widget.user;
     final role = ref.watch(adminRoleProvider);
     final canModerate = role?.can(AdminPermission.moderateUsers) ?? false;
+    // Premium is not part of moderation: the rules let only super_admin
+    // write `subscription` (D5).
+    final canPremium = role?.canSetPremium ?? false;
     final canRoles = role?.can(AdminPermission.manageRoles) ?? false;
     final canGrant = role?.can(AdminPermission.grantCredits) ?? false;
     final ent = ref.watch(adminEntitlementProvider(u.uid));
@@ -325,7 +328,7 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
             ]),
           ]),
         ),
-        if (canModerate || canRoles || canGrant)
+        if (canModerate || canPremium || canRoles || canGrant)
           AdminCard(
             title: l.adminUserActions,
             child: Wrap(spacing: AppSpacing.sm, runSpacing: AppSpacing.sm, children: [
@@ -335,7 +338,7 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
                   icon: Icon(u.isBanned ? Icons.lock_open : Icons.block),
                   label: Text(u.isBanned ? l.adminUserUnban : l.adminUserBan),
                 ),
-              if (canModerate)
+              if (canPremium)
                 OutlinedButton.icon(
                   onPressed: _busy ? null : _togglePremium,
                   icon: const Icon(Icons.workspace_premium_outlined),

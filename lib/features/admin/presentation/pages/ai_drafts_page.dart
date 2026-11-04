@@ -11,6 +11,7 @@ import '../../domain/blueprint_spec.dart';
 import '../../domain/exam_question.dart';
 import '../widgets/admin_widgets.dart';
 import '../widgets/math_markdown.dart';
+import '../widgets/table_editor.dart';
 import 'exam_question_editor_page.dart' show examIssueText;
 
 class _DraftItem {
@@ -100,17 +101,26 @@ class _AiDraftsPageState extends ConsumerState<AiDraftsPage> {
           type: pl.p?.itemType ?? 'single_choice',
         );
         if (pl.p != null && pl.p!.hasFixedOptions) {
+          // Comparison drafts come back with `options: []`: the part's fixed
+          // options are the only valid ones.
           d = AiDraft(
             d.question.copyWith(options: [
               for (final o in fixedOptionsFor(pl.p!, _language)) ExamOption(o.id, o.text),
             ]),
             d.key,
+            serverValid: d.serverValid,
           );
         }
         items.add(_DraftItem(
           d,
-          validateExamQuestion(d.question, d.key,
-              expectedOptions: expected, needsPassage: pl.p?.needsPassage ?? false),
+          validateExamQuestion(
+            d.question,
+            d.key,
+            expectedOptions: expected,
+            needsPassage: pl.p?.needsPassage ?? false,
+            // The callable puts comparison quantities in column_a/column_b.
+            requireColumns: pl.p?.itemType == kQuantitativeComparison,
+          ),
         ));
       }
       if (!mounted) return;
@@ -322,7 +332,16 @@ class _DraftCard extends StatelessWidget {
             Checkbox(value: item.selected && item.savable, onChanged: item.savable ? (_) => onToggle() : null),
             Expanded(child: Text(l.adminAiDraftMeta(q.topicId, q.difficulty), overflow: TextOverflow.ellipsis)),
           ]),
-          MathMarkdownText(q.stem),
+          if (q.stem.trim().isNotEmpty) MathMarkdownText(q.stem),
+          if (q.columnA != null || q.columnB != null) ...[
+            const SizedBox(height: AppSpacing.xs),
+            MathMarkdownText('**${l.adminExamColumnA}:** ${q.columnA ?? '—'}'),
+            MathMarkdownText('**${l.adminExamColumnB}:** ${q.columnB ?? '—'}'),
+          ],
+          if (q.table != null && !q.table!.isBlank) ...[
+            const SizedBox(height: AppSpacing.xs),
+            AdminTablePreview(table: q.table!),
+          ],
           const SizedBox(height: AppSpacing.sm),
           for (final o in q.options)
             Padding(

@@ -14,6 +14,7 @@ import '../widgets/admin_widgets.dart';
 import '../widgets/file_io.dart';
 import '../widgets/math_markdown.dart';
 import '../widgets/storage_image.dart';
+import '../widgets/table_editor.dart';
 
 String examIssueText(AppLocalizations l, String code, {int? expectedOptions}) => switch (code) {
       ExamQuestionIssue.sectionRequired => l.adminExamIssueSection,
@@ -27,6 +28,7 @@ String examIssueText(AppLocalizations l, String code, {int? expectedOptions}) =>
       ExamQuestionIssue.correctRequired => l.adminIssueCorrectRequired,
       ExamQuestionIssue.correctNotInOptions => l.adminIssueCorrectNotInOptions,
       ExamQuestionIssue.passageRequired => l.adminExamIssuePassage,
+      ExamQuestionIssue.columnsIncomplete => l.adminExamIssueColumns,
       _ => code,
     };
 
@@ -66,6 +68,9 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
 
   /// Bumped to rebuild text fields after programmatic changes.
   int _formEpoch = 0;
+
+  /// Bumped when the table is added or removed (rebuilds the grid editor).
+  int _tableEpoch = 0;
 
   Future<({ExamQuestionDoc question, ExamKeyDoc key})?> _fetch() {
     if (!_isNew) return ref.read(examBankRepoProvider).get(widget.questionId);
@@ -219,6 +224,8 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
             actor: ref.read(adminActorProvider),
             review: next,
             reviewChanged: next != current,
+            original: _isNew ? null : saved,
+            originalKey: _isNew ? null : _savedKey,
           );
       if (!mounted) return;
       showAdminSnack(context, next != current ? l.adminExamSavedBackToDraft : l.adminSaved);
@@ -594,8 +601,11 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
             },
           ),
         ),
+        if (_isQuantitativeComparison(part) || _q.columnA != null || _q.columnB != null)
+          _columnsCard(l),
         if (showPassage) _passageCard(l),
         _imageCard(l),
+        _tableCard(l),
         _optionsCard(l, fixed),
         _keyCard(l),
         _sourceCard(l),
@@ -673,6 +683,83 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
                 ],
               ),
       );
+
+  bool _isQuantitativeComparison(PartSpec? part) =>
+      part?.itemType == kQuantitativeComparison || _q.type == kQuantitativeComparison;
+
+  /// `column_a` / `column_b` (CP-08): the two quantities of a comparison item;
+  /// the stem then holds only the shared condition.
+  Widget _columnsCard(AppLocalizations l) => AdminCard(
+        title: l.adminExamColumns,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l.adminExamColumnsHelp, style: TextStyle(color: context.tokens.textSecondary)),
+            const SizedBox(height: AppSpacing.sm),
+            MathTextField(
+              key: ValueKey('colA$_formEpoch'),
+              label: l.adminExamColumnA,
+              initialValue: _q.columnA ?? '',
+              minLines: 1,
+              onChanged: (v) {
+                _q = v.trim().isEmpty ? _q.copyWith(clearColumnA: true) : _q.copyWith(columnA: v);
+                _dirty = true;
+              },
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            MathTextField(
+              key: ValueKey('colB$_formEpoch'),
+              label: l.adminExamColumnB,
+              initialValue: _q.columnB ?? '',
+              minLines: 1,
+              onChanged: (v) {
+                _q = v.trim().isEmpty ? _q.copyWith(clearColumnB: true) : _q.copyWith(columnB: v);
+                _dirty = true;
+              },
+            ),
+          ],
+        ),
+      );
+
+  /// `table` (CP-05, D2 storage shape). Pipeline comparison items keep both
+  /// quantities in the first row, so reviewers must see and be able to fix it.
+  Widget _tableCard(AppLocalizations l) {
+    final table = _q.table;
+    return AdminCard(
+      title: l.adminExamTable,
+      trailing: table == null
+          ? TextButton.icon(
+              onPressed: _busy
+                  ? null
+                  : () => _change(() {
+                        _q = _q.copyWith(table: ExamTableDoc.blank());
+                        _tableEpoch++;
+                      }),
+              icon: const Icon(Icons.table_chart_outlined),
+              label: Text(l.adminExamAddTable),
+            )
+          : IconButton(
+              tooltip: l.adminExamRemoveTable,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _busy
+                  ? null
+                  : () => _change(() {
+                        _q = _q.copyWith(clearTable: true);
+                        _tableEpoch++;
+                      }),
+            ),
+      child: table == null
+          ? Text(l.adminExamNoTable, style: TextStyle(color: context.tokens.textTertiary))
+          : AdminTableEditor(
+              key: ValueKey('table$_formEpoch-$_tableEpoch'),
+              initial: table,
+              onChanged: (t) {
+                _q = _q.copyWith(table: t);
+                _dirty = true;
+              },
+            ),
+    );
+  }
 
   Widget _optionsCard(AppLocalizations l, bool fixed) => AdminCard(
         title: l.adminFieldOptions,

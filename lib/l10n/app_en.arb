@@ -103,6 +103,7 @@
     }
   },
   "adminAll": "All",
+  "adminAppCheckPlatformNote": "App Check is not available on this platform: server functions that enforce it (roles, credits, publishing, pricing, AI drafts) may be rejected. Use the web build with App Check or Android.",
   "adminAppTitle": "ORT Master · CMS",
   "adminApply": "Apply",
   "adminCancel": "Cancel",
@@ -137,6 +138,8 @@
   },
   "adminDiscard": "Discard",
   "adminEdit": "Edit",
+  "adminErrAppCheckPlatform": "The server rejected the request: App Check is not available on this platform (Windows/Linux, or web without an App Check key). Open the admin panel in the web build with App Check or on Android, or ask the owner to set APP_CHECK_ENFORCE_ADMIN=false.",
+  "adminErrAppCheckRejected": "The server rejected the request (App Check token missing or invalid). Sign in again; if it repeats, check the App Check registration of this device.",
   "adminErrFileTooLarge": "File is too large (max {mb} MB).",
   "@adminErrFileTooLarge": {
     "placeholders": {
@@ -161,6 +164,15 @@
   "adminErrQuota": "Limit reached. Try again later.",
   "adminErrTitle": "Could not load",
   "adminErrUnknown": "Something went wrong. Try again.",
+  "adminErrUnsupportedMedia": "Unsupported file format ({ext}). Allowed: PNG, JPEG, WEBP, GIF, PDF.",
+  "@adminErrUnsupportedMedia": {
+    "placeholders": {
+      "ext": {
+        "type": "String"
+      }
+    }
+  },
+  "adminErrUserBanned": "This account is blocked. Server actions are not available.",
   "adminErrValidation": "Validation failed: {message}",
   "@adminErrValidation": {
     "placeholders": {
@@ -169,9 +181,14 @@
       }
     }
   },
+  "adminExamAddTable": "Add table",
   "adminExamApprove": "Approve",
   "adminExamBackToDraft": "Back to draft",
   "adminExamChoosePlacement": "Choose the test structure and section first.",
+  "adminExamColumnA": "Column A",
+  "adminExamColumnB": "Column B",
+  "adminExamColumns": "Columns A / B",
+  "adminExamColumnsHelp": "Quantitative comparison: the two quantities to compare. The stem holds only the shared condition (it may be empty).",
   "adminExamCorrectIs": "Correct option: {id}",
   "@adminExamCorrectIs": {
     "placeholders": {
@@ -202,6 +219,7 @@
   },
   "adminExamHasTranslation": "Has translation",
   "adminExamImage": "Image",
+  "adminExamIssueColumns": "Fill in both columns A and B.",
   "adminExamIssueLanguage": "Choose the language (ru, ky or en).",
   "adminExamIssueOptionDuplicate": "Option ids must be unique.",
   "adminExamIssueOptionsCount": "The blueprint requires {n} options.",
@@ -236,6 +254,7 @@
   },
   "adminExamNoGroup": "Not linked to a translation yet.",
   "adminExamNoImage": "No image.",
+  "adminExamNoTable": "No table.",
   "adminExamPartUnverified": "This split into parts is an assumption (not officially published).",
   "adminExamPassage": "Linked text",
   "adminExamPassageEmpty": "The text is empty.",
@@ -243,6 +262,7 @@
   "adminExamPlacement": "Placement",
   "adminExamQuestionId": "Question id",
   "adminExamReject": "Reject",
+  "adminExamRemoveTable": "Remove table",
   "adminExamReview": "Review",
   "adminExamReviewDone": "Status: {status}",
   "@adminExamReviewDone": {
@@ -277,6 +297,17 @@
   "adminExamSourceKind": "Origin",
   "adminExamSourceOriginal": "Original",
   "adminExamStemLabel": "Question text",
+  "adminExamTable": "Table",
+  "adminExamTableAddColumn": "Add column",
+  "adminExamTableAddRow": "Add row",
+  "adminExamTableCell": "Cell",
+  "adminExamTableEmpty": "The table is empty and will not be saved.",
+  "adminExamTableHeader": "Header",
+  "adminExamTableHeaderShort": "Hdr",
+  "adminExamTableHelp": "Header row and body rows; cells accept Markdown and LaTeX ($...$). In comparison items the first row holds quantities A and B.",
+  "adminExamTablePreview": "Preview",
+  "adminExamTableRemoveColumn": "Remove column",
+  "adminExamTableRemoveRow": "Remove row",
   "adminExamTranslations": "Translations",
   "adminExamWrongNote": "Why {id} is wrong",
   "@adminExamWrongNote": {
@@ -796,8 +827,26 @@
   "adminVariantPublishBody": "The server checks the variant again. Students will be able to start it right after publishing.",
   "adminVariantPublishTitle": "Publish variant?",
   "adminVariantPublished": "Published",
+  "adminVariantReadOnly": "Read-only: only a super admin or a content manager can create and edit variants.",
   "adminVariantReady": "Ready to publish (the server checks again).",
   "adminVariantRecheck": "Re-check",
+  "adminVariantResync": "Re-sync to blueprint version {version}",
+  "@adminVariantResync": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVariantResyncDone": "The variant now targets blueprint version {version}. Save to apply.",
+  "@adminVariantResyncDone": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVariantResyncHelp": "The server publishes only variants built for the current blueprint version. Re-syncing keeps every question; then save and check the report.",
   "adminVariantServerResult": "Server: {status}",
   "@adminVariantServerResult": {
     "placeholders": {

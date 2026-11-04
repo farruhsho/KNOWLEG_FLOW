@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/network/firebase_service.dart';
 import '../../../providers/admin_access_provider.dart';
 import '../data/admin_firebase.dart';
 import '../data/models/admin_records.dart';
@@ -35,6 +36,11 @@ final paymentsRepoProvider =
 final adminLogsRepoProvider =
     Provider((ref) => AdminLogsRepository(ref.watch(adminFirestoreProvider)));
 final statsRepoProvider = Provider((ref) => StatsRepository(ref.watch(adminFirestoreProvider)));
+
+/// Whether this build activates App Check (Android/Apple, or web built with
+/// `APP_CHECK_WEB_SITE_KEY`). Where it does not, callables that enforce App
+/// Check reject every request; the shell says so up front (SEC-APPCHECK-01).
+final adminAppCheckAvailableProvider = Provider<bool>((ref) => FirebaseService.supportsAppCheck);
 
 /// uid of the signed-in admin, written into `*_by` audit fields.
 final adminActorProvider =
