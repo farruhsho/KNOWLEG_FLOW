@@ -123,9 +123,18 @@ class _GroupTile extends StatelessWidget {
 class _GroupActions extends ConsumerWidget {
   const _GroupActions();
 
+  // This widget sits in the empty state and, once a group exists, in the list:
+  // joining or creating the first group rebuilds the page (users.group_ids
+  // changes while the dialog is still open) and unmounts this widget. So
+  // everything used after an await is captured up front from objects that
+  // outlive it (router, navigator, messenger, provider container); a
+  // `context.mounted` check here would silently drop the navigation.
   Future<void> _join(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context)!;
     final repo = ref.read(socialRepositoryProvider);
+    final container = ProviderScope.containerOf(context, listen: false);
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
     final groupId = await showCodeEntryDialog<String>(
       context,
       title: l.socialGroupJoinTitle,
@@ -138,24 +147,29 @@ class _GroupActions extends ConsumerWidget {
       validate: (c) => SocialCodes.isGroupCode(c) ? null : l.socialErrorGroupCodeFormat,
       submit: repo.groupJoin,
     );
-    if (groupId == null || !context.mounted) return;
-    ref.invalidate(myGroupsProvider);
-    showSocialSnack(context, l.socialGroupJoined);
-    context.push(RoutePaths.groupById(groupId));
+    if (groupId == null) return;
+    container.invalidate(myGroupsProvider);
+    messenger
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(l.socialGroupJoined), behavior: SnackBarBehavior.floating));
+    router.push(RoutePaths.groupById(groupId));
   }
 
   Future<void> _create(BuildContext context, WidgetRef ref) async {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final router = GoRouter.of(context);
+    final navigator = Navigator.of(context);
     final created = await showDialog<GroupCreated>(
       context: context,
       builder: (_) => const _CreateGroupDialog(),
     );
-    if (created == null || !context.mounted) return;
-    ref.invalidate(myGroupsProvider);
+    if (created == null || !navigator.mounted) return;
+    container.invalidate(myGroupsProvider);
     final open = await showDialog<bool>(
-      context: context,
+      context: navigator.context,
       builder: (_) => _GroupCreatedDialog(created: created),
     );
-    if (open == true && context.mounted) context.push(RoutePaths.groupById(created.groupId));
+    if (open == true) router.push(RoutePaths.groupById(created.groupId));
   }
 
   @override
