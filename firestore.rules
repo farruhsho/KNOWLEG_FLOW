@@ -290,7 +290,8 @@ service cloud.firestore {
         && d.answers is map
         && d.answers.size() <= 100
         && (!('flags' in d) || (d.flags is list && d.flags.size() <= 100))
-        && (!('client_updated_at' in d) || d.client_updated_at is timestamp);
+        // Timestamp (or serverTimestamp()) or epoch milliseconds.
+        && (!('client_updated_at' in d) || d.client_updated_at is timestamp || d.client_updated_at is int);
     }
 
     match /exam_attempts/{attemptId} {

@@ -40,11 +40,34 @@ export function examXpEventId(attemptId: string): string {
   return `exam_${attemptId}`;
 }
 
-export async function readCompletionInputs(tx: Transaction, ctx: CompletionContext): Promise<CompletionReads> {
+/** Answer keys + question metadata needed to grade an attempt. */
+export interface ScoringContent {
+  keys: Map<string, QuestionKey>;
+  questions: Map<string, ExamQuestion>;
+}
+
+/**
+ * Loads keys and questions OUTSIDE the transaction. The attempt's question
+ * ids are fixed at examStart and content documents are not part of the
+ * attempt's consistency boundary, so pre-loading them keeps the completion
+ * transaction short (fewer locked documents, fewer contention retries).
+ */
+export async function loadScoringContent(attempt: AttemptState): Promise<ScoringContent> {
+  const qids = attempt.sections.flatMap((s) => s.question_ids);
+  const [keys, questions] = await Promise.all([loadKeys(qids), loadQuestions(qids)]);
+  return { keys, questions };
+}
+
+/**
+ * Transactional reads for completion. `content` should be pre-loaded with
+ * loadScoringContent; when it is missing (the attempt reached its last
+ * section between the pre-read and the transaction) it is read in `tx`.
+ */
+export async function readCompletionInputs(tx: Transaction, ctx: CompletionContext, content?: ScoringContent): Promise<CompletionReads> {
   const qids = ctx.attempt.sections.flatMap((s) => s.question_ids);
   const [keys, questions, [stats, user, xpEvent]] = await Promise.all([
-    loadKeys(qids, tx),
-    loadQuestions(qids, tx),
+    content ? Promise.resolve(content.keys) : loadKeys(qids, tx),
+    content ? Promise.resolve(content.questions) : loadQuestions(qids, tx),
     tx.getAll(statsRef(ctx.uid), db().doc(`users/${ctx.uid}`), xpEventRef(ctx.uid, examXpEventId(ctx.attemptId))),
   ]);
   return { keys, questions, stats: stats!, user: user!, xpEvent: xpEvent! };

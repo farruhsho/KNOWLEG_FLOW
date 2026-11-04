@@ -337,6 +337,13 @@ export const billingRtdn = onMessagePublished({ topic: 'play-billing', retry: fa
       logger.info('RTDN ignored', { why: ev.why });
       return;
     case 'voided': {
+      if (ev.refundType === 2) {
+        // REFUND_TYPE_QUANTITY_BASED_PARTIAL_REFUND: the notification carries no
+        // quantity, so the daily Voided Purchases sweep (which has
+        // voidedQuantity) revokes the proportional share instead.
+        logger.info('RTDN partial refund deferred to billingSweepVoided', { orderId: ev.orderId });
+        return;
+      }
       const r = await revokePurchase(purchaseTokenId(ev.purchaseToken), 'rtdn', { orderId: ev.orderId });
       logger.info('RTDN voided handled', { result: r, refundType: ev.refundType });
       return;

@@ -35,7 +35,7 @@ import {
   Timestamp,
   wrap,
 } from './common';
-import { bumpVariantStats, readCompletionInputs, writeCompletion, type CompletionContext } from './completion';
+import { bumpVariantStats, loadScoringContent, readCompletionInputs, writeCompletion, type CompletionContext } from './completion';
 import {
   attemptFromDoc,
   attemptRef,
@@ -199,6 +199,12 @@ export const examSubmitSection = onCall(
     const preState = pre.exists ? attemptFromDoc(pre.data()) : null;
     assertOwner(preState, uid);
     const blueprint = await requireBlueprint(preState.blueprint_id);
+    // Grading content for the final section is read before the transaction.
+    const isLastSection =
+      preState.status === 'in_progress' &&
+      preState.current_section_id === sectionId &&
+      preState.current_section_index === preState.sections.length - 1;
+    const content = isLastSection ? await loadScoringContent(preState) : undefined;
 
     const outcome = await db().runTransaction(async (tx: Transaction) => {
       const nowMs = Date.now();
@@ -243,7 +249,7 @@ export const examSubmitSection = onCall(
       others.forEach((s, i) => (answersBySection[s.section_id] = answersFromSnap(otherSnaps[i])));
       answersBySection[sectionId] = answers;
       const ctx: CompletionContext = { uid, attemptId, attempt: transition.attempt, blueprint, answersBySection, nowMs };
-      const reads = await readCompletionInputs(tx, ctx);
+      const reads = await readCompletionInputs(tx, ctx, content);
       tx.set(answersRef(attemptId, sectionId), answersDoc);
       const result = writeCompletion(tx, ctx, reads);
       return { kind: 'completed' as const, attempt: transition.attempt, result };
@@ -335,6 +341,7 @@ async function expireOne(attemptId: string): Promise<'expired' | 'skipped'> {
     logger.error('expire: blueprint missing', { attemptId, blueprintId: preState.blueprint_id });
     return 'skipped';
   }
+  const content = await loadScoringContent(preState);
   return db().runTransaction(async (tx) => {
     const nowMs = Date.now();
     const snap = await tx.get(attemptRef(attemptId));
@@ -362,7 +369,7 @@ async function expireOne(attemptId: string): Promise<'expired' | 'skipped'> {
     }
 
     const ctx: CompletionContext = { uid: attempt.uid, attemptId, attempt: transition.attempt, blueprint, answersBySection, nowMs };
-    const reads = await readCompletionInputs(tx, ctx);
+    const reads = await readCompletionInputs(tx, ctx, content);
     for (const c of transition.closed) {
       const flags = current && c.section_id === current.section_id && draft?.exists ? draft.get('flags') : [];
       tx.set(answersRef(attemptId, c.section_id), {

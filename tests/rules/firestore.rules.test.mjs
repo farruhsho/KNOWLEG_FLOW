@@ -196,6 +196,12 @@ describe('exam attempts and drafts', () => {
     await assertSucceeds(
       setDoc(doc(db('alice'), 'exam_attempts/a1/drafts/math'), { answers: { q1: 'A' }, flags: ['q2'], client_updated_at: Timestamp.now() }),
     );
+    await assertSucceeds(
+      setDoc(doc(db('alice'), 'exam_attempts/a1/drafts/math'), { answers: { q1: 'B' }, client_updated_at: Date.now() }),
+    );
+    await assertFails(
+      setDoc(doc(db('alice'), 'exam_attempts/a1/drafts/math'), { answers: { q1: 'B' }, client_updated_at: 'yesterday' }),
+    );
   });
 
   it('drafts are rejected for other sections, other users, extra keys, oversize maps, late or finished attempts', async () => {
