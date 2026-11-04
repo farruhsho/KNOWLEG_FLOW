@@ -22,6 +22,10 @@ const int kPromoMaxRedemptionsLimit = 100000;
 /// Longest internal note, in code points.
 const int kPromoNoteMax = 200;
 
+/// `details.why` of the `VALIDATION_FAILED` that `adminUpsertPromoCode`
+/// returns for `createOnly: true` when the code already exists (§9.7).
+const String kPromoExistsWhy = 'exists';
+
 final RegExp _codePattern = RegExp('^[A-Z0-9]{$kPromoCodeMinLength,$kPromoCodeMaxLength}\$');
 
 /// Alphabet for generated codes: no 0/O/1/I to avoid misreading.
@@ -112,14 +116,16 @@ class PromoCodeDraft {
   }
 
   /// The callable payload. Optional fields are omitted when unset
-  /// (unlimited / no expiry).
-  Map<String, dynamic> toCallable() => {
+  /// (unlimited / no expiry). [createOnly] (a new code, §9.7) makes the
+  /// server refuse instead of overwriting a code that already exists.
+  Map<String, dynamic> toCallable({bool createOnly = false}) => {
         'code': normalizedCode,
         'credits': credits,
         if (maxRedemptions != null) 'maxRedemptions': maxRedemptions,
         if (expiresAt != null) 'expiresAt': expiresAt!.millisecondsSinceEpoch,
         'active': active,
         'note': note.trim(),
+        if (createOnly) 'createOnly': true,
       };
 
   PromoCodeDraft copyWith({bool? active}) => PromoCodeDraft(

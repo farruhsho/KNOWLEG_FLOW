@@ -54,20 +54,43 @@ class PromoCodesPage extends ConsumerWidget {
       confirmLabel: l.adminSave,
     );
     if (!ok || !context.mounted) return;
+    final code = draft.normalizedCode;
     try {
-      await ref.read(adminFunctionsServiceProvider).upsertPromoCode(draft);
+      // A new code is sent with createOnly (§9.7): the server refuses an
+      // existing code instead of overwriting it (the editor already checked;
+      // this covers a code created in between).
+      final created = await ref
+          .read(adminFunctionsServiceProvider)
+          .upsertPromoCode(draft, createOnly: isNew);
       if (!context.mounted) return;
-      showAdminSnack(context, l.adminPromoSaved(draft.normalizedCode));
+      // created == false on a create: an older server ignored createOnly and
+      // updated the existing code — say so instead of "saved".
+      final overwritten = isNew && created == false;
+      showAdminSnack(
+        context,
+        overwritten ? l.adminPromoOverwritten(code) : l.adminPromoSaved(code),
+        error: overwritten,
+      );
       await ref.read(promoCodesPageProvider.notifier).refresh();
     } catch (e) {
-      if (context.mounted) showAdminSnack(context, adminErrorMessage(l, e), error: true);
+      if (!context.mounted) return;
+      showAdminSnack(
+        context,
+        isPromoCodeExistsError(e) ? l.adminPromoErrExists(code) : adminErrorMessage(l, e),
+        error: true,
+      );
     }
   }
 
   Future<void> _openEditor(BuildContext context, WidgetRef ref, [PromoCodeRecord? existing]) async {
     final draft = await showDialog<PromoCodeDraft>(
       context: context,
-      builder: (_) => PromoCodeEditorDialog(existing: existing),
+      builder: (_) => PromoCodeEditorDialog(
+        existing: existing,
+        codeExists: existing != null
+            ? null
+            : (code) async => await ref.read(promoCodesRepoProvider).get(code) != null,
+      ),
     );
     if (draft == null || !context.mounted) return;
     await _save(context, ref, draft, isNew: existing == null);
@@ -171,8 +194,13 @@ class PromoCodesPage extends ConsumerWidget {
 /// Create / edit form. Pops a valid [PromoCodeDraft], or `null` on cancel.
 /// The code (document id) cannot be changed once created.
 class PromoCodeEditorDialog extends StatefulWidget {
-  const PromoCodeEditorDialog({super.key, this.existing});
+  const PromoCodeEditorDialog({super.key, this.existing, this.codeExists});
   final PromoCodeRecord? existing;
+
+  /// For a new code: whether `promo_codes/{code}` already exists (§9.7).
+  /// Checked on submit; an existing code keeps the form open with an error
+  /// instead of overwriting that code's settings.
+  final Future<bool> Function(String code)? codeExists;
 
   @override
   State<PromoCodeEditorDialog> createState() => _PromoCodeEditorDialogState();
@@ -188,6 +216,11 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
   late DateTime? _expiresAt = _initial.expiresAt;
   late bool _active = _initial.active;
   List<PromoIssue> _issues = const [];
+
+  /// Result of the [PromoCodeEditorDialog.codeExists] check: the code is
+  /// taken, or the check failed. Cleared when the code changes.
+  String? _codeError;
+  bool _checking = false;
 
   bool get _isNew => widget.existing == null;
 
@@ -225,12 +258,39 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
     }
   }
 
-  void _submit() {
+  void _codeChanged() {
+    if (_codeError != null) setState(() => _codeError = null);
+  }
+
+  Future<void> _submit() async {
+    final l = AppLocalizations.of(context)!;
     final draft = _draft;
     final issues = draft.validate(now: DateTime.now(), redemptions: widget.existing?.redemptions ?? 0);
     if (issues.isNotEmpty) {
       setState(() => _issues = issues);
       return;
+    }
+    final codeExists = widget.codeExists;
+    if (_isNew && codeExists != null) {
+      // Read promo_codes/{CODE} first (§9.7): never upsert over an existing
+      // code from the Create form. A failed read blocks too (retry).
+      setState(() {
+        _issues = const [];
+        _codeError = null;
+        _checking = true;
+      });
+      String? error;
+      try {
+        if (await codeExists(draft.normalizedCode)) error = l.adminPromoErrExists(draft.normalizedCode);
+      } catch (e) {
+        error = adminErrorMessage(l, e);
+      }
+      if (!mounted) return;
+      setState(() {
+        _checking = false;
+        _codeError = error;
+      });
+      if (error != null) return;
     }
     Navigator.pop(context, draft);
   }
@@ -274,6 +334,7 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
                 key: const ValueKey('promo_code_field'),
                 controller: _code,
                 enabled: _isNew,
+                onChanged: (_) => _codeChanged(),
                 textCapitalization: TextCapitalization.characters,
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]')),
@@ -285,12 +346,16 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
                 decoration: InputDecoration(
                   labelText: l.adminPromoCode,
                   helperText: l.adminPromoCodeHelp(kPromoCodeMinLength, kPromoCodeMaxLength),
-                  errorText: _error(l, const [PromoIssue.codeFormat]),
+                  errorText: _error(l, const [PromoIssue.codeFormat]) ?? _codeError,
+                  errorMaxLines: 3,
                   suffixIcon: _isNew
                       ? IconButton(
                           tooltip: l.adminPromoGenerate,
                           icon: const Icon(Icons.autorenew),
-                          onPressed: () => setState(() => _code.text = generatePromoCode()),
+                          onPressed: () => setState(() {
+                            _code.text = generatePromoCode();
+                            _codeError = null;
+                          }),
                         )
                       : null,
                 ),
@@ -382,8 +447,10 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l.adminCancel)),
         FilledButton(
           key: const ValueKey('promo_submit'),
-          onPressed: _submit,
-          child: Text(l.adminSave),
+          onPressed: _checking ? null : _submit,
+          child: _checking
+              ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : Text(l.adminSave),
         ),
       ],
     );

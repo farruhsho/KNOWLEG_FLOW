@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_core/firebase_core.dart' show FirebaseException;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +23,7 @@ import 'package:knowledge_flow/features/admin/presentation/pages/admin_notificat
 import 'package:knowledge_flow/features/admin/presentation/pages/promo_codes_page.dart';
 import 'package:knowledge_flow/features/admin/presentation/pages/users_page.dart';
 import 'package:knowledge_flow/features/admin/presentation/shell/admin_shell.dart';
+import 'package:knowledge_flow/features/admin/presentation/widgets/admin_widgets.dart' show isAdminPermissionDenied;
 import 'package:knowledge_flow/features/onboarding/data/kg_regions_provider.dart';
 import 'package:knowledge_flow/l10n/app_localizations.dart';
 import 'package:knowledge_flow/providers/admin_access_provider.dart';
@@ -66,9 +68,40 @@ class _FakeAdminFunctions extends AdminFunctions {
     );
   }
 
+  /// Thrown by [upsertPromoCode] (e.g. the §9.7 `createOnly` refusal).
+  Object? promoError;
+
+  /// The `created` flag of the response.
+  bool? promoCreated = true;
+
   @override
-  Future<void> upsertPromoCode(PromoCodeDraft draft) async => promoCalls.add(draft.toCallable());
+  Future<bool?> upsertPromoCode(PromoCodeDraft draft, {bool createOnly = false}) async {
+    promoCalls.add(draft.toCallable(createOnly: createOnly));
+    if (promoError != null) throw promoError!;
+    return promoCreated;
+  }
 }
+
+/// `promo_codes/{CODE}` lookups of the Create form (§9.7).
+class _FakePromoRepo implements PromoCodesRepository {
+  _FakePromoRepo([this.existing = const {}]);
+  final Set<String> existing;
+  final lookups = <String>[];
+  Object? error;
+
+  @override
+  Future<PromoCodeRecord?> get(String code) async {
+    lookups.add(code);
+    if (error != null) throw error!;
+    return existing.contains(code) ? PromoCodeRecord(code: code, credits: 1, active: true) : null;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+FirebaseException _firestoreError(String code) =>
+    FirebaseException(plugin: 'cloud_firestore', code: code, message: code);
 
 class _FakeAchievementsRepo implements AchievementsConfigRepository {
   final saved = <Map<String, dynamic>>[];
@@ -112,12 +145,14 @@ List<Override> _base(
   List<PromoCodeRecord> promos = const [],
   AchievementsConfig achievements = AchievementsConfig.empty,
   _FakeAchievementsRepo? achievementsRepo,
+  _FakePromoRepo? promoRepo,
 }) =>
     [
       adminSessionProvider.overrideWith(() => _TestSession(role)),
       adminFunctionsServiceProvider.overrideWithValue(functions ?? _FakeAdminFunctions()),
       notificationsPageProvider.overrideWith((ref) => _paged(history)),
       promoCodesPageProvider.overrideWith((ref) => _paged(promos)),
+      promoCodesRepoProvider.overrideWithValue(promoRepo ?? _FakePromoRepo()),
       achievementsConfigProvider.overrideWith((ref) async => achievements),
       achievementsConfigRepoProvider.overrideWithValue(achievementsRepo ?? _FakeAchievementsRepo()),
       kgRegionsProvider.overrideWith((ref) async => _regions),
@@ -273,7 +308,8 @@ void main() {
               id: 'n1',
               title: const {'ru': 'Новый пробный экзамен по математике уже доступен в приложении', 'ky': 'Жаңы'},
               body: const {'ru': 'Текст', 'ky': 'Текст'},
-              audience: const NotificationAudience(NotificationAudienceKind.region, 'Чуйская область'),
+              // The server stores the resolved kg_regions id (F5).
+              audience: const NotificationAudience(NotificationAudienceKind.region, 'chuy'),
               recipients: 1200,
               sent: 1180,
               failed: 20,
@@ -395,9 +431,69 @@ void main() {
         expect(find.textContaining('школа-гимназия'), findsOneWidget);
         expect(find.text('g2'), findsOneWidget);
         expect(find.text('Группа не найдена (удалена?)'), findsOneWidget);
+        expect(find.byKey(const ValueKey('growth_no_access')), findsNothing);
         expect(tester.takeException(), isNull);
       });
     }
+
+    // F1/F2: rules deployed before §9.7 deny staff the referrals count and
+    // group names. The card degrades instead of showing error texts.
+    Future<void> pumpGrowth(WidgetTester tester, {required Object countError, Object? groupError}) => _pump(
+          tester,
+          const Scaffold(
+            body: SingleChildScrollView(
+              child: UserGrowthCard(
+                user: AdminUserRecord(
+                  uid: 'u1',
+                  name: '',
+                  email: '',
+                  referralCode: 'ABC234',
+                  referredBy: 'inviter-uid',
+                  groupIds: ['g1', 'g2'],
+                ),
+              ),
+            ),
+          ),
+          overrides: [
+            ..._base(AdminRole.support),
+            adminReferralsCountProvider.overrideWith((ref, uid) async => throw countError),
+            adminGroupNameProvider.overrideWith((ref, gid) async {
+              if (gid == 'g1' && groupError != null) throw groupError;
+              return '11-А класс';
+            }),
+          ],
+        );
+
+    testWidgets('growth card under older rules: permission-denied shows "—" and one note', (tester) async {
+      await pumpGrowth(
+        tester,
+        countError: _firestoreError('permission-denied'),
+        groupError: _firestoreError('permission-denied'),
+      );
+      expect(find.text('ABC234'), findsOneWidget);
+      expect(find.text('inviter-uid'), findsOneWidget);
+      expect(find.text('—'), findsOneWidget, reason: 'the invited count');
+      expect(find.text('g1'), findsOneWidget, reason: 'the group id stands in for its name');
+      expect(find.text('11-А класс'), findsOneWidget);
+      expect(find.text('Недостаточно прав для этого действия.'), findsNothing);
+      expect(find.byKey(const ValueKey('growth_no_access')), findsOneWidget);
+      expect(find.textContaining('правила Firestore'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('growth card: a denied group name alone also shows the note', (tester) async {
+      await pumpGrowth(tester, countError: _firestoreError('unavailable'), groupError: _firestoreError('permission-denied'));
+      // Other failures keep their message.
+      expect(find.text('Нет связи с сервером. Проверьте сеть и повторите.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('growth_no_access')), findsOneWidget);
+    });
+
+    testWidgets('growth card: a network error is not mistaken for old rules', (tester) async {
+      await pumpGrowth(tester, countError: _firestoreError('unavailable'));
+      expect(find.text('Нет связи с сервером. Проверьте сеть и повторите.'), findsOneWidget);
+      expect(find.byKey(const ValueKey('growth_no_access')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets('Kyrgyz CMS strings are real Kyrgyz', (tester) async {
       await _pump(
@@ -565,7 +661,115 @@ void main() {
         'maxRedemptions': 50,
         'active': true,
         'note': '',
+        'createOnly': true,
       });
+      expect(find.text('Промокод SCHOOL5 сохранён'), findsOneWidget);
+    });
+
+    Future<void> openCreate(WidgetTester tester, _FakeAdminFunctions fn, _FakePromoRepo repo) async {
+      await _pump(
+        tester,
+        const Scaffold(body: PromoCodesPage()),
+        size: const Size(400, 900),
+        overrides: _base(AdminRole.superAdmin, functions: fn, promoRepo: repo),
+      );
+      await tester.tap(find.byKey(const ValueKey('promo_create')));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> confirmSave(WidgetTester tester) async {
+      await tester.tap(find.widgetWithText(FilledButton, 'Сохранить'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('F3: creating a code that already exists is refused before any upsert', (tester) async {
+      final fn = _FakeAdminFunctions();
+      final repo = _FakePromoRepo({'SUMMER'});
+      await openCreate(tester, fn, repo);
+      await tester.enterText(find.byKey(const ValueKey('promo_code_field')), 'summer');
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      expect(repo.lookups, ['SUMMER']);
+      expect(find.text('Код SUMMER уже существует. Чтобы изменить его, откройте код в списке.'), findsOneWidget);
+      expect(find.text('Создать промокод?'), findsNothing, reason: 'no confirmation for an existing code');
+      expect(fn.promoCalls, isEmpty);
+      expect(find.byKey(const ValueKey('promo_submit')), findsOneWidget, reason: 'the form stays open');
+
+      // Another code clears the error and goes through, as a create-only call.
+      await tester.enterText(find.byKey(const ValueKey('promo_code_field')), 'summer2');
+      // The decorator fades the old error text out.
+      await tester.pumpAndSettle();
+      expect(find.textContaining('уже существует'), findsNothing);
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      expect(find.text('Создать промокод?'), findsOneWidget);
+      await confirmSave(tester);
+      expect(repo.lookups, ['SUMMER', 'SUMMER2']);
+      expect(fn.promoCalls.single['code'], 'SUMMER2');
+      expect(fn.promoCalls.single['createOnly'], isTrue);
+    });
+
+    testWidgets('F3: a failed existence check blocks the create (retry)', (tester) async {
+      final fn = _FakeAdminFunctions();
+      final repo = _FakePromoRepo()..error = _firestoreError('unavailable');
+      await openCreate(tester, fn, repo);
+      await tester.enterText(find.byKey(const ValueKey('promo_code_field')), 'SCHOOL5');
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      expect(find.text('Нет связи с сервером. Проверьте сеть и повторите.'), findsOneWidget);
+      expect(find.text('Создать промокод?'), findsNothing);
+      expect(fn.promoCalls, isEmpty);
+
+      repo.error = null;
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      await confirmSave(tester);
+      expect(fn.promoCalls.single['code'], 'SCHOOL5');
+    });
+
+    testWidgets('F3: the server createOnly refusal (why: exists) says the code exists', (tester) async {
+      final fn = _FakeAdminFunctions()
+        ..promoError = FirebaseFunctionsException(
+          code: 'invalid-argument',
+          message: 'promo code already exists',
+          details: {'reason': 'VALIDATION_FAILED', 'why': 'exists'},
+        );
+      await openCreate(tester, fn, _FakePromoRepo());
+      await tester.enterText(find.byKey(const ValueKey('promo_code_field')), 'RACE1');
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      await confirmSave(tester);
+      expect(fn.promoCalls.single['createOnly'], isTrue);
+      expect(find.text('Код RACE1 уже существует. Чтобы изменить его, откройте код в списке.'), findsOneWidget);
+      expect(find.textContaining('promo code already exists'), findsNothing);
+      expect(find.textContaining('сохранён'), findsNothing);
+    });
+
+    testWidgets('F3: created == false on a create (older server) warns about the overwrite', (tester) async {
+      final fn = _FakeAdminFunctions()..promoCreated = false;
+      await openCreate(tester, fn, _FakePromoRepo());
+      await tester.enterText(find.byKey(const ValueKey('promo_code_field')), 'OLD2');
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      await confirmSave(tester);
+      expect(find.text('Код OLD2 уже существовал: его настройки перезаписаны. Проверьте его в списке.'),
+          findsOneWidget);
+      expect(find.textContaining('сохранён'), findsNothing);
+    });
+
+    testWidgets('editing an existing code neither looks it up nor sends createOnly', (tester) async {
+      final fn = _FakeAdminFunctions()..promoCreated = false;
+      final repo = _FakePromoRepo({'ORT2026'});
+      await _pump(
+        tester,
+        const Scaffold(body: PromoCodesPage()),
+        size: const Size(400, 900),
+        overrides: _base(AdminRole.superAdmin, functions: fn, promoRepo: repo, promos: const [
+          PromoCodeRecord(code: 'ORT2026', credits: 3, maxRedemptions: 10, redemptions: 4, active: true),
+        ]),
+      );
+      await tester.tap(find.text('ORT2026'));
+      await tester.pumpAndSettle();
+      await _tap(tester, find.byKey(const ValueKey('promo_submit')));
+      expect(find.text('Сохранить изменения?'), findsOneWidget);
+      await confirmSave(tester);
+      expect(repo.lookups, isEmpty);
+      expect(fn.promoCalls.single.containsKey('createOnly'), isFalse);
+      expect(find.text('Промокод ORT2026 сохранён'), findsOneWidget);
     });
 
     testWidgets('deactivate keeps the other fields', (tester) async {
@@ -658,6 +862,26 @@ void main() {
     n.replaceWhere((x) => x == 'a', (_) => 'A');
     expect(n.state.items, ['A', 'b']);
     n.dispose();
+  });
+
+  test('F5: region audience label matches the stored id as well as the oblast name', () {
+    final ru = lookupAppLocalizations(const Locale('ru'));
+    final ky = lookupAppLocalizations(const Locale('ky'));
+    const byId = NotificationAudience(NotificationAudienceKind.region, 'chuy');
+    const byName = NotificationAudience(NotificationAudienceKind.region, 'Нарынская область');
+    const unknown = NotificationAudience(NotificationAudienceKind.region, 'mars');
+    expect(notificationAudienceLabel(ru, byId, regions: _regions), 'Регион: Чуйская область');
+    expect(notificationAudienceLabel(ky, byId, regions: _regions, lang: 'ky'), 'Аймак: Чүй облусу');
+    expect(notificationAudienceLabel(ru, byName, regions: _regions), 'Регион: Нарынская область');
+    expect(notificationAudienceLabel(ru, unknown, regions: _regions), 'Регион: mars');
+    expect(notificationAudienceLabel(ru, byId), 'Регион: chuy', reason: 'regions not loaded yet');
+  });
+
+  test('isAdminPermissionDenied: only permission-denied', () {
+    expect(isAdminPermissionDenied(_firestoreError('permission-denied')), isTrue);
+    expect(isAdminPermissionDenied(FirebaseFunctionsException(code: 'permission-denied', message: 'x')), isTrue);
+    expect(isAdminPermissionDenied(_firestoreError('unavailable')), isFalse);
+    expect(isAdminPermissionDenied(StateError('permission-denied')), isFalse);
   });
 
   test('users/{uid} phase-3 fields are read from the snake_case document', () {

@@ -420,15 +420,25 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
 /// code, inviter, number of invited people (`count()` over
 /// `referrals/{uid}/items`) and group memberships (`group_ids` → names).
 /// All of it is written by the server only.
+///
+/// `canViewUsers()` roles may read `referrals/{uid}`, its items and
+/// `groups/{gid}` (§9.7). Under older deployed rules those reads are
+/// `permission-denied`: the count then shows "—", a group shows its id, and
+/// one note under the card says the rules need an update — the rest of the
+/// card (from `users/{uid}`) is unaffected.
 class UserGrowthCard extends ConsumerWidget {
   const UserGrowthCard({super.key, required this.user});
   final AdminUserRecord user;
+
+  static bool _denied(AsyncValue<Object?> v) => v.hasError && isAdminPermissionDenied(v.error!);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context)!;
     final t = context.tokens;
     final referrals = ref.watch(adminReferralsCountProvider(user.uid));
+    final groups = [for (final gid in user.groupIds) ref.watch(adminGroupNameProvider(gid))];
+    final rulesOutdated = _denied(referrals) || groups.any(_denied);
     final referredBy = user.referredBy;
     return AdminCard(
       title: l.adminUserGrowth,
@@ -454,7 +464,7 @@ class UserGrowthCard extends ConsumerWidget {
             l.adminUserReferralsCount,
             referrals.when(
               loading: () => '…',
-              error: (e, _) => adminErrorMessage(l, e),
+              error: (e, _) => isAdminPermissionDenied(e) ? '—' : adminErrorMessage(l, e),
               data: (n) => '$n',
             ),
           ),
@@ -465,6 +475,14 @@ class UserGrowthCard extends ConsumerWidget {
             Text(l.adminUserNoGroups, style: TextStyle(color: t.textSecondary))
           else
             for (final gid in user.groupIds) _GroupMembershipRow(groupId: gid),
+          if (rulesOutdated) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              l.adminUserGrowthNoAccess,
+              key: const ValueKey('growth_no_access'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: t.textTertiary),
+            ),
+          ],
         ],
       ),
     );
@@ -482,7 +500,8 @@ class _GroupMembershipRow extends ConsumerWidget {
     final name = ref.watch(adminGroupNameProvider(groupId));
     final (String title, String? note, Color? noteColor) = name.when(
       loading: () => (groupId, null, null),
-      error: (e, _) => (groupId, adminErrorMessage(l, e), t.danger),
+      // Older rules: no name, just the id (the card explains once).
+      error: (e, _) => isAdminPermissionDenied(e) ? (groupId, null, null) : (groupId, adminErrorMessage(l, e), t.danger),
       data: (n) => n == null
           ? (groupId, l.adminUserGroupMissing, t.warning)
           : (n.isEmpty ? groupId : n, n.isEmpty ? null : groupId, t.textTertiary),

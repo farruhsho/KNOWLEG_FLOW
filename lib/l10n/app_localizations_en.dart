@@ -1467,6 +1467,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String adminPromoErrExists(String code) {
+    return 'Code $code already exists. To change it, open it in the list.';
+  }
+
+  @override
   String get adminPromoErrExpiry =>
       'The date has passed: pick a future date or deactivate the code';
 
@@ -1505,6 +1510,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminPromoNoteHelp =>
       'Who the code is for: campaign, partner, school.';
+
+  @override
+  String adminPromoOverwritten(String code) {
+    return 'Code $code already existed: its settings were overwritten. Check it in the list.';
+  }
 
   @override
   String get adminPromoPickDate => 'Pick a date';
@@ -1842,6 +1852,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminUserGrowth => 'Referrals and groups';
+
+  @override
+  String get adminUserGrowthNoAccess =>
+      'Part of this data is hidden: the Firestore rules on the server do not let your role read it yet. The updated rules need to be deployed.';
 
   @override
   String get adminUserLanguage => 'Language';

@@ -58,7 +58,9 @@ String notificationAudienceLabel(
     case NotificationAudienceKind.language:
       return l.adminNotifAudienceLanguageIs(languageLabel(l, v));
     case NotificationAudienceKind.region:
-      final match = regions.where((r) => r.oblast == v);
+      // The composer sends the oblast name; the server resolves it and the
+      // history stores the kg_regions id (§9.4), so accept either.
+      final match = regions.where((r) => r.id == v || r.oblast == v);
       return l.adminNotifAudienceRegionIs(match.isEmpty ? v : match.first.label(lang));
     case NotificationAudienceKind.group:
       return l.adminNotifAudienceGroupIs(v);

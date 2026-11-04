@@ -1472,6 +1472,11 @@ class AppLocalizationsKy extends AppLocalizations {
   }
 
   @override
+  String adminPromoErrExists(String code) {
+    return '$code коду мурунтан эле бар. Аны өзгөртүү үчүн тизмеден ачыңыз.';
+  }
+
+  @override
   String get adminPromoErrExpiry =>
       'Бул күн өтүп кетти: келечектеги күндү тандаңыз же кодду өчүрүңүз';
 
@@ -1509,6 +1514,11 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminPromoNoteHelp => 'Код ким үчүн: кампания, өнөктөш, мектеп.';
+
+  @override
+  String adminPromoOverwritten(String code) {
+    return '$code коду мурунтан эле бар болчу: анын жөндөөлөрү кайра жазылды. Тизмеден текшериңиз.';
+  }
 
   @override
   String get adminPromoPickDate => 'Күндү тандоо';
@@ -1847,6 +1857,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminUserGrowth => 'Рефералдар жана топтор';
+
+  @override
+  String get adminUserGrowthNoAccess =>
+      'Маалыматтын бир бөлүгү жашырылган: сервердеги Firestore эрежелери сиздин ролуңузга аны окууга азырынча уруксат бербейт. Жаңыланган эрежелерди орнотуу керек.';
 
   @override
   String get adminUserLanguage => 'Язык';
