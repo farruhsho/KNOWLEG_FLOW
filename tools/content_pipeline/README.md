@@ -19,6 +19,9 @@ npm run cli -- help
 * `import` is a dry run unless `--commit`; it writes in batches of ≤ 400 and
   never deletes. It never changes the status of a variant that already exists
   in Firestore, never overwrites documents edited in the admin panel
-  (reported as `cms_conflicts`) unless `--overwrite`, and stores
+  (reported as `cms_conflicts`) or translation links changed there
+  (`translation_links_kept`) unless `--overwrite`, takes back a question
+  whose admin-panel edit is already in the bank (`cms_caught_up`: hash fields
+  written, `edited_in_cms_at` deleted, content untouched), and stores
   `table.rows` as `[{cells: [...]}]` (Firestore cannot hold nested arrays).
 * `gen_blueprints_2026.js` regenerates `assets/data/exam_blueprints.json`.

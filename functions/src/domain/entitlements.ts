@@ -61,6 +61,26 @@ export function parseEntitlement(raw: unknown): EntitlementState {
   };
 }
 
+/**
+ * `config/pricing.free_exams_per_user`: an integer in
+ * [FREE_EXAMS_PER_USER_MIN, FREE_EXAMS_PER_USER_MAX] (0..5 inclusive).
+ * adminUpdatePricing rejects anything else with VALIDATION_FAILED; on read a
+ * missing or out-of-range value means the default. The admin CMS and the
+ * student client (billing/domain/pricing_config.dart) mirror this range.
+ */
+export const FREE_EXAMS_PER_USER_MIN = 0;
+export const FREE_EXAMS_PER_USER_MAX = 5;
+export const FREE_EXAMS_PER_USER_DEFAULT = 1;
+
+export function isValidFreeExamsPerUser(v: unknown): v is number {
+  return typeof v === 'number' && Number.isInteger(v) && v >= FREE_EXAMS_PER_USER_MIN && v <= FREE_EXAMS_PER_USER_MAX;
+}
+
+/** Stored value -> effective number of free exams (default when invalid). */
+export function parseFreeExamsPerUser(v: unknown): number {
+  return isValidFreeExamsPerUser(v) ? v : FREE_EXAMS_PER_USER_DEFAULT;
+}
+
 export type StartDecision =
   | { kind: 'resume'; attemptId: string }
   | { kind: 'free_first' }

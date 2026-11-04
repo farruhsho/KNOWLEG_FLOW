@@ -19,8 +19,9 @@ enum ExamFailureKind {
   /// The account is banned by a moderator (`USER_BANNED`). Not retryable.
   userBanned,
 
-  /// Exam callables need App Check, which has no provider on this platform
-  /// (Windows / Linux desktop builds, contract D7). Not retryable.
+  /// Exam callables need App Check, which this build cannot obtain
+  /// (Windows / Linux desktop builds, web built without
+  /// `APP_CHECK_WEB_SITE_KEY`; contract D7). Not retryable.
   platformUnsupported,
 
   /// No connection / timeout / backend unavailable — safe to retry.

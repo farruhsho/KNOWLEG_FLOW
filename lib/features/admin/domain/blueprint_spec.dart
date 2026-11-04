@@ -110,6 +110,19 @@ class SectionSpec {
     return null;
   }
 
+  /// `part_id` the CMS stores on a question of this section (CP-06).
+  ///
+  /// A single-part section always gets that part's id — the content
+  /// pipeline writes the same value, so CMS and pipeline items agree and the
+  /// server's part check sees one explicit part for the whole section. In a
+  /// multi-part section it is [chosen] when that is one of this section's
+  /// parts, otherwise null (not chosen yet, or left over from another
+  /// section).
+  String? storedPartId(String? chosen) {
+    if (parts.length == 1) return parts.first.id;
+    return part(chosen)?.id;
+  }
+
   factory SectionSpec.fromJson(Map<String, dynamic> j) {
     final parts = <PartSpec>[];
     final rawParts = j['parts'];

@@ -157,3 +157,7 @@ lib/generated_plugin_registrant.dart
 
 # Kotlin Gradle plugin 2.x session data
 **/android/.kotlin/
+
+# Node tooling and Firebase emulator logs
+node_modules/
+*-debug.log

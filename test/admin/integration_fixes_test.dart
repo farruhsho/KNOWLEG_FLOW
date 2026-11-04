@@ -394,25 +394,54 @@ void main() {
     });
   });
 
-  group('SEC-APPCHECK-01 / D5: callable errors', () {
-    test('classification', () {
-      AdminCallableIssue? c(String code, {String? reason, bool appCheck = true}) =>
-          classifyAdminCallableError(code: code, reason: reason, appCheckAvailable: appCheck);
-      expect(c('unauthenticated', appCheck: false), AdminCallableIssue.appCheckUnavailable);
-      expect(c('unauthenticated'), AdminCallableIssue.appCheckRejected);
-      expect(c('failed-precondition', appCheck: false), AdminCallableIssue.appCheckUnavailable);
+  group('SEC-APPCHECK-01 / D5 / F5: callable errors', () {
+    test('classification (admin App Check off by default)', () {
+      expect(kAdminAppCheckEnforced, isFalse, reason: 'server default APP_CHECK_ENFORCE_ADMIN=false');
+      AdminCallableIssue? c(String code,
+              {String? reason, String? message, bool appCheck = true, bool enforced = false}) =>
+          classifyAdminCallableError(
+              code: code,
+              reason: reason,
+              message: message,
+              appCheckAvailable: appCheck,
+              appCheckEnforced: enforced);
+      // A bare `unauthenticated` is an expired / missing session.
+      expect(c('unauthenticated', appCheck: false), AdminCallableIssue.sessionExpired);
+      expect(c('unauthenticated'), AdminCallableIssue.sessionExpired);
+      expect(c('unauthenticated', message: 'Sign in required.', appCheck: false),
+          AdminCallableIssue.sessionExpired);
+      expect(c('unauthenticated', message: 'Unauthenticated'), AdminCallableIssue.sessionExpired);
+      // Only an explicit App Check message gets the App Check hint.
+      expect(c('unauthenticated', message: 'App Check token is invalid', appCheck: false),
+          AdminCallableIssue.appCheckUnavailable);
+      expect(c('unauthenticated', message: 'app-check/token-error'), AdminCallableIssue.appCheckRejected);
+      expect(c('failed-precondition', message: 'AppCheck failed', appCheck: false),
+          AdminCallableIssue.appCheckUnavailable);
+      expect(c('failed-precondition', appCheck: false), isNull);
       expect(c('failed-precondition'), isNull);
+      // A backend known to enforce it (APP_CHECK_ENFORCE_ADMIN=true).
+      expect(c('unauthenticated', appCheck: false, enforced: true), AdminCallableIssue.appCheckUnavailable);
+      expect(c('unauthenticated', enforced: true), AdminCallableIssue.appCheckRejected);
+      // Domain errors keep their own mapping.
       expect(c('failed-precondition', reason: 'VALIDATION_FAILED', appCheck: false), isNull);
       expect(c('permission-denied', reason: 'FORBIDDEN_ROLE', appCheck: false), isNull);
       expect(c('permission-denied', reason: kUserBannedReason), AdminCallableIssue.userBanned);
     });
 
-    test('adminErrorMessage shows a platform message instead of "forbidden"', () async {
+    test('adminErrorMessage: "sign in again", App Check only when named', () async {
       final l = await AppLocalizations.delegate.load(const Locale('ru'));
-      FirebaseFunctionsException e(String code, [String? reason]) => FirebaseFunctionsException(
-          code: code, message: 'x', details: reason == null ? null : {'reason': reason});
-      expect(adminErrorMessage(l, e('unauthenticated'), appCheckAvailable: false), l.adminErrAppCheckPlatform);
-      expect(adminErrorMessage(l, e('unauthenticated'), appCheckAvailable: true), l.adminErrAppCheckRejected);
+      FirebaseFunctionsException e(String code, [String? reason, String message = 'x']) =>
+          FirebaseFunctionsException(
+              code: code, message: message, details: reason == null ? null : {'reason': reason});
+      expect(adminErrorMessage(l, e('unauthenticated'), appCheckAvailable: false), l.adminErrSessionExpired);
+      expect(adminErrorMessage(l, e('unauthenticated'), appCheckAvailable: true), l.adminErrSessionExpired);
+      expect(l.adminErrSessionExpired, isNot(contains('App Check')));
+      expect(adminErrorMessage(l, e('unauthenticated', null, 'Missing App Check token'), appCheckAvailable: false),
+          l.adminErrAppCheckPlatform);
+      expect(adminErrorMessage(l, e('unauthenticated', null, 'Missing App Check token'), appCheckAvailable: true),
+          l.adminErrAppCheckRejected);
+      expect(adminErrorMessage(l, e('unauthenticated'), appCheckAvailable: false, appCheckEnforced: true),
+          l.adminErrAppCheckPlatform);
       expect(adminErrorMessage(l, e('permission-denied', 'FORBIDDEN_ROLE'), appCheckAvailable: false),
           l.adminErrForbidden);
       expect(adminErrorMessage(l, e('permission-denied', kUserBannedReason)), l.adminErrUserBanned);
@@ -458,7 +487,9 @@ void main() {
       expect(find.byType(FloatingActionButton), findsOneWidget);
     });
 
-    testWidgets('SEC-APPCHECK-01: the shell explains missing App Check', (tester) async {
+    testWidgets('F5: no App Check warning by default, even without App Check', (tester) async {
+      // Default backend: APP_CHECK_ENFORCE_ADMIN=false, admin* callables do
+      // not need a token, so the CMS must not claim they will be rejected.
       await pump(
         tester,
         const AdminShell(location: '/admin/dashboard', child: SizedBox()),
@@ -468,7 +499,24 @@ void main() {
         ],
         size: const Size(1280, 800),
       );
+      expect(find.textContaining('App Check'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('SEC-APPCHECK-01: the shell warns when admin App Check is enforced and missing',
+        (tester) async {
+      await pump(
+        tester,
+        const AdminShell(location: '/admin/dashboard', child: SizedBox()),
+        [
+          ...session(AdminRole.superAdmin),
+          adminAppCheckAvailableProvider.overrideWithValue(false),
+          adminAppCheckEnforcedProvider.overrideWithValue(true),
+        ],
+        size: const Size(1280, 800),
+      );
       expect(find.textContaining('App Check'), findsOneWidget);
+      expect(find.textContaining('APP_CHECK_ENFORCE_ADMIN'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -479,6 +527,7 @@ void main() {
         [
           ...session(AdminRole.superAdmin),
           adminAppCheckAvailableProvider.overrideWithValue(true),
+          adminAppCheckEnforcedProvider.overrideWithValue(true),
         ],
         size: const Size(1280, 800),
       );

@@ -86,10 +86,11 @@ class AdminShell extends ConsumerWidget {
       );
     }
     final current = AdminSection.forPath(location) ?? AdminSection.dashboard;
-    final appCheck = ref.watch(adminAppCheckAvailableProvider);
+    final appCheckNotice = ref.watch(adminAppCheckNoticeProvider);
     return LayoutBuilder(builder: (context, constraints) {
       final wide = constraints.maxWidth >= 1000;
-      final nav = _AdminNav(role: role, current: current, closeOnTap: !wide, appCheck: appCheck);
+      final nav = _AdminNav(
+          role: role, current: current, closeOnTap: !wide, appCheckNotice: appCheckNotice);
       return Scaffold(
         appBar: AppBar(
           title: Text(adminSectionLabel(l, current), overflow: TextOverflow.ellipsis),
@@ -117,15 +118,15 @@ class _AdminNav extends StatelessWidget {
     required this.role,
     required this.current,
     required this.closeOnTap,
-    required this.appCheck,
+    required this.appCheckNotice,
   });
   final AdminRole role;
   final AdminSection current;
   final bool closeOnTap;
 
-  /// `false` on platforms without App Check (see
-  /// [adminAppCheckAvailableProvider]): server functions may be rejected.
-  final bool appCheck;
+  /// The backend enforces App Check on admin callables and this platform has
+  /// none ([adminAppCheckNoticeProvider]): they will be rejected.
+  final bool appCheckNotice;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +145,7 @@ class _AdminNav extends StatelessWidget {
                 Text(l.adminAppTitle, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xs),
                 AdminPill(adminRoleLabel(l, role), tone: AdminTone.info),
-                if (!appCheck) ...[
+                if (appCheckNotice) ...[
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:knowledge_flow/core/backend/callable_platform.dart';
 import 'package:knowledge_flow/core/design/tokens.dart';
 import 'package:knowledge_flow/features/exam/data/exam_remote_datasource.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_failure.dart';
+import 'package:knowledge_flow/features/exam/presentation/providers/exam_providers.dart';
 import 'package:knowledge_flow/features/exam/presentation/widgets/exam_common.dart';
 import 'package:knowledge_flow/l10n/app_localizations.dart';
 import 'package:knowledge_flow/l10n/app_localizations_ky.dart';
@@ -49,21 +53,54 @@ void main() {
     });
   });
 
-  group('unsupported platform (contract D7)', () {
-    test('only Windows / Linux desktop builds are unsupported', () {
-      bool on(TargetPlatform p, {bool web = false}) =>
-          examCallablesSupported(isWeb: web, platform: p, desktopOverride: false);
+  group('unsupported platform (contract D7, APPCHECK-01)', () {
+    // Exams use the app-wide App Check gate (lib/core/backend/
+    // callable_platform.dart), the same one as the tutor and account
+    // deletion — not a gate of their own.
+    test('web is supported only when built with an App Check site key', () {
+      bool on(TargetPlatform p, {bool web = false, String key = ''}) =>
+          callablesSupportedOn(isWeb: web, platform: p, webSiteKey: key);
       expect(on(TargetPlatform.android), isTrue);
       expect(on(TargetPlatform.iOS), isTrue);
       expect(on(TargetPlatform.macOS), isTrue);
-      expect(on(TargetPlatform.windows, web: true), isTrue, reason: 'web build');
       expect(on(TargetPlatform.windows), isFalse);
       expect(on(TargetPlatform.linux), isFalse);
-      expect(
-          examCallablesSupported(
-              isWeb: false, platform: TargetPlatform.windows, desktopOverride: true),
-          isTrue,
-          reason: 'developer override for emulator / unenforced backends');
+      expect(on(TargetPlatform.windows, web: true), isFalse,
+          reason: 'web without APP_CHECK_WEB_SITE_KEY gets no App Check token');
+      expect(on(TargetPlatform.android, web: true), isFalse);
+      expect(on(TargetPlatform.windows, web: true, key: '6Lc_key'), isTrue);
+    });
+
+    test('examCallablesSupportedProvider follows the shared gate', () {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      bool readGate() {
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+        return container.read(examCallablesSupportedProvider);
+      }
+
+      for (final p in TargetPlatform.values) {
+        debugDefaultTargetPlatformOverride = p;
+        expect(readGate(), callablesSupportedOnThisPlatform, reason: '$p');
+        expect(
+            readGate(),
+            callablesSupportedOn(
+                isWeb: kIsWeb, platform: p, webSiteKey: appCheckWebSiteKey),
+            reason: '$p');
+      }
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      expect(readGate(), isFalse);
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(readGate(), isTrue);
+    });
+
+    test('the platform message no longer sends desktop users to the browser', () {
+      for (final l in [AppLocalizationsRu(), AppLocalizationsKy()]) {
+        final msg = examFailureMessage(
+            l, const ExamFailure(ExamFailureKind.platformUnsupported));
+        expect(msg, isNot(contains('браузер')));
+        expect(msg, contains('Android'));
+      }
     });
 
     test('the data source fails fast without touching Firebase', () async {

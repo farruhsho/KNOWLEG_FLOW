@@ -9,6 +9,7 @@ import '../data/repositories/content_repositories.dart';
 import '../data/repositories/exam_repositories.dart';
 import '../data/repositories/people_repositories.dart';
 import '../domain/blueprint_spec.dart';
+import '../domain/callable_errors.dart' show kAdminAppCheckEnforced;
 import '../domain/exam_question.dart';
 import '../domain/lesson_doc.dart';
 import '../domain/practice_question_codec.dart';
@@ -38,9 +39,19 @@ final adminLogsRepoProvider =
 final statsRepoProvider = Provider((ref) => StatsRepository(ref.watch(adminFirestoreProvider)));
 
 /// Whether this build activates App Check (Android/Apple, or web built with
-/// `APP_CHECK_WEB_SITE_KEY`). Where it does not, callables that enforce App
-/// Check reject every request; the shell says so up front (SEC-APPCHECK-01).
+/// `APP_CHECK_WEB_SITE_KEY`).
 final adminAppCheckAvailableProvider = Provider<bool>((ref) => FirebaseService.supportsAppCheck);
+
+/// Whether the backend enforces App Check on the admin* callables
+/// (`APP_CHECK_ENFORCE_ADMIN`, off by default — see [kAdminAppCheckEnforced]).
+final adminAppCheckEnforcedProvider = Provider<bool>((ref) => kAdminAppCheckEnforced);
+
+/// Whether the shell warns that admin callables will be rejected: only when
+/// the backend enforces App Check for them and this platform cannot provide
+/// a token (SEC-APPCHECK-01). With the default backend config (admin App
+/// Check off) there is nothing to warn about.
+final adminAppCheckNoticeProvider = Provider<bool>((ref) =>
+    ref.watch(adminAppCheckEnforcedProvider) && !ref.watch(adminAppCheckAvailableProvider));
 
 /// uid of the signed-in admin, written into `*_by` audit fields.
 final adminActorProvider =

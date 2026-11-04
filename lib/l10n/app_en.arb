@@ -115,9 +115,18 @@
     }
   },
   "adminAll": "All",
-  "adminAppCheckPlatformNote": "App Check is not available on this platform: server functions that enforce it (roles, credits, publishing, pricing, AI drafts) may be rejected. Use the web build with App Check or Android.",
+  "adminAppCheckPlatformNote": "This build expects the server to require App Check for admin functions (APP_CHECK_ENFORCE_ADMIN), but App Check is not available on this platform: roles, credits, publishing, pricing and AI drafts will be rejected. Use the web build with App Check or Android.",
   "adminAppTitle": "ORT Master · CMS",
   "adminApply": "Apply",
+  "adminBanReasonTooLong": "The reason must be at most {max} characters.",
+  "@adminBanReasonTooLong": {
+    "description": "Ban dialog: firestore.rules limits ban_reason for moderators",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "adminCancel": "Cancel",
   "adminClose": "Close",
   "adminCorrectMultiHelp": "Mark all correct options.",
@@ -174,6 +183,10 @@
   "adminErrNetwork": "No connection to the server. Check the network and try again.",
   "adminErrNotFound": "Not found.",
   "adminErrQuota": "Limit reached. Try again later.",
+  "adminErrSessionExpired": "Your admin session has expired. Sign in again.",
+  "@adminErrSessionExpired": {
+    "description": "A server function answered unauthenticated without an App Check hint"
+  },
   "adminErrTitle": "Could not load",
   "adminErrUnknown": "Something went wrong. Try again.",
   "adminErrUnsupportedMedia": "Unsupported file format ({ext}). Allowed: PNG, JPEG, WEBP, GIF, PDF.",
@@ -617,7 +630,18 @@
   "adminPricingFreeHelp": "Product rule: 1 (the first full exam is free once per account)",
   "adminPricingFreeLabel": "Free full exams per account",
   "adminPricingIssueCredits": "Credits per product must be 1–100.",
-  "adminPricingIssueFree": "Free exams per user must be 0–10.",
+  "adminPricingIssueFree": "Free exams per user must be {min}–{max}.",
+  "@adminPricingIssueFree": {
+    "description": "Same range as adminUpdatePricing on the server",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "adminPricingIssueProduct": "Unknown product id.",
   "adminPricingIssueSingle": "exam_single must grant exactly 1 credit.",
   "adminPricingProducts": "Credits per product",
@@ -1295,6 +1319,15 @@
   "@examEntitlementFree": {
     "description": "Exam mode"
   },
+  "examEntitlementFreeLeft": "{count, plural, =1{1 free test left} other{{count} free tests left}}",
+  "@examEntitlementFreeLeft": {
+    "description": "Exams tab balance when config/pricing grants more than one free exam per account",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "examEntitlementHint": "One credit = one full test. Continuing an unfinished test is free.",
   "@examEntitlementHint": {
     "description": "Exam mode"
@@ -1319,9 +1352,9 @@
   "@examErrorNetwork": {
     "description": "Exam mode"
   },
-  "examErrorPlatformUnsupported": "Practice tests are not available on this device. Open the app on your phone (Android or iPhone) or in a web browser.",
+  "examErrorPlatformUnsupported": "Practice tests are not available on this device. Open the app on your phone (Android or iPhone).",
   "@examErrorPlatformUnsupported": {
-    "description": "Exam mode: desktop builds (Windows/Linux) cannot call the exam functions"
+    "description": "Exam mode: builds without App Check (Windows/Linux, or web built without APP_CHECK_WEB_SITE_KEY) cannot call the exam functions"
   },
   "examErrorSignIn": "Sign in to take exams.",
   "@examErrorSignIn": {
@@ -2773,6 +2806,10 @@
     }
   },
   "shellHomeNextStepError": "Couldn't load your recommendation.",
+  "shellHomeNoCredits": "No mock exams available",
+  "@shellHomeNoCredits": {
+    "description": "Home entitlement chip in BILLING_MODE=external when nothing is left: neutral balance, not tappable, no purchase wording"
+  },
   "shellHomeReminderEnable": "Turn on",
   "shellHomeReminderMessage": "A short daily reminder helps keep your streak.",
   "shellHomeReminderTitle": "Remind you to study?",

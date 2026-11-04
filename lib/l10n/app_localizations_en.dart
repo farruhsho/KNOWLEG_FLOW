@@ -218,13 +218,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminAppCheckPlatformNote =>
-      'App Check is not available on this platform: server functions that enforce it (roles, credits, publishing, pricing, AI drafts) may be rejected. Use the web build with App Check or Android.';
+      'This build expects the server to require App Check for admin functions (APP_CHECK_ENFORCE_ADMIN), but App Check is not available on this platform: roles, credits, publishing, pricing and AI drafts will be rejected. Use the web build with App Check or Android.';
 
   @override
   String get adminAppTitle => 'ORT Master · CMS';
 
   @override
   String get adminApply => 'Apply';
+
+  @override
+  String adminBanReasonTooLong(int max) {
+    return 'The reason must be at most $max characters.';
+  }
 
   @override
   String get adminCancel => 'Cancel';
@@ -323,6 +328,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminErrQuota => 'Limit reached. Try again later.';
+
+  @override
+  String get adminErrSessionExpired =>
+      'Your admin session has expired. Sign in again.';
 
   @override
   String get adminErrTitle => 'Could not load';
@@ -1134,7 +1143,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminPricingIssueCredits => 'Credits per product must be 1–100.';
 
   @override
-  String get adminPricingIssueFree => 'Free exams per user must be 0–10.';
+  String adminPricingIssueFree(int min, int max) {
+    return 'Free exams per user must be $min–$max.';
+  }
 
   @override
   String get adminPricingIssueProduct => 'Unknown product id.';
@@ -2182,6 +2193,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get examEntitlementFree => 'Your first test is free';
 
   @override
+  String examEntitlementFreeLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count free tests left',
+      one: '1 free test left',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get examEntitlementHint =>
       'One credit = one full test. Continuing an unfinished test is free.';
 
@@ -2204,7 +2226,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examErrorPlatformUnsupported =>
-      'Practice tests are not available on this device. Open the app on your phone (Android or iPhone) or in a web browser.';
+      'Practice tests are not available on this device. Open the app on your phone (Android or iPhone).';
 
   @override
   String get examErrorSignIn => 'Sign in to take exams.';
@@ -4001,6 +4023,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shellHomeNextStepError => 'Couldn\'t load your recommendation.';
+
+  @override
+  String get shellHomeNoCredits => 'No mock exams available';
 
   @override
   String get shellHomeReminderEnable => 'Turn on';

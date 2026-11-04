@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { assembleVariant, usedIds } from '../src/assemble';
-import { PipelineFirestore } from '../src/firestore';
+import { deletedFields, PipelineFirestore } from '../src/firestore';
 import { CollectionName, MAX_BATCH, nestedArrayPaths } from '../src/importer';
 import { BankItem, BankPassage, Language, VariantFile } from '../src/schema';
 import { ValidationContext } from '../src/validate';
@@ -51,7 +51,9 @@ export function assembleMany(
 
 /**
  * In-memory FirestorePort. Like the real backend it rejects a whole batch
- * that holds an array inside an array (INVALID_ARGUMENT at commit time).
+ * that holds an array inside an array (INVALID_ARGUMENT at commit time) or a
+ * field delete in a write that is not a merge, and a merge write's delete
+ * marker (FieldValue.delete()) removes the field.
  */
 export class FakeFirestore implements PipelineFirestore {
   readonly docs = new Map<string, Record<string, unknown>>();
@@ -78,11 +80,14 @@ export class FakeFirestore implements PipelineFirestore {
     for (const w of writes) {
       const bad = nestedArrayPaths(w.data);
       if (bad.length) throw new Error(`INVALID_ARGUMENT: Cannot convert an array value in an array value (${w.collection}/${w.id} ${bad[0]})`);
+      if (!w.merge && deletedFields(w.data).length) throw new Error(`INVALID_ARGUMENT: FieldValue.delete() needs set() with merge (${w.collection}/${w.id})`);
     }
     this.batches.push(writes.length);
     for (const w of writes) {
       const k = `${w.collection}/${w.id}`;
-      this.docs.set(k, w.merge ? { ...(this.docs.get(k) ?? {}), ...structuredClone(w.data) } : structuredClone(w.data));
+      const doc = w.merge ? { ...(this.docs.get(k) ?? {}), ...structuredClone(w.data) } : structuredClone(w.data);
+      for (const f of deletedFields(w.data)) delete doc[f];
+      this.docs.set(k, doc);
     }
   }
 }

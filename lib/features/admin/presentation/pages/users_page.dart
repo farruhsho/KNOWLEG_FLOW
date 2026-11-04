@@ -11,6 +11,7 @@ import '../../../../providers/admin_access_provider.dart';
 import '../../application/admin_providers.dart';
 import '../../data/admin_functions.dart';
 import '../../data/models/admin_records.dart';
+import '../../data/repositories/people_repositories.dart' show UsersRepository;
 import '../../domain/admin_role.dart';
 import '../shell/admin_shell.dart' show adminRoleLabel;
 import '../widgets/admin_widgets.dart';
@@ -147,32 +148,35 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
   Future<void> _toggleBan() async {
     final l = AppLocalizations.of(context)!;
     final ban = !widget.user.isBanned;
-    final reason = TextEditingController();
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(ban ? l.adminUserBanTitle : l.adminUserUnbanTitle),
-        content: ban
-            ? TextField(
-                controller: reason,
-                autofocus: true,
-                decoration: InputDecoration(labelText: l.adminReason),
-              )
-            : Text(l.adminUserUnbanBody),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.adminCancel)),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(ban ? l.adminUserBan : l.adminUserUnban),
-          ),
-        ],
-      ),
-    );
-    final text = reason.text.trim();
-    reason.dispose();
-    if (ok != true || !mounted) return;
+    final String reason;
+    if (ban) {
+      final picked = await showDialog<String>(
+        context: context,
+        builder: (_) => const BanReasonDialog(),
+      );
+      if (picked == null) return;
+      reason = picked;
+    } else {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l.adminUserUnbanTitle),
+          content: Text(l.adminUserUnbanBody),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.adminCancel)),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l.adminUserUnban),
+            ),
+          ],
+        ),
+      );
+      if (ok != true) return;
+      reason = '';
+    }
+    if (!mounted) return;
     await _run(
-      () => ref.read(usersRepoProvider).setBanned(_uid, ban, actor: ref.read(adminActorProvider), reason: text),
+      () => ref.read(usersRepoProvider).setBanned(_uid, ban, actor: ref.read(adminActorProvider), reason: reason),
       l.adminSaved,
     );
   }
@@ -405,6 +409,69 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
                       if (s[k] != null) AdminKeyValue(k, '${s[k]}'),
                   ]),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Ban confirmation with the reason field (MOD-01). firestore.rules rejects a
+/// moderator's `ban_reason` longer than [UsersRepository.maxBanReasonLength]
+/// characters, so the field shows a counter and the Ban button stays
+/// disabled with a message while the reason is too long. Pops the trimmed
+/// reason to ban, or null when cancelled.
+class BanReasonDialog extends StatefulWidget {
+  const BanReasonDialog({super.key});
+
+  @override
+  State<BanReasonDialog> createState() => _BanReasonDialogState();
+}
+
+class _BanReasonDialogState extends State<BanReasonDialog> {
+  final _reason = TextEditingController();
+
+  @override
+  void dispose() {
+    _reason.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    const max = UsersRepository.maxBanReasonLength;
+    // The stored value is the trimmed text, measured like the rules do.
+    final text = _reason.text.trim();
+    final length = UsersRepository.banReasonLength(text);
+    final tooLong = length > max;
+    return AlertDialog(
+      title: Text(l.adminUserBanTitle),
+      content: SizedBox(
+        width: 480,
+        child: TextField(
+          key: const ValueKey('ban_reason_field'),
+          controller: _reason,
+          onChanged: (_) => setState(() {}),
+          autofocus: true,
+          minLines: 1,
+          maxLines: 5,
+          // Typing past the limit is allowed so a pasted text is not cut
+          // silently; the counter and the message say what to shorten.
+          maxLength: max,
+          maxLengthEnforcement: MaxLengthEnforcement.none,
+          decoration: InputDecoration(
+            labelText: l.adminReason,
+            counterText: '$length / $max',
+            errorText: tooLong ? l.adminBanReasonTooLong(max) : null,
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(l.adminCancel)),
+        FilledButton(
+          key: const ValueKey('ban_confirm'),
+          onPressed: tooLong ? null : () => Navigator.pop(context, text),
+          child: Text(l.adminUserBan),
         ),
       ],
     );

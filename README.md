@@ -110,10 +110,13 @@ Node.js 22; для эмуляторов Firebase — firebase-tools 15+ и JDK 2
    (`enforceAppCheck`). В debug приложение использует debug-провайдер: при
    первом запуске в logcat появится строка `DebugAppCheckProvider` с
    debug-секретом — добавьте его в Firebase Console → App Check → Приложения →
-   «Управление debug-токенами». Можно задать фиксированный токен через
-   `--dart-define=APP_CHECK_DEBUG_TOKEN=<uuid>` (имя параметра сверить с
-   `lib/main.dart` после слияния ветки). Debug-токены и debug-сборки в магазин
-   не попадают.
+   «Управление debug-токенами». Debug-токены и debug-сборки в магазин не
+   попадают. Для web нужен ключ reCAPTCHA Enterprise:
+   `--dart-define=APP_CHECK_WEB_SITE_KEY=<site key>` — без него студенческие
+   функции на web показывают «недоступно на этой платформе»; на Windows/Linux
+   App Check нет вообще (админ-функции App Check по умолчанию не требуют,
+   параметр `APP_CHECK_ENFORCE_ADMIN`). Решения интеграции — в
+   [`ARCHITECTURE.md` §8](docs/modernization/ARCHITECTURE.md).
 
 Проверки:
 

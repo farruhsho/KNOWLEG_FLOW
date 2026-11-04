@@ -10,6 +10,7 @@ import '../../../../providers/auth_provider.dart';
 import '../../../../shared/models/region_model.dart';
 import '../../../../shared/models/user_model.dart';
 import '../../../auth/presentation/widgets/email_verification_banner.dart';
+import '../../../billing/application/billing_providers.dart' show canSellProvider;
 import '../../../dashboard/data/dashboard_providers.dart';
 import '../../../dashboard/domain/dashboard_models.dart';
 import '../../../onboarding/data/kg_regions_provider.dart';
@@ -372,7 +373,13 @@ class _AccountLinks extends ConsumerWidget {
               tile(Icons.emoji_events_outlined, l.shellProfileAchievements,
                   () => context.push(RoutePaths.achievements)),
               const Divider(height: 1),
-              tile(Icons.receipt_long_outlined, l.shellProfileTransactions,
+              // BILLING_MODE=external: the same page is a neutral credit
+              // history, so the entry must not say "Purchases" (BILL-EXT-01).
+              tile(
+                  Icons.receipt_long_outlined,
+                  ref.watch(canSellProvider)
+                      ? l.shellProfileTransactions
+                      : l.billingCreditHistoryTitle,
                   () => context.push(RoutePaths.transactions)),
               const Divider(height: 1),
               tile(Icons.settings_outlined, l.shellSettingsTitle,

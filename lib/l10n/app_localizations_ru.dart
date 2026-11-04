@@ -220,13 +220,18 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminAppCheckPlatformNote =>
-      'На этой платформе нет App Check: серверные функции с его проверкой (роли, кредиты, публикация, тарифы, черновики ИИ) могут быть отклонены. Используйте веб-версию с App Check или Android.';
+      'Сборка рассчитана на сервер, который требует App Check для админ-функций (APP_CHECK_ENFORCE_ADMIN), а на этой платформе App Check нет: роли, кредиты, публикация, тарифы и черновики ИИ будут отклонены. Используйте веб-версию с App Check или Android.';
 
   @override
   String get adminAppTitle => 'ORT Master · CMS';
 
   @override
   String get adminApply => 'Применить';
+
+  @override
+  String adminBanReasonTooLong(int max) {
+    return 'Причина — не длиннее $max символов.';
+  }
 
   @override
   String get adminCancel => 'Отмена';
@@ -324,6 +329,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminErrQuota => 'Достигнут лимит. Повторите позже.';
+
+  @override
+  String get adminErrSessionExpired =>
+      'Сессия администратора истекла. Войдите снова.';
 
   @override
   String get adminErrTitle => 'Не удалось загрузить';
@@ -1134,8 +1143,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminPricingIssueCredits => 'Кредитов за продукт — от 1 до 100.';
 
   @override
-  String get adminPricingIssueFree =>
-      'Бесплатных тестов на пользователя — от 0 до 10.';
+  String adminPricingIssueFree(int min, int max) {
+    return 'Бесплатных тестов на пользователя — от $min до $max.';
+  }
 
   @override
   String get adminPricingIssueProduct => 'Неизвестный id продукта.';
@@ -2198,6 +2208,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get examEntitlementFree => 'Первый тест бесплатно';
 
   @override
+  String examEntitlementFreeLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Осталось $count бесплатного теста',
+      many: 'Осталось $count бесплатных тестов',
+      few: 'Осталось $count бесплатных теста',
+      one: 'Остался $count бесплатный тест',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get examEntitlementHint =>
       'Один кредит — один полный тест. Продолжение незавершённого теста бесплатно.';
 
@@ -2220,7 +2243,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get examErrorPlatformUnsupported =>
-      'На этом устройстве пробные экзамены недоступны. Откройте приложение на телефоне (Android или iPhone) или в браузере.';
+      'На этом устройстве пробные экзамены недоступны. Откройте приложение на телефоне (Android или iPhone).';
 
   @override
   String get examErrorSignIn => 'Войдите в аккаунт, чтобы проходить экзамены.';
@@ -4054,6 +4077,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get shellHomeNextStepError => 'Не удалось загрузить рекомендацию.';
+
+  @override
+  String get shellHomeNoCredits => 'Нет доступных пробных экзаменов';
 
   @override
   String get shellHomeReminderEnable => 'Включить';

@@ -128,8 +128,7 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
   PartSpec? _part(List<BlueprintSpec> all) {
     final s = _section(all);
     if (s == null) return null;
-    if (_q.partId != null) return s.part(_q.partId);
-    return s.parts.length == 1 ? s.parts.first : null;
+    return s.part(s.storedPartId(_q.partId));
   }
 
   /// Aligns subject, type and the options list with the chosen placement.
@@ -153,8 +152,9 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
       subjectId: b.subjectIdFor(s),
       type: part?.itemType ?? _q.type,
       options: options,
-      partId: (s.parts.length > 1) ? part?.id : null,
-      clearPart: s.parts.length <= 1,
+      // CP-06: a single-part section stores its part id, like the pipeline.
+      partId: part?.id,
+      clearPart: part == null,
     );
     if (!b.languages.contains(_q.language) && b.languages.isNotEmpty) {
       _q = _q.copyWith(language: b.languages.first);
@@ -180,9 +180,15 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
     var q = _collectQ();
     final b = _blueprint(blueprints);
     final section = _section(blueprints);
-    if (section != null && section.parts.length > 1 && q.partId == null) {
-      showAdminSnack(context, l.adminExamIssuePart, error: true);
-      return;
+    if (section != null) {
+      final partId = section.storedPartId(q.partId);
+      if (section.parts.length > 1 && partId == null) {
+        showAdminSnack(context, l.adminExamIssuePart, error: true);
+        return;
+      }
+      // CP-06: questions of a single-part section always carry that part's
+      // id (older CMS saves left it null), so CMS and pipeline items agree.
+      q = q.copyWith(partId: partId, clearPart: partId == null);
     }
     final part = _part(blueprints);
     final expected = b?.optionsFor(part);

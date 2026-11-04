@@ -116,6 +116,9 @@ AI_TUTOR_MODEL=claude-opus-5-5
 
 - `config/pricing` — `{products: {exam_single: 1, exam_pack_5: 5, exam_pack_10: 10}, free_exams_per_user: 1}`.
   Written by `adminUpdatePricing`; prices shown to users always come from Google Play.
+  `free_exams_per_user` is an integer in **0..5** (inclusive): `adminUpdatePricing` rejects anything else
+  with `VALIDATION_FAILED`, and on read a missing or out-of-range value means 1
+  (`FREE_EXAMS_PER_USER_*` in `src/domain/entitlements.ts`). The admin CMS and the student client use the same range.
 - `config/ai_tutor` — `{enabled: true, daily_limit: 15, max_tokens: 1200}` (Admin SDK / console only;
   clients cannot read it).
 - `exam_blueprints/{id}` — import from `assets/data/exam_blueprints.json`; the functions fall back
@@ -212,6 +215,13 @@ legacy field (cross-service rules, see step 9); migrating to the claim is still 
   ago, using `drafts/{sectionId}` for the open section; all closed sections are `late`.
 - **ExamResult** carries `incorrect` (scored, answered wrongly) and `skipped` (scored, unanswered)
   besides `correct`/`total`/`answered`; `correct + incorrect + skipped == total`.
+- **Publishing variants (parts).** `adminPublishVariant` assigns each question to a blueprint part
+  (`partForValidation` in `src/domain/blueprint_validation.ts`): an explicit `part_id` must name a
+  part of the section; a question with no `part_id` (missing, `null` or `''`) in a **single-part**
+  section belongs to that part, so pipeline items (with `part_id`) and CMS items (`part_id: null`)
+  can be mixed; in a **multi-part** section a missing `part_id` is `question_wrong_part` as soon as
+  any question of the section has one (no inference by type). Only a section where no question
+  has a `part_id` falls back to positional parts.
 - **Question tables.** Firestore stores `table: {headers: [...], rows: [{cells: [...]}]}` (an array
   cannot directly contain an array). Every callable response (exam payload, `examGetReview`, tutor
   context) normalizes it to the wire shape `rows: [[...]]`; documents in the old shape are accepted.

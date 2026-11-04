@@ -7,7 +7,12 @@ import {
   applyStartDecision,
   decideExamStart,
   EMPTY_ENTITLEMENT,
+  FREE_EXAMS_PER_USER_DEFAULT,
+  FREE_EXAMS_PER_USER_MAX,
+  FREE_EXAMS_PER_USER_MIN,
+  isValidFreeExamsPerUser,
   parseEntitlement,
+  parseFreeExamsPerUser,
 } from '../src/domain/entitlements';
 
 const NOW = 1_762_000_000_000;
@@ -38,6 +43,27 @@ describe('decideExamStart', () => {
     assert.deepEqual(decideExamStart({ entitlement: fresh, inProgressAttemptId: null, freeExamsPerUser: 0 }), { kind: 'none' });
     const usedOne = parseEntitlement({ free_exam_used: true });
     assert.deepEqual(decideExamStart({ entitlement: usedOne, inProgressAttemptId: null, freeExamsPerUser: 2 }), { kind: 'free_first' });
+  });
+});
+
+// adminUpdatePricing accepts exactly these values; the admin CMS and the
+// student client must use the same range (ENT-FREE-01).
+describe('free_exams_per_user range', () => {
+  it('is an integer in [0, 5], default 1', () => {
+    assert.equal(FREE_EXAMS_PER_USER_MIN, 0);
+    assert.equal(FREE_EXAMS_PER_USER_MAX, 5);
+    assert.equal(FREE_EXAMS_PER_USER_DEFAULT, 1);
+    for (const ok of [0, 1, 2, 5, 3.0]) assert.equal(isValidFreeExamsPerUser(ok), true, String(ok));
+    for (const bad of [-1, 6, 10, 1.5, '1', null, undefined, Number.NaN]) assert.equal(isValidFreeExamsPerUser(bad), false, String(bad));
+  });
+
+  it('stored values outside the range read as the default', () => {
+    assert.equal(parseFreeExamsPerUser(0), 0);
+    assert.equal(parseFreeExamsPerUser(5), 5);
+    assert.equal(parseFreeExamsPerUser(6), 1);
+    assert.equal(parseFreeExamsPerUser(10), 1);
+    assert.equal(parseFreeExamsPerUser('3'), 1);
+    assert.equal(parseFreeExamsPerUser(undefined), 1);
   });
 });
 

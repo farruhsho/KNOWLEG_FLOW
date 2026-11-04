@@ -11,6 +11,12 @@
  *   - a question, key, passage or draft variant edited outside the pipeline
  *     (admin panel, console) is not overwritten unless `overwrite` is set; it
  *     is reported as a cms_conflict. A question and its key are one unit;
+ *   - a question stamped `edited_in_cms_at` whose content (content hash) is
+ *     the bank's again is taken back: only its hash fields are written and the
+ *     marker is deleted (cms_caught_up), so later bank-only metadata changes
+ *     are not conflicts;
+ *   - a translation_group_id changed outside the pipeline (admin panel
+ *     translation links) is kept (translation_links_kept) unless `overwrite`;
  *   - an existing question keeps its review if the remote one is further
  *     along (a methodologist approved it in the admin panel) or rejected;
  *   - server-maintained fields (variant stats, created_at) are not reset.
@@ -34,6 +40,10 @@ export type TimestampMarker = { __timestamp: string };
 export type ServerTimestampMarker = { __server_timestamp: true };
 export const ts = (iso: string | null): TimestampMarker | null => (iso === null ? null : { __timestamp: iso });
 export const SERVER_TS: ServerTimestampMarker = { __server_timestamp: true };
+/** Removes the field (FieldValue.delete()); only valid in merge writes. */
+export type DeleteFieldMarker = { __delete_field: true };
+export const DELETE_FIELD: DeleteFieldMarker = { __delete_field: true };
+export const isDeleteField = (v: unknown): boolean => !!v && typeof v === 'object' && (v as { __delete_field?: unknown }).__delete_field === true;
 
 export interface WriteOp {
   collection: CollectionName;
@@ -100,7 +110,10 @@ export function nestedArrayPaths(v: unknown, path = '$'): string[] {
   return [];
 }
 
-/** exam_questions document: the public fields of ARCHITECTURE §1.3 plus `part_id` and `pipeline_hash`. */
+/**
+ * exam_questions document: the public fields of ARCHITECTURE §1.3 plus
+ * `part_id`, `pipeline_hash` and `pipeline_translation_group_id`.
+ */
 export function questionDoc(item: BankItem): Record<string, unknown> {
   const q = item.question;
   return {
@@ -114,6 +127,8 @@ export function questionDoc(item: BankItem): Record<string, unknown> {
     difficulty: q.difficulty,
     language: q.language,
     translation_group_id: q.translation_group_id,
+    // The translation_group_id this pipeline wrote; a different remote value means the admin panel re-linked the question.
+    pipeline_translation_group_id: q.translation_group_id,
     type: q.type,
     stem: q.stem,
     options: q.options.map((o) => ({ id: o.id, text: o.text })),
@@ -345,20 +360,53 @@ export function editedOutsideReason(collection: CollectionName, data: Record<str
 const SYNC_IGNORE: Record<CollectionName, readonly string[]> = {
   exam_blueprints: [],
   exam_passages: ['content_hash', 'pipeline_hash'],
-  exam_questions: ['pipeline_hash', 'review', 'created_at', 'updated_at', 'content_version', 'edited_in_cms_at'],
+  exam_questions: ['pipeline_hash', 'pipeline_translation_group_id', 'review', 'created_at', 'updated_at', 'content_version', 'edited_in_cms_at'],
   exam_question_keys: ['pipeline_hash'],
   exam_variants: ['pipeline_hash', 'status', 'published_at', 'published_by', 'stats', 'created_by', 'edited_in_cms_at'],
 };
 
 /**
+ * CP-NEW-1: an exam_questions document stamped by the admin panel
+ * (`edited_in_cms_at`) whose content, by the pipeline's content hash
+ * (language, type, stem, options, table, image, passage; metadata ignored), is
+ * the bank's version again: the edit was ported into git, or the save touched
+ * only the key or metadata. The pipeline takes the document back (`commitPlan`
+ * writes only the hash fields and deletes the marker) instead of reporting it
+ * as a conflict on every later import.
+ */
+export function cmsEditCaughtUp(collection: CollectionName, data: Record<string, unknown>, remote: Record<string, unknown>): boolean {
+  return collection === 'exam_questions' && isSet(remote.edited_in_cms_at) && typeof data.content_hash === 'string' && remoteQuestionHash(remote) === data.content_hash;
+}
+
+/**
+ * CP-NEW-2: translation_group_id belongs to the admin panel once it was
+ * changed there (create a translation, link, unlink; none of them stamps
+ * `edited_in_cms_at`). Returns the remote link to keep, or null when the
+ * pipeline may write the bank's value: the remote value already is the bank's,
+ * or it is still the one the pipeline wrote (`pipeline_translation_group_id`).
+ * A document written before that field existed keeps a non-null remote link
+ * that differs from the bank (the pipeline cannot tell who set it).
+ */
+export function cmsTranslationLink(data: Record<string, unknown>, remote: Record<string, unknown>): { remote: string | null; local: string | null } | null {
+  const local = str(data.translation_group_id);
+  const current = str(remote.translation_group_id);
+  if (current === local) return null;
+  const written = remote.pipeline_translation_group_id;
+  const cmsOwned = written !== undefined ? current !== str(written) : current !== null;
+  return cmsOwned ? { remote: current, local } : null;
+}
+
+/**
  * A conflict is a document edited outside the pipeline whose content differs
  * from the bank: writing would revert the edit. An edited document that
- * already matches the bank (the edit was ported into git) is not a conflict.
+ * already matches the bank (the edit was ported into git) is not a conflict;
+ * a translation link kept from the admin panel is not compared.
  */
 export function conflictReason(collection: CollectionName, data: Record<string, unknown>, remote: Record<string, unknown>): string | null {
   const reason = editedOutsideReason(collection, data, remote);
   if (reason === null) return null;
-  const ignore = SYNC_IGNORE[collection];
+  if (cmsEditCaughtUp(collection, data, remote)) return null;
+  const ignore = [...SYNC_IGNORE[collection], ...(collection === 'exam_questions' && cmsTranslationLink(data, remote) ? ['translation_group_id'] : [])];
   const inSync = Object.keys(data).every((k) => ignore.includes(k) || data[k] === undefined || sameValue(data[k], remote[k]));
   return inSync ? null : reason;
 }
@@ -395,11 +443,20 @@ export function sameValue(a: unknown, b: unknown): boolean {
   return a === b;
 }
 
+/** Fields of `data` whose write would change the stored document (a delete marker only if the field exists). */
+function changedFields(data: Record<string, unknown>, remote: Record<string, unknown>): string[] {
+  return Object.keys(data).filter((k) => {
+    if (data[k] === undefined) return false;
+    if (isDeleteField(data[k])) return remote[k] !== undefined;
+    return !(k in remote) || !sameValue(data[k], remote[k]);
+  });
+}
+
 /** True when writing `data` would not change the stored document. */
 function unchangedRemote(data: Record<string, unknown>, remote: Record<string, unknown>, merge: boolean): boolean {
-  const keys = Object.keys(data).filter((k) => data[k] !== undefined);
-  if (!keys.every((k) => k in remote && sameValue(data[k], remote[k]))) return false;
-  return merge || Object.keys(remote).filter((k) => remote[k] !== undefined).length === keys.length;
+  if (changedFields(data, remote).length) return false;
+  const kept = Object.keys(data).filter((k) => data[k] !== undefined && !isDeleteField(data[k]));
+  return merge || Object.keys(remote).filter((k) => remote[k] !== undefined).length === kept.length;
 }
 
 // ---------------------------------------------------------------------------
@@ -437,6 +494,16 @@ export interface CommitReport {
   cms_conflicts: Array<{ collection: CollectionName; id: string; reason: string }>;
   /** Documents edited outside the pipeline and overwritten (`overwrite`). */
   overwritten: Array<{ collection: CollectionName; id: string; reason: string }>;
+  /**
+   * Questions stamped `edited_in_cms_at` whose content is the bank's again
+   * (CP-NEW-1): only `pipeline_hash` (and a stale `content_hash`) was written
+   * and the marker deleted; no content or metadata was changed.
+   * `pending_fields` still differ from the bank: the next import writes the
+   * bank's values (port them into the bank to keep the Firestore ones).
+   */
+  cms_caught_up: Array<{ id: string; pending_fields: string[] }>;
+  /** translation_group_id changed outside the pipeline (admin panel links), kept as it is in Firestore (CP-NEW-2). */
+  translation_links_kept: Array<{ id: string; remote: string | null; local: string | null }>;
 }
 
 /**
@@ -453,6 +520,9 @@ export const MERGE: Record<CollectionName, boolean> = {
   exam_variants: true,
 };
 
+/** Bookkeeping fields left out of `cms_caught_up.pending_fields`. */
+const CAUGHT_UP_UNREPORTED: readonly string[] = ['pipeline_hash', 'pipeline_translation_group_id', 'content_hash', 'edited_in_cms_at', 'updated_at'];
+
 const rankOf = (s: unknown): number => (typeof s === 'string' && s in REVIEW_RANK ? REVIEW_RANK[s as ReviewStatus] : 0);
 const docKey = (collection: CollectionName, id: string): string => `${collection}/${id}`;
 
@@ -462,7 +532,7 @@ export async function commitPlan(plan: ImportPlan, db: FirestorePort, options: n
   if (batchSize < 1 || batchSize > MAX_BATCH) throw new Error(`batch size must be 1..${MAX_BATCH}`);
   const report: CommitReport = {
     written: 0, unchanged: 0, batches: 0, skipped_published: [], skipped_archived: [], published: [], publish_in_admin: [],
-    publish_blocked: [], review_conflicts: [], cms_conflicts: [], overwritten: [],
+    publish_blocked: [], review_conflicts: [], cms_conflicts: [], overwritten: [], cms_caught_up: [], translation_links_kept: [],
   };
 
   // 1. Read every target document before writing anything.
@@ -511,10 +581,23 @@ export async function commitPlan(plan: ImportPlan, db: FirestorePort, options: n
           continue;
         }
         report.overwritten.push({ collection, id: op.id, reason: conflict });
-        if (MERGE[collection] && remote && isSet(remote.edited_in_cms_at)) data.edited_in_cms_at = null;
+        if (MERGE[collection] && remote && isSet(remote.edited_in_cms_at)) data.edited_in_cms_at = DELETE_FIELD;
       }
       if (remote) {
         for (const f of op.preserve_on_update) delete data[f];
+        // CP-NEW-1: an admin-panel edit that is in the bank now; only the hash fields are written (below).
+        const caughtUp = !conflict && cmsEditCaughtUp(collection, op.data, remote);
+        if (collection === 'exam_questions') {
+          const link = cmsTranslationLink(op.data, remote);
+          if (link && opts.overwrite && !caughtUp) {
+            report.overwritten.push({ collection, id: op.id, reason: `translation_group_id ${link.remote ?? 'null'} set outside the pipeline, replaced by the bank's ${link.local ?? 'null'}` });
+          } else if (link) {
+            // The admin panel owns the link now: keep it, and keep the record of what the pipeline wrote.
+            delete data.translation_group_id;
+            delete data.pipeline_translation_group_id;
+            report.translation_links_kept.push({ id: op.id, remote: link.remote, local: link.local });
+          }
+        }
         if (op.guard === 'published_variant') {
           if (remote.status === 'published') {
             report.skipped_published.push(op.id);
@@ -538,6 +621,15 @@ export async function commitPlan(plan: ImportPlan, db: FirestorePort, options: n
               delete data.review;
             }
           }
+        }
+        if (caughtUp) {
+          // Take the document back without touching its content or metadata.
+          const hash = String(op.data.content_hash);
+          const takeBack: Record<string, unknown> = { pipeline_hash: hash, edited_in_cms_at: DELETE_FIELD };
+          if (remote.content_hash !== hash) takeBack.content_hash = hash;
+          report.cms_caught_up.push({ id: op.id, pending_fields: changedFields(data, remote).filter((k) => !CAUGHT_UP_UNREPORTED.includes(k)) });
+          final.push({ collection, id: op.id, data: takeBack, merge: true });
+          continue;
         }
         if (unchangedRemote(data, remote, MERGE[collection])) {
           report.unchanged++;

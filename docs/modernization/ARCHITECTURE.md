@@ -153,7 +153,8 @@ content_manager, methodologist), изображения ≤ 5 МБ, PDF ≤ 20 �
   "options": [ {"id": "A", "text": "5"}, {"id": "B", "text": "6"}, ... ],
   "passage_id": null,             // для заданий к тексту
   "image_path": null,             // путь в Storage: exam_media/{questionId}/...
-  "table": null,                  // {"headers": [...], "rows": [[...]]}
+  "table": null,                  // хранение: {"headers": [...], "rows": [{"cells": [...]}]} — Firestore не хранит массив в массиве;
+                                  // в ответах функций отдаётся как {"headers": [...], "rows": [[...]]} (решение D2)
   "source": {"kind": "original", "basis": "Программа 9 кл., тема ...", "author": "pipeline:v1"},
   "review": {"status": "methodologist_approved", "reviewed_by": "<uid>", "reviewed_at": <Timestamp>, "notes": ""},
   "content_version": 1, "content_hash": "sha256:...",
@@ -200,7 +201,8 @@ content_manager, methodologist), изображения ≤ 5 МБ, PDF ≤ 20 �
 
 ```jsonc
 {
-  "correct": 97, "total": 150, "percent": 64.7,
+  "correct": 97, "incorrect": 41, "skipped": 12, "answered": 138,   // incorrect/skipped — решение D4
+  "total": 150, "percent": 64.7,
   "sections": [ {"section_id": "math", "correct": 38, "total": 60, "percent": 63.3} ],
   "topics": [ {"topic_id": "math.quadratic_equations", "correct": 2, "total": 5} ],
   "weak_topics": ["math.quadratic_equations"], "strong_topics": ["analogies.part_whole"],
@@ -354,7 +356,8 @@ Application Default Credentials функции, приглашённый в Play
   "status": "in_progress", "currentSectionIndex": 1,
   "section": { "sectionId": "verbal", "deadlineAt": 1762080000000, "durationSec": 1800,
                "questions": [ {"id": "...", "stem": "...", "options": [{"id":"A","text":"..."}],
-                               "passageId": null, "imageUrl": null, "table": null, "topicId": "..."} ],
+                               "passageId": null, "imageUrl": null, "imagePath": "exam_media/q1/fig.png", "table": null, "topicId": "..."} ],
+               // imageUrl — только для https-ссылок; imagePath — путь в Storage, клиент сам получает download URL (D3)
                "passages": { "p1": {"title": "...", "text": "..."} } },
   "serverNow": 1762078200000,
   "entitlementSource": "credit" }
@@ -464,3 +467,28 @@ Application Default Credentials функции, приглашённый в Play
 тайминга → импорт в Firebase → финальная валидация. Реестр готовности —
 `content/registry.json`; вариант считается готовым только при статусе
 `methodologist_approved` у всех вопросов. Подробно: `CONTENT_PIPELINE.md`.
+
+---
+
+## 8. Решения интеграции (D1–D14, 2026-11-04)
+
+Приняты после перекрёстного ревью пакетов; обязательны для клиента, функций,
+правил и пайплайна.
+
+| # | Решение |
+|---|---|
+| D1 | Черновик раздела: клиент пишет ровно `{answers, flags, client_updated_at: serverTimestamp}` в `exam_attempts/{id}/drafts/{sectionId}`; правило — `hasOnly` этих трёх ключей. |
+| D2 | Таблица вопроса хранится как `rows: [{cells: [...]}]`; функции отдают `rows: [[...]]`; клиенты читают обе формы. |
+| D3 | Изображения: функции отдают `imagePath` (путь в Storage), клиент получает download URL сам; `imageUrl` — только для внешних https-ссылок. |
+| D4 | `ExamResult` содержит `incorrect` и `skipped` (+ `answered`); `correct + incorrect + skipped == total`. |
+| D5 | Модератор пишет в `users/{uid}` только `is_banned, ban_reason (≤ 500), banned_at, banned_by, updated_at`; подписка/премиум — только super_admin. Бан проверяется сервером (`USER_BANNED` в examStart, aiTutor, recordActivity, adminAiDraftQuestions), забаненные исключаются из рейтингов. |
+| D6 | super_admin, support и moderator читают `entitlements/{uid}` (+ledger) и `user_stats/{uid}` любого пользователя. |
+| D7 | App Check: студенческие callable — `APP_CHECK_ENFORCE` (по умолчанию вкл.), admin* — `APP_CHECK_ENFORCE_ADMIN` (по умолчанию выкл., защищены ролями). Клиент включает App Check на web только с `--dart-define=APP_CHECK_WEB_SITE_KEY`; единственная проверка платформы — `lib/core/backend/callable_platform.dart`. Windows/Linux показывают «недоступно на этой платформе». |
+| D8 | Пока у пользователя есть любая незавершённая попытка, `aiTutor` отвечает `AI_EXAM_IN_PROGRESS`. |
+| D9 | `accountDelete` требует свежий вход (≤ 5 мин, `REQUIRES_RECENT_LOGIN`), сначала удаляет Auth-пользователя, затем данные; студенческие callable отклоняют удалённых/отключённых пользователей. |
+| D10 | Недельный и общий рейтинг — весь серверный XP (экзамены + практика/уроки с дневным лимитом); предметные — только экзамены, ключи: main, math, chemistry, biology, physics, history, english, kyrgyz_lit, russian_lit, state_language. При нулевой награде recordActivity ничего не пишет. |
+| D11 | Повторный импорт пайплайна не перезаписывает документы, отредактированные в CMS (`edited_in_cms_at` / расхождение `pipeline_hash`) без `--overwrite`, не меняет `status` существующих вариантов и пишет `part_id` всегда. CMS при сохранении ставит `edited_in_cms_at` и не пересчитывает `content_hash`. |
+| D12 | Напоминания: `sendStudyReminders` ежедневно в 18:00 по Бишкеку для `daily_reminder_enabled == true` и `fcm_tokens`, если сегодня не было активности; тихие часы 22:00–08:00. Выход из аккаунта удаляет только токен устройства. |
+| D13 | Длина сообщения AI-репетитору ≤ 2000 символов (клиент и сервер). |
+| D14 | Число бесплатных экзаменов — `config/pricing.free_exams_per_user` (по умолчанию 1); клиент показывает остаток по `entitlements.free_exams_used_count`. |
+

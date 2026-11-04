@@ -88,18 +88,28 @@ class _AiDraftsPageState extends ConsumerState<AiDraftsPage> {
       final repo = ref.read(examBankRepoProvider);
       final expected = pl.b!.optionsFor(pl.p);
       final items = <_DraftItem>[];
+      // CP-06: the requested placement decides the part; a single-part
+      // section stores its part id, as the content pipeline does.
+      final partId = pl.s!.storedPartId(pl.p?.id);
       for (final r in raw) {
         var d = parseAiDraft(
           r,
           id: repo.newId(),
           subjectId: pl.b!.subjectIdFor(pl.s!),
           sectionId: pl.s!.id,
-          partId: pl.s!.parts.length > 1 ? pl.p?.id : null,
+          partId: partId,
           topicId: topic,
           difficulty: _difficulty,
           language: _language,
           type: pl.p?.itemType ?? 'single_choice',
         );
+        if (d.question.partId != partId) {
+          d = AiDraft(
+            d.question.copyWith(partId: partId, clearPart: partId == null),
+            d.key,
+            serverValid: d.serverValid,
+          );
+        }
         if (pl.p != null && pl.p!.hasFixedOptions) {
           // Comparison drafts come back with `options: []`: the part's fixed
           // options are the only valid ones.

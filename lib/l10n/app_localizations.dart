@@ -457,7 +457,7 @@ abstract class AppLocalizations {
   /// No description provided for @adminAppCheckPlatformNote.
   ///
   /// In en, this message translates to:
-  /// **'App Check is not available on this platform: server functions that enforce it (roles, credits, publishing, pricing, AI drafts) may be rejected. Use the web build with App Check or Android.'**
+  /// **'This build expects the server to require App Check for admin functions (APP_CHECK_ENFORCE_ADMIN), but App Check is not available on this platform: roles, credits, publishing, pricing and AI drafts will be rejected. Use the web build with App Check or Android.'**
   String get adminAppCheckPlatformNote;
 
   /// No description provided for @adminAppTitle.
@@ -471,6 +471,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply'**
   String get adminApply;
+
+  /// Ban dialog: firestore.rules limits ban_reason for moderators
+  ///
+  /// In en, this message translates to:
+  /// **'The reason must be at most {max} characters.'**
+  String adminBanReasonTooLong(int max);
 
   /// No description provided for @adminCancel.
   ///
@@ -639,6 +645,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit reached. Try again later.'**
   String get adminErrQuota;
+
+  /// A server function answered unauthenticated without an App Check hint
+  ///
+  /// In en, this message translates to:
+  /// **'Your admin session has expired. Sign in again.'**
+  String get adminErrSessionExpired;
 
   /// No description provided for @adminErrTitle.
   ///
@@ -2104,11 +2116,11 @@ abstract class AppLocalizations {
   /// **'Credits per product must be 1–100.'**
   String get adminPricingIssueCredits;
 
-  /// No description provided for @adminPricingIssueFree.
+  /// Same range as adminUpdatePricing on the server
   ///
   /// In en, this message translates to:
-  /// **'Free exams per user must be 0–10.'**
-  String get adminPricingIssueFree;
+  /// **'Free exams per user must be {min}–{max}.'**
+  String adminPricingIssueFree(int min, int max);
 
   /// No description provided for @adminPricingIssueProduct.
   ///
@@ -3922,6 +3934,12 @@ abstract class AppLocalizations {
   /// **'Your first test is free'**
   String get examEntitlementFree;
 
+  /// Exams tab balance when config/pricing grants more than one free exam per account
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 free test left} other{{count} free tests left}}'**
+  String examEntitlementFreeLeft(int count);
+
   /// Exam mode
   ///
   /// In en, this message translates to:
@@ -3958,10 +3976,10 @@ abstract class AppLocalizations {
   /// **'No connection. Check the internet and try again.'**
   String get examErrorNetwork;
 
-  /// Exam mode: desktop builds (Windows/Linux) cannot call the exam functions
+  /// Exam mode: builds without App Check (Windows/Linux, or web built without APP_CHECK_WEB_SITE_KEY) cannot call the exam functions
   ///
   /// In en, this message translates to:
-  /// **'Practice tests are not available on this device. Open the app on your phone (Android or iPhone) or in a web browser.'**
+  /// **'Practice tests are not available on this device. Open the app on your phone (Android or iPhone).'**
   String get examErrorPlatformUnsupported;
 
   /// Exam mode
@@ -6873,6 +6891,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t load your recommendation.'**
   String get shellHomeNextStepError;
+
+  /// Home entitlement chip in BILLING_MODE=external when nothing is left: neutral balance, not tappable, no purchase wording
+  ///
+  /// In en, this message translates to:
+  /// **'No mock exams available'**
+  String get shellHomeNoCredits;
 
   /// No description provided for @shellHomeReminderEnable.
   ///

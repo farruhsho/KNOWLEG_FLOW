@@ -152,6 +152,21 @@ describe('cli', () => {
     const over = await runDb(db, root, 'import', '--blueprint', BP, '--all-items', '--commit', '--overwrite');
     assert.ok(over.text.includes(`OVERWRITTEN exam_questions/${qid}`), over.text);
     assert.notEqual(db.get('exam_questions', qid)!.stem, 'Правка методиста');
+
+    // A save in the admin panel that left the content as the bank has it is taken back; a re-link is kept (CP-NEW-1, CP-NEW-2).
+    const other = f2.sections[0]!.question_ids[1]!;
+    Object.assign(db.get('exam_questions', qid)!, { edited_in_cms_at: '2026-11-03T12:00:00.000Z', updated_by: 'uid_m' });
+    db.get('exam_questions', other)!.translation_group_id = 'tg_q_cms_link';
+    const caught = await runDb(db, root, 'import', '--blueprint', BP, '--all-items', '--commit');
+    assert.equal(caught.code, 0, caught.text);
+    assert.ok(caught.text.includes(`caught up exam_questions/${qid}: the admin-panel edit is in the bank`), caught.text);
+    assert.ok(caught.text.includes(`exam_questions/${other}: Firestore tg_q_cms_link, bank tg_`), caught.text);
+    assert.ok(!caught.text.includes('cms_conflicts'), caught.text);
+    assert.equal('edited_in_cms_at' in db.get('exam_questions', qid)!, false);
+    assert.equal(db.get('exam_questions', other)!.translation_group_id, 'tg_q_cms_link');
+    const caughtReport = readJson<{ cms_caught_up: Array<{ id: string }>; translation_links_kept: Array<{ id: string }> }>(join(root, 'content', 'reports', 'import-report.json'));
+    assert.deepEqual(caughtReport.cms_caught_up.map((c) => c.id), [qid]);
+    assert.deepEqual(caughtReport.translation_links_kept.map((c) => c.id), [other]);
   });
 
   it('paid stages without the flag only print a plan and never call the API', async () => {

@@ -4,7 +4,7 @@
  * `methodologist_approved` and has a key). Pure; returns a list of problems
  * (empty = publishable).
  */
-import type { Blueprint, BlueprintPart, ExamQuestion, QuestionKey, Variant } from './types';
+import type { Blueprint, BlueprintPart, BlueprintSection, ExamQuestion, QuestionKey, Variant } from './types';
 import { partForIndex } from './types';
 
 export type ProblemCode =
@@ -58,6 +58,32 @@ function allowedOptionIds(part: BlueprintPart, q: ExamQuestion): string[] {
   return q.options.map((o) => o.id);
 }
 
+/**
+ * Part a question counts towards when a variant is validated.
+ *
+ * - An explicit `part_id` must name one of the section's parts (a stale or
+ *   foreign id is `question_wrong_part`).
+ * - A question without `part_id` in a single-part section belongs to that
+ *   part. The CMS stores `part_id: null` there while the pipeline writes the
+ *   part id, and both kinds of item may be mixed in one section.
+ * - In a multi-part section a missing `part_id` is ambiguous once any
+ *   question of the section is explicit, so it resolves to nothing
+ *   (`question_wrong_part`). Only a section where no question carries a
+ *   `part_id` falls back to positional parts (legacy variants).
+ *
+ * `explicitParts`: whether any question of the section has a `part_id`.
+ */
+export function partForValidation(
+  section: BlueprintSection,
+  q: Pick<ExamQuestion, 'part_id'>,
+  index: number,
+  explicitParts: boolean,
+): BlueprintPart | undefined {
+  if (q.part_id) return section.parts.find((p) => p.id === q.part_id);
+  if (section.parts.length === 1) return section.parts[0];
+  return explicitParts ? undefined : partForIndex(section, index);
+}
+
 export function validateVariant(input: ValidationInput): Problem[] {
   const { blueprint, variant } = input;
   const problems: Problem[] = [];
@@ -91,8 +117,9 @@ export function validateVariant(input: ValidationInput): Problem[] {
       problems.push({ code: 'section_count', sectionId: bs.id, expected: bs.question_count, actual: vs.question_ids.length });
     }
 
-    // Explicit part_id on questions wins; otherwise parts are positional.
-    const explicitParts = vs.question_ids.some((qid) => input.questions.get(qid)?.part_id);
+    // Explicit part_id on questions wins; see partForValidation for the
+    // single-part fallback and the positional (no part_id at all) mode.
+    const explicitParts = vs.question_ids.some((qid) => !!input.questions.get(qid)?.part_id);
     const partCounts = new Map<string, number>();
 
     vs.question_ids.forEach((qid, index) => {
@@ -104,9 +131,15 @@ export function validateVariant(input: ValidationInput): Problem[] {
         problems.push({ code: 'question_missing', sectionId: bs.id, questionId: qid });
         return;
       }
-      const part = explicitParts ? bs.parts.find((p) => p.id === q.part_id) : partForIndex(bs, index);
+      const part = partForValidation(bs, q, index, explicitParts);
       if (!part) {
-        problems.push({ code: 'question_wrong_part', sectionId: bs.id, questionId: qid, actual: q.part_id });
+        problems.push({
+          code: 'question_wrong_part',
+          sectionId: bs.id,
+          questionId: qid,
+          expected: bs.parts.map((p) => p.id).join(','),
+          actual: q.part_id,
+        });
       } else {
         partCounts.set(part.id, (partCounts.get(part.id) ?? 0) + 1);
         if (!typeMatches(part, q.type)) {

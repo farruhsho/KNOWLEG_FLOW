@@ -11,6 +11,13 @@ const Map<String, int> kDefaultProductCredits = {
   'exam_pack_10': 10,
 };
 
+/// `free_exams_per_user` range `adminUpdatePricing` accepts
+/// (functions/src/domain/entitlements.ts `FREE_EXAMS_PER_USER_MIN/MAX`); a
+/// value outside it is rejected with VALIDATION_FAILED. The student client
+/// reads the same bound (billing `PricingConfig.maxFreeExamsPerUser`).
+const int kFreeExamsPerUserMin = 0;
+const int kFreeExamsPerUserMax = 5;
+
 abstract final class PricingIssue {
   static const creditsRange = 'credits_range';
   static const freeRange = 'free_range';
@@ -71,7 +78,7 @@ class PricingConfig {
 
   /// Validation mirrored from the server: only known products, 1..100
   /// credits each, `exam_single` grants exactly one exam (1 credit = 1 test),
-  /// 0..10 free exams per user.
+  /// [kFreeExamsPerUserMin]..[kFreeExamsPerUserMax] free exams per user.
   List<String> validate({Set<String> knownProducts = const {
     'exam_single',
     'exam_pack_5',
@@ -85,7 +92,9 @@ class PricingConfig {
     if (products['exam_single'] != null && products['exam_single'] != 1) {
       issues.add(PricingIssue.singleMustBeOne);
     }
-    if (freeExamsPerUser < 0 || freeExamsPerUser > 10) issues.add(PricingIssue.freeRange);
+    if (freeExamsPerUser < kFreeExamsPerUserMin || freeExamsPerUser > kFreeExamsPerUserMax) {
+      issues.add(PricingIssue.freeRange);
+    }
     return issues.toList();
   }
 }

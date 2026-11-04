@@ -7,7 +7,7 @@ import '../config';
 import { getAuth } from 'firebase-admin/auth';
 import { onCall } from 'firebase-functions/v2/https';
 import { validateVariant } from '../domain/blueprint_validation';
-import { applyAdminDelta, parseEntitlement } from '../domain/entitlements';
+import { applyAdminDelta, FREE_EXAMS_PER_USER_MAX, FREE_EXAMS_PER_USER_MIN, parseEntitlement } from '../domain/entitlements';
 import { isValidProductId } from '../domain/purchase';
 import { DomainError, Reasons } from '../domain/reasons';
 import { isRole, legacyUserRoleFor, ROLES, type Role } from '../domain/roles';
@@ -172,7 +172,7 @@ export const adminUpdatePricing = onCall(
       products[id] = c;
     }
     if (Object.keys(products).length === 0) throw new DomainError(Reasons.VALIDATION_FAILED, 'products must not be empty', { field: 'products' });
-    const freeExamsPerUser = reqInt(data['freeExamsPerUser'], 'freeExamsPerUser', 0, 5);
+    const freeExamsPerUser = reqInt(data['freeExamsPerUser'], 'freeExamsPerUser', FREE_EXAMS_PER_USER_MIN, FREE_EXAMS_PER_USER_MAX);
 
     const ref = db().doc('config/pricing');
     const before = (await ref.get()).data() ?? null;

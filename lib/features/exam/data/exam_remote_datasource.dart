@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../../core/backend/backend_contract.dart';
 import '../domain/exam_failure.dart';
@@ -29,31 +28,10 @@ abstract interface class ExamRemoteDataSource {
 const String examClientAppVersion =
     String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0+1');
 
-/// Developer escape hatch: `--dart-define=EXAM_CALLABLES_ON_DESKTOP=true`
-/// lets a Windows/Linux debug build call the exam functions, e.g. against a
-/// backend deployed with `APP_CHECK_ENFORCE=false`. Never set it in releases.
-const bool _examCallablesOnDesktop =
-    bool.fromEnvironment('EXAM_CALLABLES_ON_DESKTOP');
-
-/// Whether the exam callables can be used on this platform (contract D7).
-/// They enforce App Check, which has providers on Android, iOS, macOS and
-/// web (reCAPTCHA Enterprise) but none on Windows or Linux, so desktop
-/// builds show a "not available on this platform" state instead of failing.
-bool examCallablesSupported({
-  bool? isWeb,
-  TargetPlatform? platform,
-  bool desktopOverride = _examCallablesOnDesktop,
-}) {
-  if (isWeb ?? kIsWeb) return true;
-  return switch (platform ?? defaultTargetPlatform) {
-    TargetPlatform.android || TargetPlatform.iOS || TargetPlatform.macOS => true,
-    _ => desktopOverride,
-  };
-}
-
 class FirebaseExamRemoteDataSource implements ExamRemoteDataSource {
-  /// False on platforms without App Check: every call then fails with
-  /// [ExamFailureKind.platformUnsupported] without touching the network.
+  /// False where this build has no App Check provider (the shared gate
+  /// `callablesSupportedOnThisPlatform`, decision D7): every call then fails
+  /// with [ExamFailureKind.platformUnsupported] without touching the network.
   final bool platformSupported;
 
   const FirebaseExamRemoteDataSource({this.platformSupported = true});

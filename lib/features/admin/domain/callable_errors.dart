@@ -8,6 +8,15 @@ library;
 /// `BackendReasons.userBanned` in lib/core/backend/backend_contract.dart.
 const String kUserBannedReason = 'USER_BANNED';
 
+/// Whether the backend this CMS build talks to enforces App Check on the
+/// admin* callables (`APP_CHECK_ENFORCE_ADMIN=true` on the functions; pass
+/// the same `--dart-define=APP_CHECK_ENFORCE_ADMIN=true` to the CMS build).
+///
+/// The server default is `false` (functions/src/config.ts): admin callables
+/// then accept requests without an App Check token, so the CMS must not warn
+/// about App Check or blame it for an `unauthenticated` answer.
+const bool kAdminAppCheckEnforced = bool.fromEnvironment('APP_CHECK_ENFORCE_ADMIN');
+
 enum AdminCallableIssue {
   /// App Check cannot run on this platform (Windows/Linux, or web built
   /// without `APP_CHECK_WEB_SITE_KEY`) and the function enforces it.
@@ -17,32 +26,52 @@ enum AdminCallableIssue {
   /// token, misconfigured provider).
   appCheckRejected,
 
+  /// `unauthenticated` with no App Check hint: the ID token is missing or
+  /// expired, or the account is no longer active — the admin has to sign in
+  /// again.
+  sessionExpired,
+
   /// The signed-in account is banned (D5).
   userBanned,
 }
 
+final RegExp _appCheckWord = RegExp(r'app[\s_-]?check', caseSensitive: false);
+
+/// Whether an error [message] names App Check explicitly.
+bool mentionsAppCheck(String? message) =>
+    message != null && _appCheckWord.hasMatch(message);
+
 /// Maps a `FirebaseFunctionsException` ([code], `details.reason` as
-/// [reason]) to a dedicated issue, or `null` for the regular mapping.
+/// [reason], [message]) to a dedicated issue, or `null` for the regular
+/// mapping.
 ///
-/// Callables answer `unauthenticated` without a reason when the App Check
-/// token is missing or invalid; an admin inside the CMS is always signed in,
-/// so that combination means App Check (SEC-APPCHECK-01). A bare
-/// `failed-precondition` is treated the same way only where App Check is not
-/// available — every domain `failed-precondition` carries a reason.
+/// admin* callables do not enforce App Check unless the backend sets
+/// `APP_CHECK_ENFORCE_ADMIN` ([appCheckEnforced], default
+/// [kAdminAppCheckEnforced]). So a bare `unauthenticated` normally comes from
+/// `requireAuth` / an expired ID token and means "sign in again"
+/// ([AdminCallableIssue.sessionExpired]). An App Check message is shown only
+/// when the error names App Check explicitly, or when this build is known to
+/// talk to a backend that enforces it.
 AdminCallableIssue? classifyAdminCallableError({
   required String code,
   String? reason,
+  String? message,
   required bool appCheckAvailable,
+  bool appCheckEnforced = kAdminAppCheckEnforced,
 }) {
   if (reason == kUserBannedReason) return AdminCallableIssue.userBanned;
   if (reason != null && reason.isNotEmpty) return null;
+  final appCheckIssue = appCheckAvailable
+      ? AdminCallableIssue.appCheckRejected
+      : AdminCallableIssue.appCheckUnavailable;
+  final explicitAppCheck = mentionsAppCheck(message);
   if (code == 'unauthenticated') {
-    return appCheckAvailable
-        ? AdminCallableIssue.appCheckRejected
-        : AdminCallableIssue.appCheckUnavailable;
+    if (explicitAppCheck || appCheckEnforced) return appCheckIssue;
+    return AdminCallableIssue.sessionExpired;
   }
-  if (code == 'failed-precondition' && !appCheckAvailable) {
-    return AdminCallableIssue.appCheckUnavailable;
+  if (code == 'failed-precondition' &&
+      (explicitAppCheck || (appCheckEnforced && !appCheckAvailable))) {
+    return appCheckIssue;
   }
   return null;
 }

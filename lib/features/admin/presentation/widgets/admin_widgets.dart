@@ -16,19 +16,30 @@ import '../../domain/review_workflow.dart';
 /// Human message for any error the CMS can hit (never a raw stack trace).
 ///
 /// [appCheckAvailable] defaults to whether this platform activates App Check
-/// ([FirebaseService.supportsAppCheck]); tests pass it explicitly.
-String adminErrorMessage(AppLocalizations l, Object error, {bool? appCheckAvailable}) {
+/// ([FirebaseService.supportsAppCheck]) and [appCheckEnforced] to whether the
+/// backend enforces it on admin callables ([kAdminAppCheckEnforced]); tests
+/// pass them explicitly.
+String adminErrorMessage(
+  AppLocalizations l,
+  Object error, {
+  bool? appCheckAvailable,
+  bool appCheckEnforced = kAdminAppCheckEnforced,
+}) {
   if (error is FirebaseFunctionsException) {
     final reason = BackendReasons.of(error);
     switch (classifyAdminCallableError(
       code: error.code,
       reason: reason,
+      message: error.message,
       appCheckAvailable: appCheckAvailable ?? FirebaseService.supportsAppCheck,
+      appCheckEnforced: appCheckEnforced,
     )) {
       case AdminCallableIssue.appCheckUnavailable:
         return l.adminErrAppCheckPlatform;
       case AdminCallableIssue.appCheckRejected:
         return l.adminErrAppCheckRejected;
+      case AdminCallableIssue.sessionExpired:
+        return l.adminErrSessionExpired;
       case AdminCallableIssue.userBanned:
         return l.adminErrUserBanned;
       case null:

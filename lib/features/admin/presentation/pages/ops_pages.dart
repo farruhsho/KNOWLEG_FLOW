@@ -129,7 +129,7 @@ class _PricingFormState extends ConsumerState<_PricingForm> {
 
   String _issue(AppLocalizations l, String code) => switch (code) {
         PricingIssue.creditsRange => l.adminPricingIssueCredits,
-        PricingIssue.freeRange => l.adminPricingIssueFree,
+        PricingIssue.freeRange => l.adminPricingIssueFree(kFreeExamsPerUserMin, kFreeExamsPerUserMax),
         PricingIssue.unknownProduct => l.adminPricingIssueProduct,
         PricingIssue.singleMustBeOne => l.adminPricingIssueSingle,
         _ => code,

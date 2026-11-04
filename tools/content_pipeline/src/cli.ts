@@ -523,6 +523,15 @@ async function cmdImport(env: Env, o: Opts): Promise<number> {
     for (const c of report.cms_conflicts) env.out(`    ${c.collection}/${c.id}: ${c.reason}`);
     env.out('  Port the edit into content/bank (git), or rerun with --overwrite to discard it. Details: content/reports/import-report.json');
   }
+  for (const c of report.cms_caught_up) {
+    const pending = c.pending_fields.length ? `; still differs from the bank: ${c.pending_fields.join(', ')} (the next import writes the bank's values; port them into content/bank to keep them)` : '';
+    env.out(`  caught up exam_questions/${c.id}: the admin-panel edit is in the bank; edited_in_cms_at removed, content left as is${pending}`);
+  }
+  if (report.translation_links_kept.length) {
+    env.out(`  ${report.translation_links_kept.length} translation link(s) changed in the admin panel were kept (translation_links_kept):`);
+    for (const t of report.translation_links_kept) env.out(`    exam_questions/${t.id}: Firestore ${t.remote ?? 'null'}, bank ${t.local ?? 'null'}`);
+    env.out("  Set translation_group_id in content/bank to adopt the link, or rerun with --overwrite to restore the bank's.");
+  }
   // Record publication locally so the registry stays honest: only variants this run created as published.
   if (report.published.length) {
     for (const v of loadVariantFiles(env.paths)) {
@@ -662,7 +671,7 @@ const HELP = `ORT content pipeline — npm run cli -- <stage> [flags]   (all pat
   timing          [--blueprint id] [--language l] [--margin 0.1]
   validate        [--blueprint id] [--language l] [--publish] [--allow-reuse] [--require-languages]
   import          [--blueprint id ...] [--all-items] [--publish --published-by uid] [--project ${DEFAULT_PROJECT_ID}] [--batch-size 400] [--commit] [--overwrite]
-                  (--overwrite also replaces questions/keys/passages/draft variants edited in the admin panel; never a variant's status)
+                  (--overwrite also replaces questions/keys/passages/draft variants and translation links edited in the admin panel; never a variant's status)
   registry        [--target 100]
   lint            [--fix]
   review          --ids q_..,q_.. --status methodologist_approved|rejected --by <uid> [--notes text] [--from-draft]

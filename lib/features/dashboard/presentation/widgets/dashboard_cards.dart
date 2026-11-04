@@ -8,6 +8,7 @@ import '../../../../core/routes/route_paths.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/locale_provider.dart';
+import '../../../billing/application/billing_providers.dart' show canSellProvider;
 import '../../../billing/domain/entitlements.dart';
 import '../../../settings/data/reminder_settings.dart';
 import '../../data/dashboard_providers.dart';
@@ -365,7 +366,12 @@ class _NextStepBody extends ConsumerWidget {
   }
 }
 
-/// Free test / credits status linking to the exams tab or the store.
+/// Free test / credits status linking to the exams tab, or to the store when
+/// nothing is left and this build sells in the app.
+///
+/// In `BILLING_MODE=external` ([canSellProvider] false) an empty balance is
+/// a neutral chip that cannot be tapped: no purchase wording and no route to
+/// the store (BILL-EXT-01, ARCHITECTURE §5, Play payments policy).
 class EntitlementChip extends ConsumerWidget {
   const EntitlementChip({super.key});
 
@@ -373,6 +379,7 @@ class EntitlementChip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context)!;
     final ent = ref.watch(entitlementsProvider);
+    final canSell = ref.watch(canSellProvider);
     final scheme = Theme.of(context).colorScheme;
 
     Widget chip(IconData icon, String label, VoidCallback onTap) => Align(
@@ -400,6 +407,17 @@ class EntitlementChip extends ConsumerWidget {
         if (e.credits > 0) {
           return chip(Icons.confirmation_number_outlined,
               l.shellHomeCredits(e.credits), () => context.go(RoutePaths.exams));
+        }
+        if (!canSell) {
+          return Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Chip(
+              key: const ValueKey('entitlement_balance_chip'),
+              avatar: Icon(Icons.confirmation_number_outlined,
+                  size: 18, color: scheme.onSurfaceVariant),
+              label: Text(l.shellHomeNoCredits),
+            ),
+          );
         }
         return chip(Icons.shopping_bag_outlined, l.shellHomeBuyExam,
             () => context.push(RoutePaths.store));

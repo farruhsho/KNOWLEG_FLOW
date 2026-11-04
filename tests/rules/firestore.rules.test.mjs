@@ -99,12 +99,15 @@ describe('users/{uid}', () => {
 
   it('super_admin (claim or legacy users.role == admin) can change roles; moderator only bans', async () => {
     await seed('users/alice', freeProfile);
+    await seed('users/bob', freeProfile);
     await seed('users/legacy', { ...freeProfile, role: 'admin' });
     await assertSucceeds(updateDoc(doc(db('root', { role: 'super_admin' }), 'users/alice'), { role: 'admin' }));
     await assertSucceeds(updateDoc(doc(db('legacy'), 'users/alice'), { is_premium: true }));
+    // alice is staff now, so the moderator works on a student profile.
     const mod = db('mod', { role: 'moderator' });
-    await assertSucceeds(updateDoc(doc(mod, 'users/alice'), { is_banned: true }));
-    await assertFails(updateDoc(doc(mod, 'users/alice'), { role: 'student' }));
+    await assertSucceeds(updateDoc(doc(mod, 'users/bob'), { is_banned: true }));
+    await assertFails(updateDoc(doc(mod, 'users/bob'), { role: 'admin' }));
+    await assertFails(updateDoc(doc(mod, 'users/alice'), { is_banned: true }));
   });
 
   // Exact maps written by the CMS (lib/features/admin/data/repositories/people_repositories.dart setBanned).
@@ -127,7 +130,8 @@ describe('users/{uid}', () => {
     await assertFails(updateDoc(doc(mod, 'users/alice'), { subscription: { tier: 'yearly', expires_at: Timestamp.now() } }));
     await assertFails(updateDoc(doc(mod, 'users/alice'), { is_premium: true }));
     await assertFails(updateDoc(doc(mod, 'users/alice'), { isActive: false }));
-    await assertFails(updateDoc(doc(mod, 'users/alice'), { ...banMap('mod'), role: 'student' }));
+    // Re-writing an unchanged value is not a change; changing the role is denied.
+    await assertFails(updateDoc(doc(mod, 'users/alice'), { ...banMap('mod'), role: 'admin' }));
     await assertFails(updateDoc(doc(mod, 'users/cm'), banMap('mod')));
     await assertFails(updateDoc(doc(mod, 'users/oldadmin'), banMap('mod')));
     // Support has view_users but not moderate_users.

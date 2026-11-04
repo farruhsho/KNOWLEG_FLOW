@@ -55,6 +55,22 @@ class UsersRepository {
   Future<Map<String, dynamic>?> stats(String uid) async =>
       (await _db.collection(AdminCollections.userStats).doc(uid).get()).data();
 
+  /// Longest `ban_reason` the moderator branch of the `users` update rule
+  /// accepts (`validModeratorBan()` in firestore.rules:
+  /// `d.ban_reason.size() <= 500`). Counted in Unicode code points, as the
+  /// rules count string size.
+  static const int maxBanReasonLength = 500;
+
+  /// Length of [reason] as firestore.rules measures it (code points).
+  static int banReasonLength(String reason) => reason.runes.length;
+
+  /// [reason] cut to [maxBanReasonLength] code points (never splits a
+  /// surrogate pair), so a write can never fail the rule on length.
+  static String clipBanReason(String reason) =>
+      banReasonLength(reason) <= maxBanReasonLength
+          ? reason
+          : String.fromCharCodes(reason.runes.take(maxBanReasonLength));
+
   /// Fields a moderator may change on `users/{uid}` (decision D5; mirrored by
   /// the moderator branch of the `users` update rule).
   static const Set<String> moderatorWritableFields = {
@@ -67,7 +83,9 @@ class UsersRepository {
 
   /// The `users/{uid}` update for a ban or unban — only
   /// [moderatorWritableFields] (AUTH-ADM-02 / SEC-MOD-01). [now] is the
-  /// timestamp value (a server timestamp in production).
+  /// timestamp value (a server timestamp in production). The reason is
+  /// clipped to [maxBanReasonLength] (the ban dialog already blocks longer
+  /// input, MOD-01).
   static Map<String, Object?> banUpdate(
     bool banned, {
     required String actor,
@@ -76,7 +94,7 @@ class UsersRepository {
   }) =>
       {
         'is_banned': banned,
-        'ban_reason': banned ? reason : null,
+        'ban_reason': banned ? clipBanReason(reason) : null,
         'banned_by': banned ? actor : null,
         'banned_at': banned ? now : null,
         'updated_at': now,

@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { loadRawBlueprints } from '../src/blueprints';
+import { deletedFields, toFirestoreValue } from '../src/firestore';
 import {
   applyRemoteReviews,
   applyRemoteVariantStatuses,
   buildImportPlan,
+  cmsEditCaughtUp,
+  cmsTranslationLink,
   commitPlan,
+  conflictReason,
+  DELETE_FIELD,
   fromStoredTable,
   ImportInput,
   keyDoc,
@@ -66,9 +71,11 @@ describe('import (dry run plan)', () => {
     for (const secret of ['correct', 'explanation', 'wrong_option_notes', 'solution_steps', 'key', 'target', 'pipeline']) assert.equal(secret in q.data, false, secret);
     assert.deepEqual(Object.keys(k.data).sort(), ['correct', 'explanation', 'pipeline_hash', 'solution_steps', 'wrong_option_notes']);
     assert.deepEqual(Object.keys(q.data).sort(), [
-      'content_hash', 'content_version', 'created_at', 'difficulty', 'image_path', 'language', 'options', 'part_id', 'passage_id', 'pipeline_hash', 'review',
-      'section_id', 'source', 'stem', 'subject_id', 'subtopic_id', 'table', 'topic_id', 'translation_group_id', 'type', 'updated_at',
+      'content_hash', 'content_version', 'created_at', 'difficulty', 'image_path', 'language', 'options', 'part_id', 'passage_id', 'pipeline_hash',
+      'pipeline_translation_group_id', 'review', 'section_id', 'source', 'stem', 'subject_id', 'subtopic_id', 'table', 'topic_id', 'translation_group_id', 'type',
+      'updated_at',
     ]);
+    assert.equal(q.data.pipeline_translation_group_id, q.data.translation_group_id, 'the link the pipeline wrote is recorded (CP-NEW-2)');
     assert.deepEqual(q.data.created_at, { __timestamp: byId.get(q.id)!.question.created_at });
     assert.match(q.id, /^q_[0-9a-f]{20}$/);
   });
@@ -256,6 +263,7 @@ describe('import (commit)', () => {
       const legacy = structuredClone(op.data);
       delete legacy.part_id;
       delete legacy.pipeline_hash;
+      delete legacy.pipeline_translation_group_id;
       if (op.collection === 'exam_passages') delete legacy.content_hash;
       db.set(op.collection, op.id, legacy);
     }
@@ -264,6 +272,8 @@ describe('import (commit)', () => {
     assert.equal(r.written, 305 - 1, 'everything except the unchanged blueprint');
     const q = plan.ops.find((o) => o.collection === 'exam_questions')!;
     assert.equal(db.get('exam_questions', q.id)!.part_id, q.data.part_id);
+    assert.equal(db.get('exam_questions', q.id)!.pipeline_translation_group_id, q.data.translation_group_id);
+    assert.deepEqual(r.translation_links_kept, [], 'an unchanged link is not reported');
   });
 
   it('does not revert documents edited in the admin panel; reports them; --overwrite replaces them (CP-04)', async () => {
@@ -331,13 +341,164 @@ describe('import (commit)', () => {
     assert.deepEqual(o.cms_conflicts, []);
     assert.equal(o.overwritten.length, 4 + 4 + 1 + 1);
     assert.equal(db.get('exam_questions', q1)!.stem, items.find((i) => i.id === q1)!.question.stem);
-    assert.equal(db.get('exam_questions', q1)!.edited_in_cms_at, null);
+    assert.equal('edited_in_cms_at' in db.get('exam_questions', q1)!, false, 'the marker is deleted (FieldValue.delete), not set to null');
     assert.equal(db.get('exam_question_keys', q4)!.correct, items.find((i) => i.id === q4)!.key.correct);
     assert.equal(db.get('exam_passages', pid)!.text, passages[0]!.passage.text);
     assert.equal(db.get('exam_variants', variant.id)!.status, 'draft');
     const again = await commitPlan(plan, db);
     assert.deepEqual(again.cms_conflicts, []);
     assert.equal(again.written, 0);
+  });
+
+  it('takes back a question whose admin-panel edit is in the bank: hash fields only, marker deleted; later bank metadata changes are no conflict (CP-NEW-1)', async () => {
+    const db = new FakeFirestore();
+    const plan = buildImportPlan(input(items, passages, files));
+    await commitPlan(plan, db);
+    const qids = plan.ops.filter((o) => o.collection === 'exam_questions' && o.data.passage_id === null).map((o) => o.id);
+    const [qa, qb, qc] = qids as [string, string, string];
+    const at = { __timestamp: '2026-11-03T12:00:00.000Z' };
+    const fixedExplanation = 'Исправленное объяснение';
+
+    // qa: a methodologist fixes the key explanation in the admin panel; the save stamps the question too.
+    Object.assign(db.get('exam_questions', qa)!, { edited_in_cms_at: at, updated_by: 'uid_m' });
+    db.set('exam_question_keys', qa, { ...keyDoc(items.find((i) => i.id === qa)!), explanation: fixedExplanation, updated_by: 'uid_m', edited_in_cms_at: at });
+    delete db.get('exam_question_keys', qa)!.pipeline_hash;
+    // qb: only metadata (difficulty) changed in the admin panel.
+    const bankDifficulty = items.find((i) => i.id === qb)!.question.difficulty;
+    const cmsDifficulty = bankDifficulty === 3 ? 2 : 3;
+    Object.assign(db.get('exam_questions', qb)!, { difficulty: cmsDifficulty, edited_in_cms_at: at, updated_by: 'uid_m' });
+    // qc: the stem changed in the admin panel and was not ported: still a conflict.
+    Object.assign(db.get('exam_questions', qc)!, { stem: 'Правка методиста', edited_in_cms_at: at });
+
+    // Detection: content equal by the pipeline's hash = caught up; different content = conflict.
+    const doc = (id: string): Record<string, unknown> => plan.ops.find((o) => o.collection === 'exam_questions' && o.id === id)!.data;
+    assert.equal(cmsEditCaughtUp('exam_questions', doc(qb), db.get('exam_questions', qb)!), true);
+    assert.equal(conflictReason('exam_questions', doc(qb), db.get('exam_questions', qb)!), null, 'metadata is ignored by the content comparison');
+    assert.equal(cmsEditCaughtUp('exam_questions', doc(qc), db.get('exam_questions', qc)!), false);
+    assert.match(conflictReason('exam_questions', doc(qc), db.get('exam_questions', qc)!)!, /edited in the admin panel/);
+
+    // The operator ports the key fix into the bank (git); the question id does not change.
+    const ported = items.map((i) => (i.id === qa ? { ...i, key: { ...i.key, explanation: fixedExplanation } } : i));
+    const portedPlan = buildImportPlan(input(ported, passages, files, { ctx: ctxFor(ported, passages) }));
+    const qbBefore = structuredClone(db.get('exam_questions', qb)!);
+    const r = await commitPlan(portedPlan, db);
+    assert.deepEqual(r.cms_conflicts.map((c) => `${c.collection}/${c.id}`).sort(), [`exam_question_keys/${qc}`, `exam_questions/${qc}`]);
+    assert.deepEqual([...r.cms_caught_up].sort((x, y) => x.id.localeCompare(y.id)), [{ id: qa, pending_fields: [] }, { id: qb, pending_fields: ['difficulty'] }].sort((x, y) => x.id.localeCompare(y.id)));
+    for (const id of [qa, qb]) {
+      const stored = db.get('exam_questions', id)!;
+      assert.equal('edited_in_cms_at' in stored, false, `${id}: the marker is deleted`);
+      assert.equal(stored.pipeline_hash, doc(id).content_hash);
+      assert.equal(stored.content_hash, doc(id).content_hash);
+    }
+    // Nothing but the marker changed in that step: the admin-panel difficulty and updated_by are still there.
+    const { edited_in_cms_at: _marker, ...qbExpected } = qbBefore;
+    assert.deepEqual(db.get('exam_questions', qb), qbExpected);
+    assert.equal(db.get('exam_question_keys', qa)!.explanation, fixedExplanation);
+    assert.equal(db.get('exam_question_keys', qa)!.updated_by, undefined, 'the ported key is pipeline-owned again');
+    assert.equal(db.get('exam_questions', qc)!.stem, 'Правка методиста');
+    assert.deepEqual(db.get('exam_questions', qc)!.edited_in_cms_at, at);
+
+    // Later the bank changes metadata outside the content hash (same id): written, not a conflict.
+    const retagged = ported.map((i) => (i.id === qa ? { ...i, question: { ...i.question, subtopic_id: 'ported_subtopic', topic_id: `${i.question.topic_id}_x` } } : i));
+    const r2 = await commitPlan(buildImportPlan(input(retagged, passages, files, { ctx: ctxFor(retagged, passages) })), db);
+    assert.deepEqual(r2.cms_conflicts.map((c) => c.id), [qc, qc], 'only the unported stem edit is still held back');
+    assert.deepEqual(r2.cms_caught_up, []);
+    assert.equal(db.get('exam_questions', qa)!.subtopic_id, 'ported_subtopic');
+    assert.equal(db.get('exam_questions', qa)!.topic_id, `${items.find((i) => i.id === qa)!.question.topic_id}_x`);
+    assert.equal(db.get('exam_questions', qb)!.difficulty, bankDifficulty, 'a pending field reported as caught up is written by the next import');
+  });
+
+  it('keeps translation links changed in the admin panel; reports them; --overwrite restores the bank link (CP-NEW-2)', async () => {
+    const db = new FakeFirestore();
+    const plan = buildImportPlan(input(items, passages, files));
+    await commitPlan(plan, db);
+    const qs = plan.ops.filter((o) => o.collection === 'exam_questions' && o.data.passage_id === null);
+    for (const o of qs) assert.equal(db.get('exam_questions', o.id)!.pipeline_translation_group_id, o.data.translation_group_id);
+    const [q1, q2, q3, q4, q5] = qs.map((o) => o.id) as [string, string, string, string, string];
+    const tg = (id: string): string | null => items.find((i) => i.id === id)!.question.translation_group_id;
+
+    // q1: linked into another group in the admin panel (link() updates translation_group_id only, no edited_in_cms_at).
+    db.get('exam_questions', q1)!.translation_group_id = 'tg_q_cms_link';
+    // q2: unlinked in the admin panel.
+    db.get('exam_questions', q2)!.translation_group_id = null;
+    // q3: written by the previous pipeline version (no record of the link it wrote), then re-linked in the admin panel.
+    delete db.get('exam_questions', q3)!.pipeline_translation_group_id;
+    db.get('exam_questions', q3)!.translation_group_id = 'tg_q_legacy_link';
+    // q4: written by the previous pipeline version, link untouched: the record is backfilled.
+    delete db.get('exam_questions', q4)!.pipeline_translation_group_id;
+    // q5: re-linked through a full editor save (edited_in_cms_at), content unchanged.
+    Object.assign(db.get('exam_questions', q5)!, { translation_group_id: 'tg_q_editor_link', edited_in_cms_at: { __timestamp: '2026-11-03T12:00:00.000Z' } });
+    assert.deepEqual(cmsTranslationLink(qs[0]!.data, db.get('exam_questions', q1)!), { remote: 'tg_q_cms_link', local: tg(q1) });
+    assert.equal(cmsTranslationLink(qs[3]!.data, db.get('exam_questions', q4)!), null);
+
+    // The bank changes q1's metadata: everything but the link is written.
+    const bank = items.map((i) => (i.id === q1 ? { ...i, question: { ...i.question, subtopic_id: 'new_subtopic' } } : i));
+    const bankPlan = buildImportPlan(input(bank, passages, files, { ctx: ctxFor(bank, passages) }));
+    const r = await commitPlan(bankPlan, db);
+    const byId = (xs: Array<{ id: string }>): string[] => xs.map((x) => x.id).sort();
+    assert.deepEqual(r.cms_conflicts, []);
+    assert.deepEqual(byId(r.translation_links_kept), [q1, q2, q3, q5].sort());
+    assert.deepEqual(r.translation_links_kept.find((t) => t.id === q2), { id: q2, remote: null, local: tg(q2) });
+    assert.deepEqual(r.cms_caught_up, [{ id: q5, pending_fields: [] }], 'the kept link is not a pending field');
+    assert.equal(db.get('exam_questions', q1)!.translation_group_id, 'tg_q_cms_link');
+    assert.equal(db.get('exam_questions', q1)!.pipeline_translation_group_id, tg(q1), 'the record of what the pipeline wrote is kept');
+    assert.equal(db.get('exam_questions', q1)!.subtopic_id, 'new_subtopic');
+    assert.equal(db.get('exam_questions', q2)!.translation_group_id, null);
+    assert.equal(db.get('exam_questions', q3)!.translation_group_id, 'tg_q_legacy_link');
+    assert.equal('pipeline_translation_group_id' in db.get('exam_questions', q3)!, false);
+    assert.equal(db.get('exam_questions', q4)!.pipeline_translation_group_id, tg(q4));
+    assert.equal(db.get('exam_questions', q5)!.translation_group_id, 'tg_q_editor_link');
+    assert.equal('edited_in_cms_at' in db.get('exam_questions', q5)!, false);
+
+    // Stable: the next import writes nothing and reports the same links.
+    const again = await commitPlan(bankPlan, db);
+    assert.equal(again.written, 0);
+    assert.deepEqual(byId(again.translation_links_kept), [q1, q2, q3, q5].sort());
+
+    // The bank adopts q1's link: the pipeline owns it again.
+    const adopted = bank.map((i) => (i.id === q1 ? { ...i, question: { ...i.question, translation_group_id: 'tg_q_cms_link' } } : i));
+    const adoptedPlan = buildImportPlan(input(adopted, passages, files, { ctx: ctxFor(adopted, passages) }));
+    const r2 = await commitPlan(adoptedPlan, db);
+    assert.deepEqual(byId(r2.translation_links_kept), [q2, q3, q5].sort());
+    assert.equal(db.get('exam_questions', q1)!.pipeline_translation_group_id, 'tg_q_cms_link');
+
+    // --overwrite restores the bank's links and reports them.
+    const o = await commitPlan(adoptedPlan, db, { overwrite: true });
+    assert.deepEqual(o.translation_links_kept, []);
+    assert.deepEqual(byId(o.overwritten), [q2, q3, q5].sort());
+    for (const x of o.overwritten) assert.match(x.reason, /^translation_group_id .* set outside the pipeline, replaced by the bank's tg_/);
+    for (const id of [q2, q3, q5]) {
+      assert.equal(db.get('exam_questions', id)!.translation_group_id, tg(id));
+      assert.equal(db.get('exam_questions', id)!.pipeline_translation_group_id, tg(id));
+    }
+    const quiet = await commitPlan(adoptedPlan, db);
+    assert.equal(quiet.written, 0);
+    assert.deepEqual(quiet.translation_links_kept, []);
+  });
+
+  it('review-sync pulls approvals of questions whose only admin-panel change is a caught-up edit or a translation link (CP-NEW-1, CP-NEW-2)', () => {
+    const local = structuredClone(items.slice(0, 2)).map((i) => ({ ...i, question: { ...i.question, review: { status: 'ai_verified' as const, reviewed_by: null, reviewed_at: null, notes: '' } } }));
+    const approved = { status: 'methodologist_approved', reviewed_by: 'uid_m', reviewed_at: '2026-11-03T09:00:00.000Z', notes: '' };
+    const remote = new Map<string, Record<string, unknown>>([
+      [local[0]!.id, { ...questionDoc(local[0]!), edited_in_cms_at: '2026-11-03T08:00:00.000Z', difficulty: 3, review: approved }],
+      [local[1]!.id, { ...questionDoc(local[1]!), translation_group_id: 'tg_q_cms_link', edited_in_cms_at: '2026-11-03T08:00:00.000Z', updated_by: 'uid_m', content_hash: 'sha256:' + 'c'.repeat(64), review: approved }],
+    ]);
+    const { updates, cms_conflicts } = applyRemoteReviews(local, remote, '2026-11-04T00:00:00.000Z');
+    assert.deepEqual(cms_conflicts, []);
+    assert.deepEqual(updates.map((u) => [u.id, u.to]), [[local[0]!.id, 'methodologist_approved'], [local[1]!.id, 'methodologist_approved']]);
+  });
+
+  it('field deletes become FieldValue.delete() and are refused outside merge writes', async () => {
+    const sentinels = { timestamp: (iso: string) => `ts(${iso})`, serverTimestamp: () => 'now()', deleteField: () => 'delete()' };
+    assert.deepEqual(toFirestoreValue({ a: DELETE_FIELD, b: { __timestamp: '2026-01-01T00:00:00.000Z' }, c: [{ __server_timestamp: true }], d: 1 }, sentinels), {
+      a: 'delete()', b: 'ts(2026-01-01T00:00:00.000Z)', c: ['now()'], d: 1,
+    });
+    assert.deepEqual(deletedFields({ a: DELETE_FIELD, b: null, c: { __delete_field: false } }), ['a']);
+    const db = new FakeFirestore();
+    db.set('exam_question_keys', 'k', { correct: 'A', edited_in_cms_at: 'x' });
+    await assert.rejects(() => db.commitBatch([{ collection: 'exam_question_keys', id: 'k', data: { correct: 'A', edited_in_cms_at: DELETE_FIELD }, merge: false }]), /merge/);
+    await db.commitBatch([{ collection: 'exam_question_keys', id: 'k', data: { edited_in_cms_at: DELETE_FIELD }, merge: true }]);
+    assert.deepEqual(db.get('exam_question_keys', 'k'), { correct: 'A' });
   });
 
   it('passage documents carry the content hash the pipeline wrote', () => {

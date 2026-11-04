@@ -37,17 +37,53 @@ jobs:
           files: coverage/lcov.info
         continue-on-error: true
 
-  # Firestore Security Rules tests (guards the SEC-002 escalation fix).
-  # Requires test/firestore/ (a @firebase/rules-unit-testing Node project).
-  # See CTO_AUDIT_REPORT.md §3 (TEST-03). Enable once that harness exists:
-  # rules-test:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with: { node-version: 20 }
-  #     - run: npm --prefix test/firestore ci
-  #     - run: npx firebase emulators:exec --only firestore "npm --prefix test/firestore test"
+  # Cloud Functions: typecheck + unit tests + build (Node 22 runtime).
+  functions:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: functions } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: functions/package-lock.json }
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  # Content pipeline: schema/dedup/assembly/import tests + typecheck.
+  content-pipeline:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: tools/content_pipeline } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: tools/content_pipeline/package-lock.json }
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+
+  # Security rules + end-to-end backend tests on the Firebase emulators
+  # (firebase-tools >= 15 needs Java 21). demo-* projects never touch real Firebase.
+  emulator-tests:
+    needs: functions
+    runs-on: ubuntu-latest
+    env:
+      FUNCTIONS_DISCOVERY_TIMEOUT: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install -g firebase-tools@15
+      - name: Build functions
+        run: npm ci && npm run build
+        working-directory: functions
+      - name: Security rules tests (Firestore + Storage)
+        run: npm install && npm test
+        working-directory: tests/rules
+      - name: End-to-end tests (Auth + Firestore + Functions + Storage)
+        run: npm install && npm test
+        working-directory: tests/e2e
 
   # Build Android
   build-android:
@@ -65,8 +101,27 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # google-services.json and the upload keystore are not in git; provide
+      # them as base64 repository secrets. Without the keystore the bundle is
+      # signed with the debug key (fine as a CI artifact, NOT uploadable).
+      - name: Restore Firebase config and signing key
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          UPLOAD_KEYSTORE_BASE64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON_BASE64" ]; then echo "::error::secret GOOGLE_SERVICES_JSON_BASE64 is missing"; exit 1; fi
+          echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
+          if [ -n "$UPLOAD_KEYSTORE_BASE64" ] && [ -n "$KEY_PROPERTIES" ]; then
+            echo "$UPLOAD_KEYSTORE_BASE64" | base64 -d > android/upload-keystore.jks
+            printf '%s
+' "$KEY_PROPERTIES" > android/key.properties
+          else
+            echo "::warning::no upload keystore secrets: bundle will be debug-signed"
+          fi
+
       - name: Build App Bundle
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --dart-define=BILLING_MODE=${{ vars.BILLING_MODE || 'external' }}
 
       - name: Upload App Bundle
         uses: actions/upload-artifact@v4
@@ -92,34 +147,3 @@ jobs:
 
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
-
-  # Deploy to Firebase Hosting (web) on main.
-  # NOTE: requires a `hosting` target in firebase.json (currently absent —
-  # DEPLOY-01) and the FIREBASE_SERVICE_ACCOUNT secret. projectId is the real
-  # project id, not the old `your-firebase-project-id` placeholder.
-  deploy-firebase:
-    needs: [build-android, build-ios]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build Web
-        run: flutter build web --release
-
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          channelId: live
-          projectId: knowleg-33f36

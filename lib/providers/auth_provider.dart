@@ -44,7 +44,8 @@ final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService(
     // Answers given in onboarding before sign-in are saved to the profile.
     onSignedIn: (user) => onboarding.flushPendingAnswers(user.uid),
-    // Unregister this device from the account's study reminders (D12).
+    // Unregister this device from the account's study reminders (D12): only
+    // its token is removed; the account-wide flag stays on (REM-01).
     beforeSignOut: () => ref.read(reminderSettingsProvider).onSignOut(),
   );
 });

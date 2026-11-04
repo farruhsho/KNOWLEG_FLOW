@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/backend/callable_platform.dart';
 import '../../../../core/network/firebase_service.dart';
 import '../../../../providers/locale_provider.dart';
 import '../../data/exam_catalog_repository.dart';
@@ -31,10 +32,13 @@ final examAuthUidProvider = StreamProvider<String?>((ref) =>
 final examUidProvider =
     Provider<String?>((ref) => ref.watch(examAuthUidProvider).valueOrNull);
 
-/// Whether exam callables work on this platform (false on Windows/Linux:
-/// no App Check provider, contract D7). Overridden in tests.
+/// Whether exam callables work in this build. examStart and the other exam*
+/// functions enforce App Check, so this is the app-wide gate
+/// [callablesSupportedOnThisPlatform] (decision D7) that the tutor, account
+/// deletion and activity reporting use too: false on Windows/Linux and on web
+/// builds without `APP_CHECK_WEB_SITE_KEY`. Overridden in tests.
 final examCallablesSupportedProvider =
-    Provider<bool>((ref) => examCallablesSupported());
+    Provider<bool>((ref) => callablesSupportedOnThisPlatform);
 
 final examRemoteProvider = Provider<ExamRemoteDataSource>((ref) =>
     FirebaseExamRemoteDataSource(

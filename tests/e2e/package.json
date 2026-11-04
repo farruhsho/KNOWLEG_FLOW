@@ -1,0 +1,16 @@
+{
+  "name": "ort-master-e2e",
+  "private": true,
+  "description": "End-to-end backend test: Cloud Functions + Firestore/Storage rules + Auth on the Firebase emulators, driven by the real client SDK.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "firebase emulators:exec --project demo-ort-e2e --only auth,firestore,functions,storage --config ../../firebase.json \"node --test --test-concurrency=1 e2e.test.mjs\""
+  },
+  "devDependencies": {
+    "firebase": "^12.19.0",
+    "firebase-admin": "^14.5.0"
+  }
+}

@@ -5,7 +5,7 @@
  * pointing to a service-account JSON kept outside the repo, or
  * `gcloud auth application-default login`).
  */
-import { nestedArrayPaths, type CollectionName, type FirestorePort } from './importer';
+import { isDeleteField, nestedArrayPaths, type CollectionName, type FirestorePort } from './importer';
 
 export const DEFAULT_PROJECT_ID = 'knowleg-33f36';
 
@@ -26,21 +26,41 @@ function plain(v: unknown): unknown {
   return v;
 }
 
+/** Firestore sentinels the JSON-safe plan markers stand for. */
+export interface FirestoreSentinels {
+  timestamp(iso: string): unknown;
+  serverTimestamp(): unknown;
+  deleteField(): unknown;
+}
+
+/** Plan markers (`__timestamp`, `__server_timestamp`, `__delete_field`) → Firestore values. */
+export function toFirestoreValue(v: unknown, s: FirestoreSentinels): unknown {
+  if (Array.isArray(v)) return v.map((x) => toFirestoreValue(x, s));
+  if (v && typeof v === 'object') {
+    const o = v as Record<string, unknown>;
+    if (typeof o.__timestamp === 'string') return s.timestamp(o.__timestamp);
+    if (o.__server_timestamp === true) return s.serverTimestamp();
+    if (isDeleteField(o)) return s.deleteField();
+    return Object.fromEntries(Object.entries(o).map(([k, x]) => [k, toFirestoreValue(x, s)]));
+  }
+  return v;
+}
+
+/** Top-level fields of a write that hold a delete marker (FieldValue.delete() is valid only in merge writes). */
+export function deletedFields(data: Record<string, unknown>): string[] {
+  return Object.keys(data).filter((k) => isDeleteField(data[k]));
+}
+
 export async function openFirestore(projectId: string): Promise<PipelineFirestore> {
   const { initializeApp, applicationDefault, getApps } = await import('firebase-admin/app');
   const { getFirestore, Timestamp, FieldValue } = await import('firebase-admin/firestore');
   const app = getApps()[0] ?? initializeApp({ credential: applicationDefault(), projectId });
   const db = getFirestore(app);
 
-  const convert = (v: unknown): unknown => {
-    if (Array.isArray(v)) return v.map(convert);
-    if (v && typeof v === 'object') {
-      const o = v as Record<string, unknown>;
-      if (typeof o.__timestamp === 'string') return Timestamp.fromDate(new Date(o.__timestamp));
-      if (o.__server_timestamp === true) return FieldValue.serverTimestamp();
-      return Object.fromEntries(Object.entries(o).map(([k, x]) => [k, convert(x)]));
-    }
-    return v;
+  const sentinels: FirestoreSentinels = {
+    timestamp: (iso) => Timestamp.fromDate(new Date(iso)),
+    serverTimestamp: () => FieldValue.serverTimestamp(),
+    deleteField: () => FieldValue.delete(),
   };
 
   return {
@@ -73,8 +93,10 @@ export async function openFirestore(projectId: string): Promise<PipelineFirestor
       // Firestore rejects an array inside an array only at commit (INVALID_ARGUMENT), after earlier batches went through: fail before.
       const bad = writes.flatMap((w) => nestedArrayPaths(w.data).map((p) => `${w.collection}/${w.id} ${p}`));
       if (bad.length) throw new Error(`Firestore cannot store an array inside an array: ${bad.slice(0, 5).join('; ')}`);
+      const deletes = writes.filter((w) => !w.merge && deletedFields(w.data).length).map((w) => `${w.collection}/${w.id}`);
+      if (deletes.length) throw new Error(`a field delete needs a merge write: ${deletes.slice(0, 5).join('; ')}`);
       const batch = db.batch();
-      for (const w of writes) batch.set(db.collection(w.collection).doc(w.id), convert(w.data) as Record<string, unknown>, { merge: w.merge });
+      for (const w of writes) batch.set(db.collection(w.collection).doc(w.id), toFirestoreValue(w.data, sentinels) as Record<string, unknown>, { merge: w.merge });
       await batch.commit();
     },
   };

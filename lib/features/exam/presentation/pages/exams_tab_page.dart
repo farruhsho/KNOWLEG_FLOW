@@ -133,7 +133,11 @@ class _EntitlementCard extends ConsumerWidget {
         : e == null
             ? l.examEntitlementHint
             : e.hasFreeExam
-                ? l.examEntitlementFree
+                // "First test is free" only fits an allowance of one; with
+                // config/pricing.free_exams_per_user > 1 show what is left.
+                ? (e.freeExamsAllowed <= 1
+                    ? l.examEntitlementFree
+                    : l.examEntitlementFreeLeft(e.freeExamsRemaining))
                 : e.credits > 0
                     ? l.examEntitlementCredits(e.credits)
                     : l.examEntitlementNone;

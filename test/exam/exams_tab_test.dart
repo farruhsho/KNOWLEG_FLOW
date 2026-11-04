@@ -222,4 +222,31 @@ void main() {
     expect(find.widgetWithText(FilledButton, 'Купить'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('several free exams: the remaining count, not "first test" (ENT-FREE-01)',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    for (final (used, allowed, text) in [
+      (0, 5, 'Осталось 5 бесплатных тестов'),
+      (1, 3, 'Осталось 2 бесплатных теста'),
+      (2, 3, 'Остался 1 бесплатный тест'),
+    ]) {
+      await tester.pumpWidget(_app(overrides(Entitlements(
+        freeExamUsed: used > 0,
+        credits: 0,
+        lifetimeCreditsPurchased: 0,
+        freeExamsUsedCount: used,
+        freeExamsAllowed: allowed,
+      ))));
+      await tester.pump();
+      await tester.pump();
+      expect(find.text(text), findsOneWidget, reason: '$used/$allowed');
+      expect(find.text('Первый тест бесплатно'), findsNothing, reason: '$used/$allowed');
+      await tester.pumpWidget(const SizedBox());
+    }
+    expect(tester.takeException(), isNull);
+  });
 }

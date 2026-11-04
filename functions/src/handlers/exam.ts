@@ -7,7 +7,7 @@ import type { DocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { applyStartDecision, decideExamStart, parseEntitlement } from '../domain/entitlements';
+import { applyStartDecision, decideExamStart, parseEntitlement, parseFreeExamsPerUser } from '../domain/entitlements';
 import {
   applyExpiry,
   applySectionSubmit,
@@ -77,8 +77,7 @@ async function sessionPayload(
 
 async function readPricingFreeExams(): Promise<number> {
   const snap = await db().doc('config/pricing').get();
-  const v = snap.get('free_exams_per_user') ?? snap.get('freeExamsPerUser');
-  return typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 5 ? v : 1;
+  return parseFreeExamsPerUser(snap.get('free_exams_per_user') ?? snap.get('freeExamsPerUser'));
 }
 
 function answersRef(attemptId: string, sectionId: string) {

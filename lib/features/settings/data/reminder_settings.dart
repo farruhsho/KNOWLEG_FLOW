@@ -18,19 +18,51 @@ abstract final class ReminderFields {
   static const bishkek = 'Asia/Bishkek';
 }
 
+/// Firebase side of [ReminderSettings]; replaced by a fake in tests.
+class ReminderBackend {
+  const ReminderBackend();
+
+  /// Whether Firebase is up (no writes are attempted otherwise).
+  bool get isReady => FirebaseService.isInitialized;
+
+  /// This device's FCM registration token, or null.
+  Future<String?> deviceToken() => FirebaseService.getFCMToken();
+
+  /// Invalidates this device's FCM token.
+  Future<void> deleteDeviceToken() => FirebaseService.deleteFCMToken();
+
+  /// Merges [patch] into `users/{uid}`.
+  Future<void> mergeProfile(String uid, Map<String, Object> patch) =>
+      FirebaseService.firestore
+          .collection('users')
+          .doc(uid)
+          .set(patch, SetOptions(merge: true));
+
+  void recordError(Object error, StackTrace stack) =>
+      FirebaseService.recordNonFatal(error, stack, reason: 'reminder_sync');
+}
+
 /// Daily study reminder preference (GAM-13 client part, AUTH-SET-01).
 ///
 /// The OS permission is requested only when the user turns the reminder on
 /// (Settings or the dashboard card), never at start-up. When enabled, the
 /// device's FCM token and the preference are stored on `users/{uid}`; the
-/// scheduled `sendStudyReminders` function sends the reminder. Turning it
-/// off or signing out removes this device's token, so a shared device never
-/// gets another account's reminders.
+/// scheduled `sendStudyReminders` function sends the reminder to every token
+/// of an account whose `daily_reminder_enabled` is true.
+///
+/// `daily_reminder_enabled` is account-wide. Turning the reminder on sets it
+/// ([enable], or [refreshRegistration] re-registering a rotated token on a
+/// device where it is on); only the explicit switch in Settings ([disable])
+/// clears it. Signing out only removes this device's token from
+/// `fcm_tokens` (REM-01), so a shared device never gets another account's
+/// reminders while the account's other devices keep theirs.
 class ReminderSettings {
-  ReminderSettings(this._prefs, this._uid);
+  ReminderSettings(this._prefs, this._uid, {ReminderBackend backend = const ReminderBackend()})
+      : _backend = backend;
 
   final SharedPreferences _prefs;
   final String? _uid;
+  final ReminderBackend _backend;
 
   /// Device-level key used before the preference was scoped per account.
   static const _legacyEnabledKey = 'daily_reminder_enabled';
@@ -85,26 +117,52 @@ class ReminderSettings {
     return ReminderEnableResult.enabled;
   }
 
-  /// Turns the reminder off and removes this device's token.
+  /// The explicit account-wide switch (Settings): turns the reminder off for
+  /// the account (`daily_reminder_enabled: false`) and removes this device's
+  /// token.
   Future<void> disable() async {
     await _setEnabled(false);
     await _syncToProfile(enabled: false);
   }
 
   /// Runs before sign-out (AuthService): if this device receives the
-  /// account's reminders, unregister it. Best-effort and bounded in time so
-  /// sign-out never hangs offline (the write stays queued for the account).
+  /// account's reminders, remove only this device's token from `fcm_tokens`
+  /// ([signOutPatch]). `daily_reminder_enabled` is left alone: it is
+  /// account-wide, and the account's other devices keep getting reminders
+  /// (REM-01). Best-effort and bounded in time so sign-out never hangs
+  /// offline (the write stays queued for the account).
   Future<void> onSignOut() async {
     if (!enabled) return;
+    // This device stops receiving this account's reminder; after signing in
+    // again the toggle shows off here until the user turns it back on.
     await _setEnabled(false);
-    await _syncToProfile(enabled: false, timeout: const Duration(seconds: 3));
+    // Whoever signs in next re-registers their own (new) token.
+    _refreshedThisSession = false;
+    final uid = _uid;
+    if (uid != null) {
+      await _prefs.remove('$_registeredTokenKey:$uid');
+      if (_backend.isReady) {
+        final token = await _deviceToken();
+        if (token != null) {
+          await _write(uid, signOutPatch(token), const Duration(seconds: 3),
+              registeredToken: null);
+        }
+      }
+    }
     // Invalidate the token itself too, in case the write above only reaches
     // the server after this account signs in again.
-    await FirebaseService.deleteFCMToken();
+    await _backend.deleteDeviceToken();
   }
 
-  /// Fields written to `users/{uid}` (pure, for tests). Enabling adds this
-  /// device's [token]; disabling removes it.
+  /// Fields written to `users/{uid}` on sign-out (pure, for tests): only
+  /// this device's [token] is removed, never `daily_reminder_enabled`.
+  static Map<String, Object> signOutPatch(String token) => {
+        ReminderFields.tokens: FieldValue.arrayRemove([token]),
+      };
+
+  /// Fields the explicit toggle writes to `users/{uid}` (pure, for tests).
+  /// Enabling adds this device's [token]; disabling turns the account-wide
+  /// flag off and removes the token. Sign-out uses [signOutPatch] instead.
   static Map<String, Object> profilePatch({required bool enabled, String? token}) {
     if (enabled) {
       return {
@@ -128,10 +186,9 @@ class ReminderSettings {
   Future<void> refreshRegistration() async {
     final uid = _uid;
     if (_refreshedThisSession || uid == null || !enabled) return;
-    if (!FirebaseService.isInitialized || !FirebaseService.supportsMessaging) return;
+    if (!_backend.isReady || !FirebaseService.supportsMessaging) return;
     _refreshedThisSession = true;
-    final token = await FirebaseService.getFCMToken()
-        .timeout(const Duration(seconds: 5), onTimeout: () => null);
+    final token = await _deviceToken();
     if (token == null || _prefs.getString('$_registeredTokenKey:$uid') == token) return;
     await _write(uid, profilePatch(enabled: true, token: token), const Duration(seconds: 8),
         registeredToken: token);
@@ -142,12 +199,15 @@ class ReminderSettings {
     Duration timeout = const Duration(seconds: 8),
   }) async {
     final uid = _uid;
-    if (uid == null || !FirebaseService.isInitialized) return;
-    final token = await FirebaseService.getFCMToken()
-        .timeout(const Duration(seconds: 5), onTimeout: () => null);
+    if (uid == null || !_backend.isReady) return;
+    final token = await _deviceToken();
     await _write(uid, profilePatch(enabled: enabled, token: token), timeout,
         registeredToken: enabled ? token : null);
   }
+
+  Future<String?> _deviceToken() => _backend
+      .deviceToken()
+      .timeout(const Duration(seconds: 5), onTimeout: () => null);
 
   Future<void> _write(
     String uid,
@@ -156,11 +216,7 @@ class ReminderSettings {
     required String? registeredToken,
   }) async {
     try {
-      await FirebaseService.firestore
-          .collection('users')
-          .doc(uid)
-          .set(patch, SetOptions(merge: true))
-          .timeout(timeout);
+      await _backend.mergeProfile(uid, patch).timeout(timeout);
       final key = '$_registeredTokenKey:$uid';
       if (registeredToken == null) {
         await _prefs.remove(key);
@@ -168,7 +224,7 @@ class ReminderSettings {
         await _prefs.setString(key, registeredToken);
       }
     } catch (e, s) {
-      FirebaseService.recordNonFatal(e, s, reason: 'reminder_sync');
+      _backend.recordError(e, s);
     }
   }
 }

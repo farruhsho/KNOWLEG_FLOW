@@ -223,13 +223,18 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminAppCheckPlatformNote =>
-      'Бул платформада App Check жок: аны текшерген сервер функциялары (ролдор, кредиттер, жарыялоо, тарифтер, ЖИ долбоорлору) четке кагылышы мүмкүн. App Check менен веб-версияны же Android\'ди колдонуңуз.';
+      'Бул версия админ-функциялар үчүн App Check талап кылган серверге ылайыкталган (APP_CHECK_ENFORCE_ADMIN), бирок бул платформада App Check жок: ролдор, кредиттер, жарыялоо, тарифтер жана ЖИ долбоорлору четке кагылат. App Check менен веб-версияны же Android\'ди колдонуңуз.';
 
   @override
   String get adminAppTitle => 'ORT Master · CMS';
 
   @override
   String get adminApply => 'Применить';
+
+  @override
+  String adminBanReasonTooLong(int max) {
+    return 'Причина — не длиннее $max символов.';
+  }
 
   @override
   String get adminCancel => 'Отмена';
@@ -327,6 +332,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminErrQuota => 'Достигнут лимит. Повторите позже.';
+
+  @override
+  String get adminErrSessionExpired =>
+      'Сессия администратора истекла. Войдите снова.';
 
   @override
   String get adminErrTitle => 'Не удалось загрузить';
@@ -1138,8 +1147,9 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminPricingIssueCredits => 'Кредитов за продукт — от 1 до 100.';
 
   @override
-  String get adminPricingIssueFree =>
-      'Бесплатных тестов на пользователя — от 0 до 10.';
+  String adminPricingIssueFree(int min, int max) {
+    return 'Бесплатных тестов на пользователя — от $min до $max.';
+  }
 
   @override
   String get adminPricingIssueProduct => 'Неизвестный id продукта.';
@@ -2191,6 +2201,16 @@ class AppLocalizationsKy extends AppLocalizations {
   String get examEntitlementFree => 'Биринчи тест акысыз';
 
   @override
+  String examEntitlementFreeLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count акысыз тест калды',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get examEntitlementHint =>
       'Бир кредит — бир толук тест. Аяктабаган тестти улантуу акысыз.';
 
@@ -2214,7 +2234,7 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get examErrorPlatformUnsupported =>
-      'Бул түзмөктө сынамык экзамендер жеткиликсиз. Колдонмону телефондон (Android же iPhone) же браузерден ачыңыз.';
+      'Бул түзмөктө сынамык экзамендер жеткиликсиз. Колдонмону телефондон (Android же iPhone) ачыңыз.';
 
   @override
   String get examErrorSignIn => 'Экзамен тапшыруу үчүн аккаунтуңузга кириңиз.';
@@ -3989,6 +4009,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get shellHomeNextStepError => 'Сунушту жүктөө мүмкүн болбоду.';
+
+  @override
+  String get shellHomeNoCredits => 'Жеткиликтүү сынамык экзамен жок';
 
   @override
   String get shellHomeReminderEnable => 'Күйгүзүү';
