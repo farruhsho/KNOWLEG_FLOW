@@ -186,7 +186,10 @@ class LessonModel {
         if (latex == null || latex.trim().isEmpty) continue;
         out.add(LessonFormula(
           latex: latex.trim(),
-          title: JsonRead.localized(JsonRead.any(m, ['title', 'name', 'description']), defaultLang: lang),
+          // 'caption' is what the admin CMS (LessonDoc) writes.
+          title: JsonRead.localized(
+              JsonRead.any(m, ['title', 'caption', 'name', 'description']),
+              defaultLang: lang),
         ));
       }
       return out;

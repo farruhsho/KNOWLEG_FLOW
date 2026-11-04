@@ -7,7 +7,8 @@ import 'package:knowledge_flow/features/admin/domain/localized_text.dart';
 import 'package:knowledge_flow/features/admin/domain/pricing_config.dart';
 import 'package:knowledge_flow/features/admin/domain/review_workflow.dart';
 import 'package:knowledge_flow/features/admin/presentation/widgets/math_markdown.dart';
-import 'package:knowledge_flow/shared/models/lesson_model.dart';
+import 'package:knowledge_flow/shared/models/lesson_model.dart'
+    hide LessonSection, LessonFormula;
 import 'package:knowledge_flow/shared/models/subject_model.dart';
 
 ExamQuestionDoc _q({List<ExamOption>? options, String stem = r'Найдите $x$', String? passage}) =>

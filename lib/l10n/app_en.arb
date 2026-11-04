@@ -1,365 +1,2969 @@
 {
   "@@locale": "en",
+  "aboutApp": "About App",
+  "accountDeleteButton": "Delete account permanently",
+  "accountDeleteConfirmLabel": "To confirm, type {word}",
+  "@accountDeleteConfirmLabel": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "accountDeleteConfirmWord": "DELETE",
+  "@accountDeleteConfirmWord": {
+    "description": "Word the user must type to confirm deletion"
+  },
+  "accountDeleteDone": "Your account has been deleted.",
+  "accountDeleteGoToLogin": "Sign in",
+  "accountDeleteInProgress": "Deleting your data…",
+  "accountDeleteItemAi": "AI tutor usage history",
+  "accountDeleteItemCredits": "Unused exam credits and the free exam — they are cancelled and can't be transferred",
+  "accountDeleteItemExams": "Mock exam attempts and results",
+  "accountDeleteItemGamification": "XP, level, streaks, achievements and leaderboard entries",
+  "accountDeleteItemLogin": "Your sign-in (email and password or the Google link)",
+  "accountDeleteItemProfile": "Profile: name, email, photo, grade, region and settings",
+  "accountDeleteItemProgress": "Learning progress, lesson history, mistakes and the review queue",
+  "accountDeleteKeptGoogle": "Your Google Play payment history is kept by Google in your Google account.",
+  "accountDeleteKeptPurchases": "Anonymized purchase records (date, product, amount, order number) without your name or email. We need them for financial reporting, refunds and fraud prevention.",
+  "accountDeleteSignedOut": "Sign in to delete your account.",
+  "accountDeleteTitle": "Delete account",
+  "accountDeleteWarningBody": "Your account and learning data will be permanently deleted. You won't be able to restore them.",
+  "accountDeleteWarningTitle": "This can't be undone",
+  "accountDeleteWhatDeletedTitle": "What will be deleted",
+  "accountDeleteWhatKeptTitle": "What we keep",
+  "accountErrorGoogle": "Google sign-in failed. Try again.",
+  "accountErrorNetwork": "No connection. Check the internet and try again.",
+  "accountErrorRecentLogin": "For security, please sign in again and repeat.",
+  "accountErrorService": "Account deletion is temporarily unavailable. Try again later.",
+  "accountErrorTooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+  "accountErrorUnknown": "Couldn't delete the account. Try again.",
+  "accountErrorUserMismatch": "That's a different account. Sign in with the account you want to delete.",
+  "accountErrorWrongPassword": "Wrong password.",
+  "accountReauthBody": "For security, sign in again before deleting the account.",
+  "accountReauthCancel": "Cancel",
+  "accountReauthConfirm": "Confirm",
+  "accountReauthEmail": "Account: {email}",
+  "@accountReauthEmail": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "accountReauthGoogle": "Continue with Google",
+  "accountReauthPassword": "Password",
+  "accountReauthTitle": "Confirm it's you",
+  "adminAccountMenu": "Account",
+  "adminActivate": "Activate",
+  "adminActive": "Active",
+  "adminAdd": "Add",
+  "adminAddOption": "Add option",
+  "adminAiCount": "Count",
+  "adminAiDraftMeta": "{topic} · difficulty {difficulty}",
+  "@adminAiDraftMeta": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      },
+      "difficulty": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAiDrafts": "Drafts: {n}",
+  "@adminAiDrafts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAiEmpty": "Fill in the request and generate drafts.",
+  "adminAiFillForm": "Choose structure, section, part and topic.",
+  "adminAiGenerate": "Generate drafts",
+  "adminAiGenerating": "Generating…",
+  "adminAiNotice": "Drafts are generated on the server; no API key is stored in the app. Every draft is saved with the status \"Draft\" and must be approved by a methodologist before it can be used in a variant.",
+  "adminAiOpenBank": "Open the exam bank",
+  "adminAiRequest": "Request",
+  "adminAiSaveSelected": "Save {n}",
+  "@adminAiSaveSelected": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAiSaved": "Saved {n} drafts for review",
+  "@adminAiSaved": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminAll": "All",
+  "adminAppTitle": "ORT Master · CMS",
+  "adminApply": "Apply",
+  "adminCancel": "Cancel",
+  "adminClose": "Close",
+  "adminCorrectMultiHelp": "Mark all correct options.",
+  "adminCorrectSingleHelp": "Mark the one correct option.",
+  "adminDashboardReviewBody": "Open the exam bank with the status filter \"Draft\" or \"AI-checked\" to review questions. Only approved questions with an answer key can go into a published variant.",
+  "adminDashboardReviewTitle": "Review queue",
+  "adminDashboardShortcuts": "Sections",
+  "adminDashboardWelcome": "Signed in as: {role}",
+  "@adminDashboardWelcome": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDeactivate": "Deactivate",
+  "adminDelete": "Delete",
+  "adminDeletePermanently": "Delete permanently",
+  "adminDeleted": "Deleted",
+  "adminDifficulty1": "1 · easy",
+  "adminDifficulty2": "2 · medium",
+  "adminDifficulty3": "3 · hard",
+  "adminDifficultyN": "difficulty {n}",
+  "@adminDifficultyN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDiscard": "Discard",
+  "adminEdit": "Edit",
+  "adminErrFileTooLarge": "File is too large (max {mb} MB).",
+  "@adminErrFileTooLarge": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "adminErrForbidden": "You do not have permission for this action.",
+  "adminErrFunctionMissing": "The server function is not deployed yet.",
+  "adminErrGeneric": "Error: {message}",
+  "@adminErrGeneric": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "adminErrIndex": "Firestore needs an index for this filter. Change the filter or create the index.",
+  "adminErrNetwork": "No connection to the server. Check the network and try again.",
+  "adminErrNotFound": "Not found.",
+  "adminErrQuota": "Limit reached. Try again later.",
+  "adminErrTitle": "Could not load",
+  "adminErrUnknown": "Something went wrong. Try again.",
+  "adminErrValidation": "Validation failed: {message}",
+  "@adminErrValidation": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamApprove": "Approve",
+  "adminExamBackToDraft": "Back to draft",
+  "adminExamChoosePlacement": "Choose the test structure and section first.",
+  "adminExamCorrectIs": "Correct option: {id}",
+  "@adminExamCorrectIs": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamCreateTranslation": "Create in {lang}",
+  "@adminExamCreateTranslation": {
+    "placeholders": {
+      "lang": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamEdit": "Edit exam question",
+  "adminExamEmpty": "No exam questions match the filter.",
+  "adminExamErrApproveNoKey": "Cannot approve: the question has no answer key.",
+  "adminExamFixedOptions": "This part uses fixed answer options. Mark the correct one.",
+  "adminExamGroup": "Translation group: {id}",
+  "@adminExamGroup": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamHasTranslation": "Has translation",
+  "adminExamImage": "Image",
+  "adminExamIssueLanguage": "Choose the language (ru, ky or en).",
+  "adminExamIssueOptionDuplicate": "Option ids must be unique.",
+  "adminExamIssueOptionsCount": "The blueprint requires {n} options.",
+  "@adminExamIssueOptionsCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminExamIssuePart": "Choose the part of the section.",
+  "adminExamIssuePassage": "This part needs a linked text (passage).",
+  "adminExamIssueSection": "Choose blueprint and section.",
+  "adminExamIssueTopic": "Topic id is required.",
+  "adminExamKey": "Answer key (never shown to students before the end)",
+  "adminExamLink": "Link",
+  "adminExamLinkTitle": "Link existing translation",
+  "adminExamLinked": "Translations linked",
+  "adminExamMarkAiVerified": "Mark as AI-checked",
+  "adminExamNew": "New exam question",
+  "adminExamNewPassage": "New text",
+  "adminExamNoBlueprint": "No blueprint section matches {subject}/{section}. Choose the structure again.",
+  "@adminExamNoBlueprint": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamNoGroup": "Not linked to a translation yet.",
+  "adminExamNoImage": "No image.",
+  "adminExamPartUnverified": "This split into parts is an assumption (not officially published).",
+  "adminExamPassage": "Linked text",
+  "adminExamPassageEmpty": "The text is empty.",
+  "adminExamPassageText": "Text",
+  "adminExamPlacement": "Placement",
+  "adminExamQuestionId": "Question id",
+  "adminExamReject": "Reject",
+  "adminExamReview": "Review",
+  "adminExamReviewDone": "Status: {status}",
+  "@adminExamReviewDone": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamReviewNoRights": "Your role cannot change the review status.",
+  "adminExamReviewNotes": "Reviewer notes",
+  "adminExamReviewedBy": "{uid} · {date}",
+  "@adminExamReviewedBy": {
+    "placeholders": {
+      "uid": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExamSaveBeforeReview": "Save your changes before changing the status.",
+  "adminExamSavedBackToDraft": "Saved. The content changed, so the question went back to \"Draft\" for review.",
+  "adminExamSolutionSteps": "Solution steps",
+  "adminExamSolutionStepsHelp": "One step per line",
+  "adminExamSource": "Source",
+  "adminExamSourceAdapted": "Adapted / translated",
+  "adminExamSourceAi": "AI",
+  "adminExamSourceAuthor": "Author",
+  "adminExamSourceBasis": "Source / basis",
+  "adminExamSourceKind": "Origin",
+  "adminExamSourceOriginal": "Original",
+  "adminExamStemLabel": "Question text",
+  "adminExamTranslations": "Translations",
+  "adminExamWrongNote": "Why {id} is wrong",
+  "@adminExamWrongNote": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminExport": "Export",
+  "adminExportCopied": "Copied to clipboard",
+  "adminExportCopy": "Copy",
+  "adminExportHelp": "Exports the questions matching the current filter (up to 5000). Dates are written as ISO strings.",
+  "adminExportSave": "Save file",
+  "adminExportSaved": "File saved",
+  "adminExportTitle": "Export questions",
+  "adminFieldBlueprint": "Test structure",
+  "adminFieldDescription": "Description",
+  "adminFieldDifficulty": "Difficulty",
+  "adminFieldExplanation": "Explanation",
+  "adminFieldHint": "Hint",
+  "adminFieldImageUrl": "Image URL",
+  "adminFieldLanguage": "Language",
+  "adminFieldOptions": "Answer options",
+  "adminFieldOrder": "Order",
+  "adminFieldPart": "Part",
+  "adminFieldPoints": "Points",
+  "adminFieldReview": "Review",
+  "adminFieldSection": "Section",
+  "adminFieldStatus": "Status",
+  "adminFieldStem": "Question text",
+  "adminFieldSubject": "Subject",
+  "adminFieldSubtopicId": "Subtopic id (optional)",
+  "adminFieldTags": "Tags",
+  "adminFieldTagsHelp": "Comma separated",
+  "adminFieldTitle": "Title",
+  "adminFieldTopic": "Topic",
+  "adminFieldTopicId": "Topic id",
+  "adminFieldTopicIdHelp": "For example math.quadratic_equations",
+  "adminFieldType": "Type",
+  "adminForbiddenBody": "Your role does not allow opening this section.",
+  "adminForbiddenTitle": "No access",
+  "adminHidden": "Hidden",
+  "adminImport": "Import",
+  "adminImportDuplicateId": "Duplicate id in the file.",
+  "adminImportEmpty": "The file has no data rows.",
+  "adminImportFailedAfter": "Stopped after {done} rows: {error}",
+  "@adminImportFailedAfter": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "adminImportHelp": "Rows are validated before writing; valid rows are written in batches of {batch}. CSV columns (separator , ; or tab):",
+  "@adminImportHelp": {
+    "placeholders": {
+      "batch": {
+        "type": "int"
+      }
+    }
+  },
+  "adminImportParseError": "The file could not be read.",
+  "adminImportPick": "Choose file",
+  "adminImportProgress": "Written {done} of {total}",
+  "@adminImportProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "adminImportRowIssue": "Row {row}: {issue}",
+  "@adminImportRowIssue": {
+    "placeholders": {
+      "row": {
+        "type": "int"
+      },
+      "issue": {
+        "type": "String"
+      }
+    }
+  },
+  "adminImportRun": "Import {count}",
+  "@adminImportRun": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminImportSummary": "Rows: {total} · valid: {valid} · with errors: {invalid}",
+  "@adminImportSummary": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "valid": {
+        "type": "int"
+      },
+      "invalid": {
+        "type": "int"
+      }
+    }
+  },
+  "adminImportTitle": "Import questions (CSV or JSON)",
+  "adminInactive": "Inactive",
+  "adminIssueCorrectNotInOptions": "The correct answer is not among the options.",
+  "adminIssueCorrectRequired": "Mark the correct answer.",
+  "adminIssueDifficulty": "Difficulty must be 1–3.",
+  "adminIssueOptionEmpty": "Every option needs text.",
+  "adminIssueStem": "Question text is required.",
+  "adminLangEn": "English",
+  "adminLangKy": "Kyrgyz",
+  "adminLangRu": "Russian",
+  "adminLessonAddExample": "Add example",
+  "adminLessonAddFormula": "Add formula",
+  "adminLessonAddMistake": "Add mistake",
+  "adminLessonAddSection": "Add section",
+  "adminLessonBasics": "Basics",
+  "adminLessonCaption": "Caption",
+  "adminLessonExamples": "Worked examples",
+  "adminLessonFormulas": "Formulas",
+  "adminLessonImages": "Images",
+  "adminLessonIssueContent": "Add a summary or at least one section.",
+  "adminLessonIssueMinutes": "Duration must be 1–240 minutes.",
+  "adminLessonIssueOrder": "Order must be 0–10000.",
+  "adminLessonIssueSubject": "Choose a subject.",
+  "adminLessonIssueUrl": "Video/PDF must be an http(s) link or an uploaded file.",
+  "adminLessonLatex": "LaTeX",
+  "adminLessonMinutes": "Minutes",
+  "adminLessonMistake": "Mistake",
+  "adminLessonMistakes": "Common mistakes",
+  "adminLessonNoImages": "No images.",
+  "adminLessonPdf": "PDF",
+  "adminLessonPdfHelp": "Link or an uploaded file (up to 20 MB)",
+  "adminLessonPracticeAndMedia": "Practice and media",
+  "adminLessonPracticeIds": "Practice question ids",
+  "adminLessonPracticeIdsHelp": "Ids from the \"questions\" collection, separated by commas",
+  "adminLessonProblem": "Problem",
+  "adminLessonPublishedHelp": "Unpublished lessons are hidden from students.",
+  "adminLessonSectionBody": "Text (Markdown, LaTeX in $…$)",
+  "adminLessonSectionTitle": "Section title",
+  "adminLessonSections": "Sections",
+  "adminLessonSolution": "Solution",
+  "adminLessonSummary": "Summary",
+  "adminLessonTitleSummary": "Title and summary",
+  "adminLessonVideoUrl": "Video URL",
+  "adminLessonsDeleteBody": "Students will no longer see this lesson. To hide it temporarily, turn off \"Published\" instead.",
+  "adminLessonsDeleteTitle": "Delete lesson?",
+  "adminLessonsEdit": "Edit lesson",
+  "adminLessonsEmpty": "No lessons for this subject.",
+  "adminLessonsLegacy": "Old format",
+  "adminLessonsMeta": "#{order} · {minutes} min",
+  "@adminLessonsMeta": {
+    "placeholders": {
+      "order": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "adminLessonsNew": "New lesson",
+  "adminLessonsNoSubjects": "Create a subject first.",
+  "adminListEnd": "Shown: {count}",
+  "@adminListEnd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminListNoItems": "Nothing added yet.",
+  "adminLoadMore": "Load more",
+  "adminLoginBackToApp": "Back to the app",
+  "adminLoginContinue": "Continue",
+  "adminLoginEmail": "Email",
+  "adminLoginEmailInvalid": "Enter a valid email",
+  "adminLoginErrCredentials": "Wrong email or password.",
+  "adminLoginErrDisabled": "This account is disabled.",
+  "adminLoginErrNotAdmin": "This account has no admin role.",
+  "adminLoginErrTooMany": "Too many attempts. Try again later.",
+  "adminLoginForgot": "Forgot password?",
+  "adminLoginHidePassword": "Hide password",
+  "adminLoginOtherAccount": "Use another account",
+  "adminLoginPassword": "Password",
+  "adminLoginPasswordRequired": "Enter the password",
+  "adminLoginResetSend": "Send link",
+  "adminLoginResetSent": "If the account exists, a reset link has been sent.",
+  "adminLoginResetTitle": "Reset password",
+  "adminLoginShowPassword": "Show password",
+  "adminLoginSignedInAs": "Signed in as {email}",
+  "@adminLoginSignedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "adminLoginSubmit": "Sign in",
+  "adminLoginSubtitle": "For ORT Master staff only.",
+  "adminLoginTitle": "Admin panel",
+  "adminLogout": "Log out",
+  "adminLogsActor": "by {uid}",
+  "@adminLogsActor": {
+    "placeholders": {
+      "uid": {
+        "type": "String"
+      }
+    }
+  },
+  "adminLogsEmpty": "The log is empty.",
+  "adminLogsTarget": "target {uid}",
+  "@adminLogsTarget": {
+    "placeholders": {
+      "uid": {
+        "type": "String"
+      }
+    }
+  },
+  "adminMarkCorrect": "Mark as correct",
+  "adminMathHelp": "Markdown; formulas in $…$ or $$…$$",
+  "adminMissingTranslation": "No {lang}",
+  "@adminMissingTranslation": {
+    "placeholders": {
+      "lang": {
+        "type": "String"
+      }
+    }
+  },
+  "adminMore": "More",
+  "adminMoveDown": "Move down",
+  "adminMoveUp": "Move up",
+  "adminNavAiDrafts": "AI drafts",
+  "adminNavDashboard": "Dashboard",
+  "adminNavExamBank": "Exam bank",
+  "adminNavLessons": "Lessons",
+  "adminNavLogs": "Admin log",
+  "adminNavPayments": "Payments",
+  "adminNavPractice": "Practice questions",
+  "adminNavPricing": "Pricing",
+  "adminNavSubjects": "Subjects & topics",
+  "adminNavUsers": "Users",
+  "adminNavVariants": "Exam variants",
+  "adminNo": "no",
+  "adminNone": "Not set",
+  "adminOptionN": "Option {id}",
+  "@adminOptionN": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminOptionText": "Text",
+  "adminPaymentsCredits": "{n} credits",
+  "@adminPaymentsCredits": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPaymentsEmpty": "No purchases.",
+  "adminPaymentsReadOnly": "Read only. Credits are granted by the server after Google Play verification.",
+  "adminPaymentsRefund": "Refund",
+  "adminPracticeDeleteBody": "The question will be removed from practice. To hide it, make it inactive instead.",
+  "adminPracticeDeleteTitle": "Delete question?",
+  "adminPracticeEdit": "Edit question",
+  "adminPracticeEmpty": "No questions match the filter.",
+  "adminPracticeIssueOptionsMin": "At least two options are required.",
+  "adminPracticeIssueSubject": "Subject is required.",
+  "adminPracticeIssueType": "Unknown type",
+  "adminPracticeNew": "New question",
+  "adminPricingConfirmBody": "Changes apply to new purchases immediately.",
+  "adminPricingConfirmTitle": "Save pricing?",
+  "adminPricingCreditsFor": "{id} — credits",
+  "@adminPricingCreditsFor": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPricingDefaults": "config/pricing does not exist yet; defaults are shown.",
+  "adminPricingFree": "Free exams",
+  "adminPricingFreeHelp": "Product rule: 1 (the first full exam is free once per account)",
+  "adminPricingFreeLabel": "Free full exams per account",
+  "adminPricingIssueCredits": "Credits per product must be 1–100.",
+  "adminPricingIssueFree": "Free exams per user must be 0–10.",
+  "adminPricingIssueProduct": "Unknown product id.",
+  "adminPricingIssueSingle": "exam_single must grant exactly 1 credit.",
+  "adminPricingProducts": "Credits per product",
+  "adminPricingSingleHelp": "Fixed: 1 credit = 1 exam",
+  "adminPricingWarning": "Prices are set in Google Play Console, not here. This page only maps products to exam credits. Do not change the base price of 100 som (exam_single) without the owner's approval.",
+  "adminPublished": "Published",
+  "adminPurchaseGranted": "Granted",
+  "adminPurchaseInvalid": "Invalid",
+  "adminPurchasePending": "Pending",
+  "adminPurchaseRefunded": "Refunded",
+  "adminPurchaseRevoked": "Revoked",
+  "adminQuestionExtra": "Extra",
+  "adminQuestionMeta": "Classification",
+  "adminReason": "Reason",
+  "adminReasonRequired": "Give a reason (at least 3 characters).",
+  "adminRemove": "Remove",
+  "adminRetry": "Retry",
+  "adminReviewAiVerified": "AI-checked",
+  "adminReviewApproved": "Approved",
+  "adminReviewDraft": "Draft",
+  "adminReviewRejected": "Rejected",
+  "adminRoleContentManager": "Content manager",
+  "adminRoleMethodologist": "Methodologist",
+  "adminRoleModerator": "Moderator",
+  "adminRoleSuperAdmin": "Super admin",
+  "adminRoleSupport": "Support",
+  "adminSave": "Save",
+  "adminSaved": "Saved",
+  "adminSessionExpiredBody": "Sign in again to continue.",
+  "adminSessionExpiredTitle": "Admin session ended",
+  "adminSignInAgain": "Sign in",
+  "adminStatApproved": "Approved",
+  "adminStatExam": "Exam questions",
+  "adminStatLessons": "Lessons",
+  "adminStatPendingReview": "Awaiting review",
+  "adminStatPractice": "Practice questions",
+  "adminStatPurchases": "Granted purchases",
+  "adminStatSubjects": "Subjects",
+  "adminStatUsers": "Users",
+  "adminStatVariants": "Published variants",
+  "adminSubjectsActiveHelp": "Inactive subjects stay in the database (soft delete).",
+  "adminSubjectsAddTopic": "Add topic",
+  "adminSubjectsColor": "Colour (#RRGGBB)",
+  "adminSubjectsColorInvalid": "Use #RRGGBB",
+  "adminSubjectsDeleteBody": "The subject {id} will be deleted only if no lessons or questions use it. Otherwise deactivate it.",
+  "@adminSubjectsDeleteBody": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminSubjectsDeleteTitle": "Delete subject?",
+  "adminSubjectsEdit": "Edit subject",
+  "adminSubjectsEmpty": "No subjects yet.",
+  "adminSubjectsErrExists": "A subject with this id already exists.",
+  "adminSubjectsErrInUse": "The subject is still used: {lessons} lessons, {questions} practice questions, {exam} exam questions. Deactivate it instead.",
+  "@adminSubjectsErrInUse": {
+    "placeholders": {
+      "lessons": {
+        "type": "int"
+      },
+      "questions": {
+        "type": "int"
+      },
+      "exam": {
+        "type": "int"
+      }
+    }
+  },
+  "adminSubjectsIcon": "Icon name",
+  "adminSubjectsId": "Subject id",
+  "adminSubjectsIdHelp": "Latin letters, digits and _; cannot be changed later",
+  "adminSubjectsIdInvalid": "2–41 characters: a–z, 0–9, _ (starts with a letter)",
+  "adminSubjectsNew": "New subject",
+  "adminSubjectsTopicDuplicate": "Duplicate topic id: {id}",
+  "@adminSubjectsTopicDuplicate": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminSubjectsTopicId": "Topic id",
+  "adminSubjectsTopicIdInvalid": "Invalid topic id: {id} (use a–z, 0–9, _ and dots)",
+  "@adminSubjectsTopicIdInvalid": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminSubjectsTopicN": "Topic {n}",
+  "@adminSubjectsTopicN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminSubjectsTopics": "Topics",
+  "adminSubjectsTopicsCount": "topics: {count}",
+  "@adminSubjectsTopicsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminSubjectsTopicsHelp": "Topic ids become subject.topic (e.g. math.quadratic_equations) and are used by exam questions.",
+  "adminTitleRequired": "Enter a title in Russian or Kyrgyz.",
+  "adminTypeAnalogy": "Analogy",
+  "adminTypeComparison": "Quantitative comparison",
+  "adminTypeCompletion": "Sentence completion",
+  "adminTypeMatching": "Matching",
+  "adminTypeMultiple": "Multiple choice",
+  "adminTypeOrdering": "Ordering",
+  "adminTypeSingle": "Single choice",
+  "adminTypeTextBased": "Reading (text-based)",
+  "adminTypeTrueFalse": "True / false",
+  "adminUnsavedBody": "You have unsaved changes.",
+  "adminUnsavedTitle": "Discard changes?",
+  "adminUpdated": "Updated",
+  "adminUploadImage": "Upload image",
+  "adminUploadPdf": "Upload PDF",
+  "adminUploaded": "Uploaded",
+  "adminUserActions": "Actions",
+  "adminUserBalance": "balance {n}",
+  "@adminUserBalance": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminUserBan": "Ban",
+  "adminUserBanTitle": "Ban user?",
+  "adminUserCreated": "Registered",
+  "adminUserCredits": "Credits",
+  "adminUserEntitlements": "Exam access",
+  "adminUserFreeUsed": "Free exam used",
+  "adminUserGrade": "Grade",
+  "adminUserGrant": "Grant",
+  "adminUserGrantDelta": "Credits",
+  "adminUserGrantDeltaHelp": "1 credit = 1 exam; negative to take back",
+  "adminUserGrantDeltaInvalid": "Enter a non-zero number from -100 to 100.",
+  "adminUserGrantDone": "Credits updated",
+  "adminUserGrantTitle": "Grant credits",
+  "adminUserLanguage": "Language",
+  "adminUserLastActive": "Last active",
+  "adminUserLedger": "Credit history",
+  "adminUserLifetime": "Credits purchased",
+  "adminUserNoEntitlements": "No entitlement record yet (first exam not used).",
+  "adminUserPremiumOff": "Remove premium",
+  "adminUserPremiumOffBody": "The subscription returns to free.",
+  "adminUserPremiumOffTitle": "Remove premium?",
+  "adminUserPremiumOn": "Grant premium",
+  "adminUserPremiumOnBody": "Sets the subscription to yearly for 365 days. Exam credits are separate and are granted only with credits.",
+  "adminUserPremiumOnTitle": "Grant premium?",
+  "adminUserRole": "Role",
+  "adminUserRoleBody": "Sets the role claim through the server. The user must sign in again for it to apply.",
+  "adminUserRoleDone": "Role updated",
+  "adminUserRoleNone": "No admin role",
+  "adminUserRoleTitle": "Admin role",
+  "adminUserSchool": "School",
+  "adminUserStats": "Progress",
+  "adminUserSubscription": "Subscription",
+  "adminUserTitle": "User",
+  "adminUserUnban": "Unban",
+  "adminUserUnbanBody": "The ban flag will be removed.",
+  "adminUserUnbanTitle": "Unban user?",
+  "adminUsersBanned": "Banned",
+  "adminUsersEmpty": "No users found.",
+  "adminUsersLegacyAdmin": "admin (legacy)",
+  "adminUsersPremium": "Premium",
+  "adminUsersSearch": "Search by email (start)",
+  "adminVariantAddIds": "Add question ids",
+  "adminVariantAddIdsHelp": "Separate ids with spaces, commas or new lines",
+  "adminVariantAdvanced": "Advanced",
+  "adminVariantArchived": "Archived",
+  "adminVariantAutoFill": "Auto-fill approved",
+  "adminVariantAutoFilled": "Added {n} approved questions",
+  "@adminVariantAutoFilled": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVariantBasics": "Variant",
+  "adminVariantBlocked": "Publishing is blocked: {n} problems.",
+  "@adminVariantBlocked": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVariantBlueprintLocked": "Remove all questions to change the structure.",
+  "adminVariantCheck": "Check against the structure",
+  "adminVariantChooseBlueprint": "Choose the test structure.",
+  "adminVariantClear": "Clear",
+  "adminVariantDifficulty": "Level",
+  "adminVariantDraft": "Draft",
+  "adminVariantInReview": "In review",
+  "adminVariantN": "Variant {n}",
+  "@adminVariantN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVariantNoKey": "no key",
+  "adminVariantNoProblems": "No problems reported.",
+  "adminVariantNumber": "Number",
+  "adminVariantNumberInvalid": "Variant number must be 1–1000.",
+  "adminVariantPublish": "Publish",
+  "adminVariantPublishBody": "The server checks the variant again. Students will be able to start it right after publishing.",
+  "adminVariantPublishTitle": "Publish variant?",
+  "adminVariantPublished": "Published",
+  "adminVariantReady": "Ready to publish (the server checks again).",
+  "adminVariantRecheck": "Re-check",
+  "adminVariantServerResult": "Server: {status}",
+  "@adminVariantServerResult": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVariantStandard": "Standard",
+  "adminVariantUnknownQuestion": "not found",
+  "adminVariantUnpublish": "Unpublish",
+  "adminVariantUnpublishBody": "New attempts will not be possible. Attempts already started can still be finished.",
+  "adminVariantUnpublishTitle": "Unpublish variant?",
+  "adminVariantsEdit": "Variant",
+  "adminVariantsEmpty": "No variants match the filter.",
+  "adminVariantsErrPublished": "The variant is published. Unpublish it before editing.",
+  "adminVariantsMeta": "{blueprint} · {count}/{expected} questions",
+  "@adminVariantsMeta": {
+    "placeholders": {
+      "blueprint": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "expected": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVariantsNew": "New variant",
+  "adminVpBlueprintVersion": "Built for blueprint version {actual}, current is {expected}.",
+  "@adminVpBlueprintVersion": {
+    "placeholders": {
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVpLanguage": "This language is not allowed by the blueprint.",
+  "adminVpPartCount": "Part {part}: {actual} questions, needs {expected}.",
+  "@adminVpPartCount": {
+    "placeholders": {
+      "part": {
+        "type": "String"
+      },
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVpPartUnknown": "{id}: part unknown (set the part in the question).",
+  "@adminVpPartUnknown": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionDuplicate": "{id}: used more than once.",
+  "@adminVpQuestionDuplicate": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionLanguage": "{id}: wrong language.",
+  "@adminVpQuestionLanguage": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionMissing": "{id}: question not found.",
+  "@adminVpQuestionMissing": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionNoKey": "{id}: no answer key.",
+  "@adminVpQuestionNoKey": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionNotApproved": "{id}: not approved by a methodologist.",
+  "@adminVpQuestionNotApproved": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionOptions": "{id}: {actual} options, needs {expected}.",
+  "@adminVpQuestionOptions": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVpQuestionPart": "{id}: its part is not in this section.",
+  "@adminVpQuestionPart": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionPassage": "{id}: needs a linked text.",
+  "@adminVpQuestionPassage": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpQuestionSection": "{id}: belongs to another section than {section}.",
+  "@adminVpQuestionSection": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpSectionCount": "{section}: {actual} questions, needs {expected}.",
+  "@adminVpSectionCount": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      },
+      "expected": {
+        "type": "int"
+      },
+      "actual": {
+        "type": "int"
+      }
+    }
+  },
+  "adminVpSectionMissing": "Section {section} is empty.",
+  "@adminVpSectionMissing": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "adminVpSectionOrder": "Sections are not in blueprint order.",
+  "adminVpSectionUnknown": "Section {section} is not in the blueprint.",
+  "@adminVpSectionUnknown": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "adminYes": "yes",
+  "alreadyHaveAccount": "Already have an account?",
+  "analytics": "Analytics",
   "appName": "ORT Master KG",
   "@appName": {
     "description": "Application name"
   },
-
-  "welcome": "Welcome",
-  "getStarted": "Get Started",
-  "login": "Login",
-  "signup": "Sign Up",
-  "email": "Email",
-  "password": "Password",
+  "appVersion": "App Version",
+  "appearance": "Appearance",
+  "averageScore": "Average Score",
+  "billingBalanceAfter": "Balance: {balance}",
+  "@billingBalanceAfter": {
+    "placeholders": {
+      "balance": {
+        "type": "int"
+      }
+    }
+  },
+  "billingBalanceError": "Couldn't load your balance.",
+  "billingBalanceTitle": "Your balance",
+  "billingBuySemantics": "Buy {title} for {price}",
+  "@billingBuySemantics": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "billingCreditRule": "1 credit = 1 full mock exam",
+  "billingCreditsCount": "{count, plural, =1{1 credit} other{{count} credits}}",
+  "@billingCreditsCount": {
+    "description": "Exam credit balance",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingErrorAccountMismatch": "This purchase belongs to another account in the app. Sign in with that account to use it.",
+  "billingErrorAlreadyOwned": "Your previous purchase is still being processed. We're checking it now.",
+  "billingErrorInvalid": "The purchase couldn't be verified. If you were charged, Google Play will refund it automatically within 3 days.",
+  "billingErrorLaunch": "Couldn't start the purchase. Try again.",
+  "billingErrorNotSignedIn": "Sign in to buy tests.",
+  "billingErrorProductUnavailable": "This offer is no longer available.",
+  "billingErrorStore": "Google Play returned an error. Try again.",
+  "billingErrorStoreUnavailable": "Google Play is unavailable right now. Try again later.",
+  "billingErrorVerifyDeferred": "We couldn't confirm the purchase yet. We'll retry automatically, and your payment won't be lost.",
+  "billingExternalInfo": "Access to additional tests can be purchased on our website.",
+  "billingExternalNote": "Purchased credits appear here automatically.",
+  "billingFreeExamAvailable": "Your first full mock exam is free",
+  "billingFreeExamUsed": "Free mock exam already used",
+  "billingHistoryError": "Couldn't load the history.",
+  "billingHistoryTooltip": "Purchase history",
+  "billingHonestNoGuarantee": "Mock exams help you practise; they don't guarantee an ORT result.",
+  "billingHonestPayment": "Payment is processed by Google Play.",
+  "billingHonestServer": "Credits are added only after our server confirms the purchase.",
+  "billingLedgerEmpty": "No credit changes yet.",
+  "billingLoadMore": "Load more",
+  "billingLoadingProducts": "Loading offers…",
+  "billingOrderId": "Order {id}",
+  "@billingOrderId": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "billingProductSubtitle": "{count, plural, =1{1 full mock exam} other{{count} full mock exams}}",
+  "@billingProductSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingProductTests": "{count, plural, =1{1 test} other{{count} tests}}",
+  "@billingProductTests": {
+    "description": "Product title by number of tests",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingProductsEmpty": "Offers are temporarily unavailable. Please try again later.",
+  "billingProductsError": "Couldn't load offers from Google Play.",
+  "billingProductsTitle": "Buy mock exams",
+  "billingPurchasesEmpty": "No purchases yet.",
+  "billingReasonAdminGrant": "Added by support",
+  "billingReasonExamStart": "Mock exam started",
+  "billingReasonFreeFirst": "Free first exam",
+  "billingReasonOther": "Balance change",
+  "billingReasonPurchase": "Purchase",
+  "billingReasonRefund": "Refund",
+  "billingRestore": "Restore purchases",
+  "billingRestoreDone": "Check finished. Your balance updates automatically.",
+  "billingRestoreStarted": "Checking unfinished purchases…",
+  "billingRetry": "Try again",
+  "billingSignInRequired": "Sign in to see your balance and history.",
+  "billingStateGranted": "Credited",
+  "billingStateInvalid": "Not confirmed",
+  "billingStatePending": "Awaiting payment",
+  "billingStateRefunded": "Refunded",
+  "billingStateRevoked": "Revoked",
+  "billingStatusCanceled": "Purchase canceled.",
+  "billingStatusGranted": "Purchase confirmed. Credits have been added.",
+  "billingStatusLaunching": "Opening Google Play…",
+  "billingStatusPending": "Awaiting payment. Credits will be added once Google Play confirms the payment.",
+  "billingStatusVerifying": "Confirming your purchase…",
+  "billingStoreTitle": "Exam access",
+  "billingTabLedger": "Credits",
+  "billingTabPurchases": "Purchases",
+  "billingTransactionsTitle": "Purchase history",
+  "billingUnavailableBody": "Google Play billing isn't available on this device. Make sure Google Play is installed and you're signed in to it.",
+  "billingUnavailableTitle": "Purchases are unavailable",
+  "biology": "Biology",
+  "buyTest": "Buy Test",
+  "cancel": "Cancel",
+  "cardPayment": "Card Payment",
+  "chemistry": "Chemistry",
+  "clear": "Clear",
+  "clearCache": "Clear Cache",
+  "clearCacheConfirmation": "Clear Cache?",
+  "clearCacheDesc": "Free up space",
+  "clearCacheMessage": "This will delete all downloaded content. You can download it again when online.",
+  "community": "Community",
   "confirmPassword": "Confirm Password",
-  "forgotPassword": "Forgot Password?",
-  "orContinueWith": "Or continue with",
-  "googleSignIn": "Sign in with Google",
-  "phoneSignIn": "Sign in with Phone",
-  "alreadyHaveAccount": "Already have an account?",
-  "dontHaveAccount": "Don't have an account?",
-
-  "onboardingTitle1": "Prepare for ORT",
-  "onboardingDesc1": "Complete practice tests and master all subjects for the ORT exam",
-  "onboardingTitle2": "Track Your Progress",
-  "onboardingDesc2": "Monitor your performance and identify weak areas to improve",
-  "onboardingTitle3": "Mock Exams",
-  "onboardingDesc3": "Take full-length simulations with real ORT format and timing",
-  "next": "Next",
-  "skip": "Skip",
+  "continueTest": "Continue Test",
+  "correct": "Correct",
+  "currentPlan": "Current Plan",
+  "dailyGoal": "Daily Goal",
+  "dark": "Dark",
+  "darkMode": "Dark Mode",
+  "dashboard": "Dashboard",
+  "dataAndStorage": "Data & Storage",
+  "deleteAccount": "Delete Account",
   "done": "Done",
-
-  "selectGrade": "Select Your Grade",
-  "grade9": "Grade 9",
+  "dontHaveAccount": "Don't have an account?",
+  "downloadedContent": "Downloaded Content",
+  "editProfile": "Edit Profile",
+  "email": "Email",
+  "emailNotifications": "Email Notifications",
+  "emailNotificationsDesc": "News and updates",
+  "english": "English",
+  "error": "Error",
+  "examAnsweredOf": "Answered {answered} of {total}",
+  "@examAnsweredOf": {
+    "description": "Exam mode",
+    "placeholders": {
+      "answered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examAutoSubmitted": "Time is up. The section has been submitted.",
+  "@examAutoSubmitted": {
+    "description": "Exam mode"
+  },
+  "examBuy": "Buy",
+  "@examBuy": {
+    "description": "Exam mode"
+  },
+  "examBuyToStart": "Buy a test",
+  "@examBuyToStart": {
+    "description": "Exam mode"
+  },
+  "examCatalogEmpty": "No exams are available yet.",
+  "@examCatalogEmpty": {
+    "description": "Exam mode"
+  },
+  "examCatalogIntro": "Full timed tests in the official ORT format.",
+  "@examCatalogIntro": {
+    "description": "Exam mode"
+  },
+  "examCatalogMainTitle": "Main test",
+  "@examCatalogMainTitle": {
+    "description": "Exam mode"
+  },
+  "examCatalogStateLanguageTitle": "State language",
+  "@examCatalogStateLanguageTitle": {
+    "description": "Exam mode"
+  },
+  "examCatalogSubjectsTitle": "Subject tests",
+  "@examCatalogSubjectsTitle": {
+    "description": "Exam mode"
+  },
+  "examClearAnswer": "Clear answer",
+  "@examClearAnswer": {
+    "description": "Exam mode"
+  },
+  "examColumnA": "Column A",
+  "@examColumnA": {
+    "description": "Exam mode"
+  },
+  "examColumnB": "Column B",
+  "@examColumnB": {
+    "description": "Exam mode"
+  },
+  "examContinue": "Continue",
+  "@examContinue": {
+    "description": "Exam mode"
+  },
+  "examCostCredit": "1 credit (you have {credits})",
+  "@examCostCredit": {
+    "description": "Exam mode",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "examCostFree": "Free — this is your first test",
+  "@examCostFree": {
+    "description": "Exam mode"
+  },
+  "examCostNeedCredit": "You need 1 credit to start this test.",
+  "@examCostNeedCredit": {
+    "description": "Exam mode"
+  },
+  "examCostResume": "Free — you are continuing your attempt",
+  "@examCostResume": {
+    "description": "Exam mode"
+  },
+  "examDisclaimerFallback": "Practice result. Not an official ORT score.",
+  "@examDisclaimerFallback": {
+    "description": "Exam mode"
+  },
+  "examEntitlementCredits": "Credits: {count}",
+  "@examEntitlementCredits": {
+    "description": "Exam mode",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examEntitlementFree": "Your first test is free",
+  "@examEntitlementFree": {
+    "description": "Exam mode"
+  },
+  "examEntitlementHint": "One credit = one full test. Continuing an unfinished test is free.",
+  "@examEntitlementHint": {
+    "description": "Exam mode"
+  },
+  "examEntitlementNone": "No credits left",
+  "@examEntitlementNone": {
+    "description": "Exam mode"
+  },
+  "examErrorAttemptNotFound": "This attempt was not found.",
+  "@examErrorAttemptNotFound": {
+    "description": "Exam mode"
+  },
+  "examErrorGeneric": "Something went wrong. Please try again.",
+  "@examErrorGeneric": {
+    "description": "Exam mode"
+  },
+  "examErrorNetwork": "No connection. Check the internet and try again.",
+  "@examErrorNetwork": {
+    "description": "Exam mode"
+  },
+  "examErrorSignIn": "Sign in to take exams.",
+  "@examErrorSignIn": {
+    "description": "Exam mode"
+  },
+  "examErrorVariantUnavailable": "This variant is not available right now.",
+  "@examErrorVariantUnavailable": {
+    "description": "Exam mode"
+  },
+  "examExit": "Leave test",
+  "@examExit": {
+    "description": "Exam mode"
+  },
+  "examExitBody": "The section timer keeps running on the server while you are away. Your answers are saved — you can continue from the home screen.",
+  "@examExitBody": {
+    "description": "Exam mode"
+  },
+  "examExitLeave": "Leave",
+  "@examExitLeave": {
+    "description": "Exam mode"
+  },
+  "examExitStay": "Stay",
+  "@examExitStay": {
+    "description": "Exam mode"
+  },
+  "examExitTitle": "Leave the test?",
+  "@examExitTitle": {
+    "description": "Exam mode"
+  },
+  "examFinishSection": "Finish section",
+  "@examFinishSection": {
+    "description": "Exam mode"
+  },
+  "examFinishSectionConfirm": "Finish",
+  "@examFinishSectionConfirm": {
+    "description": "Exam mode"
+  },
+  "examFinishSectionFlagged": "Marked for review: {count}",
+  "@examFinishSectionFlagged": {
+    "description": "Exam mode",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examFinishSectionTitle": "Finish “{section}”?",
+  "@examFinishSectionTitle": {
+    "description": "Exam mode",
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "examFinishSectionUnanswered": "Unanswered: {count}",
+  "@examFinishSectionUnanswered": {
+    "description": "Exam mode",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examFinishSectionWarning": "After finishing you cannot return to this section.",
+  "@examFinishSectionWarning": {
+    "description": "Exam mode"
+  },
+  "examFinishedLoading": "Test finished. Loading your result…",
+  "@examFinishedLoading": {
+    "description": "Exam mode"
+  },
+  "examFlag": "Mark for review",
+  "@examFlag": {
+    "description": "Exam mode"
+  },
+  "examHistoryAction": "History",
+  "@examHistoryAction": {
+    "description": "Exam mode"
+  },
+  "examHistoryAttempts": "Attempts: {count}",
+  "@examHistoryAttempts": {
+    "description": "Exam mode",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examHistoryEmpty": "No finished tests yet. Your results will appear here.",
+  "@examHistoryEmpty": {
+    "description": "Exam mode"
+  },
+  "examHistoryLast": "Last: {percent}%",
+  "@examHistoryLast": {
+    "description": "Exam mode",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "examHistoryTitle": "Exam history",
+  "@examHistoryTitle": {
+    "description": "Exam mode"
+  },
+  "examHistoryTrendDown": "−{delta}% vs previous",
+  "@examHistoryTrendDown": {
+    "description": "Exam mode",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "examHistoryTrendSame": "Same as previous",
+  "@examHistoryTrendSame": {
+    "description": "Exam mode"
+  },
+  "examHistoryTrendUp": "+{delta}% vs previous",
+  "@examHistoryTrendUp": {
+    "description": "Exam mode",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "examImageError": "The image could not be loaded",
+  "@examImageError": {
+    "description": "Exam mode"
+  },
+  "examIntroCost": "Cost",
+  "@examIntroCost": {
+    "description": "Exam mode"
+  },
+  "examIntroLanguage": "Test language: {language}",
+  "@examIntroLanguage": {
+    "description": "Exam mode",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "examIntroRules": "Rules",
+  "@examIntroRules": {
+    "description": "Exam mode"
+  },
+  "examIntroStructure": "Structure",
+  "@examIntroStructure": {
+    "description": "Exam mode"
+  },
+  "examKeepWorking": "Keep working",
+  "@examKeepWorking": {
+    "description": "Exam mode"
+  },
+  "examLangEn": "English",
+  "@examLangEn": {
+    "description": "Exam mode"
+  },
+  "examLangKy": "Kyrgyz",
+  "@examLangKy": {
+    "description": "Exam mode"
+  },
+  "examLangRu": "Russian",
+  "@examLangRu": {
+    "description": "Exam mode"
+  },
+  "examLanguageLabel": "Test language",
+  "@examLanguageLabel": {
+    "description": "Exam mode"
+  },
+  "examLoading": "Loading…",
+  "@examLoading": {
+    "description": "Exam mode"
+  },
+  "examMinutesCount": "{minutes} min",
+  "@examMinutesCount": {
+    "description": "Exam mode",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examMockTitle": "Mock ORT",
+  "@examMockTitle": {
+    "description": "Exam mode"
+  },
+  "examNext": "Next",
+  "@examNext": {
+    "description": "Exam mode"
+  },
+  "examNextSectionTimeRunning": "The timer of this section is already running:",
+  "@examNextSectionTimeRunning": {
+    "description": "Exam mode"
+  },
+  "examNextSectionTitle": "Next section",
+  "@examNextSectionTitle": {
+    "description": "Exam mode"
+  },
+  "examNoQuestions": "This section has no questions. Please contact support.",
+  "@examNoQuestions": {
+    "description": "Exam mode"
+  },
+  "examOfflineAutoRetry": "We will also retry automatically.",
+  "@examOfflineAutoRetry": {
+    "description": "Exam mode"
+  },
+  "examOfflineBadge": "Offline — answers are saved on the device",
+  "@examOfflineBadge": {
+    "description": "Exam mode"
+  },
+  "examOfflineBody": "Your answers are saved on this device. The next section starts only after the server receives this one.",
+  "@examOfflineBody": {
+    "description": "Exam mode"
+  },
+  "examOfflineTitle": "No connection",
+  "@examOfflineTitle": {
+    "description": "Exam mode"
+  },
+  "examOnlyLanguage": "Only in {language}",
+  "@examOnlyLanguage": {
+    "description": "Exam mode",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "examOptionSemantics": "Option {letter}",
+  "@examOptionSemantics": {
+    "description": "Exam mode",
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "examPalette": "Questions",
+  "@examPalette": {
+    "description": "Exam mode"
+  },
+  "examPaletteAnswered": "Answered",
+  "@examPaletteAnswered": {
+    "description": "Exam mode"
+  },
+  "examPaletteCurrent": "Current",
+  "@examPaletteCurrent": {
+    "description": "Exam mode"
+  },
+  "examPaletteFlagged": "Marked",
+  "@examPaletteFlagged": {
+    "description": "Exam mode"
+  },
+  "examPaletteUnanswered": "Not answered",
+  "@examPaletteUnanswered": {
+    "description": "Exam mode"
+  },
+  "examPartAssumption": "The official split between these parts is not published; this is an approximation.",
+  "@examPartAssumption": {
+    "description": "Exam mode"
+  },
+  "examPassage": "Text",
+  "@examPassage": {
+    "description": "Exam mode"
+  },
+  "examPassageHide": "Hide text",
+  "@examPassageHide": {
+    "description": "Exam mode"
+  },
+  "examPassageShow": "Show text",
+  "@examPassageShow": {
+    "description": "Exam mode"
+  },
+  "examPrevious": "Previous",
+  "@examPrevious": {
+    "description": "Exam mode"
+  },
+  "examQuestionOf": "Question {current} of {total}",
+  "@examQuestionOf": {
+    "description": "Exam mode",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examQuestionsCount": "{count, plural, =1{1 question} other{{count} questions}}",
+  "@examQuestionsCount": {
+    "description": "Exam mode",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examResultBySection": "By section",
+  "@examResultBySection": {
+    "description": "Exam mode"
+  },
+  "examResultCorrect": "Correct",
+  "@examResultCorrect": {
+    "description": "Exam mode"
+  },
+  "examResultIncorrect": "Wrong",
+  "@examResultIncorrect": {
+    "description": "Exam mode"
+  },
+  "examResultLevelsBody": "The official result of the state language test is a level from 1 to 4. The level boundaries are not published, so the app shows only your percentage of correct answers and does not guess your level.",
+  "@examResultLevelsBody": {
+    "description": "Exam mode"
+  },
+  "examResultLevelsTitle": "How the official result works",
+  "@examResultLevelsTitle": {
+    "description": "Exam mode"
+  },
+  "examResultNoWeak": "No weak topics found — great job!",
+  "@examResultNoWeak": {
+    "description": "Exam mode"
+  },
+  "examResultNotEligible": "Some sections were closed late, so this attempt does not count for the leaderboard.",
+  "@examResultNotEligible": {
+    "description": "Exam mode"
+  },
+  "examResultPending": "The result is still being calculated. Try again in a few seconds.",
+  "@examResultPending": {
+    "description": "Exam mode"
+  },
+  "examResultRecommendation": "Review “{topic}”: go back to the theory and solve 10–15 practice questions on it.",
+  "@examResultRecommendation": {
+    "description": "Exam mode",
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "examResultReview": "Review answers",
+  "@examResultReview": {
+    "description": "Exam mode"
+  },
+  "examResultScore": "{correct} of {total} correct",
+  "@examResultScore": {
+    "description": "Exam mode",
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examResultSkipped": "Skipped",
+  "@examResultSkipped": {
+    "description": "Exam mode"
+  },
+  "examResultStrong": "Strong topics",
+  "@examResultStrong": {
+    "description": "Exam mode"
+  },
+  "examResultTitle": "Result",
+  "@examResultTitle": {
+    "description": "Exam mode"
+  },
+  "examResultToExams": "To exams",
+  "@examResultToExams": {
+    "description": "Exam mode"
+  },
+  "examResultTopicScore": "{correct} of {total}",
+  "@examResultTopicScore": {
+    "description": "Exam mode",
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examResultWeak": "What to review",
+  "@examResultWeak": {
+    "description": "Exam mode"
+  },
+  "examResultWrongOrSkipped": "Wrong or skipped",
+  "@examResultWrongOrSkipped": {
+    "description": "Exam mode"
+  },
+  "examResultXp": "XP earned: {xp}",
+  "@examResultXp": {
+    "description": "Exam mode",
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "examResumeAwaitingSubmit": "Waiting to be submitted",
+  "@examResumeAwaitingSubmit": {
+    "description": "Exam mode"
+  },
+  "examResumeTimeUp": "Section time is up",
+  "@examResumeTimeUp": {
+    "description": "Exam mode"
+  },
+  "examResumeTitle": "Unfinished test",
+  "@examResumeTitle": {
+    "description": "Exam mode"
+  },
+  "examRetry": "Try again",
+  "@examRetry": {
+    "description": "Exam mode"
+  },
+  "examReviewAskTutor": "Ask the AI tutor",
+  "@examReviewAskTutor": {
+    "description": "Exam mode"
+  },
+  "examReviewCorrectAnswer": "Correct answer: {answer}",
+  "@examReviewCorrectAnswer": {
+    "description": "Exam mode",
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "examReviewEmpty": "Nothing here for this filter.",
+  "@examReviewEmpty": {
+    "description": "Exam mode"
+  },
+  "examReviewExplanation": "Explanation",
+  "@examReviewExplanation": {
+    "description": "Exam mode"
+  },
+  "examReviewFilterAll": "All",
+  "@examReviewFilterAll": {
+    "description": "Exam mode"
+  },
+  "examReviewFilterFlagged": "Marked",
+  "@examReviewFilterFlagged": {
+    "description": "Exam mode"
+  },
+  "examReviewFilterWrong": "Mistakes",
+  "@examReviewFilterWrong": {
+    "description": "Exam mode"
+  },
+  "examReviewNoAnswer": "no answer",
+  "@examReviewNoAnswer": {
+    "description": "Exam mode"
+  },
+  "examReviewQuestionNumber": "Question {number}",
+  "@examReviewQuestionNumber": {
+    "description": "Exam mode",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "examReviewTitle": "Answer review",
+  "@examReviewTitle": {
+    "description": "Exam mode"
+  },
+  "examReviewYourAnswer": "Your answer: {answer}",
+  "@examReviewYourAnswer": {
+    "description": "Exam mode",
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "examRuleForwardOnly": "Sections go strictly in order. A finished section is closed — you cannot return to it.",
+  "@examRuleForwardOnly": {
+    "description": "Exam mode"
+  },
+  "examRuleFreeNavigation": "Inside a section you can move between questions freely and mark them to come back later.",
+  "@examRuleFreeNavigation": {
+    "description": "Exam mode"
+  },
+  "examRuleKeepsRunning": "If you leave the app, the timer keeps running. Your answers are saved on the device.",
+  "@examRuleKeepsRunning": {
+    "description": "Exam mode"
+  },
+  "examRuleNoCalculator": "Calculators are not allowed.",
+  "@examRuleNoCalculator": {
+    "description": "Exam mode"
+  },
+  "examRuleScratchpad": "Scratch paper is allowed in: {sections}.",
+  "@examRuleScratchpad": {
+    "description": "Exam mode",
+    "placeholders": {
+      "sections": {
+        "type": "String"
+      }
+    }
+  },
+  "examRuleTimer": "Each section has its own timer. You will be warned 5 minutes and 1 minute before the end; at zero the section is submitted automatically.",
+  "@examRuleTimer": {
+    "description": "Exam mode"
+  },
+  "examSectionDone": "Section submitted",
+  "@examSectionDone": {
+    "description": "Exam mode"
+  },
+  "examSectionLabel": "Section {index} of {count}",
+  "@examSectionLabel": {
+    "description": "Exam mode",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examSectionsCount": "{count, plural, =1{1 section} other{{count} sections}}",
+  "@examSectionsCount": {
+    "description": "Exam mode",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examShowMore": "Show more",
+  "@examShowMore": {
+    "description": "Exam mode"
+  },
+  "examStart": "Start test",
+  "@examStart": {
+    "description": "Exam mode"
+  },
+  "examStartSection": "Start section",
+  "@examStartSection": {
+    "description": "Exam mode"
+  },
+  "examStarting": "Preparing your test…",
+  "@examStarting": {
+    "description": "Exam mode"
+  },
+  "examSubmitting": "Submitting the section…",
+  "@examSubmitting": {
+    "description": "Exam mode"
+  },
+  "examTabTitle": "Exams",
+  "@examTabTitle": {
+    "description": "Exam mode"
+  },
+  "examTimeLeftLabel": "Time left",
+  "@examTimeLeftLabel": {
+    "description": "Exam mode"
+  },
+  "examTotal": "Total",
+  "@examTotal": {
+    "description": "Exam mode"
+  },
+  "examUnflag": "Remove mark",
+  "@examUnflag": {
+    "description": "Exam mode"
+  },
+  "examVariantAdvanced": "Advanced",
+  "@examVariantAdvanced": {
+    "description": "Exam mode"
+  },
+  "examVariantBest": "Best: {percent}%",
+  "@examVariantBest": {
+    "description": "Exam mode",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "examVariantInProgress": "In progress",
+  "@examVariantInProgress": {
+    "description": "Exam mode"
+  },
+  "examVariantNotStarted": "Not started",
+  "@examVariantNotStarted": {
+    "description": "Exam mode"
+  },
+  "examVariantTitle": "Variant {number}",
+  "@examVariantTitle": {
+    "description": "Exam mode",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "examVariants": "Variants",
+  "@examVariants": {
+    "description": "Exam mode"
+  },
+  "examVariantsEmpty": "No variants in this language yet. New ones are added regularly.",
+  "@examVariantsEmpty": {
+    "description": "Exam mode"
+  },
+  "examWarningFive": "5 minutes left in this section",
+  "@examWarningFive": {
+    "description": "Exam mode"
+  },
+  "examWarningOne": "1 minute left — the section will be submitted automatically",
+  "@examWarningOne": {
+    "description": "Exam mode"
+  },
+  "explanation": "Explanation",
+  "finish": "Finish",
+  "flashcards": "Flashcards",
+  "forgotPassword": "Forgot Password?",
+  "free": "Free",
+  "geography": "Geography",
+  "getStarted": "Get Started",
+  "googleSignIn": "Sign in with Google",
   "grade10": "Grade 10",
   "grade11": "Grade 11",
+  "grade9": "Grade 9",
   "graduate": "Graduate",
-  "selectSubjects": "Select Weak Subjects",
-  "selectLanguage": "Select Language",
-  "kyrgyz": "Kyrgyz",
-  "russian": "Russian",
-  "english": "English",
-
-  "dashboard": "Dashboard",
-  "subjects": "Subjects",
-  "tests": "Tests",
-  "profile": "Profile",
-  "community": "Community",
-
-  "myProgress": "My Progress",
-  "dailyGoal": "Daily Goal",
-  "streak": "Day Streak",
-  "nextOrtDate": "Next ORT Registration",
-  "startLearning": "Start Learning",
-  "takeQuiz": "Take Quiz",
-  "mockTest": "Mock Test",
-
-  "mathematics": "Mathematics",
-  "physics": "Physics",
-  "chemistry": "Chemistry",
-  "biology": "Biology",
   "history": "History of Kyrgyzstan",
-  "geography": "Geography",
-  "kyrgyzLanguage": "Kyrgyz Language",
-  "russianLanguage": "Russian Language",
-
-  "lessons": "Lessons",
-  "practiceQuiz": "Practice Quiz",
-  "flashcards": "Flashcards",
-  "progress": "Progress",
-
-  "startQuiz": "Start Quiz",
-  "submit": "Submit",
-  "next": "Next",
-  "previous": "Previous",
-  "finish": "Finish",
-  "review": "Review",
-  "score": "Score",
-  "correct": "Correct",
+  "hours": "hours",
   "incorrect": "Incorrect",
-  "explanation": "Explanation",
-  "timeSpent": "Time Spent",
-
-  "mockTestTitle": "Full ORT Simulation",
+  "kgs": "KGS",
+  "kyrgyz": "Kyrgyz",
+  "kyrgyzLanguage": "Kyrgyz Language",
+  "language": "Language",
+  "learnAchAccuracy90Desc": "Score 90% on a mock exam",
+  "learnAchAccuracy90Title": "90% accuracy",
+  "learnAchAnalogiesDesc": "A high score in the analogies section",
+  "learnAchAnalogiesTitle": "Analogies master",
+  "learnAchDays30Desc": "Study on 30 different days",
+  "learnAchDays30Title": "30 study days",
+  "learnAchExamChampionDesc": "Complete 10 mock exams",
+  "learnAchExamChampionTitle": "Mock exam champion",
+  "learnAchFirstLessonDesc": "Complete your first lesson",
+  "learnAchFirstLessonTitle": "First lesson",
+  "learnAchMathExpertDesc": "90% in math on three mock exams",
+  "learnAchMathExpertTitle": "Math expert",
+  "learnAchReaderDesc": "A high score in the reading section",
+  "learnAchReaderTitle": "Reader",
+  "learnAchStreak7Desc": "Study 7 days in a row",
+  "learnAchStreak7Title": "Week streak",
+  "learnAchXp100Desc": "Earn 100 XP",
+  "learnAchXp100Title": "First 100 XP",
+  "learnAchievementLocked": "Locked",
+  "learnAchievementUnlocked": "Unlocked",
+  "learnAchievementUnlockedOn": "Unlocked on {date}",
+  "@learnAchievementUnlockedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "learnAchievementsServerNote": "Achievements are granted automatically from your results on the server.",
+  "learnAchievementsTitle": "Achievements",
+  "learnAchievementsUnlocked": "{n} of {total} unlocked",
+  "@learnAchievementsUnlocked": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnAnswersCount": "{n, plural, =1{1 answer} other{{n} answers}}",
+  "@learnAnswersCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnAskTutor": "Ask the AI tutor",
+  "learnAvgPerQuestion": "Average {seconds} s per question",
+  "@learnAvgPerQuestion": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "learnBack": "Back",
+  "learnBackHome": "Back to home",
+  "learnBestResult": "Best result",
+  "learnCorrect": "Correct!",
+  "learnCorrectAnswerIs": "Correct answer: {answer}",
+  "@learnCorrectAnswerIs": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "learnDailyLessonTitle": "Lesson of the day",
+  "learnDifficultyEasy": "Easy",
+  "learnDifficultyHard": "Hard",
+  "learnDifficultyMedium": "Medium",
+  "learnDurationMinutes": "{n} min",
+  "@learnDurationMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnElapsedTime": "Elapsed time",
+  "learnErrorGeneric": "Could not load data. Please try again.",
+  "learnErrorNotFound": "Not found.",
+  "learnErrorOffline": "No connection. Check the internet and try again.",
+  "learnErrorPermission": "No access to the data. Please sign in again.",
+  "learnExamHistoryAll": "Full history",
+  "learnExamHistoryEmpty": "You haven't finished a mock exam yet.",
+  "learnExamHistoryTitle": "Recent attempts",
+  "learnExamHistoryUnavailable": "Exam history is unavailable right now.",
+  "learnExamResultUnofficial": "Practice result, not an official ORT score.",
+  "learnExamResultsTitle": "Mock exams",
+  "learnExamSectionsTitle": "Average by section",
+  "learnExitBody": "{count, plural, =0{You haven't answered any questions yet.} =1{Your answer to 1 question can be saved.} other{Your answers to {count} questions can be saved.}}",
+  "@learnExitBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "learnExitContinue": "Continue",
+  "learnExitDiscard": "Leave without saving",
+  "learnExitFinish": "Finish and save",
+  "learnExitTitle": "Finish practice?",
+  "learnExplanation": "Explanation",
+  "learnFinish": "Finish",
+  "learnHandbookFactsUnavailable": "Couldn't load the exam structure.",
+  "learnHandbookNotFound": "Handbook section not found",
+  "learnHandbookRussianOnly": "This section is available in Russian only.",
+  "learnHandbookSearch": "Search the handbook",
+  "learnHandbookSections": "{n, plural, =1{1 section} other{{n} sections}}",
+  "@learnHandbookSections": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHandbookTitle": "Handbook",
+  "learnHbAssumption": "(split is an assumption)",
+  "learnHbMainTest": "ORT main test ({year})",
+  "@learnHbMainTest": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "learnHbMainTotal": "Total: {questions, plural, =1{1 item} other{{questions} items}}, {minutes} min.",
+  "@learnHbMainTotal": {
+    "placeholders": {
+      "questions": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbMaxScore": "The official maximum score of the main test is {score}.",
+  "@learnHbMaxScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbPartLine": "{title}: {questions} items, {options, plural, =1{1 answer option} other{{options} answer options}}",
+  "@learnHbPartLine": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "questions": {
+        "type": "int"
+      },
+      "options": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbSectionLine": "{title}: {questions, plural, =1{1 item} other{{questions} items}}, {minutes} min",
+  "@learnHbSectionLine": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "questions": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbStateLanguage": "{questions, plural, =1{1 item} other{{questions} items}}, {minutes} min. Required for the certificate; reported as level 1–4.",
+  "@learnHbStateLanguage": {
+    "placeholders": {
+      "questions": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbSubjectTests": "Subject tests (optional)",
+  "learnHbThresholdCollege": "Colleges: {n} on the main test.",
+  "@learnHbThresholdCollege": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbThresholdsUniversity": "University thresholds: {main} on the main test and {subject} on subject tests (2026–2027).",
+  "@learnHbThresholdsUniversity": {
+    "placeholders": {
+      "main": {
+        "type": "int"
+      },
+      "subject": {
+        "type": "int"
+      }
+    }
+  },
+  "learnHbThresholdsYearly": "Thresholds are set anew every year — check testing.kg.",
+  "learnLeaderboardAllTime": "All time",
+  "learnLeaderboardAnonymous": "Student",
+  "learnLeaderboardBySubject": "By subject",
+  "learnLeaderboardEmpty": "The leaderboard is empty",
+  "learnLeaderboardEmptyBody": "It will fill up as students earn XP.",
+  "learnLeaderboardNotRanked": "You're not on this board yet. XP from studying is added automatically.",
+  "learnLeaderboardTitle": "Leaderboard",
+  "learnLeaderboardWeekly": "Weekly",
+  "learnLeaderboardYou": "{name} (you)",
+  "@learnLeaderboardYou": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "learnLessonAllDone": "You've completed every lesson in this subject.",
+  "learnLessonCommonMistakes": "Common mistakes",
+  "learnLessonCompletedToast": "Lesson marked as completed.",
+  "learnLessonDone": "Lesson completed",
+  "learnLessonExampleN": "Example {n}",
+  "@learnLessonExampleN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnLessonExamples": "Examples",
+  "learnLessonFormulas": "Formulas",
+  "learnLessonHideSolution": "Hide solution",
+  "learnLessonMarkDone": "Mark lesson as completed",
+  "learnLessonMaterials": "Materials",
+  "learnLessonNoContent": "The lesson content hasn't been added yet.",
+  "learnLessonNotFound": "Lesson not found",
+  "learnLessonNotFoundBody": "The lesson may not be published yet or was removed.",
+  "learnLessonNumber": "Lesson {n}",
+  "@learnLessonNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnLessonOpenPdf": "Open PDF",
+  "learnLessonPracticeBody": "{n, plural, =1{1 question on this lesson.} other{{n} questions on this lesson.}}",
+  "@learnLessonPracticeBody": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnLessonPracticeSubjectBody": "Reinforce the material with questions on this subject.",
+  "learnLessonPracticeTitle": "Lesson practice",
+  "learnLessonShowSolution": "Show solution",
+  "learnLessonSummary": "Summary",
+  "learnLessonTitle": "Lesson",
+  "learnLessonWatchVideo": "Watch the video",
+  "learnLessonsCount": "{n, plural, =1{1 lesson} other{{n} lessons}}",
+  "@learnLessonsCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnLessonsHeading": "Lessons",
+  "learnLevelN": "Level {n}",
+  "@learnLevelN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnLinkFailed": "Couldn't open the link.",
+  "learnLoadingLesson": "Loading the lesson…",
+  "learnLoadingQuestions": "Picking questions…",
+  "learnLoadingSubject": "Loading the subject…",
+  "learnLoadingSubjects": "Loading subjects…",
+  "learnMinutes": "{n} min",
+  "@learnMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnMistakeFromExam": "Question from a mock exam",
+  "learnMistakeOpenReview": "Review",
+  "learnMistakePractice": "Practise",
+  "learnMistakeQuestion": "Question",
+  "learnMistakeResolve": "Mark as resolved",
+  "learnMistakeReviewOn": "review on {date}",
+  "@learnMistakeReviewOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "learnMistakeReviewToday": "due today",
+  "learnMistakeWrongCount": "wrong: {n}",
+  "@learnMistakeWrongCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnMistakesAllSubjects": "All subjects",
+  "learnMistakesDueToday": "Due today: {n}",
+  "@learnMistakesDueToday": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnMistakesEmptyBody": "Wrong answers from practice and exams will appear here.",
+  "learnMistakesEmptyTitle": "No mistakes to review",
+  "learnMistakesFilterAll": "All",
+  "learnMistakesFilterDue": "Due",
+  "learnMistakesNothingDue": "All caught up for today. Come back tomorrow.",
+  "learnMistakesPracticeN": "{n, plural, =1{Review 1 question} other{Review {n} questions}}",
+  "@learnMistakesPracticeN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnMistakesPracticeTitle": "Mistakes review",
+  "learnMistakesSrsNote": "Each mistake comes back after 1, 3, 7, 14 and 30 days. A correct answer moves it further; a wrong one restarts it.",
+  "learnMistakesTitle": "Mistakes & review",
+  "learnMore": "More",
+  "learnNext": "Next",
+  "learnNextLesson": "Next lesson",
+  "learnNoExplanation": "No explanation has been added for this question yet.",
+  "learnNoLessonsYet": "No lessons yet — start with practice.",
+  "learnNoQuestionsBody": "There are no reviewed questions here yet. Check back later or try quick practice.",
+  "learnNoQuestionsTitle": "No questions yet",
+  "learnNoSearchResults": "Nothing found",
+  "learnNoSubjectsBody": "Learning materials are coming soon. Meanwhile, try quick practice.",
+  "learnNoSubjectsTitle": "No subjects yet",
+  "learnOpenMistakes": "Work on mistakes",
+  "learnPracticeAgain": "Practice again",
+  "learnPracticeBySubjectEmpty": "Answer a few questions to see accuracy by subject.",
+  "learnPracticeBySubjectTitle": "Practice by subject",
+  "learnPracticeCorrectOfTotal": "{correct} of {total} correct",
+  "@learnPracticeCorrectOfTotal": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnPracticeNotOrtNote": "This is a practice result, not an ORT score: a short set of questions cannot estimate an exam score.",
+  "learnPracticePercentLabel": "Practice: {percent}%",
+  "@learnPracticePercentLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "learnPracticeSubject": "Practise this subject",
+  "learnPracticeTitle": "Practice",
+  "learnPracticeVerdictExcellent": "Excellent! Keep it up.",
+  "learnPracticeVerdictFair": "Not bad. Reviewing mistakes improves results fastest.",
+  "learnPracticeVerdictGood": "Good. Almost there.",
+  "learnPracticeVerdictLow": "More practice needed. Start by reviewing mistakes.",
+  "learnProgressEmptyBody": "Complete a lesson or practice set to see your real statistics.",
+  "learnProgressEmptyTitle": "No data yet",
+  "learnProgressTitle": "My progress",
+  "learnQuestAnswer": "{n, plural, =1{Answer 1 question} other{Answer {n} questions}}",
+  "@learnQuestAnswer": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnQuestCompleteSet": "Finish one practice set",
+  "learnQuestRun": "{n, plural, =1{1 correct answer in a row} other{{n} correct answers in a row}}",
+  "@learnQuestRun": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnQuestionNumber": "Question {n}",
+  "@learnQuestionNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnQuestionProgress": "Question {current} of {total}",
+  "@learnQuestionProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnQuestsDone": "{done} of {total} done",
+  "@learnQuestsDone": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "learnQuestsReset": "Reset in {h} h {m} min",
+  "@learnQuestsReset": {
+    "placeholders": {
+      "h": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "learnQuestsTitle": "Daily quests",
+  "learnQuickPracticeTitle": "Quick practice",
+  "learnRecDueMistakesTitle": "We recommend reviewing your mistakes ({n})",
+  "@learnRecDueMistakesTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnRecDueMistakesWhy": "…because they are due today, and spaced review makes material stick.",
+  "learnRecMoreDataTitle": "{n, plural, =1{We recommend answering 1 more question} other{We recommend answering {n} more questions}}",
+  "@learnRecMoreDataTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnRecMoreDataWhy": "…because accuracy becomes meaningful after about 20 answers.",
+  "learnRecNoExamTitle": "We recommend taking a mock exam",
+  "learnRecNoExamWhy": "…because there's no result across all sections yet, so it's unclear which one lags.",
+  "learnRecOpenExams": "Go to exams",
+  "learnRecWeakSectionTitle": "We recommend working on {section}",
+  "@learnRecWeakSectionTitle": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "learnRecWeakSectionWhy": "…because you average {percent}% there on mock exams — your lowest section.",
+  "@learnRecWeakSectionWhy": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "learnRecWeakSubjectTitle": "We recommend practising {subject}",
+  "@learnRecWeakSubjectTitle": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      }
+    }
+  },
+  "learnRecWeakSubjectWhy": "…because your accuracy there is {percent}%, lower than in other subjects ({count} answers).",
+  "@learnRecWeakSubjectWhy": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "learnRecWeakTopicTitle": "We recommend revisiting {topic}",
+  "@learnRecWeakTopicTitle": {
+    "placeholders": {
+      "topic": {
+        "type": "String"
+      }
+    }
+  },
+  "learnRecWeakTopicWhy": "…because only {percent}% of your answers on this topic are correct.",
+  "@learnRecWeakTopicWhy": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "learnRecommendationsNone": "Everything looks good — keep going.",
+  "learnRecommendationsTitle": "Recommendations",
+  "learnResultsEmptyBody": "Do a practice set and the answer review will appear here.",
+  "learnResultsEmptyTitle": "No results yet",
+  "learnResultsTitle": "Practice result",
+  "learnReviewAnswers": "Review answers",
+  "learnRightAnswer": "Correct answer",
+  "learnSearchSubjects": "Search subjects",
+  "learnSignIn": "Sign in",
+  "learnSignInToPractice": "Sign in to practise and save your progress.",
+  "learnSignInToSave": "Sign in to save your progress.",
+  "learnSkip": "Skip",
+  "learnSkipAndFinish": "Skip and finish",
+  "learnStartPractice": "Start practice",
+  "learnStatAnswered": "Practice answers",
+  "learnStatBestStreak": "Best: {n}",
+  "@learnStatBestStreak": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnStatCorrect": "Correct",
+  "learnStatExams": "Mock exams",
+  "learnStatLessonsCompleted": "lessons done: {n}",
+  "@learnStatLessonsCompleted": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnStatLessonsDone": "Lessons done",
+  "learnStatLevel": "Level",
+  "learnStatPracticeAccuracy": "Practice accuracy",
+  "learnStatPracticeOnly": "practice only",
+  "learnStatPracticeTime": "Practice time",
+  "learnStatPracticeTimeHint": "from finished sets",
+  "learnStatSessions": "{n, plural, =1{1 set} other{{n} sets}}",
+  "@learnStatSessions": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnStatSkipped": "Skipped",
+  "learnStatStreak": "Streak, days",
+  "learnStatTime": "Time",
+  "learnStatWrong": "Wrong",
+  "learnStreakDays": "{n, plural, =1{1 day} other{{n} days}}",
+  "@learnStreakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "learnSubjectNotFound": "Subject not found",
+  "learnSubjectNotFoundBody": "The link may be out of date.",
+  "learnSubjectsTitle": "Subjects",
+  "learnWeakTopicsEmpty": "Not enough answers to spot weak topics yet (5+ per topic needed).",
+  "learnWeakTopicsTitle": "Topics to review",
+  "learnWrong": "Incorrect",
+  "learnXpAwarded": "+{xp} XP",
+  "@learnXpAwarded": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "learnXpNone": "No XP was awarded for this set.",
+  "learnXpPending": "Awarding XP…",
+  "learnXpQueued": "XP will be credited once you're back online.",
+  "learnXpShort": "{xp} XP",
+  "@learnXpShort": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "learnXpToNextLevel": "{xp} XP to level {level}",
+  "@learnXpToNextLevel": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "learnXpTotal": "{xp} XP total",
+  "@learnXpTotal": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "learnYourAnswer": "Your answer",
+  "lessons": "Lessons",
+  "light": "Light",
+  "loading": "Loading...",
+  "login": "Login",
+  "logout": "Logout",
+  "mathematics": "Mathematics",
+  "mbankPayment": "MBank Payment",
+  "mockTest": "Mock Test",
   "mockTestDesc": "Complete mock test with real exam format",
+  "mockTestTitle": "Full ORT Simulation",
+  "monthly": "Monthly",
+  "myProgress": "My Progress",
+  "next": "Next",
+  "nextOrtDate": "Next ORT Registration",
+  "noConnection": "No internet connection",
+  "notifications": "Notifications",
+  "onboardingDesc1": "Complete practice tests and master all subjects for the ORT exam",
+  "onboardingDesc2": "Monitor your performance and identify weak areas to improve",
+  "onboardingDesc3": "Take full-length simulations with real ORT format and timing",
+  "onboardingTitle1": "Prepare for ORT",
+  "onboardingTitle2": "Track Your Progress",
+  "onboardingTitle3": "Mock Exams",
+  "orContinueWith": "Or continue with",
+  "password": "Password",
+  "payNow": "Pay Now",
+  "payment": "Payment",
+  "paymentMethod": "Payment Method",
+  "phoneSignIn": "Sign in with Phone",
+  "physics": "Physics",
+  "practiceQuiz": "Practice Quiz",
+  "previous": "Previous",
+  "price": "Price",
+  "privacy": "Privacy",
+  "privacyPolicy": "Privacy Policy",
+  "profile": "Profile",
+  "progress": "Progress",
+  "pushNotifications": "Push Notifications",
+  "pushNotificationsDesc": "Study reminders",
+  "retry": "Retry",
+  "review": "Review",
+  "russian": "Russian",
+  "russianLanguage": "Russian Language",
+  "score": "Score",
   "section1": "Main Test",
   "section2": "Subject Test",
   "section3": "Language Test",
-  "startTest": "Start Test",
-  "continueTest": "Continue Test",
-  "buyTest": "Buy Test",
-  "price": "Price",
-  "kgs": "KGS",
-
-  "analytics": "Analytics",
-  "weakTopics": "Weak Topics",
-  "strongTopics": "Strong Topics",
-  "averageScore": "Average Score",
-  "testsTaken": "Tests Taken",
-  "studyTime": "Study Time",
-  "hours": "hours",
-
+  "selectGrade": "Select Your Grade",
+  "selectLanguage": "Select Language",
+  "selectSubjects": "Select Weak Subjects",
   "settings": "Settings",
-  "editProfile": "Edit Profile",
-  "notifications": "Notifications",
-  "language": "Language",
-  "theme": "Theme",
-  "darkMode": "Dark Mode",
-  "privacy": "Privacy",
-  "terms": "Terms of Service",
-  "logout": "Logout",
-  "deleteAccount": "Delete Account",
-
-  "subscription": "Subscription",
-  "free": "Free",
-  "monthly": "Monthly",
-  "yearly": "Yearly",
-  "subscribe": "Subscribe",
-  "currentPlan": "Current Plan",
-
-  "payment": "Payment",
-  "paymentMethod": "Payment Method",
-  "cardPayment": "Card Payment",
-  "mbankPayment": "MBank Payment",
-  "payNow": "Pay Now",
-  "cancel": "Cancel",
-
-  "error": "Error",
-  "success": "Success",
-  "loading": "Loading...",
-  "retry": "Retry",
-  "noConnection": "No internet connection",
-  "somethingWentWrong": "Something went wrong",
-  
-  "appearance": "Appearance",
-  "system": "System",
-  "light": "Light",
-  "dark": "Dark",
-  "pushNotifications": "Push Notifications",
-  "pushNotificationsDesc": "Study reminders",
-  "emailNotifications": "Email Notifications",
-  "emailNotificationsDesc": "News and updates",
-  "dataAndStorage": "Data & Storage",
-  "downloadedContent": "Downloaded Content",
-  "clearCache": "Clear Cache",
-  "clearCacheDesc": "Free up space",
-  "aboutApp": "About App",
-  "appVersion": "App Version",
-  "privacyPolicy": "Privacy Policy",
-  "termsOfService": "Terms of Service",
-  "clearCacheConfirmation": "Clear Cache?",
-  "clearCacheMessage": "This will delete all downloaded content. You can download it again when online.",
-  "clear": "Clear",
-
-  "shellNavHome": "Home",
-  "shellNavLearn": "Learn",
-  "shellNavExams": "Exams",
-  "shellNavProgress": "Progress",
-  "shellNavProfile": "Profile",
-  "shellExitTitle": "Exit the app?",
-  "shellExitMessage": "Your progress is saved.",
-  "shellExitConfirm": "Exit",
-  "shellCancel": "Cancel",
-  "shellRetry": "Try again",
-  "shellLoading": "Loading",
-  "shellNotFoundTitle": "Page not found",
-  "shellNotFoundMessage": "The link may be outdated. Go back to the home screen.",
-  "shellGoHome": "Go to home",
-  "shellTagline": "ORT preparation",
-  "shellBootErrorTitle": "Couldn't start the app",
-  "shellBootErrorMessage": "Check your internet connection and try again.",
-  "shellLater": "Later",
-  "shellNotNow": "Not now",
-  "shellHide": "Hide",
-  "shellSave": "Save",
-  "shellOptional": "Optional",
-  "shellNotSet": "Not set",
-  "shellLinkOpenFailed": "Couldn't open the link.",
-  "shellLangRu": "Russian",
-  "shellLangKy": "Kyrgyz",
-  "shellLangEn": "English",
-  "shellLangRuNative": "Русский",
-  "shellLangKyNative": "Кыргызча",
-  "shellLangEnNative": "English",
-  "shellLoginTitle": "Welcome back",
-  "shellLoginSubtitle": "Sign in to continue preparing for the ORT.",
-  "shellLoginButton": "Sign in",
-  "shellLoginNoAccount": "No account yet?",
-  "shellLoginCreateAccount": "Create one",
-  "shellAuthEmailLabel": "Email",
-  "shellAuthPasswordLabel": "Password",
   "shellAuthConfirmPasswordLabel": "Repeat password",
-  "shellAuthNameLabel": "Name",
-  "shellAuthPasswordHint": "At least {min} characters, letters and digits",
-  "@shellAuthPasswordHint": {"placeholders": {"min": {"type": "int"}}},
-  "shellAuthForgotPassword": "Forgot password?",
-  "shellAuthShowPassword": "Show password",
-  "shellAuthHidePassword": "Hide password",
-  "shellAuthOr": "or",
   "shellAuthContinueWithGoogle": "Continue with Google",
-  "shellAuthResetTitle": "Reset password",
+  "shellAuthEmailInvalid": "Check the email address, e.g. name@example.com",
+  "shellAuthEmailLabel": "Email",
+  "shellAuthEmailRequired": "Enter your email",
+  "shellAuthErrorDifferentCredential": "This email is linked to another sign-in method.",
+  "shellAuthErrorEmailInUse": "This email is already registered. Sign in instead.",
+  "shellAuthErrorGoogleUnavailable": "Google sign-in isn't available on this device yet. Use email instead.",
+  "shellAuthErrorInvalidCredentials": "Wrong email or password.",
+  "shellAuthErrorNetwork": "No connection. Check the internet and try again.",
+  "shellAuthErrorNotAllowed": "This sign-in method is temporarily unavailable.",
+  "shellAuthErrorTooManyRequests": "Too many attempts. Wait a few minutes and try again.",
+  "shellAuthErrorUnknown": "Something went wrong. Please try again.",
+  "shellAuthErrorUserDisabled": "This account has been blocked. Contact support.",
+  "shellAuthErrorUserNotFound": "No account with this email. Create one first.",
+  "shellAuthForgotPassword": "Forgot password?",
+  "shellAuthHidePassword": "Hide password",
+  "shellAuthNameLabel": "Name",
+  "shellAuthNameRequired": "Enter your name",
+  "shellAuthNameTooShort": "Name is too short",
+  "shellAuthOr": "or",
+  "shellAuthPasswordHint": "At least {min} characters, letters and digits",
+  "@shellAuthPasswordHint": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "shellAuthPasswordLabel": "Password",
+  "shellAuthPasswordMismatch": "Passwords don't match",
+  "shellAuthPasswordRequired": "Enter a password",
+  "shellAuthPasswordTooShort": "Password must be at least {min} characters",
+  "@shellAuthPasswordTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "shellAuthPasswordTooWeak": "Use both letters and digits",
   "shellAuthResetMessage": "Enter your account email and we'll send a link to set a new password.",
   "shellAuthResetSend": "Send link",
   "shellAuthResetSent": "If an account with this email exists, we've sent a reset link.",
-  "shellAuthEmailRequired": "Enter your email",
-  "shellAuthEmailInvalid": "Check the email address, e.g. name@example.com",
-  "shellAuthPasswordRequired": "Enter a password",
-  "shellAuthPasswordTooShort": "Password must be at least {min} characters",
-  "@shellAuthPasswordTooShort": {"placeholders": {"min": {"type": "int"}}},
-  "shellAuthPasswordTooWeak": "Use both letters and digits",
-  "shellAuthPasswordMismatch": "Passwords don't match",
-  "shellAuthNameRequired": "Enter your name",
-  "shellAuthNameTooShort": "Name is too short",
-  "shellAuthErrorInvalidCredentials": "Wrong email or password.",
-  "shellAuthErrorUserNotFound": "No account with this email. Create one first.",
-  "shellAuthErrorUserDisabled": "This account has been blocked. Contact support.",
-  "shellAuthErrorTooManyRequests": "Too many attempts. Wait a few minutes and try again.",
-  "shellAuthErrorEmailInUse": "This email is already registered. Sign in instead.",
-  "shellAuthErrorNotAllowed": "This sign-in method is temporarily unavailable.",
-  "shellAuthErrorNetwork": "No connection. Check the internet and try again.",
-  "shellAuthErrorGoogleUnavailable": "Google sign-in isn't available on this device yet. Use email instead.",
-  "shellAuthErrorDifferentCredential": "This email is linked to another sign-in method.",
-  "shellAuthErrorUnknown": "Something went wrong. Please try again.",
-  "shellSignupTitle": "Create account",
-  "shellSignupSubtitle": "It takes a minute. Your progress will be saved in your account.",
-  "shellSignupButton": "Create account",
-  "shellSignupHaveAccount": "Already have an account?",
-  "shellSignupSuccess": "Account created. We've sent a confirmation email.",
-  "shellSignupLegalPrefix": "By creating an account you agree to the ",
-  "shellSignupLegalAnd": " and the ",
-  "shellVerifyTitle": "Confirm your email",
-  "shellVerifyMessage": "We sent a link to {email}. It helps you recover your account.",
-  "@shellVerifyMessage": {"placeholders": {"email": {"type": "String"}}},
-  "shellVerifyResend": "Send again",
-  "shellVerifyCheck": "I've confirmed",
-  "shellVerifySent": "Email sent. Check your inbox and spam folder.",
-  "shellVerifySendFailed": "Couldn't send the email. Try again later.",
-  "shellVerifyDone": "Email confirmed. Thank you!",
-  "shellVerifyNotYet": "Not confirmed yet. Open the link from the email.",
-  "shellOnbSkip": "Skip",
-  "shellOnbBack": "Back",
-  "shellOnbNext": "Next",
-  "shellOnbStart": "Get started",
-  "shellOnbStepOf": "Step {current} of {total}",
-  "@shellOnbStepOf": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
-  "shellOnbLanguageTitle": "Which language will you prepare in?",
-  "shellOnbLanguageSubtitle": "The app and mock exams will use this language. You can change it in Settings.",
-  "shellOnbLangRuHint": "ORT in Russian",
-  "shellOnbLangKyHint": "ORT in Kyrgyz",
-  "shellOnbAboutTitle": "Tell us about yourself",
-  "shellOnbAboutSubtitle": "We'll tailor tasks and show your region's leaderboard.",
-  "shellGradeLabel": "Grade",
-  "shellGradeNumber": "Grade {grade}",
-  "@shellGradeNumber": {"placeholders": {"grade": {"type": "int"}}},
-  "shellGradeGraduate": "Graduate",
-  "shellRegionLabel": "Region",
-  "shellRegionOblast": "Region or city",
-  "shellRegionDistrict": "District",
-  "shellRegionLoadError": "Couldn't load the list of regions.",
-  "shellOnbGoalTitle": "What score are you aiming for?",
-  "shellOnbGoalSubtitle": "A goal shows how far you still have to go. You can change it in your profile.",
+  "shellAuthResetTitle": "Reset password",
+  "shellAuthShowPassword": "Show password",
+  "shellBootErrorMessage": "Check your internet connection and try again.",
+  "shellBootErrorTitle": "Couldn't start the app",
+  "shellCancel": "Cancel",
+  "shellDaily10Desc": "Easy start",
+  "shellDaily20Desc": "Steady pace",
+  "shellDaily30Desc": "Intensive preparation",
+  "shellDailyMinutes": "{minutes} min a day",
+  "@shellDailyMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shellExitConfirm": "Exit",
+  "shellExitMessage": "Your progress is saved.",
+  "shellExitTitle": "Exit the app?",
+  "shellGoHome": "Go to home",
   "shellGoalBand110Desc": "Solid base",
   "shellGoalBand150Desc": "Strong result",
   "shellGoalBand190Desc": "Top result",
   "shellGoalUnsure": "Not sure yet",
-  "shellOnbUniversityLabel": "Dream university",
-  "shellOnbUniversityHint": "e.g. KSMA or KNU",
-  "shellOnbDailyTitle": "How much time a day can you study?",
-  "shellOnbDailySubtitle": "Short daily sessions work better than rare marathons.",
-  "shellDailyMinutes": "{minutes} min a day",
-  "@shellDailyMinutes": {"placeholders": {"minutes": {"type": "int"}}},
-  "shellDaily10Desc": "Easy start",
-  "shellDaily20Desc": "Steady pace",
-  "shellDaily30Desc": "Intensive preparation",
-  "shellOnbSavedLater": "Answers saved. They'll sync when you're online.",
-  "shellHomeGreeting": "Hi!",
-  "shellHomeGreetingName": "Hi, {name}!",
-  "@shellHomeGreetingName": {"placeholders": {"name": {"type": "String"}}},
-  "shellHomeSubtitle": "Let's keep preparing for the ORT",
-  "shellHomeStatsError": "Couldn't load your progress.",
-  "shellHomeEmptyStatsTitle": "Start your streak today",
-  "shellHomeEmptyStatsMessage": "Solve a task or take a lesson — your streak and daily progress will appear here.",
-  "shellHomeGoalMinutes": "Your goal: {minutes} min a day",
-  "@shellHomeGoalMinutes": {"placeholders": {"minutes": {"type": "int"}}},
-  "shellHomeStreakDays": "{count, plural, =1{1 day in a row} other{{count} days in a row}}",
-  "@shellHomeStreakDays": {"placeholders": {"count": {"type": "int"}}},
-  "shellHomeStreakNone": "No streak yet",
+  "shellGradeGraduate": "Graduate",
+  "shellGradeLabel": "Grade",
+  "shellGradeNumber": "Grade {grade}",
+  "@shellGradeNumber": {
+    "placeholders": {
+      "grade": {
+        "type": "int"
+      }
+    }
+  },
+  "shellHide": "Hide",
   "shellHomeBestStreak": "Best: {count}",
-  "@shellHomeBestStreak": {"placeholders": {"count": {"type": "int"}}},
-  "shellHomeTodayXpOfGoal": "Today: {today} of {goal} XP",
-  "@shellHomeTodayXpOfGoal": {"placeholders": {"today": {"type": "int"}, "goal": {"type": "int"}}},
-  "shellHomeTodayXp": "Today: {today} XP",
-  "@shellHomeTodayXp": {"placeholders": {"today": {"type": "int"}}},
+  "@shellHomeBestStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shellHomeBuyExam": "Get a mock exam",
+  "shellHomeCredits": "Mock exams available: {count}",
+  "@shellHomeCredits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "shellHomeDailyGoal": "Daily goal",
-  "shellHomeGoalReached": "Daily goal reached!",
-  "shellHomeLevelXp": "Level {level} · {xp} XP",
-  "@shellHomeLevelXp": {"placeholders": {"level": {"type": "int"}, "xp": {"type": "int"}}},
-  "shellHomeNextStepError": "Couldn't load your recommendation.",
-  "shellNextStepTitle": "Next step",
-  "shellNextFirstMockFree": "Take your first full mock exam — it's free. You'll see your level and weak topics.",
-  "shellNextFirstMock": "Take a full mock exam to see your level and weak topics.",
-  "shellNextOpenExams": "Go to exams",
-  "shellNextWeakTopic": "Your weakest area in the last exam: {area}. Review it to raise your score.",
-  "@shellNextWeakTopic": {"placeholders": {"area": {"type": "String"}}},
-  "shellNextOpenLearn": "Go to study",
-  "shellNextPractice": "Good work! Reinforce it with a quick test or take another mock exam.",
+  "shellHomeEmptyStatsMessage": "Solve a task or take a lesson — your streak and daily progress will appear here.",
+  "shellHomeEmptyStatsTitle": "Start your streak today",
   "shellHomeEntitlementError": "Couldn't check access · Retry",
   "shellHomeFreeExam": "Free mock exam available",
-  "shellHomeCredits": "Mock exams available: {count}",
-  "@shellHomeCredits": {"placeholders": {"count": {"type": "int"}}},
-  "shellHomeBuyExam": "Get a mock exam",
-  "shellHomeSetupTitle": "Set your goal",
-  "shellHomeSetupMessage": "Add your grade, region and target score to get better recommendations.",
-  "shellHomeSetupAction": "Set up",
-  "shellHomeReminderTitle": "Remind you to study?",
-  "shellHomeReminderMessage": "A short daily reminder helps keep your streak.",
+  "shellHomeGoalMinutes": "Your goal: {minutes} min a day",
+  "@shellHomeGoalMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shellHomeGoalReached": "Daily goal reached!",
+  "shellHomeGreeting": "Hi!",
+  "shellHomeGreetingName": "Hi, {name}!",
+  "@shellHomeGreetingName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shellHomeLevelXp": "Level {level} · {xp} XP",
+  "@shellHomeLevelXp": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "shellHomeNextStepError": "Couldn't load your recommendation.",
   "shellHomeReminderEnable": "Turn on",
-  "shellReminderEnabled": "Reminders are on.",
-  "shellReminderDenied": "Notifications are off for the app. Allow them in your phone settings.",
-  "shellReminderUnsupported": "Reminders aren't available on this device.",
-  "shellReminderFailed": "Couldn't turn on reminders. Try again later.",
-  "shellQuickTitle": "Quick actions",
-  "shellQuickMockExam": "Mock exam",
-  "shellQuickTest": "Quick test",
-  "shellQuickDailyLesson": "Lesson of the day",
-  "shellQuickTutor": "AI tutor",
-  "shellQuickLeaderboard": "Leaderboard",
-  "shellQuickHandbook": "Handbook",
-  "shellProfileLoadError": "Couldn't load your profile.",
-  "shellProfileNoName": "Student",
+  "shellHomeReminderMessage": "A short daily reminder helps keep your streak.",
+  "shellHomeReminderTitle": "Remind you to study?",
+  "shellHomeSetupAction": "Set up",
+  "shellHomeSetupMessage": "Add your grade, region and target score to get better recommendations.",
+  "shellHomeSetupTitle": "Set your goal",
+  "shellHomeStatsError": "Couldn't load your progress.",
+  "shellHomeStreakDays": "{count, plural, =1{1 day in a row} other{{count} days in a row}}",
+  "@shellHomeStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shellHomeStreakNone": "No streak yet",
+  "shellHomeSubtitle": "Let's keep preparing for the ORT",
+  "shellHomeTodayXp": "Today: {today} XP",
+  "@shellHomeTodayXp": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      }
+    }
+  },
+  "shellHomeTodayXpOfGoal": "Today: {today} of {goal} XP",
+  "@shellHomeTodayXpOfGoal": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "shellLangEn": "English",
+  "shellLangEnNative": "English",
+  "shellLangKy": "Kyrgyz",
+  "shellLangKyNative": "Кыргызча",
+  "shellLangRu": "Russian",
+  "shellLangRuNative": "Русский",
+  "shellLater": "Later",
+  "shellLinkOpenFailed": "Couldn't open the link.",
+  "shellLoading": "Loading",
+  "shellLoginButton": "Sign in",
+  "shellLoginCreateAccount": "Create one",
+  "shellLoginNoAccount": "No account yet?",
+  "shellLoginSubtitle": "Sign in to continue preparing for the ORT.",
+  "shellLoginTitle": "Welcome back",
+  "shellNavExams": "Exams",
+  "shellNavHome": "Home",
+  "shellNavLearn": "Learn",
+  "shellNavProfile": "Profile",
+  "shellNavProgress": "Progress",
+  "shellNextFirstMock": "Take a full mock exam to see your level and weak topics.",
+  "shellNextFirstMockFree": "Take your first full mock exam — it's free. You'll see your level and weak topics.",
+  "shellNextOpenExams": "Go to exams",
+  "shellNextOpenLearn": "Go to study",
+  "shellNextPractice": "Good work! Reinforce it with a quick test or take another mock exam.",
+  "shellNextStepTitle": "Next step",
+  "shellNextWeakTopic": "Your weakest area in the last exam: {area}. Review it to raise your score.",
+  "@shellNextWeakTopic": {
+    "placeholders": {
+      "area": {
+        "type": "String"
+      }
+    }
+  },
+  "shellNotFoundMessage": "The link may be outdated. Go back to the home screen.",
+  "shellNotFoundTitle": "Page not found",
+  "shellNotNow": "Not now",
+  "shellNotSet": "Not set",
+  "shellOnbAboutSubtitle": "We'll tailor tasks and show your region's leaderboard.",
+  "shellOnbAboutTitle": "Tell us about yourself",
+  "shellOnbBack": "Back",
+  "shellOnbDailySubtitle": "Short daily sessions work better than rare marathons.",
+  "shellOnbDailyTitle": "How much time a day can you study?",
+  "shellOnbGoalSubtitle": "A goal shows how far you still have to go. You can change it in your profile.",
+  "shellOnbGoalTitle": "What score are you aiming for?",
+  "shellOnbLangKyHint": "ORT in Kyrgyz",
+  "shellOnbLangRuHint": "ORT in Russian",
+  "shellOnbLanguageSubtitle": "The app and mock exams will use this language. You can change it in Settings.",
+  "shellOnbLanguageTitle": "Which language will you prepare in?",
+  "shellOnbNext": "Next",
+  "shellOnbSavedLater": "Answers saved. They'll sync when you're online.",
+  "shellOnbSkip": "Skip",
+  "shellOnbStart": "Get started",
+  "shellOnbStepOf": "Step {current} of {total}",
+  "@shellOnbStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shellOnbUniversityHint": "e.g. KSMA or KNU",
+  "shellOnbUniversityLabel": "Dream university",
+  "shellOptional": "Optional",
+  "shellProfileAchievements": "Achievements",
   "shellProfileComplete": "Fill in profile",
+  "shellProfileDailyGoal": "Daily goal",
+  "shellProfileDeleteAccount": "Delete account",
   "shellProfileEdit": "Edit profile",
   "shellProfileEditTitle": "Edit profile",
-  "shellProfileLevel": "Level",
-  "shellProfileStreak": "Streak",
+  "shellProfileExamLanguage": "Exam language",
   "shellProfileExams": "Exams",
   "shellProfileGoal": "Target score",
-  "shellProfileDailyGoal": "Daily goal",
-  "shellProfileExamLanguage": "Exam language",
-  "shellProfileSchool": "School",
+  "shellProfileLevel": "Level",
+  "shellProfileLoadError": "Couldn't load your profile.",
+  "shellProfileNoName": "Student",
   "shellProfileRegionLocked": "The region can be changed once a year.",
+  "shellProfileSaveError": "Couldn't save. Check your connection and try again.",
   "shellProfileSaved": "Profile saved.",
   "shellProfileSavedOffline": "Saved. Changes will sync when you're online.",
-  "shellProfileSaveError": "Couldn't save. Check your connection and try again.",
-  "shellProfileAchievements": "Achievements",
+  "shellProfileSchool": "School",
+  "shellProfileStreak": "Streak",
   "shellProfileTransactions": "Purchases",
-  "shellProfileDeleteAccount": "Delete account",
-  "shellSignOut": "Sign out",
-  "shellSignOutTitle": "Sign out?",
-  "shellSignOutMessage": "Your progress stays in your account.",
-  "shellSettingsTitle": "Settings",
-  "shellSettingsAppearance": "App",
-  "shellSettingsNotifications": "Notifications",
+  "shellQuickDailyLesson": "Lesson of the day",
+  "shellQuickHandbook": "Handbook",
+  "shellQuickLeaderboard": "Leaderboard",
+  "shellQuickMockExam": "Mock exam",
+  "shellQuickTest": "Quick test",
+  "shellQuickTitle": "Quick actions",
+  "shellQuickTutor": "AI tutor",
+  "shellRegionDistrict": "District",
+  "shellRegionLabel": "Region",
+  "shellRegionLoadError": "Couldn't load the list of regions.",
+  "shellRegionOblast": "Region or city",
+  "shellReminderDenied": "Notifications are off for the app. Allow them in your phone settings.",
+  "shellReminderEnabled": "Reminders are on.",
+  "shellReminderFailed": "Couldn't turn on reminders. Try again later.",
+  "shellReminderUnsupported": "Reminders aren't available on this device.",
+  "shellRetry": "Try again",
+  "shellSave": "Save",
   "shellSettingsAbout": "About",
+  "shellSettingsAppearance": "App",
+  "shellSettingsDisclaimer": "Mock exam results are for practice and are not official ORT scores.",
   "shellSettingsLanguage": "Language",
-  "shellSettingsTheme": "Theme",
-  "shellThemeSystem": "As on device",
-  "shellThemeLight": "Light",
-  "shellThemeDark": "Dark",
+  "shellSettingsNotifications": "Notifications",
+  "shellSettingsPrivacy": "Privacy Policy",
   "shellSettingsReminder": "Daily reminder",
   "shellSettingsReminderHint": "A short reminder to study once a day",
-  "shellSettingsPrivacy": "Privacy Policy",
   "shellSettingsTerms": "Terms of Service",
+  "shellSettingsTheme": "Theme",
+  "shellSettingsTitle": "Settings",
   "shellSettingsVersion": "Version",
-  "shellSettingsDisclaimer": "Mock exam results are for practice and are not official ORT scores."
+  "shellSignOut": "Sign out",
+  "shellSignOutMessage": "Your progress stays in your account.",
+  "shellSignOutTitle": "Sign out?",
+  "shellSignupButton": "Create account",
+  "shellSignupHaveAccount": "Already have an account?",
+  "shellSignupLegalAnd": " and the ",
+  "shellSignupLegalPrefix": "By creating an account you agree to the ",
+  "shellSignupSubtitle": "It takes a minute. Your progress will be saved in your account.",
+  "shellSignupSuccess": "Account created. We've sent a confirmation email.",
+  "shellSignupTitle": "Create account",
+  "shellTagline": "ORT preparation",
+  "shellThemeDark": "Dark",
+  "shellThemeLight": "Light",
+  "shellThemeSystem": "As on device",
+  "shellVerifyCheck": "I've confirmed",
+  "shellVerifyDone": "Email confirmed. Thank you!",
+  "shellVerifyMessage": "We sent a link to {email}. It helps you recover your account.",
+  "@shellVerifyMessage": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "shellVerifyNotYet": "Not confirmed yet. Open the link from the email.",
+  "shellVerifyResend": "Send again",
+  "shellVerifySendFailed": "Couldn't send the email. Try again later.",
+  "shellVerifySent": "Email sent. Check your inbox and spam folder.",
+  "shellVerifyTitle": "Confirm your email",
+  "signup": "Sign Up",
+  "skip": "Skip",
+  "somethingWentWrong": "Something went wrong",
+  "startLearning": "Start Learning",
+  "startQuiz": "Start Quiz",
+  "startTest": "Start Test",
+  "streak": "Day Streak",
+  "strongTopics": "Strong Topics",
+  "studyTime": "Study Time",
+  "subjects": "Subjects",
+  "submit": "Submit",
+  "subscribe": "Subscribe",
+  "subscription": "Subscription",
+  "success": "Success",
+  "system": "System",
+  "takeQuiz": "Take Quiz",
+  "terms": "Terms of Service",
+  "termsOfService": "Terms of Service",
+  "tests": "Tests",
+  "testsTaken": "Tests Taken",
+  "theme": "Theme",
+  "timeSpent": "Time Spent",
+  "tutorAssistant": "Tutor",
+  "tutorClear": "Clear chat",
+  "tutorContextAttempt": "Exam attempt attached",
+  "tutorContextQuestion": "Question attached",
+  "tutorContextRemove": "Remove attachment",
+  "tutorDisclaimer": "AI can make mistakes. Check important steps with your textbook or teacher.",
+  "tutorEmptyBody": "Choose a mode above and ask a question. I explain the reasoning instead of just giving the answer.",
+  "tutorEmptyTitle": "How can I help?",
+  "tutorErrorDisabled": "The AI tutor is temporarily unavailable.",
+  "tutorErrorExamInProgress": "The tutor can't help during an active exam. Finish the attempt, then review your mistakes here.",
+  "tutorErrorNetwork": "No connection. Check the internet and try again.",
+  "tutorErrorQuota": "You've used today's AI requests. Come back tomorrow.",
+  "tutorErrorSignIn": "Sign in to use the AI tutor.",
+  "tutorErrorUnknown": "The tutor couldn't answer. Try again.",
+  "tutorErrorValidation": "The message is empty or too long. Shorten it and try again.",
+  "tutorExplainPrompt": "Help me understand my mistake.\nTask: {stem}\nOptions:\n{options}\nMy answer: {userAnswer}\nCorrect answer: {correctAnswer}\nExplain where I went wrong and how to reason correctly.",
+  "@tutorExplainPrompt": {
+    "description": "Message sent to the AI tutor on behalf of the student",
+    "placeholders": {
+      "stem": {
+        "type": "String"
+      },
+      "options": {
+        "type": "String"
+      },
+      "userAnswer": {
+        "type": "String"
+      },
+      "correctAnswer": {
+        "type": "String"
+      }
+    }
+  },
+  "tutorExplainerAiButton": "Explain my mistake",
+  "tutorExplainerAiTitle": "Why is it wrong? Ask the AI tutor",
+  "tutorExplainerClose": "Close",
+  "tutorExplainerCorrect": "Correct!",
+  "tutorExplainerCorrectAnswer": "Correct answer: {answer}",
+  "@tutorExplainerCorrectAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "tutorExplainerExplanation": "Explanation",
+  "tutorExplainerIncorrect": "Incorrect",
+  "tutorExplainerNext": "Next",
+  "tutorExplainerNoAnswer": "no answer",
+  "tutorExplainerOpenChat": "Open tutor chat",
+  "tutorExplainerTryAgain": "Try again",
+  "tutorExplainerYourAnswer": "Your answer: {answer}",
+  "@tutorExplainerYourAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "tutorHintChat": "Ask anything about ORT preparation.",
+  "tutorHintExplainMistake": "Paste the task and your answer — I'll explain where the mistake is.",
+  "tutorHintGrammar": "Ask about a rule or paste a sentence to check.",
+  "tutorHintPractice": "Name a topic — I'll suggest similar tasks.",
+  "tutorHintStepByStep": "Describe the problem — we'll solve it step by step.",
+  "tutorHintStudyPlan": "Tell me your exam date and weak subjects.",
+  "tutorModeChat": "Free question",
+  "tutorModeExplainMistake": "Explain a mistake",
+  "tutorModeGrammar": "Grammar",
+  "tutorModePractice": "Similar tasks",
+  "tutorModeStepByStep": "Step by step",
+  "tutorModeStudyPlan": "Study plan",
+  "tutorRemainingToday": "Requests left today: {count}",
+  "@tutorRemainingToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tutorRetry": "Retry",
+  "tutorSend": "Send",
+  "tutorThinking": "The tutor is thinking…",
+  "tutorTitle": "AI tutor",
+  "tutorYou": "You",
+  "weakTopics": "Weak Topics",
+  "welcome": "Welcome",
+  "yearly": "Yearly"
 }
