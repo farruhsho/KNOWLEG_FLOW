@@ -52,12 +52,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     if (!mounted) return;
 
     if (user != null) {
-      // Existing session: make sure the profile exists and pending
-      // onboarding answers are saved — both in the background.
-      final authService = ref.read(authServiceProvider);
-      final onboarding = ref.read(onboardingServiceProvider);
-      unawaited(authService.ensureProfile(user));
-      unawaited(onboarding.flushPendingAnswers(user.uid));
+      // Existing session: make sure the profile exists, then save pending
+      // onboarding answers — in the background, in that order.
+      unawaited(ref.read(authServiceProvider).bootstrapSession(user));
       context.go(RoutePaths.home);
       return;
     }

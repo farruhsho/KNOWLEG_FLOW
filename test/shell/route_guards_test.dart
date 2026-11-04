@@ -64,6 +64,35 @@ void main() {
     });
   });
 
+  group('pop fallback (UI-04 / NAV-02)', () {
+    test('drill-downs fall back to the tab they belong to', () {
+      expect(RouteGuards.popFallback(RoutePaths.subject('math')), RoutePaths.learn);
+      expect(RouteGuards.popFallback(RoutePaths.lessonById('l1')), RoutePaths.learn);
+      expect(RouteGuards.popFallback(RoutePaths.quizById('q1')), RoutePaths.learn);
+      expect(RouteGuards.popFallback(RoutePaths.examRunFor('a1')), RoutePaths.exams);
+      expect(RouteGuards.popFallback(RoutePaths.examHistory), RoutePaths.exams);
+      expect(RouteGuards.popFallback(RoutePaths.settings), RoutePaths.profile);
+      expect(RouteGuards.popFallback(RoutePaths.achievements), RoutePaths.profile);
+      expect(RouteGuards.popFallback(RoutePaths.transactions), RoutePaths.profile);
+      expect(RouteGuards.popFallback(RoutePaths.accountDelete), RoutePaths.profile);
+      expect(RouteGuards.popFallback(RoutePaths.quickTest), RoutePaths.home);
+      expect(RouteGuards.popFallback(RoutePaths.dailyLesson), RoutePaths.home);
+      expect(RouteGuards.popFallback(RoutePaths.tutor), RoutePaths.home);
+    });
+
+    test('entry and admin screens have safe parents', () {
+      expect(RouteGuards.popFallback(RoutePaths.signup), RoutePaths.login);
+      expect(RouteGuards.popFallback(RoutePaths.adminLogin), RoutePaths.splash);
+      expect(RouteGuards.popFallback('/admin/users'), RoutePaths.adminDashboard);
+      expect(RouteGuards.popFallback(RoutePaths.adminDashboard), RoutePaths.adminLogin);
+    });
+
+    test('lookalike prefixes are not matched', () {
+      expect(RouteGuards.popFallback('/subjectsx'), RoutePaths.home);
+      expect(RouteGuards.popFallback('/quiz-results'), RoutePaths.home);
+    });
+  });
+
   group('student auth guard (NAV-04)', () {
     test('signed-out users may open only the public entry screens', () {
       for (final path in [

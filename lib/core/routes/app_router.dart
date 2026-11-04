@@ -32,6 +32,7 @@ import '../design/tokens.dart';
 import '../navigation/app_shell.dart';
 import '../navigation/nav_helpers.dart';
 import '../navigation/route_guards.dart';
+import '../navigation/safe_pop_router.dart';
 import '../network/firebase_service.dart';
 import 'admin_session.dart';
 import 'route_paths.dart';
@@ -104,7 +105,7 @@ class AppRouter {
       return observer == null ? const [] : [observer];
     }
 
-    return GoRouter(
+    return SafePopGoRouter(
       navigatorKey: navigatorKey,
       initialLocation: initialLocation,
       debugLogDiagnostics: kDebugMode,
@@ -224,6 +225,7 @@ class AppRouter {
           builder: (context, state) {
             final args = QuizResultsArgs.tryParse(state.extra)!;
             return RootBackGuard(
+              fallback: RouteGuards.popFallback(RoutePaths.quizResults),
               child: QuizResultsPage(
                 totalQuestions: args.totalQuestions,
                 correctAnswers: args.correctAnswers,
@@ -255,7 +257,6 @@ class AppRouter {
           RoutePaths.settings,
           'settings',
           (_) => const SettingsPage(),
-          fallback: RoutePaths.profile,
         ),
 
         // Feature packages.
@@ -279,17 +280,21 @@ class AppRouter {
     }
   }
 
+  /// A full-screen route on the root navigator. Android back on a page that
+  /// was opened with `go()` (nothing below it) goes to the page's logical
+  /// parent instead of closing the app.
   static GoRoute _page(
     String path,
     String name,
-    Widget Function(GoRouterState state) build, {
-    String fallback = RoutePaths.home,
-  }) {
+    Widget Function(GoRouterState state) build,
+  ) {
     return GoRoute(
       path: path,
       name: name,
-      builder: (context, state) =>
-          RootBackGuard(fallback: fallback, child: build(state)),
+      builder: (context, state) => RootBackGuard(
+        fallback: RouteGuards.popFallback(state.uri.path),
+        child: build(state),
+      ),
     );
   }
 }

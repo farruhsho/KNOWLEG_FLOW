@@ -95,7 +95,11 @@ void main() {
     expect(find.text('Привет!'), findsOneWidget);
     expect(find.text('Начните серию сегодня'), findsOneWidget);
     expect(find.text('Следующий шаг'), findsOneWidget);
-    expect(find.text('Доступен бесплатный пробный экзамен'), findsOneWidget);
+    // Entitlement chip: built below the fold on a 360x640 phone.
+    expect(
+      find.text('Доступен бесплатный пробный экзамен', skipOffstage: false),
+      findsOneWidget,
+    );
     // No fabricated numbers from the old dashboard.
     expect(find.text('145'), findsNothing);
     expect(find.text('+12%'), findsNothing);
@@ -144,6 +148,50 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     expect(selectedTab(tester), 0);
+  });
+
+  testWidgets('pop() on a page opened with go() falls back instead of throwing',
+      (tester) async {
+    setPhoneSize(tester);
+    final router = await pumpShell(tester);
+
+    // Settings opened with go(): it is alone on the root navigator.
+    router.go(RoutePaths.settings);
+    await tester.pumpAndSettle();
+    expect(router.canPop(), isFalse);
+
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(selectedTab(tester), 4); // profile = logical parent of settings
+
+    // Pushed normally it simply pops back to where it came from.
+    router.go(RoutePaths.home);
+    await tester.pumpAndSettle();
+    router.push(RoutePaths.settings);
+    await tester.pumpAndSettle();
+    expect(router.canPop(), isTrue);
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(selectedTab(tester), 0);
+  });
+
+  testWidgets('settings is reachable from the profile tab', (tester) async {
+    setPhoneSize(tester);
+    final router = await pumpShell(tester);
+    router.go(RoutePaths.profile);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Настройки'));
+    await tester.pumpAndSettle();
+    expect(find.text('Приложение'), findsOneWidget);
+    expect(find.text('Политика конфиденциальности', skipOffstage: false),
+        findsOneWidget);
+
+    // Android back returns to the profile tab.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(selectedTab(tester), 4);
   });
 
   testWidgets('home renders in dark mode on a small phone', (tester) async {

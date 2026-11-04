@@ -230,6 +230,11 @@ class FirebaseService {
   static Future<String?> getFCMToken() async {
     if (!_initialized || !supportsMessaging) return null;
     try {
+      // The registration-token API is deprecated in favour of FID-based
+      // register()/onRegistered, which needs FCM direct-send support on the
+      // backend. The reminder job (not built yet) targets registration
+      // tokens, so keep using them until the backend moves to FIDs.
+      // ignore: deprecated_member_use
       return await messaging.getToken();
     } catch (e) {
       debugPrint('FCM token unavailable: $e');

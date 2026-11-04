@@ -183,6 +183,12 @@ class AuthService {
     await _runOnSignedIn(user);
   }
 
+  /// Background work for a session restored on a cold start: make sure the
+  /// profile exists, then save pending onboarding answers. Sequential on
+  /// purpose — creating the profile after the answers were merged would
+  /// overwrite them with defaults. Never throws.
+  Future<void> bootstrapSession(User user) => _afterSignIn(user);
+
   Future<void> _runOnSignedIn(User user) async {
     try {
       await _onSignedIn?.call(user);

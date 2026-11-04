@@ -113,6 +113,33 @@ abstract final class RouteGuards {
     return true;
   }
 
+  /// Where "back" goes when there is nothing to pop (UI-04 / NAV-02): a page
+  /// opened with `go()` is alone in the stack, so `pop()` would throw. The
+  /// user lands on the tab the page logically belongs to instead.
+  static String popFallback(String rawPath) {
+    final path = _normalize(rawPath);
+    bool under(String prefix) => path == prefix || path.startsWith('$prefix/');
+
+    if (path == RoutePaths.signup) return RoutePaths.login;
+    if (path == RoutePaths.adminLogin) return RoutePaths.splash;
+    if (isAdminArea(path)) {
+      return path == RoutePaths.adminDashboard
+          ? RoutePaths.adminLogin
+          : RoutePaths.adminDashboard;
+    }
+    if (under('/subjects') || under('/lessons') || under('/quiz')) {
+      return RoutePaths.learn;
+    }
+    if (under(RoutePaths.exams)) return RoutePaths.exams;
+    if (path == RoutePaths.settings ||
+        path == RoutePaths.achievements ||
+        under(RoutePaths.store) ||
+        under('/account')) {
+      return RoutePaths.profile;
+    }
+    return RoutePaths.home;
+  }
+
   /// The complete top-level redirect.
   static String? resolveRedirect(
     Uri uri, {

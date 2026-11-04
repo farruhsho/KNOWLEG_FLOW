@@ -18,11 +18,20 @@ import '../widgets/dashboard_cards.dart';
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
+  /// Re-subscribes the home data sources and waits (bounded) for their
+  /// first fresh value, so the pull-to-refresh indicator reflects real work.
   Future<void> _refresh(WidgetRef ref) async {
     ref.invalidate(userStatsProvider);
     ref.invalidate(latestExamProvider);
     ref.invalidate(userModelProvider);
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+    try {
+      await Future.wait<Object?>([
+        ref.read(userStatsProvider.future),
+        ref.read(latestExamProvider.future),
+      ]).timeout(const Duration(seconds: 8));
+    } catch (_) {
+      // Errors are shown by the cards themselves (with retry).
+    }
   }
 
   @override
