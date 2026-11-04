@@ -61,6 +61,14 @@ void main() {
       expect(((p['history'] as List).single as Map)['content'].length, TutorRequest.maxHistoryChars);
     });
 
+    test('message limit is the server limit (2000, D13)', () {
+      expect(TutorRequest.maxMessageChars, 2000);
+      final ok = TutorRequest(mode: TutorMode.chat, message: 'a' * 2000, language: 'ru').toPayload();
+      expect((ok['message'] as String).length, 2000);
+      final cut = TutorRequest(mode: TutorMode.chat, message: 'b' * 2500, language: 'ru').toPayload();
+      expect((cut['message'] as String).length, lessThanOrEqualTo(2000));
+    });
+
     test('every mode has the contract wire name', () {
       expect(TutorMode.values.map((m) => m.wire).toList(),
           ['explain_mistake', 'step_by_step', 'grammar', 'practice', 'study_plan', 'chat']);
@@ -92,6 +100,7 @@ void main() {
       expect(TutorFailure.from(err('failed-precondition', 'AI_DISABLED')), TutorFailure.disabled);
       expect(TutorFailure.from(err('failed-precondition', 'AI_EXAM_IN_PROGRESS')), TutorFailure.examInProgress);
       expect(TutorFailure.from(err('invalid-argument', 'VALIDATION_FAILED')), TutorFailure.validation);
+      expect(TutorFailure.from(err('permission-denied', 'USER_BANNED')), TutorFailure.banned);
     });
 
     test('maps plain codes', () {
@@ -104,9 +113,10 @@ void main() {
       expect(TutorFailure.from(Exception('SocketException: failed host lookup')), TutorFailure.network);
     });
 
-    test('only quota/disabled block further input', () {
+    test('only quota/disabled/banned block further input', () {
       expect(TutorFailure.quotaExceeded.blocksInput, isTrue);
       expect(TutorFailure.disabled.blocksInput, isTrue);
+      expect(TutorFailure.banned.blocksInput, isTrue);
       expect(TutorFailure.examInProgress.blocksInput, isFalse);
       expect(TutorFailure.network.blocksInput, isFalse);
     });
@@ -133,6 +143,24 @@ void main() {
       final b = TutorArgs.fromExtra(a.toExtra());
       expect(b.questionId, 'q');
       expect(b.mode, TutorMode.practice);
+    });
+  });
+
+  group('clipTutorText', () {
+    test('keeps short text and cuts long text to the limit', () {
+      expect(clipTutorText('abc', 5), 'abc');
+      expect(clipTutorText('abcdef', 3), 'abc');
+      expect(clipTutorText('abcdef', 4, ellipsis: true), 'abc…');
+      expect(clipTutorText('abcdef', 4, ellipsis: true).length, 4);
+      expect(clipTutorText('abc', 0), '');
+    });
+
+    test('never splits a surrogate pair', () {
+      const s = 'ab😀cd'; // 😀 is two UTF-16 code units at index 2..3
+      final cut = clipTutorText(s, 3);
+      expect(cut, 'ab');
+      expect(cut.codeUnits.any((u) => u >= 0xD800 && u <= 0xDFFF), isFalse);
+      expect(clipTutorText(s, 4), 'ab😀');
     });
   });
 

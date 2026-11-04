@@ -31,7 +31,11 @@ class _FakeDeletionService extends AccountDeletionService {
   final List<String> passwords = [];
   int googleCalls = 0;
   int deleteCalls = 0;
+  int signOutCalls = 0;
   AccountDeleteFailure? passwordFailure;
+
+  @override
+  Future<void> signOutForFreshSignIn() async => signOutCalls++;
 
   @override
   User? get currentUser => signedIn ? _FakeUser() : null;
@@ -61,6 +65,8 @@ void main() {
     WidgetTester tester,
     _FakeDeletionService service, {
     Brightness brightness = Brightness.light,
+    String locale = 'ru',
+    bool available = true,
   }) async {
     tester.view.physicalSize = const Size(1080, 1920);
     tester.view.devicePixelRatio = 3;
@@ -77,7 +83,10 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(ProviderScope(
-      overrides: [accountDeletionServiceProvider.overrideWithValue(service)],
+      overrides: [
+        accountDeletionServiceProvider.overrideWithValue(service),
+        accountDeletionAvailableProvider.overrideWithValue(available),
+      ],
       child: MaterialApp.router(
         routerConfig: router,
         theme: ThemeData(
@@ -87,14 +96,14 @@ void main() {
         ),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('ru'),
+        locale: Locale(locale),
       ),
     ));
     await tester.pumpAndSettle();
   }
 
-  Finder deleteButton() => find.ancestor(
-        of: find.text('Удалить аккаунт навсегда'),
+  Finder deleteButton([String label = 'Удалить аккаунт навсегда']) => find.ancestor(
+        of: find.text(label),
         matching: find.byWidgetPredicate((w) => w is FilledButton),
       );
 
@@ -181,6 +190,97 @@ void main() {
     expect(find.textContaining('Нет соединения'), findsOneWidget);
     expect(tester.widget<FilledButton>(deleteButton()).onPressed, isNotNull);
     expect(find.text('SPLASH'), findsNothing);
+  });
+
+  testWidgets('REQUIRES_RECENT_LOGIN after re-auth twice → error with "Sign in again" (D9)',
+      (tester) async {
+    final service = _FakeDeletionService(
+      reauthMethods: const [ReauthMethod.google],
+      deleteScript: [const AccountDeleteException(AccountDeleteFailure.requiresRecentLogin)],
+    );
+    await pumpPage(tester, service);
+
+    await typeConfirmation(tester, 'УДАЛИТЬ');
+    await tester.scrollUntilVisible(deleteButton(), 200, scrollable: find.byType(Scrollable).first);
+    await tester.tap(deleteButton());
+    await tester.pumpAndSettle();
+
+    // Re-auth + exactly one retry, then the user gets a way out.
+    expect(service.deleteCalls, 2);
+    expect(service.googleCalls, 2);
+    expect(find.textContaining('войдите ещё раз'), findsOneWidget);
+    await tester.ensureVisible(find.text('Войти заново'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Войти заново'));
+    await tester.pumpAndSettle();
+    expect(service.signOutCalls, 1);
+    expect(find.text('LOGIN'), findsOneWidget);
+  });
+
+  testWidgets('no in-app re-auth method: no retry loop, "Sign in again" offered', (tester) async {
+    final service = _FakeDeletionService(
+      reauthMethods: const [],
+      deleteScript: [const AccountDeleteException(AccountDeleteFailure.requiresRecentLogin)],
+    );
+    await pumpPage(tester, service);
+
+    await typeConfirmation(tester, 'УДАЛИТЬ');
+    await tester.scrollUntilVisible(deleteButton(), 200, scrollable: find.byType(Scrollable).first);
+    await tester.tap(deleteButton());
+    await tester.pumpAndSettle();
+
+    expect(service.deleteCalls, 1);
+    await tester.scrollUntilVisible(find.text('Войти заново'), 200, scrollable: find.byType(Scrollable).first);
+    expect(find.text('Войти заново'), findsOneWidget);
+  });
+
+  testWidgets('bare unauthenticated is not treated as recent-login: no re-auth loop', (tester) async {
+    final service = _FakeDeletionService(
+      reauthMethods: const [ReauthMethod.google],
+      deleteScript: [const AccountDeleteException(AccountDeleteFailure.unauthenticated)],
+    );
+    await pumpPage(tester, service);
+
+    await typeConfirmation(tester, 'УДАЛИТЬ');
+    await tester.scrollUntilVisible(deleteButton(), 200, scrollable: find.byType(Scrollable).first);
+    await tester.tap(deleteButton());
+    await tester.pumpAndSettle();
+
+    expect(service.deleteCalls, 1);
+    expect(service.googleCalls, 1);
+    expect(find.textContaining('Сервер не смог проверить приложение'), findsOneWidget);
+    expect(find.text('Войти заново'), findsNothing);
+    expect(find.text('SPLASH'), findsNothing);
+  });
+
+  testWidgets('Kyrgyz UI: the word can be typed on a Russian keyboard (UX-10)', (tester) async {
+    final service = _FakeDeletionService();
+    await pumpPage(tester, service, locale: 'ky');
+    const button = 'Аккаунтту биротоло өчүрүү';
+
+    await tester.scrollUntilVisible(find.byType(TextField), 200, scrollable: find.byType(Scrollable).first);
+    expect(find.text('Ырастоо үчүн ӨЧҮРҮҮ деп жазыңыз'), findsOneWidget);
+    expect(find.text('ОЧУРУУ деп жазсаңыз да болот'), findsOneWidget);
+
+    await typeConfirmation(tester, 'очуруу');
+    await tester.scrollUntilVisible(deleteButton(button), 200, scrollable: find.byType(Scrollable).first);
+    expect(tester.widget<FilledButton>(deleteButton(button)).onPressed, isNotNull);
+  });
+
+  testWidgets('Russian UI shows no alternative-spelling hint', (tester) async {
+    await pumpPage(tester, _FakeDeletionService());
+    expect(find.textContaining('Можно также ввести'), findsNothing);
+  });
+
+  testWidgets('platform without App Check: explains instead of failing (D7)', (tester) async {
+    final service = _FakeDeletionService();
+    await pumpPage(tester, service, available: false);
+    await tester.scrollUntilVisible(find.textContaining('недоступно на этой платформе'), 200,
+        scrollable: find.byType(Scrollable).first);
+    expect(find.byType(TextField), findsNothing);
+    expect(deleteButton(), findsNothing);
+    expect(service.deleteCalls, 0);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('signed out → offers to sign in instead of deleting', (tester) async {

@@ -89,6 +89,64 @@ void main() {
     expect(c.state.blockingFailure, isNull);
   });
 
+  group('route context (TUTOR-CTX-01)', () {
+    test('a practice question after an exam review drops the stale attemptId', () async {
+      final api = FakeTutorApi([const TutorReply('ok')]);
+      final c = TutorChatController(api);
+      // "Ask tutor" from an exam review.
+      c.applyArgs(const TutorArgs(questionId: 'exam_q1', attemptId: 'att_1', mode: TutorMode.explainMistake));
+      expect(c.state.attemptId, 'att_1');
+
+      // Later: "Ask tutor" on a practice mistake (no attempt).
+      c.applyArgs(const TutorArgs(questionId: 'practice_q9', mode: TutorMode.explainMistake));
+      expect(c.state.questionId, 'practice_q9');
+      expect(c.state.attemptId, isNull);
+
+      await c.send('Почему?', language: 'ru');
+      final payload = api.requests.single.toPayload();
+      expect(payload['questionId'], 'practice_q9');
+      expect(payload.containsKey('attemptId'), isFalse);
+    });
+
+    test('an attempt-only context drops the old question', () {
+      final c = TutorChatController(FakeTutorApi([const TutorReply('ok')]));
+      c.applyArgs(const TutorArgs(questionId: 'q1'));
+      c.applyArgs(const TutorArgs(attemptId: 'att_2'));
+      expect(c.state.questionId, isNull);
+      expect(c.state.attemptId, 'att_2');
+    });
+
+    test('arguments without context (mode / prefill only) keep the current context', () {
+      final c = TutorChatController(FakeTutorApi([const TutorReply('ok')]));
+      c.applyArgs(const TutorArgs(questionId: 'q1', attemptId: 'a1'));
+      c.applyArgs(const TutorArgs(mode: TutorMode.studyPlan));
+      expect(c.state.mode, TutorMode.studyPlan);
+      expect(c.state.questionId, 'q1');
+      expect(c.state.attemptId, 'a1');
+    });
+  });
+
+  test('a message over the server limit is not sent (D13)', () async {
+    final api = FakeTutorApi([const TutorReply('ok')]);
+    final c = TutorChatController(api);
+    expect(await c.send('x' * (TutorRequest.maxMessageChars + 1), language: 'ru'), isFalse);
+    expect(api.requests, isEmpty);
+    expect(c.state.messages, isEmpty);
+    expect(await c.send('x' * TutorRequest.maxMessageChars, language: 'ru'), isTrue);
+    expect(api.requests, hasLength(1));
+  });
+
+  test('a banned account blocks further input', () async {
+    final api = FakeTutorApi([
+      FirebaseFunctionsException(
+          code: 'permission-denied', message: 'banned', details: {'reason': 'USER_BANNED'}),
+    ]);
+    final c = TutorChatController(api);
+    await c.send('help', language: 'ru');
+    expect(c.state.blockingFailure, TutorFailure.banned);
+    expect(await c.send('again', language: 'ru'), isFalse);
+  });
+
   test('empty input is not sent; clear keeps mode', () async {
     final api = FakeTutorApi([const TutorReply('x')]);
     final c = TutorChatController(api);

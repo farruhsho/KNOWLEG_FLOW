@@ -81,15 +81,18 @@ class TutorRequest {
   /// Per-message cap for history items, to keep requests small.
   static const maxHistoryChars = 1500;
 
-  /// Cap for the new message. The server enforces its own limit too.
-  static const maxMessageChars = 4000;
+  /// Cap for the new (trimmed) message, in UTF-16 code units. Mirrors
+  /// `MAX_MESSAGE_CHARS` in functions/src/domain/tutor_quota.ts: the server
+  /// rejects anything longer with VALIDATION_FAILED, so the composer blocks
+  /// sending above it and every generated prompt is built to fit (D13).
+  static const maxMessageChars = 2000;
 
   Map<String, dynamic> toPayload() {
     final usable = history.where((m) => m.failure == null && m.text.trim().isNotEmpty).toList();
     final recent = usable.length > maxHistory ? usable.sublist(usable.length - maxHistory) : usable;
     return {
       'mode': mode.wire,
-      'message': _clip(message.trim(), maxMessageChars),
+      'message': clipTutorText(message.trim(), maxMessageChars),
       'language': language,
       if (questionId != null && questionId!.isNotEmpty) 'questionId': questionId,
       if (attemptId != null && attemptId!.isNotEmpty) 'attemptId': attemptId,
@@ -97,13 +100,28 @@ class TutorRequest {
         for (final m in recent)
           {
             'role': m.role == TutorRole.user ? 'user' : 'assistant',
-            'content': _clip(m.text.trim(), maxHistoryChars),
+            'content': clipTutorText(m.text.trim(), maxHistoryChars),
           },
       ],
     };
   }
+}
 
-  static String _clip(String s, int max) => s.length <= max ? s : s.substring(0, max);
+/// Cuts [s] to at most [max] UTF-16 code units (the unit both Dart and the
+/// server's JS `length` count) without splitting a surrogate pair. With
+/// [ellipsis], a cut string ends in "…" and still fits in [max].
+String clipTutorText(String s, int max, {bool ellipsis = false}) {
+  if (s.length <= max) return s;
+  if (max <= 0) return '';
+  final budget = ellipsis ? max - 1 : max;
+  var end = budget < 0 ? 0 : budget;
+  // Do not leave a lone high surrogate at the end.
+  if (end > 0 && end < s.length) {
+    final last = s.codeUnitAt(end - 1);
+    if (last >= 0xD800 && last <= 0xDBFF) end--;
+  }
+  final cut = s.substring(0, end).trimRight();
+  return ellipsis ? '$cut…' : cut;
 }
 
 /// `aiTutor` response: `{reply, remainingToday}`.
@@ -129,13 +147,20 @@ enum TutorFailure {
   quotaExceeded,
   disabled,
   examInProgress,
+
+  /// The account is banned by a moderator (`USER_BANNED`, decision D5).
+  banned,
   signInRequired,
   network,
   validation,
   unknown;
 
+  /// `details.reason` for a banned account (D5). Must equal the USER_BANNED
+  /// entry of `BackendReasons` and functions/src/domain/reasons.ts.
+  static const userBannedReason = 'USER_BANNED';
+
   /// Failures that make further requests pointless for now.
-  bool get blocksInput => this == quotaExceeded || this == disabled;
+  bool get blocksInput => this == quotaExceeded || this == disabled || this == banned;
 
   /// Maps a callable error (HttpsError + `details.reason`) to a failure.
   static TutorFailure from(Object error) {
@@ -147,6 +172,8 @@ enum TutorFailure {
           return disabled;
         case BackendReasons.aiExamInProgress:
           return examInProgress;
+        case userBannedReason:
+          return banned;
         case BackendReasons.validationFailed:
           return validation;
       }

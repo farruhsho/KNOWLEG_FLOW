@@ -4,14 +4,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:knowledge_flow/core/design/tokens.dart';
 import 'package:knowledge_flow/features/billing/application/billing_providers.dart';
+import 'package:knowledge_flow/features/billing/application/paged_list_controller.dart';
+import 'package:knowledge_flow/features/billing/data/billing_history_repository.dart';
 import 'package:knowledge_flow/features/billing/domain/billing_mode.dart';
+import 'package:knowledge_flow/features/billing/domain/billing_records.dart';
 import 'package:knowledge_flow/features/billing/domain/entitlements.dart';
 import 'package:knowledge_flow/features/billing/domain/obfuscated_account_id.dart';
 import 'package:knowledge_flow/features/billing/domain/pricing_config.dart';
 import 'package:knowledge_flow/features/billing/presentation/pages/store_page.dart';
+import 'package:knowledge_flow/features/billing/presentation/pages/transactions_page.dart';
 import 'package:knowledge_flow/l10n/app_localizations.dart';
 
 import 'billing_fakes.dart';
+
+class _FakeHistory extends BillingHistoryRepository {
+  _FakeHistory({this.ledgerList = const []});
+
+  final List<LedgerEntry> ledgerList;
+  int purchaseCalls = 0;
+
+  @override
+  Future<PageChunk<PurchaseRecord>> purchases(String uid, Object? cursor) async {
+    purchaseCalls++;
+    return const PageChunk([], hasMore: false);
+  }
+
+  @override
+  Future<PageChunk<LedgerEntry>> ledger(String uid, Object? cursor) async =>
+      PageChunk(ledgerList, hasMore: false);
+}
 
 void main() {
   late FakeStore store;
@@ -31,6 +52,10 @@ void main() {
         const Entitlements(freeExamUsed: false, credits: 3, lifetimeCreditsPurchased: 3),
     Brightness brightness = Brightness.light,
     String? uid = 'user-1',
+    bool playPlatform = true,
+    String locale = 'ru',
+    Widget home = const StorePage(),
+    BillingHistoryRepository? history,
   }) async {
     // Small phone: 360 x 640 dp.
     tester.view.physicalSize = const Size(1080, 1920);
@@ -40,6 +65,7 @@ void main() {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         billingModeProvider.overrideWithValue(mode),
+        playBillingPlatformProvider.overrideWithValue(playPlatform),
         storeGatewayProvider.overrideWithValue(store),
         purchaseVerifierProvider.overrideWithValue(verifier),
         billingCurrentUidProvider.overrideWithValue(() => uid),
@@ -47,6 +73,7 @@ void main() {
         billingUidProvider.overrideWith((ref) => Stream<String?>.value(uid)),
         entitlementsProvider.overrideWith((ref) => Stream.value(entitlements)),
         pricingConfigProvider.overrideWith((ref) => Stream.value(PricingConfig.defaults)),
+        if (history != null) billingHistoryRepositoryProvider.overrideWithValue(history),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -56,13 +83,26 @@ void main() {
         ),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('ru'),
-        home: const StorePage(),
+        locale: Locale(locale),
+        home: home,
       ),
     ));
     await tester.pump();
     await tester.pump();
   }
+
+  /// Every string currently rendered (Text, RichText and tooltips).
+  List<String> visibleStrings(WidgetTester tester) => [
+        for (final w in tester.widgetList<Text>(find.byType(Text))) w.data ?? w.textSpan?.toPlainText() ?? '',
+        for (final w in tester.widgetList<RichText>(find.byType(RichText))) w.text.toPlainText(),
+        for (final w in tester.widgetList<Tooltip>(find.byType(Tooltip))) w.message ?? '',
+      ];
+
+  /// Buy / purchase / payment / website wording (ru, ky, en).
+  final purchaseWording = RegExp(
+    r'купи|покуп|приобр|оплат|сайт|сатып|төлө|buy|purchas|pay|website|http|US\$|\d\s?сом',
+    caseSensitive: false,
+  );
 
   group('external (consumption-only) mode', () {
     testWidgets('shows balance and the neutral line, no prices or buy buttons', (tester) async {
@@ -70,7 +110,7 @@ void main() {
 
       expect(find.text('3 кредита'), findsOneWidget);
       expect(find.text('Первый полный пробный экзамен — бесплатно'), findsOneWidget);
-      expect(find.text('Доступ к дополнительным тестам можно приобрести на нашем сайте.'), findsOneWidget);
+      expect(find.text('Кредиты на вашем аккаунте отображаются здесь.'), findsOneWidget);
 
       expect(find.byType(FilledButton), findsNothing);
       expect(find.text('Восстановить покупки'), findsNothing);
@@ -82,8 +122,99 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    for (final locale in ['ru', 'ky', 'en']) {
+      testWidgets('[$locale] no buy, purchase, payment or website wording anywhere', (tester) async {
+        await pumpStore(tester, mode: BillingMode.external, locale: locale);
+        final offending = visibleStrings(tester).where(purchaseWording.hasMatch).toList();
+        expect(offending, isEmpty);
+        expect(find.byType(FilledButton), findsNothing);
+      });
+    }
+
+    testWidgets('credit history: ledger only, neutral title and reasons', (tester) async {
+      final history = _FakeHistory(ledgerList: [
+        LedgerEntry.fromMap('l1', {'delta': 5, 'balance_after': 5, 'reason': 'purchase'}),
+        LedgerEntry.fromMap('l2', {'delta': -1, 'balance_after': 4, 'reason': 'exam_start'}),
+      ]);
+      await pumpStore(tester,
+          mode: BillingMode.external, home: const TransactionsPage(), history: history);
+      await tester.pump();
+
+      expect(find.text('История кредитов'), findsOneWidget);
+      expect(find.byType(TabBar), findsNothing);
+      expect(find.text('Кредиты зачислены'), findsOneWidget);
+      expect(history.purchaseCalls, 0);
+      final offending = visibleStrings(tester).where(purchaseWording.hasMatch).toList();
+      expect(offending, isEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('history button is labelled neutrally', (tester) async {
+      await pumpStore(tester, mode: BillingMode.external);
+      expect(find.byTooltip('История кредитов'), findsOneWidget);
+      expect(find.byTooltip('История покупок'), findsNothing);
+    });
+
     testWidgets('renders in dark mode without overflow', (tester) async {
       await pumpStore(tester, mode: BillingMode.external, brightness: Brightness.dark);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('free exams from config/pricing (D14)', () {
+    testWidgets('shows how many free exams are left', (tester) async {
+      await pumpStore(
+        tester,
+        mode: BillingMode.play,
+        entitlements: const Entitlements(
+          freeExamUsed: true,
+          freeExamsUsedCount: 1,
+          freeExamsAllowed: 3,
+          credits: 0,
+          lifetimeCreditsPurchased: 0,
+        ),
+      );
+      expect(find.text('Осталось 2 бесплатных пробных экзамена'), findsOneWidget);
+    });
+
+    testWidgets('all free exams used', (tester) async {
+      await pumpStore(
+        tester,
+        mode: BillingMode.play,
+        entitlements: const Entitlements(
+          freeExamUsed: true,
+          freeExamsUsedCount: 2,
+          freeExamsAllowed: 2,
+          credits: 0,
+          lifetimeCreditsPurchased: 0,
+        ),
+      );
+      expect(find.text('Бесплатный пробный экзамен уже использован'), findsOneWidget);
+    });
+
+    testWidgets('no free exams configured → no free-exam promise', (tester) async {
+      await pumpStore(
+        tester,
+        mode: BillingMode.play,
+        entitlements: const Entitlements(
+          freeExamUsed: false,
+          freeExamsAllowed: 0,
+          credits: 0,
+          lifetimeCreditsPurchased: 0,
+        ),
+      );
+      expect(find.textContaining('бесплат'), findsNothing);
+    });
+  });
+
+  group('platform without Google Play Billing (D7)', () {
+    testWidgets('play mode on web/desktop explains instead of offering products', (tester) async {
+      await pumpStore(tester, mode: BillingMode.play, playPlatform: false);
+      await tester.pump();
+      expect(find.text('Покупки здесь недоступны'), findsOneWidget);
+      expect(find.byKey(const ValueKey('buy_exam_single')), findsNothing);
+      expect(find.text('Восстановить покупки'), findsNothing);
+      expect(find.text('Повторить'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });

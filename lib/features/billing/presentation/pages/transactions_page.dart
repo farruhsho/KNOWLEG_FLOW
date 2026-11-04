@@ -12,6 +12,9 @@ import '../widgets/billing_state_views.dart';
 
 /// Purchase history + credits ledger (RoutePaths.transactions). Read-only,
 /// server-written data; paginated 20 rows at a time.
+///
+/// In `BILLING_MODE=external` builds there are no in-app purchases: the page
+/// is a neutral credit history (ledger only, no purchase wording or prices).
 class TransactionsPage extends ConsumerWidget {
   const TransactionsPage({super.key});
 
@@ -19,6 +22,13 @@ class TransactionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final uid = ref.watch(billingUidProvider);
+    final sellsInApp = ref.watch(canSellProvider);
+    if (!sellsInApp) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.billingCreditHistoryTitle)),
+        body: _body(context, ref, uid, sellsInApp: false),
+      );
+    }
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -31,43 +41,51 @@ class TransactionsPage extends ConsumerWidget {
             ],
           ),
         ),
-        body: uid.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => _Padded(
-            child: BillingMessage(
-              icon: Icons.error_outline,
-              tone: BillingTone.danger,
-              message: l10n.billingHistoryError,
-              actionLabel: l10n.billingRetry,
-              onAction: () => ref.invalidate(billingUidProvider),
-            ),
-          ),
-          data: (uid) {
-            if (uid == null) {
-              return _Padded(
-                child: BillingMessage(icon: Icons.person_outline, message: l10n.billingSignInRequired),
-              );
-            }
-            final repo = ref.watch(billingHistoryRepositoryProvider);
-            return TabBarView(
-              children: [
-                _PagedList<PurchaseRecord>(
-                  key: ValueKey('purchases_$uid'),
-                  fetch: (cursor) => repo.purchases(uid, cursor),
-                  emptyText: l10n.billingPurchasesEmpty,
-                  itemBuilder: (context, p) => _PurchaseTile(record: p),
-                ),
-                _PagedList<LedgerEntry>(
-                  key: ValueKey('ledger_$uid'),
-                  fetch: (cursor) => repo.ledger(uid, cursor),
-                  emptyText: l10n.billingLedgerEmpty,
-                  itemBuilder: (context, e) => _LedgerTile(entry: e),
-                ),
-              ],
-            );
-          },
+        body: _body(context, ref, uid, sellsInApp: true),
+      ),
+    );
+  }
+
+  Widget _body(BuildContext context, WidgetRef ref, AsyncValue<String?> uid,
+      {required bool sellsInApp}) {
+    final l10n = AppLocalizations.of(context)!;
+    return uid.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => _Padded(
+        child: BillingMessage(
+          icon: Icons.error_outline,
+          tone: BillingTone.danger,
+          message: l10n.billingHistoryError,
+          actionLabel: l10n.billingRetry,
+          onAction: () => ref.invalidate(billingUidProvider),
         ),
       ),
+      data: (uid) {
+        if (uid == null) {
+          return _Padded(
+            child: BillingMessage(icon: Icons.person_outline, message: l10n.billingSignInRequired),
+          );
+        }
+        final repo = ref.watch(billingHistoryRepositoryProvider);
+        final ledger = _PagedList<LedgerEntry>(
+          key: ValueKey('ledger_$uid'),
+          fetch: (cursor) => repo.ledger(uid, cursor),
+          emptyText: l10n.billingLedgerEmpty,
+          itemBuilder: (context, e) => _LedgerTile(entry: e, neutral: !sellsInApp),
+        );
+        if (!sellsInApp) return ledger;
+        return TabBarView(
+          children: [
+            _PagedList<PurchaseRecord>(
+              key: ValueKey('purchases_$uid'),
+              fetch: (cursor) => repo.purchases(uid, cursor),
+              emptyText: l10n.billingPurchasesEmpty,
+              itemBuilder: (context, p) => _PurchaseTile(record: p),
+            ),
+            ledger,
+          ],
+        );
+      },
     );
   }
 }
@@ -293,8 +311,11 @@ class _PurchaseTile extends ConsumerWidget {
 }
 
 class _LedgerTile extends StatelessWidget {
-  const _LedgerTile({required this.entry});
+  const _LedgerTile({required this.entry, this.neutral = false});
   final LedgerEntry entry;
+
+  /// External builds: no purchase wording in reason labels.
+  final bool neutral;
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +340,8 @@ class _LedgerTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.billingLedgerReasonLabel(entry.reason), style: theme.textTheme.titleSmall),
+                Text(l10n.billingLedgerReasonLabel(entry.reason, neutral: neutral),
+                    style: theme.textTheme.titleSmall),
                 if (sub.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.xxs),
                   Text(sub, style: theme.textTheme.bodySmall),

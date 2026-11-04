@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:knowledge_flow/features/billing/application/billing_providers.dart';
 import 'package:knowledge_flow/features/billing/application/paged_list_controller.dart';
 import 'package:knowledge_flow/features/billing/domain/billing_mode.dart';
 import 'package:knowledge_flow/features/billing/domain/billing_records.dart';
@@ -40,6 +42,17 @@ void main() {
       expect(BillingMode.parse(null), BillingMode.play);
       expect(BillingMode.external.sellsInApp, isFalse);
       expect(BillingMode.play.sellsInApp, isTrue);
+    });
+
+    test('canSellProvider is false in external builds', () {
+      final ext = ProviderContainer(
+          overrides: [billingModeProvider.overrideWithValue(BillingMode.external)]);
+      final play = ProviderContainer(
+          overrides: [billingModeProvider.overrideWithValue(BillingMode.play)]);
+      addTearDown(ext.dispose);
+      addTearDown(play.dispose);
+      expect(ext.read(canSellProvider), isFalse);
+      expect(play.read(canSellProvider), isTrue);
     });
   });
 
@@ -87,6 +100,78 @@ void main() {
       expect(Entitlements.fromMap({'credits': -2}).credits, 0);
       expect(Entitlements.fromMap({'credits': 'abc'}).credits, 0);
       expect(Entitlements.fromMap({'free_exam_used': 1}).freeExamUsed, isTrue);
+    });
+  });
+
+  group('free exams per user (ENT-FREE-01 / D14)', () {
+    test('used count falls back to the free_exam_used flag', () {
+      expect(Entitlements.fromMap({'free_exam_used': true}).freeExamsUsedCount, 1);
+      expect(Entitlements.fromMap({'free_exam_used': false}).freeExamsUsedCount, 0);
+      expect(Entitlements.fromMap({}).freeExamsUsedCount, 0);
+      // The server takes max(count, flag ? 1 : 0).
+      expect(Entitlements.fromMap({'free_exam_used': true, 'free_exams_used_count': 0}).freeExamsUsedCount, 1);
+      expect(Entitlements.fromMap({'free_exams_used_count': 2}).freeExamUsed, isTrue);
+      const legacy = Entitlements(freeExamUsed: true, credits: 0, lifetimeCreditsPurchased: 0);
+      expect(legacy.freeExamsUsedCount, 1);
+      expect(legacy.hasFreeExam, isFalse);
+    });
+
+    test('allowance above one: a second free exam is still available', () {
+      final e = Entitlements.fromMap(
+        {'free_exam_used': true, 'free_exams_used_count': 1, 'credits': 0},
+        freeExamsAllowed: 2,
+      );
+      expect(e.freeExamsRemaining, 1);
+      expect(e.hasFreeExam, isTrue);
+      expect(e.canStartExam, isTrue);
+      final used = Entitlements.fromMap({'free_exams_used_count': 2, 'credits': 0}, freeExamsAllowed: 2);
+      expect(used.hasFreeExam, isFalse);
+      expect(used.canStartExam, isFalse);
+    });
+
+    test('allowance zero: a new account has no free exam', () {
+      final e = Entitlements.fromMap(null, freeExamsAllowed: 0);
+      expect(e.hasFreeExam, isFalse);
+      expect(e.canStartExam, isFalse);
+      expect(e.freeExamsRemaining, 0);
+      expect(Entitlements.fromMap({'credits': 1}, freeExamsAllowed: 0).canStartExam, isTrue);
+    });
+
+    test('withFreeExamsAllowed keeps the document and changes only the allowance', () {
+      final e = Entitlements.fromMap({'free_exams_used_count': 1, 'credits': 2});
+      final more = e.withFreeExamsAllowed(3);
+      expect(more.credits, 2);
+      expect(more.freeExamsUsedCount, 1);
+      expect(more.freeExamsRemaining, 2);
+      expect(identical(e.withFreeExamsAllowed(1), e), isTrue);
+    });
+
+    test('config/pricing.free_exams_per_user mirrors the server (int 0..5, default 1)', () {
+      expect(PricingConfig.fromMap(null).freeExamsPerUser, 1);
+      expect(PricingConfig.fromMap({}).freeExamsPerUser, 1);
+      expect(PricingConfig.fromMap({'free_exams_per_user': 3}).freeExamsPerUser, 3);
+      expect(PricingConfig.fromMap({'free_exams_per_user': 0}).freeExamsPerUser, 0);
+      expect(PricingConfig.fromMap({'free_exams_per_user': 2.0}).freeExamsPerUser, 2);
+      expect(PricingConfig.fromMap({'freeExamsPerUser': 4}).freeExamsPerUser, 4);
+      expect(PricingConfig.fromMap({'free_exams_per_user': 6}).freeExamsPerUser, 1);
+      expect(PricingConfig.fromMap({'free_exams_per_user': -1}).freeExamsPerUser, 1);
+      expect(PricingConfig.fromMap({'free_exams_per_user': 1.5}).freeExamsPerUser, 1);
+      expect(PricingConfig.fromMap({'free_exams_per_user': '2'}).freeExamsPerUser, 1);
+      expect(PricingConfig.defaults.freeExamsPerUser, 1);
+    });
+
+    test('entitlementsProvider applies the configured allowance', () async {
+      final c = ProviderContainer(overrides: [
+        pricingConfigProvider.overrideWith(
+            (ref) => Stream.value(const PricingConfig({}, freeExamsPerUser: 0))),
+      ]);
+      addTearDown(c.dispose);
+      await c.read(pricingConfigProvider.future);
+      // No Firebase app in unit tests: the provider falls back to the
+      // signed-out value, still with the configured allowance.
+      final e = await c.read(entitlementsProvider.future);
+      expect(e.freeExamsAllowed, 0);
+      expect(e.hasFreeExam, isFalse);
     });
   });
 

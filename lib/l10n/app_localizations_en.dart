@@ -15,6 +15,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeleteButton => 'Delete account permanently';
 
   @override
+  String accountDeleteConfirmAlt(String word) {
+    return 'You can also type $word';
+  }
+
+  @override
   String accountDeleteConfirmLabel(String word) {
     return 'To confirm, type $word';
   }
@@ -72,6 +77,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountDeleteTitle => 'Delete account';
 
   @override
+  String get accountDeleteUnavailablePlatform =>
+      'Account deletion isn\'t available on this platform. Open the app on an Android device to delete your account.';
+
+  @override
   String get accountDeleteWarningBody =>
       'Your account and learning data will be permanently deleted. You won\'t be able to restore them.';
 
@@ -104,6 +113,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many attempts. Wait a few minutes and try again.';
 
   @override
+  String get accountErrorUnauthenticated =>
+      'The server couldn\'t verify this app or your session. Update the app, sign in again and retry.';
+
+  @override
   String get accountErrorUnknown => 'Couldn\'t delete the account. Try again.';
 
   @override
@@ -133,6 +146,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountReauthPassword => 'Password';
+
+  @override
+  String get accountReauthSignInAgain => 'Sign in again';
 
   @override
   String get accountReauthTitle => 'Confirm it\'s you';
@@ -1674,6 +1690,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get billingCreditHistoryTitle => 'Credit history';
+
+  @override
   String get billingCreditRule => '1 credit = 1 full mock exam';
 
   @override
@@ -1721,18 +1740,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t confirm the purchase yet. We\'ll retry automatically, and your payment won\'t be lost.';
 
   @override
-  String get billingExternalInfo =>
-      'Access to additional tests can be purchased on our website.';
+  String get billingExternalInfo => 'Credits on your account are shown here.';
 
   @override
-  String get billingExternalNote =>
-      'Purchased credits appear here automatically.';
+  String get billingExternalNote => 'Your balance updates automatically.';
 
   @override
   String get billingFreeExamAvailable => 'Your first full mock exam is free';
 
   @override
   String get billingFreeExamUsed => 'Free mock exam already used';
+
+  @override
+  String billingFreeExamsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count free mock exams left',
+      one: '1 free mock exam left',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get billingHistoryError => 'Couldn\'t load the history.';
@@ -1802,6 +1830,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get billingReasonAdminGrant => 'Added by support';
+
+  @override
+  String get billingReasonCreditsAdded => 'Credits added';
 
   @override
   String get billingReasonExamStart => 'Mock exam started';
@@ -1885,6 +1916,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get billingUnavailableTitle => 'Purchases are unavailable';
+
+  @override
+  String get billingUnsupportedPlatformBody =>
+      'Tests can be bought in the Android app through Google Play. Your balance is the same on every device.';
+
+  @override
+  String get billingUnsupportedPlatformTitle =>
+      'Purchases aren\'t available here';
 
   @override
   String get biology => 'Biology';
@@ -4360,6 +4399,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tutorEmptyTitle => 'How can I help?';
 
   @override
+  String get tutorErrorBanned =>
+      'Your account is restricted, so the AI tutor isn\'t available. If you think this is a mistake, contact support.';
+
+  @override
   String get tutorErrorDisabled => 'The AI tutor is temporarily unavailable.';
 
   @override
@@ -4456,6 +4499,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tutorHintStudyPlan => 'Tell me your exam date and weak subjects.';
 
   @override
+  String tutorMessageTooLong(int count, int max) {
+    return 'The message is too long ($count/$max characters). Shorten it to send.';
+  }
+
+  @override
   String get tutorModeChat => 'Free question';
 
   @override
@@ -4489,6 +4537,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorTitle => 'AI tutor';
+
+  @override
+  String get tutorUnavailablePlatform =>
+      'The AI tutor isn\'t available on this platform. Use the Android app.';
 
   @override
   String get tutorYou => 'You';

@@ -24,6 +24,7 @@ extension TutorL10n on AppLocalizations {
         TutorFailure.quotaExceeded => tutorErrorQuota,
         TutorFailure.disabled => tutorErrorDisabled,
         TutorFailure.examInProgress => tutorErrorExamInProgress,
+        TutorFailure.banned => tutorErrorBanned,
         TutorFailure.signInRequired => tutorErrorSignIn,
         TutorFailure.network => tutorErrorNetwork,
         TutorFailure.validation => tutorErrorValidation,

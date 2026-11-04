@@ -15,6 +15,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accountDeleteButton => 'Удалить аккаунт навсегда';
 
   @override
+  String accountDeleteConfirmAlt(String word) {
+    return 'Можно также ввести $word';
+  }
+
+  @override
   String accountDeleteConfirmLabel(String word) {
     return 'Для подтверждения введите $word';
   }
@@ -72,6 +77,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accountDeleteTitle => 'Удаление аккаунта';
 
   @override
+  String get accountDeleteUnavailablePlatform =>
+      'Удаление аккаунта недоступно на этой платформе. Откройте приложение на Android-устройстве, чтобы удалить аккаунт.';
+
+  @override
   String get accountDeleteWarningBody =>
       'Аккаунт и данные об обучении будут удалены навсегда. Восстановить их будет невозможно.';
 
@@ -105,6 +114,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Слишком много попыток. Подождите несколько минут и повторите.';
 
   @override
+  String get accountErrorUnauthenticated =>
+      'Сервер не смог проверить приложение или ваш сеанс. Обновите приложение, войдите заново и повторите.';
+
+  @override
   String get accountErrorUnknown =>
       'Не удалось удалить аккаунт. Попробуйте ещё раз.';
 
@@ -135,6 +148,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get accountReauthPassword => 'Пароль';
+
+  @override
+  String get accountReauthSignInAgain => 'Войти заново';
 
   @override
   String get accountReauthTitle => 'Подтвердите, что это вы';
@@ -1676,6 +1692,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get billingCreditHistoryTitle => 'История кредитов';
+
+  @override
   String get billingCreditRule => '1 кредит = 1 полный пробный экзамен';
 
   @override
@@ -1729,11 +1748,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get billingExternalInfo =>
-      'Доступ к дополнительным тестам можно приобрести на нашем сайте.';
+      'Кредиты на вашем аккаунте отображаются здесь.';
 
   @override
-  String get billingExternalNote =>
-      'Приобретённые кредиты появятся здесь автоматически.';
+  String get billingExternalNote => 'Баланс обновляется автоматически.';
 
   @override
   String get billingFreeExamAvailable =>
@@ -1742,6 +1760,19 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get billingFreeExamUsed =>
       'Бесплатный пробный экзамен уже использован';
+
+  @override
+  String billingFreeExamsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Осталось $count бесплатного пробного экзамена',
+      many: 'Осталось $count бесплатных пробных экзаменов',
+      few: 'Осталось $count бесплатных пробных экзамена',
+      one: 'Остался $count бесплатный пробный экзамен',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get billingHistoryError => 'Не удалось загрузить историю.';
@@ -1816,6 +1847,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get billingReasonAdminGrant => 'Начислено поддержкой';
+
+  @override
+  String get billingReasonCreditsAdded => 'Кредиты зачислены';
 
   @override
   String get billingReasonExamStart => 'Начат пробный экзамен';
@@ -1898,6 +1932,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get billingUnavailableTitle => 'Покупки недоступны';
+
+  @override
+  String get billingUnsupportedPlatformBody =>
+      'Тесты можно купить в Android-приложении через Google Play. Баланс одинаковый на всех устройствах.';
+
+  @override
+  String get billingUnsupportedPlatformTitle => 'Покупки здесь недоступны';
 
   @override
   String get biology => 'Биология';
@@ -4414,6 +4455,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tutorEmptyTitle => 'Чем помочь?';
 
   @override
+  String get tutorErrorBanned =>
+      'Ваш аккаунт ограничен, поэтому ИИ-репетитор недоступен. Если это ошибка, напишите в поддержку.';
+
+  @override
   String get tutorErrorDisabled => 'ИИ-репетитор временно недоступен.';
 
   @override
@@ -4512,6 +4557,11 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tutorHintStudyPlan => 'Напишите дату экзамена и слабые предметы.';
 
   @override
+  String tutorMessageTooLong(int count, int max) {
+    return 'Сообщение слишком длинное ($count/$max символов). Сократите его, чтобы отправить.';
+  }
+
+  @override
   String get tutorModeChat => 'Свободный вопрос';
 
   @override
@@ -4545,6 +4595,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tutorTitle => 'ИИ-репетитор';
+
+  @override
+  String get tutorUnavailablePlatform =>
+      'ИИ-репетитор недоступен на этой платформе. Воспользуйтесь Android-приложением.';
 
   @override
   String get tutorYou => 'Вы';
