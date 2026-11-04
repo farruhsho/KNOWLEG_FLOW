@@ -275,11 +275,13 @@ class FirebaseDataService {
 
   // ========== ORT TESTS (legacy admin) ==========
 
-  /// Get all ORT tests
-  Future<List<Map<String, dynamic>>> getOrtTests() async {
+  /// All ORT test documents. Returned as snapshots because the admin test
+  /// manager parses them with `OrtTestModel.fromFirestore(DocumentSnapshot)`
+  /// (the old `List<dynamic>` of raw maps crashed that call at runtime).
+  Future<List<DocumentSnapshot<Map<String, dynamic>>>> getOrtTests() async {
     try {
       final snapshot = await _firestore.collection('ort_tests').get();
-      return snapshot.docs.map((doc) => {...doc.data(), 'id': doc.data()['id'] ?? doc.id}).toList();
+      return snapshot.docs;
     } catch (e, st) {
       reportError(e, st, reason: 'learn.getOrtTests');
       return [];

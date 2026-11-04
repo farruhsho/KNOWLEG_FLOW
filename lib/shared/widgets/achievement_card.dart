@@ -78,7 +78,7 @@ class AchievementCard extends StatelessWidget {
                 LinearProgressIndicator(
                   value: achievement.progressPercentage,
                   backgroundColor: AppColors.grey200,
-                  valueColor: AlwaysStoppedAnimation(AppColors.primary),
+                  valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                   minHeight: 4,
                 ),
                 const SizedBox(height: 4),
@@ -98,7 +98,7 @@ class AchievementCard extends StatelessWidget {
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Получено',
                     style: TextStyle(
                       color: AppColors.success,

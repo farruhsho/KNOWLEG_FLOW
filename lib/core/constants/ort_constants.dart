@@ -1,130 +1,140 @@
-/// ORT (Общереспубликанское тестирование) Кыргызстана
-/// Complete structure and constants for ORT testing system
+/// ORT (Общереспубликанское тестирование) constants for code that needs a
+/// synchronous answer (admin pickers, AI drafting prompts, legacy screens).
+///
+/// **The canonical exam structure is `assets/data/exam_blueprints.json`**
+/// (versioned blueprints, verified against the official 2026 brochure — see
+/// docs/modernization/ARCHITECTURE.md §1.1). Everything below mirrors
+/// blueprint `ort_main_2026` / `ort_subject_*_2026`, and
+/// test/learning/ort_constants_test.dart fails if the two drift apart
+/// (CMS-08). New features should read the blueprint, not these constants.
+///
+/// Scoring: the app counts raw correct answers (1 point each, no penalty).
+/// The official conversion to the ORT scale is not published, so nothing in
+/// the app may present a raw count or a percentage as an official ORT score.
 class OrtConstants {
   // ═══════════════════════════════════════════════════════════════════
-  // ОСНОВНОЙ ТЕСТ (Обязательный для всех)
+  // ОСНОВНОЙ ТЕСТ (ort_main_2026): math 60/90 → verbal 30/30 →
+  // reading 30/60 → grammar 30/35. Итого 150 заданий / 215 минут.
   // ═══════════════════════════════════════════════════════════════════
 
-  static const int totalMainQuestions = 140;
-  static const int totalMainMinutes = 160;
-  static const int totalMainScore = 160;
+  static const int totalMainQuestions = 150;
+  static const int totalMainMinutes = 215;
 
-  // Математика 1 (Базовая)
+  /// Raw points of the main test (1 per correct answer). NOT the official
+  /// ORT scale — see [officialMainMaxScore].
+  static const int totalMainScore = 150;
+
+  /// Official maximum of the main test on the ORT scale (blueprint
+  /// `reference.official_max_score`). Reference information only: the app
+  /// never converts raw results to this scale.
+  static const int officialMainMaxScore = 245;
+
+  // Section timers. Parts inside a section share the section timer; the
+  // per-part minutes below are the equal-pace share of that timer, used only
+  // for display and pacing hints.
+  static const int mathSectionMinutes = 90;
+  static const int verbalSectionMinutes = 30;
+
+  // Математика, часть I — сравнение величин (4 фиксированных варианта)
   static const int math1Questions = 30;
-  static const int math1Minutes = 40;
+  static const int math1Minutes = 45;
   static const int math1PointsPerQuestion = 1;
   static const int math1MaxScore = 30;
 
-  // Математика 2 (Продвинутая)
-  static const int math2Questions = 20;
-  static const int math2Minutes = 30;
-  static const int math2PointsPerQuestion = 2;
-  static const int math2MaxScore = 40;
+  // Математика, часть II — задачи (5 вариантов ответа)
+  static const int math2Questions = 30;
+  static const int math2Minutes = 45;
+  static const int math2PointsPerQuestion = 1;
+  static const int math2MaxScore = 30;
 
-  // Аналогии (Логика)
+  // Аналогии (часть раздела verbal; деление 15/15 официально не опубликовано)
   static const int analogiesQuestions = 15;
-  static const int analogiesMinutes = 12;
+  static const int analogiesMinutes = 15;
   static const int analogiesPointsPerQuestion = 1;
   static const int analogiesMaxScore = 15;
 
-  // Дополнение предложений (Логика)
+  // Дополнение предложений (часть раздела verbal)
   static const int completionQuestions = 15;
-  static const int completionMinutes = 13;
+  static const int completionMinutes = 15;
   static const int completionPointsPerQuestion = 1;
   static const int completionMaxScore = 15;
 
-  // Грамматика (русский/кыргызский)
-  static const int grammarQuestions = 40;
+  // Чтение и понимание
+  static const int readingQuestions = 30;
+  static const int readingMinutes = 60;
+  static const int readingPointsPerQuestion = 1;
+  static const int readingMaxScore = 30;
+
+  // Практическая грамматика (язык выбранного теста)
+  static const int grammarQuestions = 30;
   static const int grammarMinutes = 35;
   static const int grammarPointsPerQuestion = 1;
-  static const int grammarMaxScore = 40;
-
-  // Чтение и понимание
-  static const int readingQuestions = 20;
-  static const int readingMinutes = 30;
-  static const int readingPointsPerQuestion = 1;
-  static const int readingMaxScore = 20;
+  static const int grammarMaxScore = 30;
 
   // ═══════════════════════════════════════════════════════════════════
-  // ПРЕДМЕТНЫЕ ТЕСТЫ (По выбору - максимум 2)
+  // ПРЕДМЕТНЫЕ ТЕСТЫ (ort_subject_*_2026). Количество заданий и время
+  // зависят от предмета — см. [subjectTestsList].
   // ═══════════════════════════════════════════════════════════════════
 
-  static const int subjectTestQuestions = 30;
-  static const int subjectTestMinutes = 45;
-  static const int subjectTestPointsPerQuestion = 2;
-  static const int subjectTestMaxScore = 60;
+  /// Most common subject-test length (English has 50).
+  static const int subjectTestQuestions = 40;
+
+  /// Shortest subject-test duration; chemistry, physics and math take 80.
+  static const int subjectTestMinutes = 60;
+  static const int subjectTestPointsPerQuestion = 1;
+  static const int subjectTestMaxScore = 40;
+
+  /// How many subject tests the app lets a student plan for. App-side limit,
+  /// not an official rule (requirements depend on the chosen programme).
   static const int maxSubjectTests = 2;
-  static const int totalSubjectMaxScore = 120; // 60 × 2
+  static const int totalSubjectMaxScore = subjectTestMaxScore * maxSubjectTests;
 
-  // Общий максимум
-  static const int totalMaxScore = 220; // 160 + 60
+  /// Kept for old callers: the official main-test maximum. There is no
+  /// official "main + subject tests" total.
+  static const int totalMaxScore = officialMainMaxScore;
 
-  // Список доступных предметных тестов
+  // Тест по государственному языку (ort_state_language_2026): только
+  // кыргызский, результат — уровень 1–4.
+  static const int stateLanguageQuestions = 50;
+  static const int stateLanguageMinutes = 60;
+
+  /// Subject tests offered in 2026 (blueprint subject ids).
   static const List<String> availableSubjects = [
-    'physics',
     'chemistry',
     'biology',
-    'history_kg',
-    'history_world',
-    'geography',
+    'physics',
+    'math',
+    'history',
     'english',
-    'german',
-    'kyrgyz_lang',
-    'russian_lang',
+    'kyrgyz_lit',
+    'russian_lit',
   ];
 
-  // Названия предметов
+  /// Subject names, including legacy ids that older content still uses.
   static const Map<String, Map<String, String>> subjectNames = {
-    'physics': {
-      'ru': 'Физика',
-      'ky': 'Физика',
-      'en': 'Physics',
+    'chemistry': {'ru': 'Химия', 'ky': 'Химия', 'en': 'Chemistry'},
+    'biology': {'ru': 'Биология', 'ky': 'Биология', 'en': 'Biology'},
+    'physics': {'ru': 'Физика', 'ky': 'Физика', 'en': 'Physics'},
+    'math': {'ru': 'Математика', 'ky': 'Математика', 'en': 'Mathematics'},
+    'history': {'ru': 'История', 'ky': 'Тарых', 'en': 'History'},
+    'english': {'ru': 'Английский язык', 'ky': 'Англис тили', 'en': 'English'},
+    'kyrgyz_lit': {
+      'ru': 'Кыргызский язык и литература',
+      'ky': 'Кыргыз тили жана адабияты',
+      'en': 'Kyrgyz language and literature',
     },
-    'chemistry': {
-      'ru': 'Химия',
-      'ky': 'Химия',
-      'en': 'Chemistry',
+    'russian_lit': {
+      'ru': 'Русский язык и литература',
+      'ky': 'Орус тили жана адабияты',
+      'en': 'Russian language and literature',
     },
-    'biology': {
-      'ru': 'Биология',
-      'ky': 'Биология',
-      'en': 'Biology',
-    },
-    'history_kg': {
-      'ru': 'История Кыргызстана',
-      'ky': 'Кыргызстандын тарыхы',
-      'en': 'History of Kyrgyzstan',
-    },
-    'history_world': {
-      'ru': 'Всемирная история',
-      'ky': 'Дүйнөлүк тарых',
-      'en': 'World History',
-    },
-    'geography': {
-      'ru': 'География',
-      'ky': 'География',
-      'en': 'Geography',
-    },
-    'english': {
-      'ru': 'Английский язык',
-      'ky': 'Англис тили',
-      'en': 'English Language',
-    },
-    'german': {
-      'ru': 'Немецкий язык',
-      'ky': 'Немис тили',
-      'en': 'German Language',
-    },
-    'kyrgyz_lang': {
-      'ru': 'Кыргызский язык (для русских школ)',
-      'ky': 'Кыргыз тили (орус мектептери үчүн)',
-      'en': 'Kyrgyz Language (for Russian schools)',
-    },
-    'russian_lang': {
-      'ru': 'Русский язык (для кыргызских школ)',
-      'ky': 'Орус тили (кыргыз мектептери үчүн)',
-      'en': 'Russian Language (for Kyrgyz schools)',
-    },
+    // Legacy ids (pre-2026 content).
+    'history_kg': {'ru': 'История Кыргызстана', 'ky': 'Кыргызстандын тарыхы', 'en': 'History of Kyrgyzstan'},
+    'history_world': {'ru': 'Всемирная история', 'ky': 'Дүйнөлүк тарых', 'en': 'World History'},
+    'geography': {'ru': 'География', 'ky': 'География', 'en': 'Geography'},
+    'german': {'ru': 'Немецкий язык', 'ky': 'Немис тили', 'en': 'German'},
+    'kyrgyz_lang': {'ru': 'Кыргызский язык', 'ky': 'Кыргыз тили', 'en': 'Kyrgyz language'},
+    'russian_lang': {'ru': 'Русский язык', 'ky': 'Орус тили', 'en': 'Russian language'},
   };
 
   // ═══════════════════════════════════════════════════════════════════
@@ -132,19 +142,19 @@ class OrtConstants {
   // ═══════════════════════════════════════════════════════════════════
 
   static const List<String> questionTypes = [
-    'single_choice', // Один правильный ответ из 5 вариантов (A-E)
-    'multiple_choice', // Несколько правильных ответов
+    'single_choice', // Один правильный ответ (4 варианта; в задачах по математике — 5)
+    'multiple_choice', // Несколько правильных ответов (в ОРТ не используется)
     'matching', // Соответствие
     'ordering', // Правильный порядок
     'fill_blank', // Заполнить пропуск
     'text_based', // Вопросы к тексту
   ];
 
-  // Варианты ответов для single/multiple choice
+  /// Answer letters. ORT items have 4 options (A–D); math part II has 5.
   static const List<String> answerOptions = ['A', 'B', 'C', 'D', 'E'];
 
   // ═══════════════════════════════════════════════════════════════════
-  // СИСТЕМА ОЦЕНКИ
+  // СИСТЕМА ОЦЕНКИ (сырые баллы приложения)
   // ═══════════════════════════════════════════════════════════════════
 
   static const int correctAnswerPoints = 1;
@@ -152,7 +162,7 @@ class OrtConstants {
   static const int skippedAnswerPoints = 0;
   static const bool hasPenaltyForWrong = false;
 
-  // Уровни сложности
+  // Уровни сложности (1–3)
   static const int difficultyEasy = 1;
   static const int difficultyMedium = 2;
   static const int difficultyHard = 3;
@@ -164,62 +174,74 @@ class OrtConstants {
   };
 
   // ═══════════════════════════════════════════════════════════════════
-  // РАЗДЕЛЫ ОСНОВНОГО ТЕСТА
+  // РАЗДЕЛЫ ОСНОВНОГО ТЕСТА (части в порядке прохождения)
   // ═══════════════════════════════════════════════════════════════════
 
   static const Map<String, Map<String, dynamic>> mainSections = {
     'math1': {
-      'name': {'ru': 'Математика 1', 'ky': 'Математика 1', 'en': 'Math 1'},
-      'description': {'ru': 'Базовая математика', 'ky': 'Базалык математика', 'en': 'Basic Mathematics'},
+      'name': {'ru': 'Математика, часть I', 'ky': 'Математика, I бөлүк', 'en': 'Mathematics, part I'},
+      'description': {'ru': 'Сравнение величин', 'ky': 'Чоңдуктарды салыштыруу', 'en': 'Quantitative comparison'},
+      'section_id': 'math',
       'questions': math1Questions,
       'minutes': math1Minutes,
+      'options': 4,
       'pointsPerQuestion': math1PointsPerQuestion,
       'maxScore': math1MaxScore,
       'order': 1,
     },
     'math2': {
-      'name': {'ru': 'Математика 2', 'ky': 'Математика 2', 'en': 'Math 2'},
-      'description': {'ru': 'Продвинутая математика', 'ky': 'Өркүндөтүлгөн математика', 'en': 'Advanced Mathematics'},
+      'name': {'ru': 'Математика, часть II', 'ky': 'Математика, II бөлүк', 'en': 'Mathematics, part II'},
+      'description': {'ru': 'Задачи', 'ky': 'Маселелер', 'en': 'Problem solving'},
+      'section_id': 'math',
       'questions': math2Questions,
       'minutes': math2Minutes,
+      'options': 5,
       'pointsPerQuestion': math2PointsPerQuestion,
       'maxScore': math2MaxScore,
       'order': 2,
     },
     'analogies': {
       'name': {'ru': 'Аналогии', 'ky': 'Аналогиялар', 'en': 'Analogies'},
-      'description': {'ru': 'Логика', 'ky': 'Логика', 'en': 'Logic'},
+      'description': {'ru': 'Логические связи между словами', 'ky': 'Сөздөрдүн ортосундагы логикалык байланыш', 'en': 'Word relationships'},
+      'section_id': 'verbal',
       'questions': analogiesQuestions,
       'minutes': analogiesMinutes,
+      'options': 4,
       'pointsPerQuestion': analogiesPointsPerQuestion,
       'maxScore': analogiesMaxScore,
       'order': 3,
     },
     'completion': {
-      'name': {'ru': 'Дополнение предложений', 'ky': 'Сүйлөмдөрдү толуктоо', 'en': 'Sentence Completion'},
-      'description': {'ru': 'Логика', 'ky': 'Логика', 'en': 'Logic'},
+      'name': {'ru': 'Дополнение предложений', 'ky': 'Сүйлөмдөрдү толуктоо', 'en': 'Sentence completion'},
+      'description': {'ru': 'Смысловое завершение предложений', 'ky': 'Сүйлөмдү мааниси боюнча толуктоо', 'en': 'Completing sentences by meaning'},
+      'section_id': 'verbal',
       'questions': completionQuestions,
       'minutes': completionMinutes,
+      'options': 4,
       'pointsPerQuestion': completionPointsPerQuestion,
       'maxScore': completionMaxScore,
       'order': 4,
     },
-    'grammar': {
-      'name': {'ru': 'Грамматика', 'ky': 'Грамматика', 'en': 'Grammar'},
-      'description': {'ru': 'Русский/Кыргызский язык', 'ky': 'Орус/Кыргыз тили', 'en': 'Russian/Kyrgyz Language'},
-      'questions': grammarQuestions,
-      'minutes': grammarMinutes,
-      'pointsPerQuestion': grammarPointsPerQuestion,
-      'maxScore': grammarMaxScore,
-      'order': 5,
-    },
     'reading': {
-      'name': {'ru': 'Чтение и понимание', 'ky': 'Окуу жана түшүнүү', 'en': 'Reading Comprehension'},
-      'description': {'ru': 'Работа с текстом', 'ky': 'Текст менен иштөө', 'en': 'Text Analysis'},
+      'name': {'ru': 'Чтение и понимание', 'ky': 'Окуу жана түшүнүү', 'en': 'Reading comprehension'},
+      'description': {'ru': 'Задания к текстам', 'ky': 'Тексттерге тапшырмалар', 'en': 'Questions on texts'},
+      'section_id': 'reading',
       'questions': readingQuestions,
       'minutes': readingMinutes,
+      'options': 4,
       'pointsPerQuestion': readingPointsPerQuestion,
       'maxScore': readingMaxScore,
+      'order': 5,
+    },
+    'grammar': {
+      'name': {'ru': 'Практическая грамматика', 'ky': 'Практикалык грамматика', 'en': 'Practical grammar'},
+      'description': {'ru': 'Язык выбранного теста', 'ky': 'Тандалган тесттин тили', 'en': 'Language of the chosen test'},
+      'section_id': 'grammar',
+      'questions': grammarQuestions,
+      'minutes': grammarMinutes,
+      'options': 4,
+      'pointsPerQuestion': grammarPointsPerQuestion,
+      'maxScore': grammarMaxScore,
       'order': 6,
     },
   };
@@ -231,7 +253,7 @@ class OrtConstants {
 
   /// Get subject name by ID and language
   static String getSubjectName(String subjectId, String language) {
-    return subjectNames[subjectId]?[language] ?? subjectId;
+    return subjectNames[subjectId]?[language] ?? subjectNames[subjectId]?['ru'] ?? subjectId;
   }
 
   /// Validate if user can select subject tests
@@ -239,7 +261,7 @@ class OrtConstants {
     return selectedSubjects.length <= maxSubjectTests;
   }
 
-  /// Calculate total score
+  /// Sum of raw points. Not an official ORT score.
   static int calculateTotalScore({
     required int mainScore,
     required int subjectScore,
@@ -252,45 +274,51 @@ class OrtConstants {
     return difficultyNames[difficulty] ?? 'Неизвестно';
   }
 
-  /// Get all main sections as OrtSection objects
+  /// Main-test parts in exam order (math I, math II, analogies, completion,
+  /// reading, grammar).
   static List<OrtSection> get mainSectionsList {
     return [
-      OrtSection(
+      const OrtSection(
         id: 'math1',
-        nameRu: 'Математика 1',
-        nameKy: 'Математика 1',
-        nameEn: 'Mathematics 1',
-        descriptionRu: 'Базовая математика: арифметика, алгебра, геометрия',
-        descriptionKy: 'Базалык математика: арифметика, алгебра, геометрия',
-        descriptionEn: 'Basic mathematics: arithmetic, algebra, geometry',
+        blueprintSectionId: 'math',
+        nameRu: 'Математика, часть I',
+        nameKy: 'Математика, I бөлүк',
+        nameEn: 'Mathematics, part I',
+        descriptionRu: 'Сравнение величин: какая из двух величин больше (4 фиксированных варианта)',
+        descriptionKy: 'Чоңдуктарды салыштыруу: эки чоңдуктун кайсынысы чоң (4 туруктуу вариант)',
+        descriptionEn: 'Quantitative comparison: which of two quantities is greater (4 fixed options)',
         questionCount: math1Questions,
         timeMinutes: math1Minutes,
         pointsPerQuestion: math1PointsPerQuestion,
         maxScore: math1MaxScore,
+        optionsPerQuestion: 4,
         order: 1,
         icon: '📐',
         color: '#6366F1',
-        topics: ['Арифметика', 'Уравнения', 'Неравенства', 'Геометрия', 'Функции'],
+        topics: ['Арифметика', 'Алгебраические выражения', 'Уравнения и неравенства', 'Проценты и пропорции', 'Геометрия'],
       ),
-      OrtSection(
+      const OrtSection(
         id: 'math2',
-        nameRu: 'Математика 2',
-        nameKy: 'Математика 2',
-        nameEn: 'Mathematics 2',
-        descriptionRu: 'Продвинутая математика: анализ, комбинаторика',
-        descriptionKy: 'Өркүндөтүлгөн математика: анализ, комбинаторика',
-        descriptionEn: 'Advanced mathematics: analysis, combinatorics',
+        blueprintSectionId: 'math',
+        nameRu: 'Математика, часть II',
+        nameKy: 'Математика, II бөлүк',
+        nameEn: 'Mathematics, part II',
+        descriptionRu: 'Задачи с выбором одного ответа из 5',
+        descriptionKy: '5 варианттан бир жоопту тандоочу маселелер',
+        descriptionEn: 'Problems with one answer out of 5',
         questionCount: math2Questions,
         timeMinutes: math2Minutes,
         pointsPerQuestion: math2PointsPerQuestion,
         maxScore: math2MaxScore,
+        optionsPerQuestion: 5,
         order: 2,
         icon: '🔢',
         color: '#8B5CF6',
-        topics: ['Производные', 'Интегралы', 'Комбинаторика', 'Теория вероятностей'],
+        topics: ['Текстовые задачи', 'Уравнения и системы', 'Функции и графики', 'Геометрия', 'Элементы комбинаторики и вероятности'],
       ),
-      OrtSection(
+      const OrtSection(
         id: 'analogies',
+        blueprintSectionId: 'verbal',
         nameRu: 'Аналогии',
         nameKy: 'Аналогиялар',
         nameEn: 'Analogies',
@@ -301,13 +329,15 @@ class OrtConstants {
         timeMinutes: analogiesMinutes,
         pointsPerQuestion: analogiesPointsPerQuestion,
         maxScore: analogiesMaxScore,
+        optionsPerQuestion: 4,
         order: 3,
         icon: '🔗',
         color: '#EC4899',
         topics: ['Синонимы', 'Антонимы', 'Часть-целое', 'Причина-следствие'],
       ),
-      OrtSection(
+      const OrtSection(
         id: 'completion',
+        blueprintSectionId: 'verbal',
         nameRu: 'Дополнение предложений',
         nameKy: 'Сүйлөмдөрдү толуктоо',
         nameEn: 'Sentence Completion',
@@ -318,30 +348,15 @@ class OrtConstants {
         timeMinutes: completionMinutes,
         pointsPerQuestion: completionPointsPerQuestion,
         maxScore: completionMaxScore,
+        optionsPerQuestion: 4,
         order: 4,
         icon: '✏️',
         color: '#F59E0B',
-        topics: ['Контекст', 'Логика', 'Грамматика', 'Смысловые связи'],
+        topics: ['Контекст', 'Логика', 'Смысловые связи'],
       ),
-      OrtSection(
-        id: 'grammar',
-        nameRu: 'Грамматика',
-        nameKy: 'Грамматика',
-        nameEn: 'Grammar',
-        descriptionRu: 'Правила русского/кыргызского языка',
-        descriptionKy: 'Орус/кыргыз тилинин эрежелери',
-        descriptionEn: 'Russian/Kyrgyz language rules',
-        questionCount: grammarQuestions,
-        timeMinutes: grammarMinutes,
-        pointsPerQuestion: grammarPointsPerQuestion,
-        maxScore: grammarMaxScore,
-        order: 5,
-        icon: '📖',
-        color: '#10B981',
-        topics: ['Орфография', 'Пунктуация', 'Морфология', 'Синтаксис'],
-      ),
-      OrtSection(
+      const OrtSection(
         id: 'reading',
+        blueprintSectionId: 'reading',
         nameRu: 'Чтение и понимание',
         nameKy: 'Окуу жана түшүнүү',
         nameEn: 'Reading Comprehension',
@@ -352,30 +367,39 @@ class OrtConstants {
         timeMinutes: readingMinutes,
         pointsPerQuestion: readingPointsPerQuestion,
         maxScore: readingMaxScore,
-        order: 6,
+        optionsPerQuestion: 4,
+        order: 5,
         icon: '📄',
         color: '#06B6D4',
         topics: ['Главная мысль', 'Детали', 'Выводы', 'Авторская позиция'],
       ),
+      const OrtSection(
+        id: 'grammar',
+        blueprintSectionId: 'grammar',
+        nameRu: 'Практическая грамматика',
+        nameKy: 'Практикалык грамматика',
+        nameEn: 'Practical grammar',
+        descriptionRu: 'Правила языка выбранного теста (русский или кыргызский)',
+        descriptionKy: 'Тандалган тесттин тилинин эрежелери (орус же кыргыз)',
+        descriptionEn: 'Language rules of the chosen test (Russian or Kyrgyz)',
+        questionCount: grammarQuestions,
+        timeMinutes: grammarMinutes,
+        pointsPerQuestion: grammarPointsPerQuestion,
+        maxScore: grammarMaxScore,
+        optionsPerQuestion: 4,
+        order: 6,
+        icon: '📖',
+        color: '#10B981',
+        topics: ['Орфография', 'Пунктуация', 'Морфология', 'Синтаксис'],
+      ),
     ];
   }
 
-  /// Get all subject tests as OrtSubject objects
+  /// Subject tests of 2026 with their real length (blueprint
+  /// `ort_subject_{id}_2026`).
   static List<OrtSubject> get subjectTestsList {
-    return [
-      const OrtSubject(
-        id: 'physics',
-        code: 'PHYS',
-        nameRu: 'Физика',
-        nameKy: 'Физика',
-        nameEn: 'Physics',
-        icon: '⚛️',
-        color: '#EF4444',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
-      ),
-      const OrtSubject(
+    return const [
+      OrtSubject(
         id: 'chemistry',
         code: 'CHEM',
         nameRu: 'Химия',
@@ -383,11 +407,11 @@ class OrtConstants {
         nameEn: 'Chemistry',
         icon: '🧪',
         color: '#22C55E',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
+        questionCount: 40,
+        timeMinutes: 80,
+        maxScore: 40,
       ),
-      const OrtSubject(
+      OrtSubject(
         id: 'biology',
         code: 'BIO',
         nameRu: 'Биология',
@@ -395,129 +419,98 @@ class OrtConstants {
         nameEn: 'Biology',
         icon: '🧬',
         color: '#84CC16',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
+        questionCount: 40,
+        timeMinutes: 60,
+        maxScore: 40,
       ),
-      const OrtSubject(
-        id: 'history_kg',
-        code: 'HIST_KG',
-        nameRu: 'История Кыргызстана',
-        nameKy: 'Кыргызстандын тарыхы',
-        nameEn: 'History of Kyrgyzstan',
+      OrtSubject(
+        id: 'physics',
+        code: 'PHYS',
+        nameRu: 'Физика',
+        nameKy: 'Физика',
+        nameEn: 'Physics',
+        icon: '⚛️',
+        color: '#EF4444',
+        questionCount: 40,
+        timeMinutes: 80,
+        maxScore: 40,
+      ),
+      OrtSubject(
+        id: 'math',
+        code: 'MATH',
+        nameRu: 'Математика',
+        nameKy: 'Математика',
+        nameEn: 'Mathematics',
+        icon: '📐',
+        color: '#6366F1',
+        questionCount: 40,
+        timeMinutes: 80,
+        maxScore: 40,
+      ),
+      OrtSubject(
+        id: 'history',
+        code: 'HIST',
+        nameRu: 'История',
+        nameKy: 'Тарых',
+        nameEn: 'History',
         icon: '🏛️',
         color: '#F97316',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
+        questionCount: 40,
+        timeMinutes: 60,
+        maxScore: 40,
       ),
-      const OrtSubject(
-        id: 'history_world',
-        code: 'HIST_WORLD',
-        nameRu: 'Всемирная история',
-        nameKy: 'Дүйнөлүк тарых',
-        nameEn: 'World History',
-        icon: '🌍',
-        color: '#A855F7',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
-      ),
-      const OrtSubject(
-        id: 'geography',
-        code: 'GEO',
-        nameRu: 'География',
-        nameKy: 'География',
-        nameEn: 'Geography',
-        icon: '🗺️',
-        color: '#14B8A6',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
-      ),
-      const OrtSubject(
+      OrtSubject(
         id: 'english',
         code: 'ENG',
         nameRu: 'Английский язык',
         nameKy: 'Англис тили',
-        nameEn: 'English Language',
+        nameEn: 'English',
         icon: '🇬🇧',
         color: '#3B82F6',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
+        questionCount: 50,
+        timeMinutes: 60,
+        maxScore: 50,
       ),
-      const OrtSubject(
-        id: 'german',
-        code: 'DEU',
-        nameRu: 'Немецкий язык',
-        nameKy: 'Немис тили',
-        nameEn: 'German Language',
-        icon: '🇩🇪',
-        color: '#FBBF24',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
-      ),
-      const OrtSubject(
-        id: 'turkish',
-        code: 'TUR',
-        nameRu: 'Турецкий язык',
-        nameKy: 'Түрк тили',
-        nameEn: 'Turkish Language',
-        icon: '🇹🇷',
-        color: '#EF4444',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
-      ),
-      const OrtSubject(
-        id: 'kyrgyz_lang',
-        code: 'KY_FOR_RU',
-        nameRu: 'Кыргызский язык',
-        nameKy: 'Кыргыз тили',
-        nameEn: 'Kyrgyz Language',
+      OrtSubject(
+        id: 'kyrgyz_lit',
+        code: 'KY_LIT',
+        nameRu: 'Кыргызский язык и литература',
+        nameKy: 'Кыргыз тили жана адабияты',
+        nameEn: 'Kyrgyz language and literature',
         icon: '🇰🇬',
         color: '#DC2626',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
+        questionCount: 40,
+        timeMinutes: 60,
+        maxScore: 40,
       ),
-      const OrtSubject(
-        id: 'russian_lang',
-        code: 'RU_FOR_KY',
-        nameRu: 'Русский язык',
-        nameKy: 'Орус тили',
-        nameEn: 'Russian Language',
-        icon: '🇷🇺',
+      OrtSubject(
+        id: 'russian_lit',
+        code: 'RU_LIT',
+        nameRu: 'Русский язык и литература',
+        nameKy: 'Орус тили жана адабияты',
+        nameEn: 'Russian language and literature',
+        icon: '📚',
         color: '#2563EB',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
-      ),
-      const OrtSubject(
-        id: 'informatics',
-        code: 'IT',
-        nameRu: 'Информатика',
-        nameKy: 'Информатика',
-        nameEn: 'Computer Science',
-        icon: '💻',
-        color: '#6366F1',
-        questionCount: subjectTestQuestions,
-        timeMinutes: subjectTestMinutes,
-        maxScore: subjectTestMaxScore,
+        questionCount: 40,
+        timeMinutes: 60,
+        maxScore: 40,
       ),
     ];
   }
 
-  /// University score thresholds
+  /// Threshold scores for university admission, 2026–2027 (blueprint
+  /// `reference.thresholds_2026_27.university`; source: testing.kg). They
+  /// are set anew every year — always show them with the year.
   static const Map<String, int> universityThresholds = {
-    'medical': 190,
-    'technical': 170,
-    'economics': 160,
-    'pedagogical': 140,
-    'humanitarian': 130,
-    'minimum': 110,
+    'general': 110,
+    'pedagogical_grant': 130,
+    'pedagogical_contract': 115,
+    'healthcare_grant': 120,
+    'healthcare_contract': 110,
+    'agriculture': 100,
+    'military_grant': 90,
+    'special_categories': 90,
+    'subject_tests': 60,
   };
 
   /// Format time in mm:ss
@@ -529,6 +522,7 @@ class OrtConstants {
 
   /// Calculate grade based on score
   static String getGrade(int score, int maxScore) {
+    if (maxScore <= 0) return 'F';
     final percentage = (score / maxScore) * 100;
     if (percentage >= 90) return 'A';
     if (percentage >= 80) return 'B';
@@ -541,6 +535,10 @@ class OrtConstants {
 /// ORT Section Model (Main test sections)
 class OrtSection {
   final String id;
+
+  /// Blueprint section this part belongs to (`math`, `verbal`, `reading`,
+  /// `grammar`); null for legacy callers.
+  final String? blueprintSectionId;
   final String nameRu;
   final String nameKy;
   final String nameEn;
@@ -551,6 +549,7 @@ class OrtSection {
   final int timeMinutes;
   final int pointsPerQuestion;
   final int maxScore;
+  final int optionsPerQuestion;
   final int order;
   final String icon;
   final String color;
@@ -558,6 +557,7 @@ class OrtSection {
 
   const OrtSection({
     required this.id,
+    this.blueprintSectionId,
     required this.nameRu,
     required this.nameKy,
     required this.nameEn,
@@ -568,6 +568,7 @@ class OrtSection {
     required this.timeMinutes,
     required this.pointsPerQuestion,
     required this.maxScore,
+    this.optionsPerQuestion = 4,
     required this.order,
     required this.icon,
     required this.color,
@@ -605,6 +606,7 @@ class OrtSection {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      if (blueprintSectionId != null) 'blueprintSectionId': blueprintSectionId,
       'nameRu': nameRu,
       'nameKy': nameKy,
       'nameEn': nameEn,
@@ -615,6 +617,7 @@ class OrtSection {
       'timeMinutes': timeMinutes,
       'pointsPerQuestion': pointsPerQuestion,
       'maxScore': maxScore,
+      'optionsPerQuestion': optionsPerQuestion,
       'order': order,
       'icon': icon,
       'color': color,

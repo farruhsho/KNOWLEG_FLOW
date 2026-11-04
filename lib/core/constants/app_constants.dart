@@ -3,20 +3,26 @@ class AppConstants {
   static const String appName = 'ORT Master KG';
   static const String appVersion = '1.0.0';
 
-  // ORT Test Structure
-  static const int mainTestQuestions = 60;
-  static const int mainTestTimeMinutes = 90;
+  // ORT test structure — mirrors assets/data/exam_blueprints.json (the
+  // canonical source, see OrtConstants); checked by
+  // test/learning/ort_constants_test.dart.
+  /// Main test (ort_main_2026): math 60 + verbal 30 + reading 30 + grammar 30.
+  static const int mainTestQuestions = 150;
+  static const int mainTestTimeMinutes = 215;
   static const int verbalQuestions = 30;
-  static const int mathQuestions = 30;
+  static const int mathQuestions = 60;
 
+  /// Typical subject test: 40 items (English 50), 60–80 minutes by subject.
   static const int subjectTestQuestions = 40;
   static const int subjectTestTimeMinutes = 60;
 
-  static const int languageTestQuestions = 30;
-  static const int languageTestTimeMinutes = 45;
+  /// State language test (Kyrgyz, ort_state_language_2026).
+  static const int languageTestQuestions = 50;
+  static const int languageTestTimeMinutes = 60;
 
-  static const int totalQuestions = 130;
-  static const int totalTimeMinutes = 195;
+  /// Main test totals.
+  static const int totalQuestions = 150;
+  static const int totalTimeMinutes = 215;
 
   /// Legacy 0–200 scale of `user_progress.averageScore`. It is NOT an ORT
   /// scale (the official conversion is unpublished, see

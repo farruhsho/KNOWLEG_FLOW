@@ -885,6 +885,1356 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get clear;
+
+  /// No description provided for @learnErrorOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check the internet and try again.'**
+  String get learnErrorOffline;
+
+  /// No description provided for @learnErrorPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'No access to the data. Please sign in again.'**
+  String get learnErrorPermission;
+
+  /// No description provided for @learnErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not found.'**
+  String get learnErrorNotFound;
+
+  /// No description provided for @learnErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load data. Please try again.'**
+  String get learnErrorGeneric;
+
+  /// No description provided for @learnPracticePercentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice: {percent}%'**
+  String learnPracticePercentLabel(int percent);
+
+  /// No description provided for @learnPracticeCorrectOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{correct} of {total} correct'**
+  String learnPracticeCorrectOfTotal(int correct, int total);
+
+  /// No description provided for @learnPracticeVerdictExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent! Keep it up.'**
+  String get learnPracticeVerdictExcellent;
+
+  /// No description provided for @learnPracticeVerdictGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good. Almost there.'**
+  String get learnPracticeVerdictGood;
+
+  /// No description provided for @learnPracticeVerdictFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Not bad. Reviewing mistakes improves results fastest.'**
+  String get learnPracticeVerdictFair;
+
+  /// No description provided for @learnPracticeVerdictLow.
+  ///
+  /// In en, this message translates to:
+  /// **'More practice needed. Start by reviewing mistakes.'**
+  String get learnPracticeVerdictLow;
+
+  /// No description provided for @learnPracticeNotOrtNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a practice result, not an ORT score: a short set of questions cannot estimate an exam score.'**
+  String get learnPracticeNotOrtNote;
+
+  /// No description provided for @learnQuickPracticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick practice'**
+  String get learnQuickPracticeTitle;
+
+  /// No description provided for @learnLessonPracticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson practice'**
+  String get learnLessonPracticeTitle;
+
+  /// No description provided for @learnMistakesPracticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mistakes review'**
+  String get learnMistakesPracticeTitle;
+
+  /// No description provided for @learnPracticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get learnPracticeTitle;
+
+  /// No description provided for @learnSignInToPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to practise and save your progress.'**
+  String get learnSignInToPractice;
+
+  /// No description provided for @learnSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get learnSignIn;
+
+  /// No description provided for @learnLoadingQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Picking questions…'**
+  String get learnLoadingQuestions;
+
+  /// No description provided for @learnNoQuestionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No questions yet'**
+  String get learnNoQuestionsTitle;
+
+  /// No description provided for @learnNoQuestionsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no reviewed questions here yet. Check back later or try quick practice.'**
+  String get learnNoQuestionsBody;
+
+  /// No description provided for @learnBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get learnBack;
+
+  /// No description provided for @learnQuestionProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Question {current} of {total}'**
+  String learnQuestionProgress(int current, int total);
+
+  /// No description provided for @learnElapsedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Elapsed time'**
+  String get learnElapsedTime;
+
+  /// No description provided for @learnFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get learnFinish;
+
+  /// No description provided for @learnNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get learnNext;
+
+  /// No description provided for @learnSkipAndFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip and finish'**
+  String get learnSkipAndFinish;
+
+  /// No description provided for @learnSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get learnSkip;
+
+  /// No description provided for @learnExitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish practice?'**
+  String get learnExitTitle;
+
+  /// No description provided for @learnExitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{You haven\'t answered any questions yet.} =1{Your answer to 1 question can be saved.} other{Your answers to {count} questions can be saved.}}'**
+  String learnExitBody(int count);
+
+  /// No description provided for @learnExitDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave without saving'**
+  String get learnExitDiscard;
+
+  /// No description provided for @learnExitContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get learnExitContinue;
+
+  /// No description provided for @learnExitFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish and save'**
+  String get learnExitFinish;
+
+  /// No description provided for @learnCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct!'**
+  String get learnCorrect;
+
+  /// No description provided for @learnWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect'**
+  String get learnWrong;
+
+  /// No description provided for @learnCorrectAnswerIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct answer: {answer}'**
+  String learnCorrectAnswerIs(String answer);
+
+  /// No description provided for @learnExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Explanation'**
+  String get learnExplanation;
+
+  /// No description provided for @learnNoExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'No explanation has been added for this question yet.'**
+  String get learnNoExplanation;
+
+  /// No description provided for @learnAskTutor.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the AI tutor'**
+  String get learnAskTutor;
+
+  /// No description provided for @learnDifficultyEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get learnDifficultyEasy;
+
+  /// No description provided for @learnDifficultyMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get learnDifficultyMedium;
+
+  /// No description provided for @learnDifficultyHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get learnDifficultyHard;
+
+  /// No description provided for @learnResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice result'**
+  String get learnResultsTitle;
+
+  /// No description provided for @learnResultsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No results yet'**
+  String get learnResultsEmptyTitle;
+
+  /// No description provided for @learnResultsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do a practice set and the answer review will appear here.'**
+  String get learnResultsEmptyBody;
+
+  /// No description provided for @learnStatCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct'**
+  String get learnStatCorrect;
+
+  /// No description provided for @learnStatWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong'**
+  String get learnStatWrong;
+
+  /// No description provided for @learnStatSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get learnStatSkipped;
+
+  /// No description provided for @learnStatTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get learnStatTime;
+
+  /// No description provided for @learnAvgPerQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Average {seconds} s per question'**
+  String learnAvgPerQuestion(int seconds);
+
+  /// No description provided for @learnReviewAnswers.
+  ///
+  /// In en, this message translates to:
+  /// **'Review answers'**
+  String get learnReviewAnswers;
+
+  /// No description provided for @learnOpenMistakes.
+  ///
+  /// In en, this message translates to:
+  /// **'Work on mistakes'**
+  String get learnOpenMistakes;
+
+  /// No description provided for @learnPracticeAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice again'**
+  String get learnPracticeAgain;
+
+  /// No description provided for @learnBackHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get learnBackHome;
+
+  /// No description provided for @learnXpPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Awarding XP…'**
+  String get learnXpPending;
+
+  /// No description provided for @learnXpQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'XP will be credited once you\'re back online.'**
+  String get learnXpQueued;
+
+  /// No description provided for @learnXpAwarded.
+  ///
+  /// In en, this message translates to:
+  /// **'+{xp} XP'**
+  String learnXpAwarded(int xp);
+
+  /// No description provided for @learnXpNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No XP was awarded for this set.'**
+  String get learnXpNone;
+
+  /// No description provided for @learnQuestionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Question {n}'**
+  String learnQuestionNumber(int n);
+
+  /// No description provided for @learnYourAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answer'**
+  String get learnYourAnswer;
+
+  /// No description provided for @learnRightAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct answer'**
+  String get learnRightAnswer;
+
+  /// No description provided for @learnLessonSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get learnLessonSummary;
+
+  /// No description provided for @learnLessonFormulas.
+  ///
+  /// In en, this message translates to:
+  /// **'Formulas'**
+  String get learnLessonFormulas;
+
+  /// No description provided for @learnLessonExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Examples'**
+  String get learnLessonExamples;
+
+  /// No description provided for @learnLessonCommonMistakes.
+  ///
+  /// In en, this message translates to:
+  /// **'Common mistakes'**
+  String get learnLessonCommonMistakes;
+
+  /// No description provided for @learnLessonNoContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The lesson content hasn\'t been added yet.'**
+  String get learnLessonNoContent;
+
+  /// No description provided for @learnLessonExampleN.
+  ///
+  /// In en, this message translates to:
+  /// **'Example {n}'**
+  String learnLessonExampleN(int n);
+
+  /// No description provided for @learnLessonHideSolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide solution'**
+  String get learnLessonHideSolution;
+
+  /// No description provided for @learnLessonShowSolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Show solution'**
+  String get learnLessonShowSolution;
+
+  /// No description provided for @learnLessonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson'**
+  String get learnLessonTitle;
+
+  /// No description provided for @learnLoadingLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the lesson…'**
+  String get learnLoadingLesson;
+
+  /// No description provided for @learnLessonNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson not found'**
+  String get learnLessonNotFound;
+
+  /// No description provided for @learnLessonNotFoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The lesson may not be published yet or was removed.'**
+  String get learnLessonNotFoundBody;
+
+  /// No description provided for @learnLessonNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson {n}'**
+  String learnLessonNumber(int n);
+
+  /// No description provided for @learnMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} min'**
+  String learnMinutes(int n);
+
+  /// No description provided for @learnLessonDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson completed'**
+  String get learnLessonDone;
+
+  /// No description provided for @learnLessonMaterials.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials'**
+  String get learnLessonMaterials;
+
+  /// No description provided for @learnLessonWatchVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch the video'**
+  String get learnLessonWatchVideo;
+
+  /// No description provided for @learnLessonOpenPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Open PDF'**
+  String get learnLessonOpenPdf;
+
+  /// No description provided for @learnLessonMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark lesson as completed'**
+  String get learnLessonMarkDone;
+
+  /// No description provided for @learnLessonAllDone.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve completed every lesson in this subject.'**
+  String get learnLessonAllDone;
+
+  /// No description provided for @learnSignInToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to save your progress.'**
+  String get learnSignInToSave;
+
+  /// No description provided for @learnLessonCompletedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson marked as completed.'**
+  String get learnLessonCompletedToast;
+
+  /// No description provided for @learnLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the link.'**
+  String get learnLinkFailed;
+
+  /// No description provided for @learnLessonPracticeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 question on this lesson.} other{{n} questions on this lesson.}}'**
+  String learnLessonPracticeBody(int n);
+
+  /// No description provided for @learnLessonPracticeSubjectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reinforce the material with questions on this subject.'**
+  String get learnLessonPracticeSubjectBody;
+
+  /// No description provided for @learnStartPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Start practice'**
+  String get learnStartPractice;
+
+  /// No description provided for @learnNextLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Next lesson'**
+  String get learnNextLesson;
+
+  /// No description provided for @learnDailyLessonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson of the day'**
+  String get learnDailyLessonTitle;
+
+  /// No description provided for @learnSubjectsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subjects'**
+  String get learnSubjectsTitle;
+
+  /// No description provided for @learnSearchSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Search subjects'**
+  String get learnSearchSubjects;
+
+  /// No description provided for @learnLoadingSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading subjects…'**
+  String get learnLoadingSubjects;
+
+  /// No description provided for @learnNoSubjectsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No subjects yet'**
+  String get learnNoSubjectsTitle;
+
+  /// No description provided for @learnNoSubjectsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning materials are coming soon. Meanwhile, try quick practice.'**
+  String get learnNoSubjectsBody;
+
+  /// No description provided for @learnMistakesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mistakes & review'**
+  String get learnMistakesTitle;
+
+  /// No description provided for @learnLeaderboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard'**
+  String get learnLeaderboardTitle;
+
+  /// No description provided for @learnLessonsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 lesson} other{{n} lessons}}'**
+  String learnLessonsCount(int n);
+
+  /// No description provided for @learnLoadingSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the subject…'**
+  String get learnLoadingSubject;
+
+  /// No description provided for @learnSubjectNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject not found'**
+  String get learnSubjectNotFound;
+
+  /// No description provided for @learnSubjectNotFoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The link may be out of date.'**
+  String get learnSubjectNotFoundBody;
+
+  /// No description provided for @learnStatLessonsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons done'**
+  String get learnStatLessonsDone;
+
+  /// No description provided for @learnStatPracticeAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice accuracy'**
+  String get learnStatPracticeAccuracy;
+
+  /// No description provided for @learnAnswersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 answer} other{{n} answers}}'**
+  String learnAnswersCount(int n);
+
+  /// No description provided for @learnPracticeSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise this subject'**
+  String get learnPracticeSubject;
+
+  /// No description provided for @learnLessonsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons'**
+  String get learnLessonsHeading;
+
+  /// No description provided for @learnNoLessonsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No lessons yet — start with practice.'**
+  String get learnNoLessonsYet;
+
+  /// No description provided for @learnNoSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found'**
+  String get learnNoSearchResults;
+
+  /// No description provided for @learnHandbookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Handbook'**
+  String get learnHandbookTitle;
+
+  /// No description provided for @learnHandbookSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the handbook'**
+  String get learnHandbookSearch;
+
+  /// No description provided for @learnHandbookSections.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 section} other{{n} sections}}'**
+  String learnHandbookSections(int n);
+
+  /// No description provided for @learnHandbookNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Handbook section not found'**
+  String get learnHandbookNotFound;
+
+  /// No description provided for @learnHandbookRussianOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This section is available in Russian only.'**
+  String get learnHandbookRussianOnly;
+
+  /// No description provided for @learnHandbookFactsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the exam structure.'**
+  String get learnHandbookFactsUnavailable;
+
+  /// No description provided for @learnHbMainTest.
+  ///
+  /// In en, this message translates to:
+  /// **'ORT main test ({year})'**
+  String learnHbMainTest(String year);
+
+  /// No description provided for @learnHbSectionLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}: {questions, plural, =1{1 item} other{{questions} items}}, {minutes} min'**
+  String learnHbSectionLine(String title, int questions, int minutes);
+
+  /// No description provided for @learnHbAssumption.
+  ///
+  /// In en, this message translates to:
+  /// **'(split is an assumption)'**
+  String get learnHbAssumption;
+
+  /// No description provided for @learnHbPartLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}: {questions} items, {options, plural, =1{1 answer option} other{{options} answer options}}'**
+  String learnHbPartLine(String title, int questions, int options);
+
+  /// No description provided for @learnHbMainTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {questions, plural, =1{1 item} other{{questions} items}}, {minutes} min.'**
+  String learnHbMainTotal(int questions, int minutes);
+
+  /// No description provided for @learnHbSubjectTests.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject tests (optional)'**
+  String get learnHbSubjectTests;
+
+  /// No description provided for @learnHbStateLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'{questions, plural, =1{1 item} other{{questions} items}}, {minutes} min. Required for the certificate; reported as level 1–4.'**
+  String learnHbStateLanguage(int questions, int minutes);
+
+  /// No description provided for @learnHbMaxScore.
+  ///
+  /// In en, this message translates to:
+  /// **'The official maximum score of the main test is {score}.'**
+  String learnHbMaxScore(int score);
+
+  /// No description provided for @learnHbThresholdsUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'University thresholds: {main} on the main test and {subject} on subject tests (2026–2027).'**
+  String learnHbThresholdsUniversity(int main, int subject);
+
+  /// No description provided for @learnHbThresholdCollege.
+  ///
+  /// In en, this message translates to:
+  /// **'Colleges: {n} on the main test.'**
+  String learnHbThresholdCollege(int n);
+
+  /// No description provided for @learnHbThresholdsYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Thresholds are set anew every year — check testing.kg.'**
+  String get learnHbThresholdsYearly;
+
+  /// No description provided for @learnAchievementsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get learnAchievementsTitle;
+
+  /// No description provided for @learnAchievementsUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} of {total} unlocked'**
+  String learnAchievementsUnlocked(int n, int total);
+
+  /// No description provided for @learnAchievementsServerNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements are granted automatically from your results on the server.'**
+  String get learnAchievementsServerNote;
+
+  /// No description provided for @learnAchievementUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get learnAchievementUnlocked;
+
+  /// No description provided for @learnAchievementLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get learnAchievementLocked;
+
+  /// No description provided for @learnAchievementUnlockedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked on {date}'**
+  String learnAchievementUnlockedOn(String date);
+
+  /// No description provided for @learnLevelN.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {n}'**
+  String learnLevelN(int n);
+
+  /// No description provided for @learnStreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 day} other{{n} days}}'**
+  String learnStreakDays(int n);
+
+  /// No description provided for @learnXpToNextLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'{xp} XP to level {level}'**
+  String learnXpToNextLevel(int xp, int level);
+
+  /// No description provided for @learnXpTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{xp} XP total'**
+  String learnXpTotal(int xp);
+
+  /// No description provided for @learnAchFirstLessonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First lesson'**
+  String get learnAchFirstLessonTitle;
+
+  /// No description provided for @learnAchFirstLessonDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete your first lesson'**
+  String get learnAchFirstLessonDesc;
+
+  /// No description provided for @learnAchXp100Title.
+  ///
+  /// In en, this message translates to:
+  /// **'First 100 XP'**
+  String get learnAchXp100Title;
+
+  /// No description provided for @learnAchXp100Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Earn 100 XP'**
+  String get learnAchXp100Desc;
+
+  /// No description provided for @learnAchStreak7Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Week streak'**
+  String get learnAchStreak7Title;
+
+  /// No description provided for @learnAchStreak7Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Study 7 days in a row'**
+  String get learnAchStreak7Desc;
+
+  /// No description provided for @learnAchDays30Title.
+  ///
+  /// In en, this message translates to:
+  /// **'30 study days'**
+  String get learnAchDays30Title;
+
+  /// No description provided for @learnAchDays30Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Study on 30 different days'**
+  String get learnAchDays30Desc;
+
+  /// No description provided for @learnAchAccuracy90Title.
+  ///
+  /// In en, this message translates to:
+  /// **'90% accuracy'**
+  String get learnAchAccuracy90Title;
+
+  /// No description provided for @learnAchAccuracy90Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Score 90% on a mock exam'**
+  String get learnAchAccuracy90Desc;
+
+  /// No description provided for @learnAchMathExpertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Math expert'**
+  String get learnAchMathExpertTitle;
+
+  /// No description provided for @learnAchMathExpertDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'90% in math on three mock exams'**
+  String get learnAchMathExpertDesc;
+
+  /// No description provided for @learnAchAnalogiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analogies master'**
+  String get learnAchAnalogiesTitle;
+
+  /// No description provided for @learnAchAnalogiesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A high score in the analogies section'**
+  String get learnAchAnalogiesDesc;
+
+  /// No description provided for @learnAchReaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reader'**
+  String get learnAchReaderTitle;
+
+  /// No description provided for @learnAchReaderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A high score in the reading section'**
+  String get learnAchReaderDesc;
+
+  /// No description provided for @learnAchExamChampionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mock exam champion'**
+  String get learnAchExamChampionTitle;
+
+  /// No description provided for @learnAchExamChampionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 10 mock exams'**
+  String get learnAchExamChampionDesc;
+
+  /// No description provided for @learnLeaderboardWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get learnLeaderboardWeekly;
+
+  /// No description provided for @learnLeaderboardAllTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All time'**
+  String get learnLeaderboardAllTime;
+
+  /// No description provided for @learnLeaderboardBySubject.
+  ///
+  /// In en, this message translates to:
+  /// **'By subject'**
+  String get learnLeaderboardBySubject;
+
+  /// No description provided for @learnLeaderboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The leaderboard is empty'**
+  String get learnLeaderboardEmpty;
+
+  /// No description provided for @learnLeaderboardEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It will fill up as students earn XP.'**
+  String get learnLeaderboardEmptyBody;
+
+  /// No description provided for @learnLeaderboardNotRanked.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re not on this board yet. XP from studying is added automatically.'**
+  String get learnLeaderboardNotRanked;
+
+  /// No description provided for @learnLeaderboardAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get learnLeaderboardAnonymous;
+
+  /// No description provided for @learnLeaderboardYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} (you)'**
+  String learnLeaderboardYou(String name);
+
+  /// No description provided for @learnXpShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{xp} XP'**
+  String learnXpShort(int xp);
+
+  /// No description provided for @learnMistakesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No mistakes to review'**
+  String get learnMistakesEmptyTitle;
+
+  /// No description provided for @learnMistakesEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong answers from practice and exams will appear here.'**
+  String get learnMistakesEmptyBody;
+
+  /// No description provided for @learnMistakesDueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today: {n}'**
+  String learnMistakesDueToday(int n);
+
+  /// No description provided for @learnMistakesSrsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Each mistake comes back after 1, 3, 7, 14 and 30 days. A correct answer moves it further; a wrong one restarts it.'**
+  String get learnMistakesSrsNote;
+
+  /// No description provided for @learnMistakesFilterDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get learnMistakesFilterDue;
+
+  /// No description provided for @learnMistakesFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get learnMistakesFilterAll;
+
+  /// No description provided for @learnMistakesAllSubjects.
+  ///
+  /// In en, this message translates to:
+  /// **'All subjects'**
+  String get learnMistakesAllSubjects;
+
+  /// No description provided for @learnMistakesPracticeN.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{Review 1 question} other{Review {n} questions}}'**
+  String learnMistakesPracticeN(int n);
+
+  /// No description provided for @learnMistakesNothingDue.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up for today. Come back tomorrow.'**
+  String get learnMistakesNothingDue;
+
+  /// No description provided for @learnMistakeFromExam.
+  ///
+  /// In en, this message translates to:
+  /// **'Question from a mock exam'**
+  String get learnMistakeFromExam;
+
+  /// No description provided for @learnMistakeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Question'**
+  String get learnMistakeQuestion;
+
+  /// No description provided for @learnMistakeReviewToday.
+  ///
+  /// In en, this message translates to:
+  /// **'due today'**
+  String get learnMistakeReviewToday;
+
+  /// No description provided for @learnMistakeReviewOn.
+  ///
+  /// In en, this message translates to:
+  /// **'review on {date}'**
+  String learnMistakeReviewOn(String date);
+
+  /// No description provided for @learnMistakeWrongCount.
+  ///
+  /// In en, this message translates to:
+  /// **'wrong: {n}'**
+  String learnMistakeWrongCount(int n);
+
+  /// No description provided for @learnMistakeOpenReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get learnMistakeOpenReview;
+
+  /// No description provided for @learnMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get learnMore;
+
+  /// No description provided for @learnMistakePractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practise'**
+  String get learnMistakePractice;
+
+  /// No description provided for @learnMistakeResolve.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as resolved'**
+  String get learnMistakeResolve;
+
+  /// No description provided for @learnQuestAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{Answer 1 question} other{Answer {n} questions}}'**
+  String learnQuestAnswer(int n);
+
+  /// No description provided for @learnQuestCompleteSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish one practice set'**
+  String get learnQuestCompleteSet;
+
+  /// No description provided for @learnQuestRun.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 correct answer in a row} other{{n} correct answers in a row}}'**
+  String learnQuestRun(int n);
+
+  /// No description provided for @learnQuestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily quests'**
+  String get learnQuestsTitle;
+
+  /// No description provided for @learnQuestsReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset in {h} h {m} min'**
+  String learnQuestsReset(int h, int m);
+
+  /// No description provided for @learnQuestsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String learnQuestsDone(int done, int total);
+
+  /// No description provided for @learnProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My progress'**
+  String get learnProgressTitle;
+
+  /// No description provided for @learnStatLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get learnStatLevel;
+
+  /// No description provided for @learnStatStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak, days'**
+  String get learnStatStreak;
+
+  /// No description provided for @learnStatBestStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Best: {n}'**
+  String learnStatBestStreak(int n);
+
+  /// No description provided for @learnStatAnswered.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice answers'**
+  String get learnStatAnswered;
+
+  /// No description provided for @learnStatSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 set} other{{n} sets}}'**
+  String learnStatSessions(int n);
+
+  /// No description provided for @learnStatPracticeOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'practice only'**
+  String get learnStatPracticeOnly;
+
+  /// No description provided for @learnStatPracticeTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice time'**
+  String get learnStatPracticeTime;
+
+  /// No description provided for @learnDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} min'**
+  String learnDurationMinutes(int n);
+
+  /// No description provided for @learnStatPracticeTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'from finished sets'**
+  String get learnStatPracticeTimeHint;
+
+  /// No description provided for @learnStatExams.
+  ///
+  /// In en, this message translates to:
+  /// **'Mock exams'**
+  String get learnStatExams;
+
+  /// No description provided for @learnStatLessonsCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'lessons done: {n}'**
+  String learnStatLessonsCompleted(int n);
+
+  /// No description provided for @learnRecommendationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendations'**
+  String get learnRecommendationsTitle;
+
+  /// No description provided for @learnRecommendationsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything looks good — keep going.'**
+  String get learnRecommendationsNone;
+
+  /// No description provided for @learnExamResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mock exams'**
+  String get learnExamResultsTitle;
+
+  /// No description provided for @learnExamHistoryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Exam history is unavailable right now.'**
+  String get learnExamHistoryUnavailable;
+
+  /// No description provided for @learnExamHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t finished a mock exam yet.'**
+  String get learnExamHistoryEmpty;
+
+  /// No description provided for @learnBestResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Best result'**
+  String get learnBestResult;
+
+  /// No description provided for @learnExamResultUnofficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice result, not an official ORT score.'**
+  String get learnExamResultUnofficial;
+
+  /// No description provided for @learnExamHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent attempts'**
+  String get learnExamHistoryTitle;
+
+  /// No description provided for @learnExamHistoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Full history'**
+  String get learnExamHistoryAll;
+
+  /// No description provided for @learnExamSectionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Average by section'**
+  String get learnExamSectionsTitle;
+
+  /// No description provided for @learnPracticeBySubjectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice by subject'**
+  String get learnPracticeBySubjectTitle;
+
+  /// No description provided for @learnPracticeBySubjectEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer a few questions to see accuracy by subject.'**
+  String get learnPracticeBySubjectEmpty;
+
+  /// No description provided for @learnWeakTopicsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Topics to review'**
+  String get learnWeakTopicsTitle;
+
+  /// No description provided for @learnWeakTopicsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough answers to spot weak topics yet (5+ per topic needed).'**
+  String get learnWeakTopicsEmpty;
+
+  /// No description provided for @learnProgressEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet'**
+  String get learnProgressEmptyTitle;
+
+  /// No description provided for @learnProgressEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a lesson or practice set to see your real statistics.'**
+  String get learnProgressEmptyBody;
+
+  /// No description provided for @learnRecDueMistakesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We recommend reviewing your mistakes ({n})'**
+  String learnRecDueMistakesTitle(int n);
+
+  /// No description provided for @learnRecDueMistakesWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'…because they are due today, and spaced review makes material stick.'**
+  String get learnRecDueMistakesWhy;
+
+  /// No description provided for @learnRecNoExamTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We recommend taking a mock exam'**
+  String get learnRecNoExamTitle;
+
+  /// No description provided for @learnRecNoExamWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'…because there\'s no result across all sections yet, so it\'s unclear which one lags.'**
+  String get learnRecNoExamWhy;
+
+  /// No description provided for @learnRecWeakSubjectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We recommend practising {subject}'**
+  String learnRecWeakSubjectTitle(String subject);
+
+  /// No description provided for @learnRecWeakSubjectWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'…because your accuracy there is {percent}%, lower than in other subjects ({count} answers).'**
+  String learnRecWeakSubjectWhy(int percent, int count);
+
+  /// No description provided for @learnRecWeakSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We recommend working on {section}'**
+  String learnRecWeakSectionTitle(String section);
+
+  /// No description provided for @learnRecWeakSectionWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'…because you average {percent}% there on mock exams — your lowest section.'**
+  String learnRecWeakSectionWhy(int percent);
+
+  /// No description provided for @learnRecWeakTopicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We recommend revisiting {topic}'**
+  String learnRecWeakTopicTitle(String topic);
+
+  /// No description provided for @learnRecWeakTopicWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'…because only {percent}% of your answers on this topic are correct.'**
+  String learnRecWeakTopicWhy(int percent);
+
+  /// No description provided for @learnRecMoreDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{We recommend answering 1 more question} other{We recommend answering {n} more questions}}'**
+  String learnRecMoreDataTitle(int n);
+
+  /// No description provided for @learnRecMoreDataWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'…because accuracy becomes meaningful after about 20 answers.'**
+  String get learnRecMoreDataWhy;
+
+  /// No description provided for @learnRecOpenExams.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to exams'**
+  String get learnRecOpenExams;
 }
 
 class _AppLocalizationsDelegate

@@ -75,7 +75,7 @@ class SafeWidget extends StatelessWidget {
       if (errorBuilder != null) {
         return errorBuilder!(error);
       }
-      return ErrorView(
+      return const ErrorView(
         message: 'Не удалось загрузить содержимое',
         onRetry: null,
       );

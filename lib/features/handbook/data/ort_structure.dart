@@ -143,7 +143,7 @@ class OrtStructureFacts {
   /// "Структура экзамена" section as Markdown, in [lang].
   String structureMarkdown(AppLocalizations l, String lang) {
     final b = StringBuffer()
-      ..writeln('**${l.learnHbMainTest(examYear)}**')
+      ..writeln('**${l.learnHbMainTest('$examYear')}**')
       ..writeln();
     for (final s in mainSections) {
       b.writeln('- ${l.learnHbSectionLine(pickLocalized(s.title, lang), s.questions, s.minutes)}');
