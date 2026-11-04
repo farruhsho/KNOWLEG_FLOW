@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { applyBonusCredits, applyClawback, applyPurchaseGrant, EMPTY_ENTITLEMENT } from '../src/domain/entitlements';
 import { DomainError } from '../src/domain/reasons';
 import {
   decideReferralApply,
+  decideReferralClawback,
   decideReferralReward,
   parseReferrerCounter,
   REFERRAL_MONTHLY_CAP,
+  REFERRAL_REWARD_CREDITS,
   referralRejection,
+  type ReferralClawbackInput,
   type RewardInput,
 } from '../src/domain/referral';
 import { bishkekMonthKey } from '../src/domain/time';
@@ -113,5 +117,63 @@ describe('referral reward (first paid grant, monthly cap)', () => {
     assert.deepEqual(parseReferrerCounter(undefined), { month_key: null, month_rewarded: 0 });
     assert.deepEqual(parseReferrerCounter({ month_key: '2026-11', month_rewarded: 5 }), { month_key: '2026-11', month_rewarded: 5 });
     assert.deepEqual(parseReferrerCounter({ month_rewarded: -2 }), { month_key: null, month_rewarded: 0 });
+  });
+
+  it('a reward clawed back after a refund (item revoked) is never paid again', () => {
+    assert.deepEqual(decideReferralReward({ ...base, itemStatus: 'revoked' }), { kind: 'none' });
+  });
+});
+
+describe('referral reward clawback on refund / void (§9.7, P3-BE-02)', () => {
+  const base: ReferralClawbackInput = {
+    referrerUid: 'alice',
+    referrerRewarded: true,
+    refereeLive: true,
+    referrerEntitlementExists: true,
+    itemStatus: 'rewarded',
+  };
+
+  it('the rewarding purchase claws back both bonuses and revokes the item', () => {
+    assert.deepEqual(decideReferralClawback(base), { referee: true, referrer: true, markItem: true });
+  });
+
+  it('a purchase that paid no reward (no referral_referrer_uid) changes nothing', () => {
+    assert.equal(decideReferralClawback({ ...base, referrerUid: null }), null);
+    assert.equal(decideReferralClawback({ ...base, referrerUid: '' }), null);
+  });
+
+  it('a capped referrer (no +1) keeps their balance; only the referee loses the bonus', () => {
+    assert.deepEqual(decideReferralClawback({ ...base, referrerRewarded: false }), { referee: true, referrer: false, markItem: true });
+  });
+
+  it('deleted accounts are skipped: a deleted referee still costs the referrer the bonus', () => {
+    assert.deepEqual(decideReferralClawback({ ...base, refereeLive: false, itemStatus: null }), { referee: false, referrer: true, markItem: false });
+    assert.deepEqual(decideReferralClawback({ ...base, referrerEntitlementExists: false }), { referee: true, referrer: false, markItem: true });
+    // The referrer deleted the account: the item went with it.
+    assert.deepEqual(decideReferralClawback({ ...base, referrerEntitlementExists: false, itemStatus: null }), {
+      referee: true,
+      referrer: false,
+      markItem: false,
+    });
+  });
+
+  it('buy -> bonus -> refund leaves nobody with free credits; spent bonuses become debt', () => {
+    // Referee buys exam_single (1 credit) and gets the referral +1; the referrer gets +1.
+    const referee = applyBonusCredits(applyPurchaseGrant(EMPTY_ENTITLEMENT, 1).entitlement, REFERRAL_REWARD_CREDITS, 'referral').entitlement;
+    const referrer = applyBonusCredits({ ...EMPTY_ENTITLEMENT, credits: 2 }, REFERRAL_REWARD_CREDITS, 'referral').entitlement;
+    assert.deepEqual([referee.credits, referrer.credits], [2, 3]);
+    // Refund: the purchase credit, then the referral credit (same applyClawback mechanism).
+    const d = decideReferralClawback(base)!;
+    const afterPurchase = applyClawback(referee, 1).entitlement;
+    const refereeAfter = d.referee ? applyClawback(afterPurchase, REFERRAL_REWARD_CREDITS) : null;
+    const referrerAfter = d.referrer ? applyClawback(referrer, REFERRAL_REWARD_CREDITS) : null;
+    assert.deepEqual([refereeAfter!.entitlement.credits, refereeAfter!.entitlement.debt_credits], [0, 0]);
+    assert.deepEqual(refereeAfter!.ledger, { delta: -1, balance_after: 0, reason: 'refund' });
+    assert.deepEqual([referrerAfter!.entitlement.credits, referrerAfter!.entitlement.debt_credits], [2, 0]);
+    // The referee already spent both credits on exams: the shortfall is recorded as debt.
+    const spent = applyClawback(applyClawback({ ...referee, credits: 0 }, 1).entitlement, REFERRAL_REWARD_CREDITS);
+    assert.deepEqual([spent.entitlement.credits, spent.entitlement.debt_credits, spent.newDebt], [0, 2, 1]);
+    assert.equal(spent.clawedBack, 0);
+    assert.equal(spent.ledger.reason, 'refund');
   });
 });

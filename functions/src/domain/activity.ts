@@ -10,8 +10,15 @@
  * - Lessons are validated against `lessons/{id}`. Legacy `daily_lessons/{day}`
  *   pointer docs are resolved to the lesson they point at, so both ids dedupe
  *   to the same award.
+ * - Study time (`seconds`) is credited at most once per (uid, reportId)
+ *   (ARCHITECTURE §9.7): the client creates `reportId` once per event and
+ *   keeps it in its offline queue, so a retry after a lost response carries
+ *   the same id. The last STUDY_REPORT_IDS_MAX ids live in the server-only
+ *   field user_stats.study_report_ids. Without a reportId every call counts
+ *   (the §9.6 behaviour).
  */
 import { sha256Hex } from './hash';
+import { validationError } from './reasons';
 import { bishkekDayKey } from './time';
 import { isRecord, num } from './types';
 
@@ -45,4 +52,43 @@ export function dailyLessonTarget(data: unknown): string | null {
 /** True when an award must be persisted (D10: a 0 award writes nothing). */
 export function shouldPersistAward(total: number): boolean {
   return total > 0;
+}
+
+/** user_stats.study_report_ids keeps the last 50 report ids (ARCHITECTURE §9.7). */
+export const STUDY_REPORT_IDS_MAX = 50;
+const REPORT_ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
+
+/** Optional recordActivity `reportId`: absent/null -> null, else 8..64 chars [A-Za-z0-9_-] or VALIDATION_FAILED. */
+export function parseReportId(raw: unknown): string | null {
+  if (raw === undefined || raw === null) return null;
+  if (typeof raw !== 'string' || !REPORT_ID_RE.test(raw)) {
+    throw validationError('reportId must be 8-64 characters [A-Za-z0-9_-]', { field: 'reportId' });
+  }
+  return raw;
+}
+
+/** Tolerant read of user_stats.study_report_ids (valid ids only, oldest first, at most 50). */
+export function storedReportIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((v): v is string => typeof v === 'string' && REPORT_ID_RE.test(v)).slice(-STUDY_REPORT_IDS_MAX);
+}
+
+export interface StudyCredit {
+  /** Add `seconds` to the study counters. */
+  credit: boolean;
+  /** New user_stats.study_report_ids to store; null = leave the field unchanged. */
+  reportIds: string[] | null;
+}
+
+/**
+ * Whether a recordActivity call's `seconds` count. Nothing to credit for
+ * 0 seconds; a report id already in `stored` is a retry (no time again); a
+ * new id is credited and remembered (the oldest ids roll off after 50).
+ */
+export function decideStudyCredit(seconds: number, reportId: string | null, stored: unknown): StudyCredit {
+  if (!(seconds > 0)) return { credit: false, reportIds: null };
+  if (reportId === null) return { credit: true, reportIds: null };
+  const ids = storedReportIds(stored);
+  if (ids.includes(reportId)) return { credit: false, reportIds: null };
+  return { credit: true, reportIds: [...ids, reportId].slice(-STUDY_REPORT_IDS_MAX) };
 }

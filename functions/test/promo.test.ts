@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import { applyBonusCredits, EMPTY_ENTITLEMENT } from '../src/domain/entitlements';
 import {
   decidePromoRedeem,
+  decidePromoUpsert,
   parsePromoCode,
   parsePromoUpsert,
   PROMO_DAILY_ATTEMPTS,
@@ -109,7 +110,30 @@ describe('adminUpsertPromoCode validation', () => {
       expiresAtMs: Date.UTC(2027, 0, 1),
       active: true,
       note: 'launch',
+      createOnly: false,
     });
+  });
+
+  it('createOnly (§9.7): optional boolean; on an existing code it refuses with why "exists"', () => {
+    assert.equal(parsePromoUpsert({ ...ok, createOnly: true }).createOnly, true);
+    assert.equal(parsePromoUpsert({ ...ok, createOnly: false }).createOnly, false);
+    assert.equal(parsePromoUpsert({ ...ok, createOnly: null }).createOnly, false);
+    for (const bad of ['yes', 1, {}]) {
+      assert.throws(() => parsePromoUpsert({ ...ok, createOnly: bad }), (e: unknown) => e instanceof DomainError && e.reason === 'VALIDATION_FAILED');
+    }
+    assert.equal(decidePromoUpsert(false, true), 'create');
+    assert.equal(decidePromoUpsert(false, false), 'create');
+    assert.equal(decidePromoUpsert(true, false), 'update', 'the edit dialog still updates');
+    let err: unknown;
+    try {
+      decidePromoUpsert(true, true);
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(err instanceof DomainError);
+    assert.equal(err.reason, 'VALIDATION_FAILED');
+    assert.equal(err.extra?.['why'], 'exists');
+    assert.equal(err.code, 'already-exists');
   });
 
   it('optional fields may be omitted or null', () => {

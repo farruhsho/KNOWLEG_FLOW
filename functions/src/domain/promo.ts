@@ -91,9 +91,11 @@ export interface PromoUpsert {
   expiresAtMs: number | null;
   active: boolean;
   note: string;
+  /** §9.7: refuse to touch an existing code (the CMS sends it when creating). */
+  createOnly: boolean;
 }
 
-/** Validates adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt? (ms), active, note}. */
+/** Validates adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt? (ms), active, note, createOnly?}. */
 export function parsePromoUpsert(data: Record<string, unknown>): PromoUpsert {
   const code = normalizeCode(data['code']);
   if (!isPromoCode(code)) throw validationError('code must be 4-20 characters A-Z0-9', { field: 'code' });
@@ -123,7 +125,33 @@ export function parsePromoUpsert(data: Record<string, unknown>): PromoUpsert {
   if (noteRaw !== undefined && noteRaw !== null && (typeof noteRaw !== 'string' || noteRaw.length > PROMO_NOTE_MAX)) {
     throw validationError(`note must be a string of at most ${PROMO_NOTE_MAX} characters`, { field: 'note' });
   }
-  return { code, credits, maxRedemptions, expiresAtMs, active: data['active'], note: typeof noteRaw === 'string' ? noteRaw.trim() : '' };
+  const createOnly = data['createOnly'];
+  if (createOnly !== undefined && createOnly !== null && typeof createOnly !== 'boolean') {
+    throw validationError('createOnly must be a boolean', { field: 'createOnly' });
+  }
+  return {
+    code,
+    credits,
+    maxRedemptions,
+    expiresAtMs,
+    active: data['active'],
+    note: typeof noteRaw === 'string' ? noteRaw.trim() : '',
+    createOnly: createOnly === true,
+  };
+}
+
+/**
+ * adminUpsertPromoCode on an existing / missing code (ARCHITECTURE §9.7):
+ * with `createOnly` (the CMS "create" dialog) an existing code is refused
+ * with VALIDATION_FAILED `why: 'exists'` and nothing changes; otherwise an
+ * existing code is updated.
+ */
+export function decidePromoUpsert(exists: boolean, createOnly: boolean): 'create' | 'update' {
+  if (!exists) return 'create';
+  if (createOnly) {
+    throw new DomainError(Reasons.VALIDATION_FAILED, 'promo code already exists', { why: 'exists', field: 'code' }, 'already-exists');
+  }
+  return 'update';
 }
 
 /** Throws the rejection as a DomainError (handlers call it after the transaction commits). */

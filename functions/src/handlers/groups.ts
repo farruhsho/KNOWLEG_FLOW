@@ -7,28 +7,41 @@
  *
  * groups/{gid} = {name, owner_uid, join_code, member_count, created_at}
  * groups/{gid}/members/{uid} = {display_name, role: owner|member, joined_at, uid}
+ * groups/{gid}/removed/{uid} = {uid, by, at}  (§9.7: removed by the owner, cannot rejoin; no client access)
  * group_join_codes/{code} = {group_id, created_at}  (uniqueness reservation, no client access)
  * users/{uid}.group_ids (privileged, ≤ 5) — the owner is a member too.
  *
  * Membership documents, member_count and users.group_ids always change in
  * one transaction. Assignments and submissions are written by clients under
- * firestore.rules (owner / member).
+ * firestore.rules (owner / member). groupJoin counts every call in the
+ * shared code_attempts limiter (30/day with friendAdd, §9.7).
  */
 import '../config';
 import { randomInt } from 'node:crypto';
+import type { DocumentReference } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 import { generateShortCode, isShortCode, MAX_CODE_ATTEMPTS, normalizeCode } from '../domain/codes';
-import { assertCanCreateGroup, decideGroupJoin, decideGroupLeave, decideRemoveMember, MAX_OWNED_GROUPS, parseGroupName } from '../domain/groups';
+import {
+  assertCanCreateGroup,
+  decideGroupJoin,
+  decideGroupLeave,
+  decideMembershipCleanup,
+  decideRemoveMember,
+  MAX_OWNED_GROUPS,
+  parseGroupName,
+} from '../domain/groups';
 import { leagueGroupIds } from '../domain/leaderboard';
 import { DomainError, Reasons } from '../domain/reasons';
 import { groupWeeklyBoardId } from '../domain/time';
 import { int, str } from '../domain/types';
-import { callableOptions, chunk, db, FieldValue, payload, reqId, requireActiveUser, wrap } from './common';
+import { callableOptions, chunk, consumeCodeAttempt, db, FieldValue, payload, reqId, requireActiveUser, wrap } from './common';
 import { displayNameOf } from './gamification';
 
 const groupRef = (gid: string) => db().doc(`groups/${gid}`);
 const memberRef = (gid: string, uid: string) => db().doc(`groups/${gid}/members/${uid}`);
+/** Marker of a member the owner removed (server only; deleted with the group). */
+const removedRef = (gid: string, uid: string) => db().doc(`groups/${gid}/removed/${uid}`);
 const joinCodeRef = (code: string) => db().doc(`group_join_codes/${code}`);
 const userRef = (uid: string) => db().doc(`users/${uid}`);
 /** Current week's group-league entry (removed when a member leaves). */
@@ -92,16 +105,29 @@ export const groupJoin = onCall(
   wrap('groupJoin', async (req) => {
     const { uid, profile } = await requireActiveUser(req);
     if (!profile.exists) throw profileRequired();
+    // Every call counts (failed guesses too) before the code is looked up (§9.7).
+    await consumeCodeAttempt(uid);
     const code = normalizeCode(payload(req)['code']);
     if (!isShortCode(code)) throw codeInvalid();
     const gid = str((await joinCodeRef(code).get()).get('group_id'));
     if (!gid) throw codeInvalid();
 
     return db().runTransaction(async (tx) => {
-      const [userSnap, groupSnap, memberSnap] = await tx.getAll(userRef(uid), groupRef(gid), memberRef(gid, uid));
+      const [userSnap, groupSnap, memberSnap, removedSnap] = await tx.getAll(
+        userRef(uid),
+        groupRef(gid),
+        memberRef(gid, uid),
+        removedRef(gid, uid),
+      );
       if (!groupSnap!.exists || groupSnap!.get('join_code') !== code) throw codeInvalid();
       const ids = leagueGroupIds(userSnap!.get('group_ids'));
-      const d = decideGroupJoin({ groupIds: ids, groupId: gid, isMember: memberSnap!.exists, memberCount: int(groupSnap!.get('member_count')) });
+      const d = decideGroupJoin({
+        groupIds: ids,
+        groupId: gid,
+        isMember: memberSnap!.exists,
+        memberCount: int(groupSnap!.get('member_count')),
+        removed: removedSnap!.exists,
+      });
       if (d.kind === 'join') {
         tx.set(memberRef(gid, uid), { uid, display_name: displayNameOf(userSnap!.data()), role: 'member', joined_at: FieldValue.serverTimestamp() });
         tx.update(groupRef(gid), { member_count: int(groupSnap!.get('member_count')) + 1 });
@@ -184,6 +210,11 @@ export const groupRemoveMember = onCall(
       });
       const ids = targetUser!.get('group_ids');
       if (targetUser!.exists && leagueGroupIds(ids).includes(gid)) tx.update(userRef(target), { group_ids: without(ids, gid) });
+      // §9.7: a removed user cannot rejoin with the code. Also written on a retry
+      // (member already gone) for an existing account.
+      if (d.kind === 'remove' || targetUser!.exists) {
+        tx.set(removedRef(gid, target), { uid: target, by: uid, at: FieldValue.serverTimestamp() });
+      }
       if (d.kind === 'not_member') return;
       tx.delete(memberRef(gid, target));
       tx.delete(groupBoardEntryRef(gid, target, nowMs));
@@ -197,10 +228,22 @@ export const groupRemoveMember = onCall(
 // ---------------------------------------------------------------------------
 // accountDelete support
 
+/** Deletes `uid`'s homework submissions in every assignment of the group. */
+async function deleteOwnSubmissions(gRef: DocumentReference, uid: string): Promise<void> {
+  const assignments = await gRef.collection('assignments').select().get();
+  for (const part of chunk(assignments.docs, 400)) {
+    const batch = db().batch();
+    for (const a of part) batch.delete(a.ref.collection('submissions').doc(uid));
+    await batch.commit();
+  }
+}
+
 /**
- * Removes `uid` from every group: memberships are dropped (member_count
- * decremented); groups the user owns are deleted with their assignments,
- * submissions and join code, and the other members' group_ids are cleaned.
+ * Removes `uid` from every group: in groups of other owners the user's
+ * homework submissions are deleted and the membership is dropped
+ * (member_count decremented only when the member doc still exists, §9.7);
+ * groups the user owns are deleted with their assignments, submissions,
+ * removed markers and join code, and the other members' group_ids are cleaned.
  */
 export async function removeUserFromGroups(uid: string): Promise<number> {
   const memberships = await db().collectionGroup('members').where('uid', '==', uid).limit(50).get();
@@ -209,15 +252,22 @@ export async function removeUserFromGroups(uid: string): Promise<number> {
     const gRef = m.ref.parent.parent;
     if (!gRef || gRef.parent.id !== 'groups') continue;
     const gid = gRef.id;
+    // Submissions go before the member doc, so a retry still finds this group.
+    const before = await gRef.get();
+    if (before.exists && before.get('owner_uid') !== uid) await deleteOwnSubmissions(gRef, uid);
     const owned = await db().runTransaction(async (tx) => {
-      const g = await tx.get(gRef);
-      if (!g.exists) {
+      const [g, member] = await tx.getAll(gRef, m.ref);
+      const d = decideMembershipCleanup({
+        uid,
+        groupExists: g!.exists,
+        ownerUid: str(g!.get('owner_uid')) || null,
+        memberExists: member!.exists,
+      });
+      if (d.kind === 'owned') return true;
+      if (d.kind === 'drop_member') {
         tx.delete(m.ref);
-        return false;
+        if (d.decrement) tx.update(gRef, { member_count: Math.max(1, int(g!.get('member_count')) - 1) });
       }
-      if (g.get('owner_uid') === uid) return true;
-      tx.delete(m.ref);
-      tx.update(gRef, { member_count: Math.max(1, int(g.get('member_count')) - 1) });
       return false;
     });
     if (owned) {

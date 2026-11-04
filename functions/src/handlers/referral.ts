@@ -4,13 +4,15 @@
  *   referralApply {code}    -> {ok}
  *   friendAdd {code}        -> {ok, friendUid, displayName}
  * The reward itself is granted inside billingVerifyPurchase (billing.ts,
- * applyReferralReward below).
+ * readReferralReward / writeReferralReward below) and undone by
+ * revokePurchase on a refund (readReferralClawback / writeReferralClawback).
+ * friendAdd shares the code_attempts limiter with groupJoin (§9.7).
  *
  * referral_codes/{code} = {uid, created_at}   (no client access)
  * users/{uid}.referral_code / .referred_by     (privileged, server-written)
  * referrals/{referrerUid} = {joined_total, rewarded_total, month_key, month_rewarded}
- * referrals/{referrerUid}/items/{uid} = {status: joined|rewarded, joined_at, rewarded_at?, display_name}
- * friends/{uid}/list/{friendUid} = {display_name, added_at}
+ * referrals/{referrerUid}/items/{uid} = {status: joined|rewarded|revoked, joined_at, rewarded_at?, revoked_at?, display_name}
+ * friends/{uid}/list/{friendUid} = {uid (= friendUid), display_name, added_at}
  */
 import '../config';
 import { randomInt } from 'node:crypto';
@@ -18,20 +20,22 @@ import type { DocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 import { generateShortCode, isShortCode, MAX_CODE_ATTEMPTS, normalizeCode } from '../domain/codes';
-import { applyBonusCredits, parseEntitlement, type EntitlementState } from '../domain/entitlements';
+import { applyBonusCredits, applyClawback, parseEntitlement, type EntitlementState } from '../domain/entitlements';
 import { decideFriendAdd, MAX_FRIENDS } from '../domain/groups';
 import { DomainError, Reasons } from '../domain/reasons';
 import {
   decideReferralApply,
+  decideReferralClawback,
   decideReferralReward,
   parseReferrerCounter,
   REFERRAL_REWARD_CREDITS,
   referralRejection,
+  type ReferralClawback,
   type RewardDecision,
 } from '../domain/referral';
 import { bishkekMonthKey } from '../domain/time';
 import { int, str } from '../domain/types';
-import { callableOptions, db, FieldValue, payload, requireActiveUser, wrap } from './common';
+import { callableOptions, consumeCodeAttempt, db, FieldValue, payload, requireActiveUser, wrap } from './common';
 import { displayNameOf, statsRef } from './gamification';
 
 const codeRef = (code: string) => db().doc(`referral_codes/${code}`);
@@ -237,6 +241,111 @@ export function writeReferralReward(
   return refereeBonus.entitlement;
 }
 
+/** Fields the grant transaction stores on purchases/{id} so a refund can undo the reward (§9.7). */
+export function referralPurchaseFields(reads: ReferralRewardReads): Record<string, unknown> {
+  const d = reads.decision;
+  if (d.kind !== 'reward') return {};
+  return { referral_referrer_uid: d.referrerUid, referral_referrer_rewarded: d.rewardReferrer };
+}
+
+// ---------------------------------------------------------------------------
+// Clawback hook (revokePurchase transaction, ARCHITECTURE §9.7)
+
+export interface ReferralClawbackReads {
+  decision: ReferralClawback;
+  referrerUid: string;
+  /** The live referee, null when the purchase owner deleted the account. */
+  refereeUid: string | null;
+  referrerEntitlement: EntitlementState | null;
+}
+
+/**
+ * Transaction READS for undoing the referral reward of a refunded / voided
+ * purchase. Must run before any write of the transaction. Null when the
+ * purchase paid no reward.
+ */
+export async function readReferralClawback(
+  tx: Transaction,
+  purchase: DocumentSnapshot,
+  refereeUid: string | null,
+): Promise<ReferralClawbackReads | null> {
+  const referrerUid = str(purchase.get('referral_referrer_uid'));
+  if (!referrerUid || referrerUid.includes('/')) return null;
+  const refs = [db().doc(`entitlements/${referrerUid}`), ...(refereeUid ? [referralItemRef(referrerUid, refereeUid)] : [])];
+  const [referrerEnt, item] = await tx.getAll(...refs);
+  const decision = decideReferralClawback({
+    referrerUid,
+    referrerRewarded: purchase.get('referral_referrer_rewarded') === true,
+    refereeLive: refereeUid !== null,
+    referrerEntitlementExists: referrerEnt!.exists,
+    itemStatus: item?.exists ? str(item.get('status')) || 'joined' : null,
+  });
+  if (!decision) return null;
+  return { decision, referrerUid, refereeUid, referrerEntitlement: decision.referrer ? parseEntitlement(referrerEnt!.data()) : null };
+}
+
+export interface ReferralClawbackResult {
+  /** Referee state after the clawback (the caller writes entitlements/{referee} once). */
+  refereeEntitlement: EntitlementState | null;
+  refereeClawedBack: number;
+  referrerClawedBack: number;
+}
+
+/**
+ * Transaction WRITES: claws back the referee's referral credit from
+ * `refereeEntitlement` (state after the purchase clawback) with its own
+ * ledger line, the referrer's credit (entitlement + ledger) and marks the
+ * item 'revoked'. Spent credits become debt (applyClawback).
+ */
+export function writeReferralClawback(
+  tx: Transaction,
+  reads: ReferralClawbackReads,
+  refereeEntitlement: EntitlementState | null,
+  purchaseRef: string,
+  actor: { actorUid: string; source: string },
+): ReferralClawbackResult {
+  const d = reads.decision;
+  const out: ReferralClawbackResult = { refereeEntitlement, refereeClawedBack: 0, referrerClawedBack: 0 };
+  if (d.referee && reads.refereeUid && refereeEntitlement) {
+    const c = applyClawback(refereeEntitlement, REFERRAL_REWARD_CREDITS);
+    tx.set(db().doc(`entitlements/${reads.refereeUid}`).collection('ledger').doc(), {
+      ...c.ledger,
+      ref: `referral_${reads.referrerUid}`,
+      referral_role: 'referee',
+      purchase_ref: purchaseRef,
+      debt_added: c.newDebt,
+      actor_uid: actor.actorUid,
+      source: actor.source,
+      at: FieldValue.serverTimestamp(),
+    });
+    out.refereeEntitlement = c.entitlement;
+    out.refereeClawedBack = c.clawedBack;
+  }
+  if (d.referrer && reads.referrerEntitlement) {
+    const c = applyClawback(reads.referrerEntitlement, REFERRAL_REWARD_CREDITS);
+    const ref = db().doc(`entitlements/${reads.referrerUid}`);
+    tx.set(ref, { credits: c.entitlement.credits, debt_credits: c.entitlement.debt_credits, updated_at: FieldValue.serverTimestamp() }, { merge: true });
+    tx.set(ref.collection('ledger').doc(), {
+      ...c.ledger,
+      ref: reads.refereeUid ? `referral_${reads.refereeUid}` : 'referral_deleted_account',
+      referral_role: 'referrer',
+      debt_added: c.newDebt,
+      actor_uid: actor.actorUid,
+      source: actor.source,
+      at: FieldValue.serverTimestamp(),
+    });
+    out.referrerClawedBack = c.clawedBack;
+  }
+  if (d.markItem && reads.refereeUid) {
+    tx.set(
+      referralItemRef(reads.referrerUid, reads.refereeUid),
+      { status: 'revoked', revoked_at: FieldValue.serverTimestamp() },
+      { merge: true },
+    );
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // friendAdd {code} -> {ok, friendUid, displayName}
 
@@ -244,13 +353,17 @@ export const friendAdd = onCall(
   callableOptions(),
   wrap('friendAdd', async (req) => {
     const { uid } = await requireActiveUser(req);
+    // Every call counts (failed guesses too) before the code is resolved (§9.7).
+    await consumeCodeAttempt(uid);
     const friend = await resolveReferralCode(payload(req)['code']);
     const displayName = displayNameOf(friend.profile.data());
     const list = db().collection(`friends/${uid}/list`);
     const added = await db().runTransaction(async (tx) => {
       const [existing, current] = await Promise.all([tx.get(list.doc(friend.uid)), tx.get(list.select().limit(MAX_FRIENDS))]);
       const d = decideFriendAdd({ callerUid: uid, friendUid: friend.uid, alreadyFriend: existing.exists, friendCount: current.size });
-      if (d.kind === 'add') tx.set(list.doc(friend.uid), { display_name: displayName, added_at: FieldValue.serverTimestamp() });
+      // `uid` lets accountDelete find the entries other users keep about a deleted friend (§9.7).
+      if (d.kind === 'add') tx.set(list.doc(friend.uid), { uid: friend.uid, display_name: displayName, added_at: FieldValue.serverTimestamp() });
+      else if (existing.get('uid') !== friend.uid) tx.set(list.doc(friend.uid), { uid: friend.uid }, { merge: true }); // backfill
       return d.kind === 'add';
     });
     if (added) logger.info('friend added', { uid, friendUid: friend.uid });

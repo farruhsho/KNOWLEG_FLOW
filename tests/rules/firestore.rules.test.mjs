@@ -8,6 +8,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   increment,
@@ -518,18 +519,27 @@ describe('phase 3: server-only fields and collections', () => {
     );
   });
 
-  it('code reservations, promo attempt counters and broadcast quota are never client-accessible', async () => {
+  it('code reservations, promo / code attempt counters and broadcast quota are never client-accessible', async () => {
     await seed('referral_codes/ABC234', { uid: 'alice' });
     await seed('group_join_codes/XYZ789', { group_id: 'g1' });
     await seed('promo_attempts/alice_2026-11-05', { count: 3 });
+    await seed('code_attempts/alice_2026-11-05', { uid: 'alice', day: '2026-11-05', count: 7 });
     await seed('notification_quota/2026-11-05', { count: 1 });
+    const paths = [
+      'referral_codes/ABC234',
+      'group_join_codes/XYZ789',
+      'promo_attempts/alice_2026-11-05',
+      'code_attempts/alice_2026-11-05',
+      'notification_quota/2026-11-05',
+    ];
     for (const who of [db('alice'), db('root', { role: 'super_admin' })]) {
-      for (const p of ['referral_codes/ABC234', 'group_join_codes/XYZ789', 'promo_attempts/alice_2026-11-05', 'notification_quota/2026-11-05']) {
+      for (const p of paths) {
         await assertFails(getDoc(doc(who, p)));
         await assertFails(setDoc(doc(who, p), { x: 1 }));
       }
     }
     await assertFails(getDocs(query(collection(db('alice'), 'referral_codes'), where('uid', '==', 'alice'))));
+    await assertFails(getDocs(query(collection(db('alice'), 'code_attempts'), where('uid', '==', 'alice'))));
   });
 
   it('promo codes: students never read them; super_admin (grant_credits) reads codes and redemptions; nobody writes', async () => {
@@ -565,8 +575,31 @@ describe('phase 3: server-only fields and collections', () => {
     await assertFails(setDoc(doc(a, 'referrals/alice'), { month_rewarded: 0 }));
   });
 
+  it('referrals: view_users roles (super_admin, moderator, support) read counters, items and the count() aggregate (§9.7)', async () => {
+    await seed('referrals/alice', { joined_total: 2, rewarded_total: 1, month_key: '2026-11', month_rewarded: 1 });
+    await seed('referrals/alice/items/bob', { status: 'rewarded', joined_at: Timestamp.now(), display_name: 'Bob' });
+    await seed('referrals/alice/items/carol', { status: 'joined', joined_at: Timestamp.now(), display_name: 'Carol' });
+    for (const role of ['super_admin', 'moderator', 'support']) {
+      const s = db(`u_${role}`, { role });
+      await assertSucceeds(getDoc(doc(s, 'referrals/alice')));
+      await assertSucceeds(getDocs(collection(s, 'referrals/alice/items')));
+      const agg = await assertSucceeds(getCountFromServer(collection(s, 'referrals/alice/items')));
+      if (agg.data().count !== 2) throw new Error(`count() as ${role}: ${agg.data().count}`);
+      // A user with no referrals: the CMS count is 0, not permission-denied.
+      await assertSucceeds(getCountFromServer(collection(s, 'referrals/nobody/items')));
+      await assertFails(setDoc(doc(s, 'referrals/alice/items/dave'), { status: 'joined' }));
+    }
+    for (const role of ['content_manager', 'methodologist']) {
+      await assertFails(getCountFromServer(collection(db(`u_${role}`, { role }), 'referrals/alice/items')));
+      await assertFails(getDoc(doc(db(`u_${role}`, { role }), 'referrals/alice')));
+    }
+    await assertFails(getCountFromServer(collection(db('bob'), 'referrals/alice/items')));
+    await seed('users/legacy', { ...freeProfile, role: 'admin' });
+    await assertSucceeds(getCountFromServer(collection(db('legacy'), 'referrals/alice/items')));
+  });
+
   it('friends: the owner reads and deletes; only friendAdd creates', async () => {
-    await seed('friends/alice/list/bob', { display_name: 'Bob', added_at: Timestamp.now() });
+    await seed('friends/alice/list/bob', { uid: 'bob', display_name: 'Bob', added_at: Timestamp.now() });
     const a = db('alice');
     await assertSucceeds(getDocs(collection(a, 'friends/alice/list')));
     await assertFails(getDocs(collection(db('bob'), 'friends/alice/list')));
@@ -650,7 +683,32 @@ describe('phase 3: groups, assignments, submissions', () => {
     await assertFails(getDoc(doc(out, 'groups/g1')));
     await assertFails(getDocs(collection(out, 'groups/g1/members')));
     await assertFails(getDoc(doc(out, 'groups/g1/assignments/a1')));
-    await assertFails(getDoc(doc(db('root', { role: 'super_admin' }), 'groups/g1')));
+  });
+
+  it('view_users roles read the group document only (CMS user card, §9.7); sub-collections stay member-only', async () => {
+    for (const role of ['super_admin', 'moderator', 'support']) {
+      const s = db(`u_${role}`, { role });
+      await assertSucceeds(getDoc(doc(s, 'groups/g1')));
+      // A deleted group reads as missing (not denied) for staff.
+      await assertSucceeds(getDoc(doc(s, 'groups/gone')));
+      await assertFails(getDocs(collection(s, 'groups/g1/members')));
+      await assertFails(getDoc(doc(s, 'groups/g1/assignments/a1')));
+      await assertFails(getDoc(doc(s, 'groups/g1/assignments/a1/submissions/alice')));
+      await assertFails(updateDoc(doc(s, 'groups/g1'), { name: 'Renamed' }));
+    }
+    for (const role of ['content_manager', 'methodologist']) {
+      await assertFails(getDoc(doc(db(`u_${role}`, { role }), 'groups/g1')));
+    }
+  });
+
+  it('removed-member markers are server only (§9.7)', async () => {
+    await seed('groups/g1/removed/mallory', { uid: 'mallory', by: 'teacher', at: Timestamp.now() });
+    for (const who of [db('teacher'), db('alice'), db('mallory'), db('root', { role: 'super_admin' })]) {
+      await assertFails(getDoc(doc(who, 'groups/g1/removed/mallory')));
+      await assertFails(getDocs(collection(who, 'groups/g1/removed')));
+      await assertFails(deleteDoc(doc(who, 'groups/g1/removed/mallory')));
+    }
+    await assertFails(setDoc(doc(db('teacher'), 'groups/g1/removed/alice'), { uid: 'alice' }));
   });
 
   it('nobody writes groups or members directly (callables only)', async () => {
@@ -671,6 +729,9 @@ describe('phase 3: groups, assignments, submissions', () => {
       setDoc(doc(t, 'groups/g1/assignments/a3'), { ...assignmentMap('teacher'), kind: 'exam_variant', ref_id: 'ort_main_ru_1', due_at: null }),
     );
     await assertSucceeds(setDoc(doc(t, 'groups/g1/assignments/a4'), { ...assignmentMap('teacher'), kind: 'practice', ref_id: 'math' }));
+    // "Quick practice" (§9.7): kind practice with an empty ref_id.
+    await assertSucceeds(setDoc(doc(t, 'groups/g1/assignments/a5'), { ...assignmentMap('teacher'), kind: 'practice', ref_id: '' }));
+    await assertSucceeds(updateDoc(doc(t, 'groups/g1/assignments/a5'), { title: 'Быстрая практика', updated_at: serverTimestamp() }));
     await assertSucceeds(updateDoc(doc(t, 'groups/g1/assignments/a2'), { title: 'Новый заголовок', due_at: due() }));
     await assertSucceeds(updateDoc(doc(t, 'groups/g1/assignments/a2'), { description: 'Страницы 1–3', updated_at: serverTimestamp() }));
     await assertSucceeds(deleteDoc(doc(t, 'groups/g1/assignments/a4')));
@@ -685,7 +746,12 @@ describe('phase 3: groups, assignments, submissions', () => {
     await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), kind: 'video' }));
     await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), title: '' }));
     await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), title: 'x'.repeat(121) }));
+    // An empty ref_id is only allowed for kind 'practice' (§9.7).
     await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), ref_id: '' }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), kind: 'exam_variant', ref_id: '' }));
+    await assertFails(updateDoc(doc(t, 'groups/g1/assignments/a1'), { ref_id: '' }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), kind: 'practice', ref_id: 'x'.repeat(151) }));
+    await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), kind: 'practice', ref_id: null }));
     await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), due_at: 'next week' }));
     await assertFails(setDoc(doc(t, 'groups/g1/assignments/x'), { ...assignmentMap('teacher'), points: 10 }));
     const { created_at: _omit, ...noCreatedAt } = assignmentMap('teacher');

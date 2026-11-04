@@ -16,7 +16,8 @@
  * filters in code (domain/notifications.ts recipientFor): no composite
  * index is needed, and region / language matching is the exact same logic
  * as the leagues and reminders (map or string region, `ky*` languages). For
- * `group`, only the group's members are read.
+ * `group`, only the group's members are read. Only RECIPIENT_FIELDS of each
+ * profile are fetched (select / fieldMask, ARCHITECTURE §9.7).
  */
 import '../config';
 import { FieldPath, type DocumentSnapshot, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
@@ -33,6 +34,8 @@ import { regionIndex } from './gamification';
 
 const PAGE_SIZE = 500;
 const MAX_PAGES = 200; // 100k users per broadcast
+/** The only users/{uid} fields recipientFor reads (§9.7: no full profile reads). */
+export const RECIPIENT_FIELDS = ['is_banned', 'fcm_tokens', 'preferred_language', 'region', 'region_id', 'group_ids'] as const;
 
 async function collectRecipients(audience: Audience): Promise<Recipient[]> {
   const regions = regionIndex();
@@ -48,12 +51,18 @@ async function collectRecipients(audience: Audience): Promise<Recipient[]> {
     const group = await db().doc(`groups/${gid}`).get();
     if (!group.exists) throw new DomainError(Reasons.VALIDATION_FAILED, 'group not found', { field: 'audience' });
     const members = await db().collection(`groups/${gid}/members`).select().get();
-    for (const part of chunk(members.docs, 300)) consider(await db().getAll(...part.map((m) => db().doc(`users/${m.id}`))));
+    for (const part of chunk(members.docs, 300)) {
+      consider(await db().getAll(...part.map((m) => db().doc(`users/${m.id}`)), { fieldMask: [...RECIPIENT_FIELDS] }));
+    }
     return out;
   }
   let last: QueryDocumentSnapshot | undefined;
   for (let page = 0; page < MAX_PAGES; page++) {
-    let q = db().collection('users').orderBy(FieldPath.documentId()).limit(PAGE_SIZE);
+    let q = db()
+      .collection('users')
+      .select(...RECIPIENT_FIELDS)
+      .orderBy(FieldPath.documentId())
+      .limit(PAGE_SIZE);
     if (last) q = q.startAfter(last);
     const snap = await q.get();
     if (snap.empty) break;

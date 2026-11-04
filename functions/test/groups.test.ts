@@ -5,6 +5,7 @@ import {
   decideFriendAdd,
   decideGroupJoin,
   decideGroupLeave,
+  decideMembershipCleanup,
   decideRemoveMember,
   MAX_FRIENDS,
   MAX_GROUP_MEMBERS,
@@ -43,6 +44,62 @@ describe('group limits (ARCHITECTURE §9.3)', () => {
     // A stale id of the same group in group_ids does not block re-joining.
     assert.deepEqual(decideGroupJoin({ groupIds: ['a', 'b', 'c', 'd', 'g'], groupId: 'g', isMember: false, memberCount: 3 }), { kind: 'join' });
     assert.equal(reasonOf(() => decideGroupJoin({ groupIds: [], groupId: 'g', isMember: false, memberCount: MAX_GROUP_MEMBERS })), 'LIMIT_REACHED');
+  });
+
+  it('groupJoin: the full group is LIMIT_REACHED what=group_members, the 6th membership what=memberships (§9.7)', () => {
+    const whatOf = (fn: () => unknown) => {
+      try {
+        fn();
+      } catch (e) {
+        return e instanceof DomainError ? e.extra?.['what'] : 'other';
+      }
+      return undefined;
+    };
+    assert.equal(whatOf(() => decideGroupJoin({ groupIds: [], groupId: 'g', isMember: false, memberCount: MAX_GROUP_MEMBERS })), 'group_members');
+    assert.equal(whatOf(() => decideGroupJoin({ groupIds: ['a', 'b', 'c', 'd', 'e'], groupId: 'g', isMember: false, memberCount: 3 })), 'memberships');
+  });
+
+  it('groupJoin: a member the owner removed cannot rejoin with the code (§9.7, P3-BE-04)', () => {
+    let err: unknown;
+    try {
+      decideGroupJoin({ groupIds: [], groupId: 'g', isMember: false, memberCount: 3, removed: true });
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(err instanceof DomainError);
+    assert.equal(err.reason, 'VALIDATION_FAILED');
+    assert.equal(err.code, 'failed-precondition');
+    assert.equal(err.extra?.['why'], 'removed_from_group');
+    // The removal check comes before the limits, and a current member stays idempotent.
+    assert.equal(reasonOf(() => decideGroupJoin({ groupIds: [], groupId: 'g', isMember: false, memberCount: MAX_GROUP_MEMBERS, removed: true })), 'VALIDATION_FAILED');
+    assert.deepEqual(decideGroupJoin({ groupIds: ['g'], groupId: 'g', isMember: true, memberCount: 3, removed: true }), { kind: 'already_member' });
+    assert.deepEqual(decideGroupJoin({ groupIds: [], groupId: 'g', isMember: false, memberCount: 3, removed: false }), { kind: 'join' });
+  });
+
+  it('accountDelete cleanup decrements member_count only while the member doc exists (§9.7, P3-BE-05)', () => {
+    const base = { uid: 'u', groupExists: true, ownerUid: 'o', memberExists: true };
+    assert.deepEqual(decideMembershipCleanup(base), { kind: 'drop_member', decrement: true });
+    // A concurrent groupLeave / groupRemoveMember or an overlapping retry already removed it: no second decrement.
+    assert.deepEqual(decideMembershipCleanup({ ...base, memberExists: false }), { kind: 'none' });
+    // Own group: deleted as a whole, also when the member doc is already gone.
+    assert.deepEqual(decideMembershipCleanup({ ...base, ownerUid: 'u' }), { kind: 'owned' });
+    assert.deepEqual(decideMembershipCleanup({ ...base, ownerUid: 'u', memberExists: false }), { kind: 'owned' });
+    // Orphan member doc of a deleted group: dropped without touching a counter.
+    assert.deepEqual(decideMembershipCleanup({ ...base, groupExists: false, ownerUid: null }), { kind: 'drop_member', decrement: false });
+    assert.deepEqual(decideMembershipCleanup({ ...base, groupExists: false, ownerUid: null, memberExists: false }), { kind: 'none' });
+    // A group without owner_uid is never treated as owned.
+    assert.deepEqual(decideMembershipCleanup({ ...base, ownerUid: null }), { kind: 'drop_member', decrement: true });
+    // Two overlapping runs: the second sees the member gone, so the count drops by exactly one.
+    let count = 3;
+    let memberExists = true;
+    for (let run = 0; run < 2; run++) {
+      const d = decideMembershipCleanup({ ...base, memberExists });
+      if (d.kind === 'drop_member') {
+        memberExists = false;
+        if (d.decrement) count -= 1;
+      }
+    }
+    assert.equal(count, 2);
   });
 
   it('groupLeave: members leave; the owner only when alone (the group is then deleted)', () => {
