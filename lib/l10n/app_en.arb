@@ -652,5 +652,8 @@
   "adminLogsActor": "by {uid}",
   "@adminLogsActor": {"placeholders": {"uid": {"type": "String"}}},
   "adminLogsTarget": "target {uid}",
-  "@adminLogsTarget": {"placeholders": {"uid": {"type": "String"}}}
+  "@adminLogsTarget": {"placeholders": {"uid": {"type": "String"}}},
+  "adminExamIssuePart": "Choose the part of the section.",
+  "adminSubjectsTopicIdInvalid": "Invalid topic id: {id} (use a–z, 0–9, _ and dots)",
+  "@adminSubjectsTopicIdInvalid": {"placeholders": {"id": {"type": "String"}}}
 }

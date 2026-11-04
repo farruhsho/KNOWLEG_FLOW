@@ -1898,4 +1898,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String adminLogsTarget(String uid) {
     return 'target $uid';
   }
+
+  @override
+  String get adminExamIssuePart => 'Choose the part of the section.';
+
+  @override
+  String adminSubjectsTopicIdInvalid(String id) {
+    return 'Invalid topic id: $id (use a–z, 0–9, _ and dots)';
+  }
 }

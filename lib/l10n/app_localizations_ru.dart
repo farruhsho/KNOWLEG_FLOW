@@ -1898,4 +1898,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String adminLogsTarget(String uid) {
     return 'кому: $uid';
   }
+
+  @override
+  String get adminExamIssuePart => 'Выберите часть раздела.';
+
+  @override
+  String adminSubjectsTopicIdInvalid(String id) {
+    return 'Некорректный id темы: $id (a–z, 0–9, _ и точки)';
+  }
 }

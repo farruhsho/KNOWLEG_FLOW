@@ -591,5 +591,7 @@
   "adminPricingFreeHelp": "Правило продукта: 1 (первый полный тест бесплатен один раз на аккаунт)",
   "adminLogsEmpty": "Журнал пуст.",
   "adminLogsActor": "кто: {uid}",
-  "adminLogsTarget": "кому: {uid}"
+  "adminLogsTarget": "кому: {uid}",
+  "adminExamIssuePart": "Выберите часть раздела.",
+  "adminSubjectsTopicIdInvalid": "Некорректный id темы: {id} (a–z, 0–9, _ и точки)"
 }

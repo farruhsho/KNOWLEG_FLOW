@@ -3549,6 +3549,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'target {uid}'**
   String adminLogsTarget(String uid);
+
+  /// No description provided for @adminExamIssuePart.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the part of the section.'**
+  String get adminExamIssuePart;
+
+  /// No description provided for @adminSubjectsTopicIdInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid topic id: {id} (use a–z, 0–9, _ and dots)'**
+  String adminSubjectsTopicIdInvalid(String id);
 }
 
 class _AppLocalizationsDelegate

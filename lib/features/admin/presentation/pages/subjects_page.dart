@@ -181,7 +181,11 @@ class _SubjectEditorState extends ConsumerState<_SubjectEditor> {
     for (var i = 0; i < _topics.length; i++) {
       final suffix = _topics[i].suffix.text.trim();
       if (suffix.isEmpty) continue;
-      final topicId = suffix.contains('.') && suffix.startsWith('$id.') ? suffix : '$id.$suffix';
+      final topicId = suffix.startsWith('$id.') ? suffix : '$id.$suffix';
+      if (!SubjectDoc.topicSuffixPattern.hasMatch(topicId.substring(id.length + 1))) {
+        showAdminSnack(context, l.adminSubjectsTopicIdInvalid(suffix), error: true);
+        return;
+      }
       if (!topicIds.add(topicId)) {
         showAdminSnack(context, l.adminSubjectsTopicDuplicate(topicId), error: true);
         return;

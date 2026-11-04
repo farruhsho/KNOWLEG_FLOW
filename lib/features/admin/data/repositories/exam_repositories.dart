@@ -91,10 +91,12 @@ class ExamBankRepository {
       ..['updated_at'] = FieldValue.serverTimestamp()
       ..['updated_by'] = actor;
     if (isNew || reviewChanged) {
+      // Saving content is never a review decision: an automatic reset (content
+      // edited by a non-reviewer) clears the previous reviewer.
       fields['review'] = {
         'status': review.wire,
-        'reviewed_by': isNew ? null : actor,
-        'reviewed_at': isNew ? null : FieldValue.serverTimestamp(),
+        'reviewed_by': null,
+        'reviewed_at': null,
         'notes': q.review.notes,
       };
     }

@@ -174,8 +174,20 @@ class _ExamQuestionEditorPageState extends ConsumerState<ExamQuestionEditorPage>
     if (role == null) return;
     var q = _collectQ();
     final b = _blueprint(blueprints);
+    final section = _section(blueprints);
+    if (section != null && section.parts.length > 1 && q.partId == null) {
+      showAdminSnack(context, l.adminExamIssuePart, error: true);
+      return;
+    }
     final part = _part(blueprints);
     final expected = b?.optionsFor(part);
+    // A note for the option that is now correct would contradict the key.
+    _key = ExamKeyDoc(
+      correct: _key.correct,
+      explanation: _key.explanation.trim(),
+      wrongOptionNotes: {..._key.wrongOptionNotes}..remove(_key.correct),
+      solutionSteps: _key.solutionSteps,
+    );
     final issues = validateExamQuestion(
       q,
       _key,
