@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/question_model.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-/// AI Explainer Modal for wrong answers
-/// Shows "Why wrong? Tip:" explanations with AI-generated insights
-class AIExplainerModal extends StatelessWidget {
+import '../../core/design/tokens.dart';
+import '../../core/routes/route_paths.dart';
+import '../../features/tutor/application/tutor_controller.dart';
+import '../../features/tutor/domain/tutor_models.dart';
+import '../../features/tutor/presentation/tutor_messages.dart';
+import '../../features/tutor/presentation/widgets/tutor_markdown.dart';
+import '../../l10n/app_localizations.dart';
+import '../models/question_model.dart';
+
+/// Explanation dialog shown after a practice answer.
+///
+/// The "why is it wrong?" part is answered by the server-side `aiTutor`
+/// callable (mode `explain_mistake`) — this widget holds no model API key and
+/// never calls an LLM directly (SEC-001 / CMS-03 / FB-26). The student can
+/// also continue in the full tutor chat.
+///
+/// Public API (constructor and [show]) is unchanged.
+class AIExplainerModal extends ConsumerStatefulWidget {
   final QuestionModel question;
   final String userAnswer;
   final VoidCallback? onRetry;
@@ -19,178 +34,202 @@ class AIExplainerModal extends StatelessWidget {
     this.onNext,
   });
 
+  /// Show the AI Explainer Modal
+  static Future<void> show(
+    BuildContext context, {
+    required QuestionModel question,
+    required String userAnswer,
+    VoidCallback? onRetry,
+    VoidCallback? onNext,
+  }) {
+    HapticFeedback.mediumImpact();
+    return showDialog(
+      context: context,
+      builder: (context) => AIExplainerModal(
+        question: question,
+        userAnswer: userAnswer,
+        onRetry: onRetry,
+        onNext: onNext,
+      ),
+    );
+  }
+
+  @override
+  ConsumerState<AIExplainerModal> createState() => _AIExplainerModalState();
+}
+
+enum _AiPhase { idle, loading, done, failed }
+
+class _AIExplainerModalState extends ConsumerState<AIExplainerModal> {
+  _AiPhase _phase = _AiPhase.idle;
+  String? _reply;
+  int? _remaining;
+  TutorFailure? _failure;
+
+  String get _lang => Localizations.localeOf(context).languageCode;
+
+  String _prompt(AppLocalizations l10n) {
+    final q = widget.question;
+    final options = q.options
+        .map((o) => '${o.id}) ${o.text[_lang] ?? o.text['ru'] ?? (o.text.isEmpty ? '' : o.text.values.first)}')
+        .join('\n');
+    final userAnswer = widget.userAnswer.trim().isEmpty ? l10n.tutorExplainerNoAnswer : widget.userAnswer;
+    return l10n.tutorExplainPrompt(_stem(), options, userAnswer, q.correctAnswer);
+  }
+
+  String _stem() => widget.question.stem.isEmpty ? '' : widget.question.getStem(_lang);
+
+  Future<void> _askAi() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _phase = _AiPhase.loading;
+      _failure = null;
+    });
+    try {
+      final reply = await ref.read(tutorApiProvider).ask(TutorRequest(
+            mode: TutorMode.explainMistake,
+            message: _prompt(l10n),
+            language: tutorLanguageFor(_lang),
+            questionId: widget.question.id.isEmpty ? null : widget.question.id,
+          ));
+      if (!mounted) return;
+      setState(() {
+        _phase = _AiPhase.done;
+        _reply = reply.reply;
+        _remaining = reply.remainingToday;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _phase = _AiPhase.failed;
+        _failure = TutorFailure.from(e);
+      });
+    }
+  }
+
+  void _openChat() {
+    final l10n = AppLocalizations.of(context)!;
+    final router = GoRouter.maybeOf(context);
+    final extra = TutorArgs(
+      questionId: widget.question.id.isEmpty ? null : widget.question.id,
+      mode: TutorMode.explainMistake,
+      prefill: _prompt(l10n),
+    ).toExtra();
+    Navigator.of(context).pop();
+    router?.push(RoutePaths.tutor, extra: extra);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isCorrect = userAnswer == question.correctAnswer;
-    
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final tokens = context.tokens;
+    final q = widget.question;
+    final isCorrect = widget.userAnswer == q.correctAnswer;
+    final accent = isCorrect ? tokens.success : tokens.danger;
+    final accentBg = isCorrect ? tokens.successContainer : tokens.dangerContainer;
+    final explanation = q.getExplanation(_lang);
+    final canOpenChat = GoRouter.maybeOf(context) != null;
+
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
-        padding: const EdgeInsets.all(24),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xxl),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: (isCorrect ? AppColors.success : AppColors.error)
-                          .withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      isCorrect ? Icons.check_circle : Icons.cancel,
-                      color: isCorrect ? AppColors.success : AppColors.error,
-                      size: 32,
+                  DecoratedBox(
+                    decoration: BoxDecoration(color: accentBg, borderRadius: AppRadii.mdAll),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      child: Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: accent, size: 28),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isCorrect ? 'Правильно!' : 'Неправильно',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: isCorrect ? AppColors.success : AppColors.error,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          isCorrect ? l10n.tutorExplainerCorrect : l10n.tutorExplainerIncorrect,
+                          style: theme.textTheme.titleLarge?.copyWith(color: accent),
                         ),
-                        if (!isCorrect)
+                        if (!isCorrect) ...[
+                          Text(l10n.tutorExplainerCorrectAnswer(q.correctAnswer),
+                              style: theme.textTheme.bodyMedium),
                           Text(
-                            'Правильный ответ: ${question.correctAnswer}',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            l10n.tutorExplainerYourAnswer(widget.userAnswer.trim().isEmpty
+                                ? l10n.tutorExplainerNoAnswer
+                                : widget.userAnswer),
+                            style: theme.textTheme.bodySmall,
                           ),
+                        ],
                       ],
                     ),
                   ),
                   IconButton(
+                    tooltip: l10n.tutorExplainerClose,
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 24),
-
-              // Question
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.grey100,
-                  borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: AppSpacing.lg),
+              if (q.stem.isNotEmpty)
+                DecoratedBox(
+                  decoration: BoxDecoration(color: tokens.surfaceMuted, borderRadius: AppRadii.mdAll),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: TutorMarkdown(_stem(), style: theme.textTheme.bodyLarge),
+                  ),
                 ),
-                child: Text(
-                  question.getStem('ru'),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Explanation
-              Text(
-                'Объяснение',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                question.getExplanation('ru'),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-
+              if (explanation.trim().isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Text(l10n.tutorExplainerExplanation, style: theme.textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.sm),
+                TutorMarkdown(explanation),
+              ],
               if (!isCorrect) ...[
-                const SizedBox(height: 20),
-
-                // AI Tip
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.1),
-                        AppColors.accent.withValues(alpha: 0.1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.auto_awesome,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Почему неправильно? Совет:',
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _generateAITip(question, userAnswer),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: AppSpacing.lg),
+                _AiSection(
+                  phase: _phase,
+                  reply: _reply,
+                  remaining: _remaining,
+                  failure: _failure,
+                  onAsk: _askAi,
+                  onOpenChat: canOpenChat ? _openChat : null,
                 ),
               ],
-
-              const SizedBox(height: 24),
-
-              // Action buttons
-              Row(
+              const SizedBox(height: AppSpacing.xl),
+              Wrap(
+                alignment: WrapAlignment.end,
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
                 children: [
-                  if (onRetry != null)
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          onRetry?.call();
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Попробовать снова'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
+                  if (widget.onRetry != null)
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        widget.onRetry?.call();
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: Text(l10n.tutorExplainerTryAgain),
                     ),
-                  if (onRetry != null && onNext != null) const SizedBox(width: 12),
-                  if (onNext != null)
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          onNext?.call();
-                        },
-                        icon: const Icon(Icons.arrow_forward),
-                        label: const Text('Следующий'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
+                  if (widget.onNext != null)
+                    FilledButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        widget.onNext?.call();
+                      },
+                      icon: const Icon(Icons.arrow_forward),
+                      label: Text(l10n.tutorExplainerNext),
                     ),
                 ],
               ),
@@ -200,44 +239,100 @@ class AIExplainerModal extends StatelessWidget {
       ),
     );
   }
+}
 
-  /// Generate AI tip based on question and wrong answer
-  /// In production, this would call an AI API
-  String _generateAITip(QuestionModel question, String wrongAnswer) {
-    // Mock AI-generated tips based on difficulty
-    if (question.difficulty <= 2) {
-      return 'Обратите внимание на ключевые слова в вопросе. '
-          'Попробуйте исключить явно неправильные варианты и сосредоточьтесь на оставшихся. '
-          'Перечитайте вопрос внимательно перед выбором ответа.';
-    } else if (question.difficulty <= 3) {
-      return 'Этот вопрос требует понимания основных концепций. '
-          'Рекомендуем повторить теорию по этой теме. '
-          'Обратите внимание на детали в формулировке вопроса - они часто содержат подсказки.';
-    } else {
-      return 'Это сложный вопрос, требующий глубокого понимания материала. '
-          'Попробуйте разбить вопрос на части и проанализировать каждую. '
-          'Рекомендуем дополнительно изучить эту тему и решить похожие задачи.';
-    }
-  }
+class _AiSection extends StatelessWidget {
+  const _AiSection({
+    required this.phase,
+    required this.reply,
+    required this.remaining,
+    required this.failure,
+    required this.onAsk,
+    required this.onOpenChat,
+  });
 
-  /// Show the AI Explainer Modal
-  static Future<void> show(
-    BuildContext context, {
-    required QuestionModel question,
-    required String userAnswer,
-    VoidCallback? onRetry,
-    VoidCallback? onNext,
-  }) {
-    // Add haptic feedback
-    HapticFeedback.mediumImpact();
-    
-    return showDialog(
-      context: context,
-      builder: (context) => AIExplainerModal(
-        question: question,
-        userAnswer: userAnswer,
-        onRetry: onRetry,
-        onNext: onNext,
+  final _AiPhase phase;
+  final String? reply;
+  final int? remaining;
+  final TutorFailure? failure;
+  final VoidCallback onAsk;
+  final VoidCallback? onOpenChat;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final tokens = context.tokens;
+    final blocked = failure?.blocksInput ?? false;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: AppRadii.mdAll,
+        border: Border.all(color: tokens.border),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.psychology_alt_outlined, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(child: Text(l10n.tutorExplainerAiTitle, style: theme.textTheme.titleSmall)),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            switch (phase) {
+              _AiPhase.idle => const SizedBox.shrink(),
+              _AiPhase.loading => Row(
+                  children: [
+                    SizedBox.square(
+                      dimension: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.primary),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Flexible(child: Text(l10n.tutorThinking, style: theme.textTheme.bodySmall)),
+                  ],
+                ),
+              _AiPhase.done => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectionArea(child: TutorMarkdown(reply ?? '')),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(l10n.tutorDisclaimer, style: theme.textTheme.bodySmall),
+                    if (remaining != null)
+                      Text(l10n.tutorRemainingToday(remaining!), style: theme.textTheme.bodySmall),
+                  ],
+                ),
+              _AiPhase.failed => Text(
+                  l10n.tutorFailureMessage(failure ?? TutorFailure.unknown),
+                  style: theme.textTheme.bodyMedium?.copyWith(color: tokens.danger),
+                ),
+            },
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.xs,
+              children: [
+                if (phase == _AiPhase.idle || (phase == _AiPhase.failed && !blocked))
+                  FilledButton.tonalIcon(
+                    onPressed: onAsk,
+                    icon: Icon(phase == _AiPhase.failed ? Icons.refresh : Icons.auto_awesome_outlined),
+                    label: Text(phase == _AiPhase.failed ? l10n.tutorRetry : l10n.tutorExplainerAiButton),
+                  ),
+                if (onOpenChat != null && phase != _AiPhase.loading)
+                  TextButton.icon(
+                    onPressed: onOpenChat,
+                    icon: const Icon(Icons.forum_outlined),
+                    label: Text(l10n.tutorExplainerOpenChat),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
