@@ -529,19 +529,31 @@ class _RunnerBottomBar extends ConsumerWidget {
   }
 }
 
+/// What the palette sheet asks its opener to do after it closes.
+enum ExamPaletteAction { finishSection }
+
 /// Bottom sheet with the question palette and "Finish section".
+///
+/// "Finish section" closes the sheet and returns
+/// [ExamPaletteAction.finishSection]; the confirmation and the submission run
+/// here with the runner page's [context] and [ref]. They must not run inside
+/// the sheet: its context and ref are disposed as soon as it pops, so the
+/// submit call would throw and the section would never be sent.
 Future<void> showExamPaletteSheet(
   BuildContext context,
   WidgetRef ref,
   String attemptId,
-) {
-  return showModalBottomSheet<void>(
+) async {
+  final action = await showModalBottomSheet<ExamPaletteAction>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
     useSafeArea: true,
     builder: (sheetContext) => _PaletteSheet(attemptId: attemptId),
   );
+  if (action == ExamPaletteAction.finishSection && context.mounted) {
+    await confirmFinishSection(context, ref, attemptId);
+  }
 }
 
 class _PaletteSheet extends ConsumerWidget {
@@ -619,10 +631,8 @@ class _PaletteSheet extends ConsumerWidget {
               AppSpacing.lg,
             ),
             child: OutlinedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pop();
-                confirmFinishSection(context, ref, attemptId);
-              },
+              onPressed: () =>
+                  Navigator.of(context).pop(ExamPaletteAction.finishSection),
               icon: const Icon(Icons.done_all_rounded),
               label: Text(l.examFinishSection),
             ),

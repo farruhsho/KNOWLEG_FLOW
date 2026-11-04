@@ -182,6 +182,40 @@ void main() {
       expect(store.saved!.phase, ExamPhase.inSection);
     });
 
+    // Regression: found in the browser walkthrough on the emulators. The
+    // palette's "Finish section" ran the confirmation with the sheet's
+    // disposed ref, so the section was never submitted.
+    testWidgets('finish section from the palette sheet submits the section',
+        (tester) async {
+      _phone(tester);
+      await tester.pumpWidget(
+          _app(const ExamRunnerPage(attemptId: 'att1'), overrides: overrides()));
+      await tester.pump();
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('option_q1_A')));
+      await tester.pump();
+
+      remote.onSubmit = (s) => SubmitSectionResponse(
+          completed: false, next: nextPayload(deviceNow: t0));
+      await tester.tap(find.byKey(const ValueKey('palette_button')));
+      await tester.pumpAndSettle();
+      final finishInSheet = find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.text('Завершить раздел'),
+      );
+      expect(finishInSheet, findsOneWidget);
+      await tester.tap(finishInSheet);
+      await tester.pumpAndSettle();
+      expect(find.text('Без ответа: 2'), findsOneWidget);
+      await tester.tap(find.text('Завершить'));
+      await tester.pumpAndSettle();
+
+      expect(remote.submissions, hasLength(1));
+      expect(remote.submissions.single.answers['q1'], 'A');
+      expect(find.text('Раздел принят'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('offline with no local copy shows an error with retry', (tester) async {
       _phone(tester);
       remote.onGetState = null;

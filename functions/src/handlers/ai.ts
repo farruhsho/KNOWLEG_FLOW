@@ -49,8 +49,26 @@ import { parseBlueprint } from '../domain/types';
 
 const FALLBACK_BETA = 'server-side-fallback-2026-07-01';
 
-function anthropic(): Anthropic {
-  return new Anthropic({ apiKey: ANTHROPIC_API_KEY.value(), maxRetries: 2, timeout: 90_000 });
+/**
+ * The Anthropic key from Secret Manager, or null when it is not configured.
+ * Never fall back to ambient credentials: an empty `apiKey` makes the SDK read
+ * ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN / local profiles from the
+ * environment (found on the emulator: it picked up a developer token).
+ */
+function anthropicKey(): string | null {
+  const key = (ANTHROPIC_API_KEY.value() ?? '').trim();
+  return key.length > 0 ? key : null;
+}
+
+/** Throws AI_DISABLED before any quota is spent when the key is missing. */
+function requireAnthropicKey(): string {
+  const key = anthropicKey();
+  if (!key) throw new DomainError(Reasons.AI_DISABLED, 'AI tutor is not configured (ANTHROPIC_API_KEY secret is not set)');
+  return key;
+}
+
+function anthropic(apiKey: string): Anthropic {
+  return new Anthropic({ apiKey, maxRetries: 2, timeout: 90_000 });
 }
 
 function mapAnthropicError(e: unknown): never {
@@ -196,6 +214,8 @@ export const aiTutor = onCall(
     if (!cfg.enabled || cfg.daily_limit === 0) throw new DomainError(Reasons.AI_DISABLED, 'AI tutor is disabled');
 
     await assertNotInLiveExam(uid);
+    // Before any quota is reserved: no key => AI_DISABLED, never ambient credentials.
+    const apiKey = requireAnthropicKey();
 
     let context: QuestionContext | null = null;
     if (input.questionId) {
@@ -222,7 +242,7 @@ export const aiTutor = onCall(
     const messages = buildTutorMessages(input.history, input.message, buildContextBlock(input.mode, input.language, context));
     let response: Anthropic.Beta.BetaMessage;
     try {
-      response = await anthropic().beta.messages.create({
+      response = await anthropic(apiKey).beta.messages.create({
         model,
         max_tokens: cfg.max_tokens,
         betas: [FALLBACK_BETA],
@@ -336,6 +356,7 @@ export const adminAiDraftQuestions = onCall(
   adminCallableOptions({ secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 300, memory: '512MiB' }),
   wrap('adminAiDraftQuestions', async (req) => {
     const actor = await requirePermission(req, 'edit_questions', { rejectBanned: true });
+    const apiKey = requireAnthropicKey();
     const data = payload(req);
     const subjectId = reqId(data['subjectId'], 'subjectId');
     const sectionId = reqId(data['sectionId'], 'sectionId');
@@ -361,7 +382,7 @@ export const adminAiDraftQuestions = onCall(
     const model = AI_TUTOR_MODEL.value();
     let response: Anthropic.Beta.BetaMessage;
     try {
-      response = await anthropic().beta.messages.create({
+      response = await anthropic(apiKey).beta.messages.create({
         model,
         max_tokens: 12000,
         betas: [FALLBACK_BETA],

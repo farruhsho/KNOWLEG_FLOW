@@ -209,8 +209,12 @@ class AppTheme {
         backgroundColor: scheme.surface,
         surfaceTintColor: Colors.transparent,
         indicatorColor: scheme.primaryContainer,
+        // 11px keeps the longest tab label ("Экзамендер", ky) on one line on a
+        // 360dp phone (5 tabs × 72dp); NavigationDestination has no maxLines.
         labelTextStyle: WidgetStateProperty.resolveWith((states) =>
             text.labelSmall?.copyWith(
+              fontSize: 11,
+              letterSpacing: 0,
               color: states.contains(WidgetState.selected)
                   ? scheme.onSurface
                   : t.textSecondary,

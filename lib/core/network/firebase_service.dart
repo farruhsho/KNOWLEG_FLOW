@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../firebase_options.dart';
+import '../backend/backend_contract.dart';
 import '../backend/callable_platform.dart' as platform_gate;
 
 /// Outcome of asking the OS for notification permission.
@@ -83,15 +84,21 @@ class FirebaseService {
   ///
   /// Admin callables (admin*) do not enforce App Check by default
   /// (APP_CHECK_ENFORCE_ADMIN) and need no such gate.
-  static bool get supportsCallables => supportsAppCheck;
+  static bool get supportsCallables =>
+      platform_gate.callablesSupportedOnThisPlatform;
 
   /// Analytics has Android/Apple/web implementations.
-  static bool get supportsAnalytics => kIsWeb || _isMobileOrMac;
+  // Emulator builds use a demo-* project: services without an emulator
+  // (Analytics, Remote Config, FCM) would only hit real Google endpoints.
+  static bool get supportsAnalytics =>
+      !platform_gate.kUseFirebaseEmulators && (kIsWeb || _isMobileOrMac);
 
   /// Push notifications (web would also need a VAPID key + service worker).
-  static bool get supportsMessaging => _isMobileOrMac;
+  static bool get supportsMessaging =>
+      !platform_gate.kUseFirebaseEmulators && _isMobileOrMac;
 
-  static bool get supportsRemoteConfig => kIsWeb || _isMobileOrMac;
+  static bool get supportsRemoteConfig =>
+      !platform_gate.kUseFirebaseEmulators && (kIsWeb || _isMobileOrMac);
 
   static bool get _crashReportingEnabled =>
       _initialized && supportsCrashlytics && !kDebugMode;
@@ -103,10 +110,15 @@ class FirebaseService {
     if (_initialized) return;
 
     if (Firebase.apps.isEmpty) {
+      final options = DefaultFirebaseOptions.currentPlatform;
       await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
+        options: platform_gate.kUseFirebaseEmulators
+            ? options.copyWith(projectId: platform_gate.kFirebaseEmulatorProject)
+            : options,
       ).timeout(timeout);
     }
+
+    if (platform_gate.kUseFirebaseEmulators) await _connectEmulators();
 
     try {
       // Offline persistence. Must be set before the first Firestore call.
@@ -130,8 +142,21 @@ class FirebaseService {
     }
   }
 
+  /// Dev builds with USE_FIREBASE_EMULATORS: every service goes to the local
+  /// emulators (ports from firebase.json). Must run before any other use.
+  static Future<void> _connectEmulators() async {
+    const host = platform_gate.kFirebaseEmulatorHost;
+    debugPrint('Firebase: using local emulators on $host '
+        '(project ${platform_gate.kFirebaseEmulatorProject})');
+    await auth.useAuthEmulator(host, 9099);
+    firestore.useFirestoreEmulator(host, 8080);
+    BackendFunctions.instance.useFunctionsEmulator(host, 5001);
+    await storage.useStorageEmulator(host, 9199);
+  }
+
   static Future<void> _activateAppCheck() async {
-    if (!supportsAppCheck) return;
+    // The emulator project runs with App Check enforcement off.
+    if (!supportsAppCheck || platform_gate.kUseFirebaseEmulators) return;
     try {
       await FirebaseAppCheck.instance.activate(
         providerWeb: kIsWeb ? ReCaptchaEnterpriseProvider(appCheckWebSiteKey) : null,

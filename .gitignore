@@ -139,7 +139,6 @@ firebase-debug.*.log
 *.freezed.dart
 *.config.dart
 **/generated/
-lib/generated_plugin_registrant.dart
 .flutter-plugins-dependencies
 
 # Localization

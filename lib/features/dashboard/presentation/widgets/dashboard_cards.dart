@@ -386,7 +386,8 @@ class EntitlementChip extends ConsumerWidget {
           alignment: AlignmentDirectional.centerStart,
           child: ActionChip(
             avatar: Icon(icon, size: 18, color: scheme.primary),
-            label: Text(label),
+            // Long ru/ky labels wrap instead of being cut off on 360dp phones.
+            label: Text(label, maxLines: 2, softWrap: true),
             onPressed: onTap,
           ),
         );
@@ -415,7 +416,7 @@ class EntitlementChip extends ConsumerWidget {
               key: const ValueKey('entitlement_balance_chip'),
               avatar: Icon(Icons.confirmation_number_outlined,
                   size: 18, color: scheme.onSurfaceVariant),
-              label: Text(l.shellHomeNoCredits),
+              label: Text(l.shellHomeNoCredits, maxLines: 2, softWrap: true),
             ),
           );
         }

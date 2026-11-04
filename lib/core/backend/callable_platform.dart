@@ -15,11 +15,26 @@ const String appCheckWebSiteKey = String.fromEnvironment('APP_CHECK_WEB_SITE_KEY
 /// * Windows / Linux: FlutterFire has no App Check provider, so these
 ///   features show a "not available on this platform" state instead of
 ///   failing with `unauthenticated`.
-bool get callablesSupportedOnThisPlatform => callablesSupportedOn(
+bool get callablesSupportedOnThisPlatform =>
+    kUseFirebaseEmulators ||
+    callablesSupportedOn(
       isWeb: kIsWeb,
       platform: defaultTargetPlatform,
       webSiteKey: appCheckWebSiteKey,
     );
+
+/// Local development against the Firebase emulators
+/// (`--dart-define=USE_FIREBASE_EMULATORS=true`). The app then talks only to
+/// the emulator project [kFirebaseEmulatorProject] (a `demo-*` id, which can
+/// never reach real Firebase services); App Check is off there
+/// (functions/.env.demo-ort-e2e), so callables work on every platform.
+const bool kUseFirebaseEmulators = bool.fromEnvironment('USE_FIREBASE_EMULATORS');
+const String kFirebaseEmulatorProject = 'demo-ort-e2e';
+
+/// Emulator host: `localhost` for desktop/web, `10.0.2.2` for the Android
+/// emulator (`--dart-define=FIREBASE_EMULATOR_HOST=10.0.2.2`).
+const String kFirebaseEmulatorHost =
+    String.fromEnvironment('FIREBASE_EMULATOR_HOST', defaultValue: 'localhost');
 
 /// Pure form of [callablesSupportedOnThisPlatform], for tests.
 bool callablesSupportedOn({

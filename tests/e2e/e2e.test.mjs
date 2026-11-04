@@ -244,6 +244,14 @@ test('review exposes keys and explanations only after completion', async () => {
   assert.ok(first.explanation);
 });
 
+test('without a configured key the tutor is unavailable and spends no quota', async () => {
+  // The emulator has no ANTHROPIC_API_KEY secret: the function must not fall
+  // back to ambient credentials and must not count the request.
+  await expectReason(call('aiTutor')({ mode: 'chat', message: 'Что такое дискриминант?', language: 'ru' }), 'AI_DISABLED');
+  const usage = await db.collection(`ai_usage/${studentUid}/days`).get();
+  assert.equal(usage.size, 0, 'no quota reserved');
+});
+
 test('server-owned stats, leaderboards and exam mistakes were written', async () => {
   const stats = (await getDoc(doc(cDb, 'user_stats', studentUid))).data();
   assert.ok(stats.xp > 0);
