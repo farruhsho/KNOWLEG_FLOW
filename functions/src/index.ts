@@ -12,3 +12,5 @@ export { aiTutor, adminAiDraftQuestions } from './handlers/ai';
 export { recordActivity } from './handlers/activity';
 export { accountDelete } from './handlers/account';
 export { adminSetRole, adminGrantCredits, adminPublishVariant, adminUpdatePricing } from './handlers/admin';
+export { onUserBanChanged } from './handlers/moderation';
+export { sendStudyReminders } from './handlers/reminders';

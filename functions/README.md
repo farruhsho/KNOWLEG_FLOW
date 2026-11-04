@@ -18,6 +18,8 @@ TypeScript (strict), Node.js 22, `firebase-functions` 7.4, `firebase-admin` 14 (
 | `examExpireStale` | schedule, every 30 min (Asia/Bishkek) | — |
 | `billingRtdn` | Pub/Sub topic `play-billing` | — |
 | `billingSweepVoided` | schedule, daily 04:00 (Asia/Bishkek) | — |
+| `sendStudyReminders` | schedule, daily 18:00 (Asia/Bishkek) | — |
+| `onUserBanChanged` | Firestore `users/{uid}` updated | — |
 
 Errors are `HttpsError` with `details.reason` from `src/domain/reasons.ts`
 (same codes as `BackendReasons` in `lib/core/backend/backend_contract.dart`).
@@ -36,6 +38,10 @@ src/
     purchase.ts        Play purchase decisions, sha256 token ids, RTDN parsing
     xp.ts              XP rules, level formula, Bishkek-day streaks, achievements
     roles.ts           permission matrix (ARCHITECTURE §2), legacy admin fallback
+    access.ts          deleted/banned accounts, recent sign-in, no tutor during an exam
+    activity.ts        recordActivity event ids, lesson pointers, 0-award rule
+    leaderboard.ts     board selection (weekly/all-time for all XP, subject boards for exams)
+    reminders.ts       study-reminder targeting, quiet hours, ru/ky texts
     tutor_quota.ts     AI tutor input validation, daily quota, cost estimate
     tutor_prompt.ts    frozen (cacheable) system prompt + per-request context
     blueprint_validation.ts  variant vs blueprint checks before publishing
@@ -91,7 +97,8 @@ Values are asked interactively on the first deploy, or put them in `functions/.e
 
 | Param | Default | Meaning |
 |---|---|---|
-| `APP_CHECK_ENFORCE` | `true` | Reject callables without a valid App Check token. `false` only for the emulator. |
+| `APP_CHECK_ENFORCE` | `true` | Reject student callables (exam*, billing, aiTutor, recordActivity, accountDelete) without a valid App Check token. `false` only for the emulator. |
+| `APP_CHECK_ENFORCE_ADMIN` | `false` | Same for the `admin*` callables. They already require a staff role (fresh custom claims), and the CMS also runs on web/desktop builds; set `true` once every admin client ships App Check. |
 | `PLAY_PACKAGE_NAME` | `com.example.knowledge_flow` | Play `applicationId`. Change together with the Android app id before the first Play upload. |
 | `ALLOW_TEST_PURCHASES` | `false` | Grant credits for license-tester purchases. Keep `false` in production. |
 | `AI_TUTOR_MODEL` | `claude-opus-5-5` | Model for the tutor and the question drafter (owner can switch without an app release). |
@@ -99,6 +106,7 @@ Values are asked interactively on the first deploy, or put them in `functions/.e
 ```dotenv
 # functions/.env.knowleg-33f36  (example values)
 APP_CHECK_ENFORCE=true
+APP_CHECK_ENFORCE_ADMIN=false
 PLAY_PACKAGE_NAME=kg.example.ortmaster
 ALLOW_TEST_PURCHASES=false
 AI_TUTOR_MODEL=claude-opus-5-5
@@ -147,9 +155,14 @@ Refunded credits never go below zero; spent credits are recorded as `debt_credit
 ### 8. App Check
 
 Register the Android app with **Play Integrity** (and a debug provider for development builds) in
-Firebase console → App Check. Callables enforce App Check whenever `APP_CHECK_ENFORCE=true`, so
-the Flutter app must activate App Check before the first callable. Turn on Firestore/Storage
-enforcement in the console separately, after the app release that ships App Check.
+Firebase console → App Check. Student callables enforce App Check whenever `APP_CHECK_ENFORCE=true`,
+so the Flutter app must activate App Check before the first callable. The web build activates it
+only when built with `--dart-define=APP_CHECK_WEB_SITE_KEY=<reCAPTCHA Enterprise site key>` (register
+the web app with reCAPTCHA Enterprise in the console); Windows/Linux builds have no App Check
+provider, so student callable features show "not available on this platform" there. The `admin*`
+callables follow `APP_CHECK_ENFORCE_ADMIN` (default `false`), so the CMS works on web and desktop.
+Turn on Firestore/Storage enforcement in the console separately, after the app release that ships
+App Check.
 
 ### 9. Deploy
 
@@ -161,8 +174,17 @@ firebase deploy --only functions
 Indexes take a few minutes to build; `examExpireStale` and the exam/billing queries fail with
 `FAILED_PRECONDITION` until they are ready.
 
+`storage.rules` reads `users/{uid}.role` through cross-service rules (legacy admin fallback). On the
+first `firebase deploy --only storage` the CLI asks to grant the Storage service agent the
+**Firebase Rules Firestore Service Agent** role; accept it, or legacy admins (no role claim) cannot
+upload CMS media.
+
+`onUserBanChanged` is a Firestore trigger (Eventarc): it must be deployed in the Firestore
+database's region (see step 1). `sendStudyReminders` needs the Firebase Cloud Messaging API
+(enabled by default for Firebase projects).
+
 During function discovery the CLI prints `params.APP_CHECK_ENFORCE.value() invoked during
-function deployment` once per callable. That comes from `onCall` itself resolving the
+function deployment` (and the same for `APP_CHECK_ENFORCE_ADMIN`) once per callable. That comes from `onCall` itself resolving the
 `enforceAppCheck` expression at load time; it is expected and harmless (the value is read again
 at runtime, where the param is set).
 
@@ -172,7 +194,8 @@ Admin rights come from the custom claim `role` (`super_admin`, `content_manager`
 `methodologist`, `moderator`, `support`). A legacy `users/{uid}.role == 'admin'` counts as
 `super_admin`, so an existing admin can call `adminSetRole({uid: <own uid>, role: 'super_admin'})`
 to receive the claim, then assign other roles. Claims refresh on the next ID-token refresh
-(sign out/in). Storage content uploads (`exam_media/`, `lesson_media/`) check the claim only.
+(sign out/in). Storage content uploads (`exam_media/`, `lesson_media/`) accept the claim or the
+legacy field (cross-service rules, see step 9); migrating to the claim is still recommended.
 
 ## Behaviour notes
 
@@ -187,14 +210,37 @@ to receive the claim, then assign other roles. Claims refresh on the next ID-tok
   weekly/all-time (and subject-weekly) leaderboards and variant stats.
 - **Expiry.** `examExpireStale` closes attempts whose current deadline passed more than 15 minutes
   ago, using `drafts/{sectionId}` for the open section; all closed sections are `late`.
-- **XP.** Server-only, idempotent per event id. Practice XP is capped at 200/day (Bishkek day) and
-  never reaches leaderboards; only exam XP from eligible attempts does.
+- **ExamResult** carries `incorrect` (scored, answered wrongly) and `skipped` (scored, unanswered)
+  besides `correct`/`total`/`answered`; `correct + incorrect + skipped == total`.
+- **Question tables.** Firestore stores `table: {headers: [...], rows: [{cells: [...]}]}` (an array
+  cannot directly contain an array). Every callable response (exam payload, `examGetReview`, tutor
+  context) normalizes it to the wire shape `rows: [[...]]`; documents in the old shape are accepted.
+- **XP and leaderboards.** Server-only, idempotent per event id (`lesson_{hash}` once per lesson,
+  `practice_{day}_{hash}` once per ref per Bishkek day). Practice XP is capped at 200/day; once the
+  cap is reached a call earns 0 and writes nothing. `weekly_{YYYY}-W{ww}` and `all_time` get all
+  awarded XP (eligible exams + lessons + practice); `subject_{key}_weekly_{YYYY}-W{ww}` boards are
+  exam-only, keyed `main`, the subject id, or `state_language`. `daily_lessons/{day}` ids are
+  resolved to the lesson they point at.
+- **Account state.** `examStart`, `billingVerifyPurchase`, `aiTutor` and `recordActivity` check that
+  the Auth user still exists (an ID token outlives `accountDelete` by up to an hour) and reject
+  deleted/disabled accounts with `unauthenticated`. Banned users (`users/{uid}.is_banned`, written
+  by moderators) get `permission-denied` with reason `USER_BANNED` from `examStart`, `aiTutor`,
+  `recordActivity` and `adminAiDraftQuestions`, never get leaderboard XP, and `onUserBanChanged`
+  deletes their existing leaderboard entries when the ban is set.
+- **Study reminders.** `sendStudyReminders` (18:00 Bishkek) messages users with
+  `users/{uid}.daily_reminder_enabled == true` and `fcm_tokens` whose `user_stats.last_active_day`
+  is not today, in `preferred_language` (ru/ky); dead tokens are removed from `fcm_tokens`; nothing
+  is sent between 22:00 and 08:00.
 - **AI tutor.** Opus with `output_config.effort: 'low'`, server-side refusal fallback
   (`fallbacks: 'default'`, beta `server-side-fallback-2026-07-01`), cached system prompt, no
   sampling parameters. Quota is reserved in a transaction before the model call and returned on
-  API failure. Questions of an in-progress attempt are rejected (`AI_EXAM_IN_PROGRESS`).
+  API failure. While the user has any in-progress exam attempt every request is rejected
+  (`AI_EXAM_IN_PROGRESS`), whatever ids the client sends. Message limit: 2000 characters.
   Token usage and an informational cost estimate go to `ai_usage/{uid}/days/{yyyy-mm-dd}`.
-- **Account deletion.** Deletes all per-user documents (new and legacy collections, attempts with
-  sub-collections, leaderboard entries, Storage avatars/temp uploads) and the Auth user;
+- **Account deletion.** Requires a recent sign-in: the ID token's `auth_time` must be at most
+  5 minutes old, else `failed-precondition` with reason `REQUIRES_RECENT_LOGIN` (the client
+  re-authenticates and retries). Deletes the Auth user first, then all per-user documents (new and
+  legacy collections, attempts with sub-collections, leaderboard entries, Storage avatars/temp
+  uploads); a retry after a partial failure finishes the data cleanup;
   `purchases` and legacy `payments` are kept for finance/fraud review with
   `uid = 'deleted:' + sha256(uid)`.

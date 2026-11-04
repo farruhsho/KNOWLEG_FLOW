@@ -5,65 +5,75 @@
  * XP is computed and stored only here (ARCHITECTURE §1.7), idempotently via
  * xp_events/{uid}/events/{eventId}. Practice correctness is reported by the
  * client (the legacy practice bank is client-readable, so it cannot be
- * verified); its impact is bounded by the 200 XP/day cap and practice XP is
- * never added to leaderboards. Leaderboards only receive exam XP.
+ * verified); its impact is bounded by the 200 XP/day cap. Awarded XP also
+ * goes to the weekly and all-time leaderboards (decision D10; subject boards
+ * stay exam-only). A 0 award (daily cap reached) writes nothing.
  */
 import '../config';
 import { onCall } from 'firebase-functions/v2/https';
-import { sha256Hex } from '../domain/hash';
+import { activityEventId, dailyLessonTarget, isActivityKind, practiceCorrectCount, shouldPersistAward } from '../domain/activity';
 import { DomainError, Reasons } from '../domain/reasons';
-import { bishkekDayKey } from '../domain/time';
-import { num } from '../domain/types';
 import { applyLessonCompleted, applyPracticeCorrect, parseStats, statsView } from '../domain/xp';
-import { callableOptions, db, FieldValue, payload, reqId, requireAuth, wrap } from './common';
-import { statsRef, statsToDoc, xpEventRef } from './gamification';
+import { callableOptions, db, FieldValue, payload, reqId, requireActiveUser, wrap } from './common';
+import { addLeaderboardXp, profileFromUserDoc, statsRef, statsToDoc, xpEventRef } from './gamification';
 
-/** Number of correct practice answers reported by the payload. */
-export function practiceCorrectCount(correct: unknown, count: unknown): number {
-  if (correct === false) return 0;
-  if (typeof correct === 'number') return Math.max(0, Math.min(50, Math.trunc(correct)));
-  const n = count === undefined || count === null ? 1 : Math.trunc(num(count, 1));
-  return Math.max(0, Math.min(50, n));
+/**
+ * Real lesson id for a lesson_completed refId: `lessons/{refId}` when it
+ * exists, else the lesson a legacy `daily_lessons/{refId}` pointer names (if
+ * that lesson exists). Null when neither resolves.
+ */
+async function resolveLessonId(refId: string): Promise<string | null> {
+  const lesson = await db().doc(`lessons/${refId}`).get();
+  if (lesson.exists) return refId;
+  const daily = await db().doc(`daily_lessons/${refId}`).get();
+  const target = daily.exists ? dailyLessonTarget(daily.data()) : null;
+  if (!target || target === refId) return null;
+  return (await db().doc(`lessons/${target}`).get()).exists ? target : null;
 }
 
 export const recordActivity = onCall(
   callableOptions(),
   wrap('recordActivity', async (req) => {
-    const uid = requireAuth(req);
+    const { uid, profile } = await requireActiveUser(req);
     const data = payload(req);
     const kind = data['kind'];
-    if (kind !== 'lesson_completed' && kind !== 'practice_answered') {
+    if (!isActivityKind(kind)) {
       throw new DomainError(Reasons.VALIDATION_FAILED, 'kind must be lesson_completed or practice_answered');
     }
     const refId = reqId(data['refId'], 'refId', true);
     const nowMs = Date.now();
-    const refHash = sha256Hex(refId).slice(0, 40);
 
-    let eventId: string;
+    let ref = refId;
     if (kind === 'lesson_completed') {
-      const [lesson, daily] = await db().getAll(db().doc(`lessons/${refId}`), db().doc(`daily_lessons/${refId}`));
-      if (!lesson!.exists && !daily!.exists) throw new DomainError(Reasons.VALIDATION_FAILED, 'unknown lesson', { field: 'refId' });
-      eventId = `lesson_${refHash}`;
-    } else {
-      eventId = `practice_${bishkekDayKey(nowMs)}_${refHash}`;
+      const lessonId = await resolveLessonId(refId);
+      if (!lessonId) throw new DomainError(Reasons.VALIDATION_FAILED, 'unknown lesson', { field: 'refId' });
+      ref = lessonId;
     }
+    const eventId = activityEventId(kind, ref, nowMs);
     const correctCount = kind === 'practice_answered' ? practiceCorrectCount(data['correct'], data['count']) : 0;
+    const leaderboardProfile = profileFromUserDoc(profile);
 
     return db().runTransaction(async (tx) => {
       const [eventSnap, statsSnap] = await tx.getAll(xpEventRef(uid, eventId), statsRef(uid));
       const stats = parseStats(statsSnap!.data());
       if (eventSnap!.exists) return { xpAwarded: 0, stats: statsView(stats), duplicate: true };
       const award = kind === 'lesson_completed' ? applyLessonCompleted(stats, nowMs) : applyPracticeCorrect(stats, correctCount, nowMs);
+      if (!shouldPersistAward(award.total)) {
+        // Daily practice cap reached (or nothing correct): no event, no stats write.
+        return { xpAwarded: 0, stats: statsView(stats), capped: kind === 'practice_answered' && correctCount > 0 };
+      }
+      const toLeaderboard = !leaderboardProfile.banned;
       tx.set(xpEventRef(uid, eventId), {
         kind,
-        ref: refId.slice(0, 150),
+        ref: ref.slice(0, 150),
         amount: award.total,
         daily_goal_bonus: award.dailyGoalBonus,
         correct_count: kind === 'practice_answered' ? correctCount : null,
-        leaderboard_xp: 0,
+        leaderboard_xp: toLeaderboard ? award.total : 0,
         at: FieldValue.serverTimestamp(),
       });
       tx.set(statsRef(uid), statsToDoc(award.stats), { merge: true });
+      if (toLeaderboard) addLeaderboardXp(tx, uid, leaderboardProfile, award.total, nowMs, null);
       return { xpAwarded: award.total, stats: statsView(award.stats), newAchievements: award.newAchievements };
     });
   }),

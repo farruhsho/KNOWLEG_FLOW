@@ -3,7 +3,7 @@
  * idempotent xp_events, and leaderboard entries.
  */
 import type { DocumentSnapshot, Transaction } from 'firebase-admin/firestore';
-import { ALL_TIME_BOARD_ID, subjectWeeklyBoardId, weeklyBoardId } from '../domain/time';
+import { leaderboardBoards } from '../domain/leaderboard';
 import { isRecord, str, strOrNull } from '../domain/types';
 import type { UserStats } from '../domain/xp';
 import { db, FieldValue, Timestamp } from './common';
@@ -60,8 +60,10 @@ export function profileFromUserDoc(snap: DocumentSnapshot): LeaderboardProfile {
 }
 
 /**
- * Adds `xp` to the weekly and all-time boards (and the subject weekly board
- * for subject tests). Entries carry `uid` so accountDelete can find them.
+ * Adds `xp` to the weekly and all-time boards, plus the subject weekly board
+ * when `subjectKey` is given (exams only, see domain/leaderboard.ts).
+ * Banned users never get entries. Entries carry `uid` so accountDelete and
+ * the ban trigger can find them.
  */
 export function addLeaderboardXp(
   tx: Transaction,
@@ -69,12 +71,10 @@ export function addLeaderboardXp(
   profile: LeaderboardProfile,
   xp: number,
   nowMs: number,
-  subjectId: string | null,
+  subjectKey: string | null,
 ): void {
   if (xp <= 0 || profile.banned) return;
-  const boards = [weeklyBoardId(nowMs), ALL_TIME_BOARD_ID];
-  if (subjectId) boards.push(subjectWeeklyBoardId(subjectId, nowMs));
-  for (const board of boards) {
+  for (const board of leaderboardBoards(nowMs, subjectKey)) {
     tx.set(
       db().doc(`leaderboards/${board}/entries/${uid}`),
       {

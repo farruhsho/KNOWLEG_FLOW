@@ -62,14 +62,38 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys();
     }
 
+    // Moderation ban on the caller's own profile (users/{uid}.is_banned).
+    function callerBanned() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('is_banned', false) == true;
+    }
+
     // ------------------------------------------------------------------
     // users/{uid}
 
     // Fields only the server / admins may set (SEC-002, SEC-USR-01, FB-08).
     function privilegedUserFields() {
       return ['role', 'roles', 'admin_role', 'isAdmin', 'is_admin', 'premium', 'is_premium',
-              'subscription', 'is_banned', 'banned', 'isActive', 'credits', 'entitlements',
-              'role_updated_at', 'role_updated_by'];
+              'subscription', 'is_banned', 'banned', 'ban_reason', 'banned_at', 'banned_by',
+              'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by'];
+    }
+
+    // Staff profiles (legacy admin or an admin_role mirrored by adminSetRole):
+    // only super_admin may ban them.
+    function isStaffProfile(d) {
+      return d.get('role', '') == 'admin' || d.get('admin_role', null) in validRoles();
+    }
+
+    // Moderator ban / unban (decision D5): only the ban fields, attributed to
+    // the caller. Subscription / premium changes stay super_admin only.
+    function validModeratorBan() {
+      let d = request.resource.data;
+      return changedKeys().hasOnly(['is_banned', 'ban_reason', 'banned_at', 'banned_by', 'updated_at'])
+        && d.get('is_banned', false) is bool
+        && (d.get('banned_by', null) == null || d.banned_by == request.auth.uid)
+        && (d.get('ban_reason', null) == null || (d.ban_reason is string && d.ban_reason.size() <= 500))
+        && (d.get('banned_at', null) == null || d.banned_at is timestamp)
+        && !isStaffProfile(resource.data);
     }
 
     // New profiles may not claim any privilege. The client's default
@@ -77,8 +101,8 @@ service cloud.firestore {
     function validNewUserProfile() {
       let d = request.resource.data;
       return !d.keys().hasAny(['roles', 'admin_role', 'isAdmin', 'is_admin', 'premium', 'is_premium',
-                               'is_banned', 'banned', 'isActive', 'credits', 'entitlements',
-                               'role_updated_at', 'role_updated_by'])
+                               'is_banned', 'banned', 'ban_reason', 'banned_at', 'banned_by',
+                               'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by'])
         && d.get('role', 'student') == 'student'
         && (!('subscription' in d) || (
               d.subscription is map
@@ -92,7 +116,7 @@ service cloud.firestore {
       allow create: if isOwner(userId) && validNewUserProfile();
       allow update: if (isOwner(userId) && !changedKeys().hasAny(privilegedUserFields()))
                     || isSuperAdmin()
-                    || (canModerateUsers() && changedKeys().hasOnly(['is_banned', 'isActive', 'updated_at']));
+                    || (canModerateUsers() && validModeratorBan());
       // Self-deletion goes through the accountDelete function (no delete+recreate bypass).
       allow delete: if isSuperAdmin();
     }
@@ -219,12 +243,13 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
-    // Forum (feature unused): posts are bound to their author (FB-30).
+    // Forum (feature unused): posts are bound to their author (FB-30);
+    // banned users cannot post or edit (D5).
     match /forum_posts/{postId} {
       allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.author_uid == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.author_uid == request.auth.uid && !callerBanned();
       allow update: if signedIn() && resource.data.author_uid == request.auth.uid
-                    && request.resource.data.author_uid == request.auth.uid;
+                    && request.resource.data.author_uid == request.auth.uid && !callerBanned();
       allow delete: if (signedIn() && resource.data.author_uid == request.auth.uid) || canModerateUsers();
     }
 
@@ -253,17 +278,46 @@ service cloud.firestore {
       return data.get('review', {}).get('status', 'draft');
     }
 
+    // Student-visible question content: changing any of these on an approved
+    // or rejected question requires review (the CMS resets it to draft).
+    function reviewedQuestionFields() {
+      return ['review', 'stem', 'options', 'passage_id', 'image_path', 'language', 'table', 'type',
+              'column_a', 'column_b'];
+    }
+
     // Questions, keys and passages: never readable by students.
     // Only reviewers (super_admin, methodologist) may approve or reject.
+    // Other content roles may create/update drafts, and may edit metadata
+    // (topic, difficulty, part, translation links, edited_in_cms_at, ...) of
+    // approved/rejected questions as long as no reviewed field changes
+    // (AUTH-ADM-04).
     match /exam_questions/{questionId} {
       allow read: if isContentRole();
-      allow create, update: if isContentRole()
-                            && (canReviewQuestions() || reviewStatus(request.resource.data) in ['draft', 'ai_verified']);
+      allow create: if isContentRole()
+                    && (canReviewQuestions() || reviewStatus(request.resource.data) in ['draft', 'ai_verified']);
+      allow update: if isContentRole()
+                    && (canReviewQuestions()
+                        || reviewStatus(request.resource.data) in ['draft', 'ai_verified']
+                        || !changedKeys().hasAny(reviewedQuestionFields()));
       allow delete: if canPublishVariants();
     }
 
+    function questionPath(questionId) {
+      return /databases/$(database)/documents/exam_questions/$(questionId);
+    }
+
+    // Answer keys (AUTH-ADM-07): reviewers write freely. Other content roles
+    // may change `correct` only while the question is (or, in the same batch,
+    // becomes) draft / ai_verified; explanation-only edits keep `correct`.
     match /exam_question_keys/{questionId} {
-      allow read, write: if isContentRole();
+      allow read: if isContentRole();
+      allow create, update: if canReviewQuestions()
+        || (isContentRole() && (
+              (existsAfter(questionPath(questionId))
+                && reviewStatus(getAfter(questionPath(questionId)).data) in ['draft', 'ai_verified'])
+              || (resource != null
+                && request.resource.data.get('correct', '') == resource.data.get('correct', ''))));
+      allow delete: if canPublishVariants();
     }
 
     match /exam_passages/{passageId} {
@@ -278,6 +332,9 @@ service cloud.firestore {
     }
 
     // Draft autosave: owner, current section only, until deadline + 2 min.
+    // Decision D1: the client writes exactly {answers, flags,
+    // client_updated_at: serverTimestamp()} (the section is the doc id);
+    // a serverTimestamp resolves to request.time, which `is timestamp`.
     function canWriteDraft(attemptId, sectionId) {
       let a = attemptData(attemptId);
       let d = request.resource.data;
@@ -313,12 +370,14 @@ service cloud.firestore {
     // ------------------------------------------------------------------
     // Billing, stats, XP, leaderboards, AI usage (server-written)
 
+    // Owner, plus staff with view_users (super_admin, moderator, support):
+    // the CMS user page shows credits, ledger and stats (decision D6).
     match /entitlements/{uid} {
-      allow read: if isOwner(uid);
+      allow read: if isOwner(uid) || canViewUsers();
       allow write: if false;
 
       match /ledger/{entryId} {
-        allow read: if isOwner(uid);
+        allow read: if isOwner(uid) || canViewUsers();
         allow write: if false;
       }
     }
@@ -334,7 +393,7 @@ service cloud.firestore {
     }
 
     match /user_stats/{uid} {
-      allow read: if isOwner(uid);
+      allow read: if isOwner(uid) || canViewUsers();
       allow write: if false;
     }
 

@@ -5,6 +5,7 @@
  * prefix stays byte-identical across students.
  */
 import type { HistoryTurn, TutorLanguage, TutorMode } from './tutor_quota';
+import { tableToText, type ExamQuestion } from './types';
 
 export const TUTOR_SYSTEM_PROMPT = `You are the AI tutor inside "ORT Master KG", a study app that prepares school leavers in Kyrgyzstan for the ORT (Общереспубликанское тестирование / Жалпы республикалык тестирлөө), the national university admission test. The students are mostly 15–18 years old.
 
@@ -56,6 +57,24 @@ export interface QuestionContext {
 }
 
 const MAX_CONTEXT_CHARS = 6000;
+
+/**
+ * Question text for the tutor context: the stem plus the compared quantities
+ * of quantitative-comparison items, which live in column_a/column_b or (for
+ * pipeline items) only in the table. Size is bounded by MAX_CONTEXT_CHARS in
+ * buildContextBlock.
+ */
+export function examContextStem(q: Pick<ExamQuestion, 'stem' | 'column_a' | 'column_b' | 'table'>): string {
+  const table = tableToText(q.table);
+  return [
+    q.stem,
+    q.column_a ? `Column A: ${q.column_a}` : '',
+    q.column_b ? `Column B: ${q.column_b}` : '',
+    table ? `Table:\n${table}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
 
 export function buildContextBlock(mode: TutorMode, language: TutorLanguage, q: QuestionContext | null): string {
   const lines = [`mode: ${mode} (${MODE_HINT[mode]})`, `reply language: ${LANGUAGE_NAME[language]}`];

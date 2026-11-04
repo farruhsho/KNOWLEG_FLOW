@@ -74,6 +74,28 @@ describe('scoreAttempt', () => {
     assert.ok(!('outcomes' in result), 'per-question keys must not be part of the stored result');
   });
 
+  it('reports incorrect and skipped (scored questions only) in the ExamResult (D4)', () => {
+    // m1 correct, m2 wrong, m3 skipped, m4 explicitly null; v1 answered but has no key (unscored), v2 wrong.
+    const score = scoreAttempt({
+      sections,
+      answers: { math: { m1: 'A', m2: 'C', m4: null }, verbal: { v1: 'B', v2: 'A' } },
+      keys: { m1: 'A', m2: 'B', m3: 'C', m4: 'D', v2: 'B' },
+      topics,
+    });
+    assert.equal(score.total, 5);
+    assert.equal(score.correct, 1);
+    assert.equal(score.incorrect, 2);
+    assert.equal(score.skipped, 2);
+    assert.equal(score.unscored, 1);
+    // `answered` also counts the unscored v1, so total - answered would be wrong: that's why the server sends both.
+    assert.equal(score.answered, 4);
+    assert.equal(score.correct + score.incorrect + score.skipped, score.total);
+    const result = buildExamResult(score, 100, true);
+    assert.equal(result.incorrect, 2);
+    assert.equal(result.skipped, 2);
+    assert.ok(Number.isInteger(result.incorrect) && Number.isInteger(result.skipped));
+  });
+
   it('percentOf rounds to one decimal and handles zero totals', () => {
     assert.equal(percentOf(97, 150), 64.7);
     assert.equal(percentOf(0, 0), 0);

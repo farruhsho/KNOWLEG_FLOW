@@ -1,8 +1,10 @@
-// Storage security rules tests. Requires the Storage emulator (Java 21+):
+// Storage security rules tests. Requires the Storage AND Firestore emulators
+// (Java 21+; storage.rules reads users/{uid} through cross-service rules):
 //   cd tests/rules && npm install && npm test
 import { readFileSync } from 'node:fs';
 import { after, before, describe, it } from 'node:test';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
+import { doc, setDoc } from 'firebase/firestore';
 import { deleteObject, getBytes, ref, uploadBytes } from 'firebase/storage';
 
 let env;
@@ -15,6 +17,16 @@ before(async () => {
       host: '127.0.0.1',
       port: 9199,
     },
+    firestore: {
+      rules: readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8'),
+      host: '127.0.0.1',
+      port: 8080,
+    },
+  });
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'users/legacy'), { name: 'Old admin', role: 'admin' });
+    await setDoc(doc(ctx.firestore(), 'users/legacy_cm'), { name: 'Demoted', role: 'admin' });
+    await setDoc(doc(ctx.firestore(), 'users/alice'), { name: 'Aida', role: 'student' });
   });
 });
 
@@ -41,6 +53,20 @@ describe('exam_media / lesson_media', () => {
       await assertSucceeds(put(st, `lesson_media/l1/${role}.pdf`, 10 * MB, 'application/pdf'));
     }
     await assertSucceeds(put(storage('cm', { role: 'content_manager' }), 'lesson_media/l1/v.mp4', 50 * MB, 'video/mp4'));
+  });
+
+  it('legacy admins (users.role == admin, no role claim) upload like super_admin (AUTH-ADM-06)', async () => {
+    const legacy = storage('legacy');
+    await assertSucceeds(put(legacy, 'exam_media/q1/legacy.png', 100, 'image/png'));
+    await assertSucceeds(put(legacy, 'lesson_media/l1/legacy.pdf', 1000, 'application/pdf'));
+    await assertSucceeds(deleteObject(ref(legacy, 'exam_media/q1/legacy.png')));
+    // A valid claim wins over the legacy field (as in firestore.rules).
+    await assertFails(put(storage('legacy_cm', { role: 'moderator' }), 'exam_media/q1/x.png', 100, 'image/png'));
+    // Students (role 'student') and users without a profile stay denied.
+    await assertFails(put(storage('alice'), 'exam_media/q1/alice.png', 100, 'image/png'));
+    await assertFails(put(storage('nobody'), 'exam_media/q1/nobody.png', 100, 'image/png'));
+    // The SVG ban applies to legacy admins too (SVG can carry scripts; AUTH-ADM-08).
+    await assertFails(put(legacy, 'exam_media/q1/x.svg', 100, 'image/svg+xml'));
   });
 
   it('rejects students, other roles, oversize files and SVG', async () => {

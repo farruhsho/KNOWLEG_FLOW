@@ -77,6 +77,17 @@ export interface QuestionOption {
   text: string;
 }
 
+/**
+ * Question table in the callable wire shape (ARCHITECTURE §1.3, decision D2):
+ * `rows` is a list of rows, each a list of cell strings. Firestore cannot
+ * store an array directly inside an array, so documents store rows as
+ * `[{cells: [...]}]`; normalizeTable accepts both shapes.
+ */
+export interface QuestionTable {
+  headers: string[];
+  rows: string[][];
+}
+
 export interface ExamQuestion {
   id: string;
   subject_id: string | null;
@@ -90,7 +101,7 @@ export interface ExamQuestion {
   options: QuestionOption[];
   passage_id: string | null;
   image_path: string | null;
-  table: unknown;
+  table: QuestionTable | null;
   column_a: string | null;
   column_b: string | null;
   review_status: string | null;
@@ -249,6 +260,40 @@ export function parseVariant(id: string, raw: unknown): Variant {
   };
 }
 
+function cellText(v: unknown): string {
+  if (typeof v === 'string') return v;
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+  return '';
+}
+
+function rowCells(row: unknown): string[] | null {
+  if (Array.isArray(row)) return row.map(cellText);
+  if (isRecord(row) && Array.isArray(row['cells'])) return row['cells'].map(cellText);
+  return null;
+}
+
+/**
+ * Stored table (Firestore `{headers, rows: [{cells}]}`, or the legacy /
+ * bundled `{headers, rows: [[...]]}`) -> wire shape `{headers, rows: [[...]]}`.
+ * Anything without headers or rows becomes null.
+ */
+export function normalizeTable(raw: unknown): QuestionTable | null {
+  if (!isRecord(raw)) return null;
+  const headers = Array.isArray(raw['headers']) ? raw['headers'].map(cellText) : [];
+  const rows = (Array.isArray(raw['rows']) ? raw['rows'] : []).map(rowCells).filter((r): r is string[] => r !== null);
+  if (headers.length === 0 && rows.length === 0) return null;
+  return { headers, rows };
+}
+
+/** Plain-text rendering of a table for prompts (`a | b` per line). */
+export function tableToText(table: QuestionTable | null): string {
+  if (!table) return '';
+  const lines: string[] = [];
+  if (table.headers.length > 0) lines.push(table.headers.join(' | '));
+  for (const r of table.rows) lines.push(r.join(' | '));
+  return lines.join('\n');
+}
+
 export function parseQuestion(id: string, raw: unknown): ExamQuestion {
   const r = isRecord(raw) ? raw : {};
   const options = (Array.isArray(r['options']) ? r['options'] : [])
@@ -272,7 +317,7 @@ export function parseQuestion(id: string, raw: unknown): ExamQuestion {
     options,
     passage_id: strOrNull(r['passage_id']),
     image_path: strOrNull(r['image_path']),
-    table: r['table'] ?? null,
+    table: normalizeTable(r['table']),
     column_a: strOrNull(r['column_a']),
     column_b: strOrNull(r['column_b']),
     review_status: strOrNull(review['status']),

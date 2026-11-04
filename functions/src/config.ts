@@ -17,6 +17,16 @@ export const APP_CHECK_ENFORCE = defineBoolean('APP_CHECK_ENFORCE', {
   description: 'Reject callable requests without a valid App Check token (false only for the emulator).',
 });
 
+/**
+ * App Check enforcement on the admin* callables. Default false: they already
+ * require a staff role (fresh custom claims), and the admin CMS also runs on
+ * web/desktop builds where App Check may not be configured.
+ */
+export const APP_CHECK_ENFORCE_ADMIN = defineBoolean('APP_CHECK_ENFORCE_ADMIN', {
+  default: false,
+  description: 'Reject admin* callable requests without a valid App Check token.',
+});
+
 /** Android package name of the Play listing (purchases are verified against it). */
 export const PLAY_PACKAGE_NAME = defineString('PLAY_PACKAGE_NAME', {
   default: 'com.example.knowledge_flow',

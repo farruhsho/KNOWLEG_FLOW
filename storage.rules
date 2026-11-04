@@ -3,7 +3,8 @@ rules_version = '2';
 // ORT Master KG — Cloud Storage security rules.
 // Contract: docs/modernization/ARCHITECTURE.md §1 (Storage paragraph).
 // Content media: written only by content roles (custom claim `role` in
-// super_admin, content_manager, methodologist); images <= 5 MB, PDF <= 20 MB,
+// super_admin, content_manager, methodologist, or a legacy admin
+// users/{uid}.role == 'admin' without a role claim); images <= 5 MB, PDF <= 20 MB,
 // video <= 200 MB; readable by signed-in users. Deletes are allowed wherever
 // writes are allowed (request.resource is null on delete, so delete rules are
 // separate from the size/type checks). Everything else is denied.
@@ -18,9 +19,24 @@ service firebase.storage {
       return signedIn() && request.auth.uid == uid;
     }
 
+    function validRoles() {
+      return ['super_admin', 'content_manager', 'methodologist', 'moderator', 'support'];
+    }
+
+    // Legacy admin (users/{uid}.role == 'admin' and no valid role claim) =
+    // super_admin, exactly as in firestore.rules, functions and the CMS
+    // (AUTH-ADM-06). Cross-service rules: the Storage service agent needs
+    // Firestore read access (the CLI offers to grant it on the first deploy).
+    function legacyAdmin() {
+      return !(request.auth.token.get('role', '') in validRoles())
+        && firestore.exists(/databases/(default)/documents/users/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin';
+    }
+
     function isContentRole() {
       return signedIn()
-        && request.auth.token.get('role', '') in ['super_admin', 'content_manager', 'methodologist'];
+        && (request.auth.token.get('role', '') in ['super_admin', 'content_manager', 'methodologist']
+            || legacyAdmin());
     }
 
     function maxMb(mb) {

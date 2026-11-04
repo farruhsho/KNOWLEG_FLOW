@@ -4,16 +4,20 @@ import { readFileSync } from 'node:fs';
 import { after, before, beforeEach, describe, it } from 'node:test';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import {
+  arrayRemove,
   collection,
   deleteDoc,
   doc,
   getDoc,
   getDocs,
+  increment,
   query,
+  serverTimestamp,
   setDoc,
   Timestamp,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 
 const PROJECT = 'demo-ort-rules';
@@ -103,6 +107,54 @@ describe('users/{uid}', () => {
     await assertFails(updateDoc(doc(mod, 'users/alice'), { role: 'student' }));
   });
 
+  // Exact maps written by the CMS (lib/features/admin/data/repositories/people_repositories.dart setBanned).
+  const banMap = (actor) => ({ is_banned: true, ban_reason: 'spam', banned_by: actor, banned_at: serverTimestamp() });
+  const unbanMap = { is_banned: false, ban_reason: null, banned_by: null, banned_at: null };
+
+  it('moderator can ban and unban with the CMS map (D5, AUTH-ADM-02)', async () => {
+    await seed('users/alice', { ...freeProfile, role: 'student' });
+    const mod = db('mod', { role: 'moderator' });
+    await assertSucceeds(updateDoc(doc(mod, 'users/alice'), banMap('mod')));
+    await assertSucceeds(updateDoc(doc(mod, 'users/alice'), { ...unbanMap, updated_at: serverTimestamp() }));
+  });
+
+  it('moderator cannot attribute the ban to someone else, touch premium/roles, or ban staff', async () => {
+    await seed('users/alice', { ...freeProfile, role: 'student' });
+    await seed('users/cm', { ...freeProfile, role: 'student', admin_role: 'content_manager' });
+    await seed('users/oldadmin', { ...freeProfile, role: 'admin' });
+    const mod = db('mod', { role: 'moderator' });
+    await assertFails(updateDoc(doc(mod, 'users/alice'), banMap('someone_else')));
+    await assertFails(updateDoc(doc(mod, 'users/alice'), { subscription: { tier: 'yearly', expires_at: Timestamp.now() } }));
+    await assertFails(updateDoc(doc(mod, 'users/alice'), { is_premium: true }));
+    await assertFails(updateDoc(doc(mod, 'users/alice'), { isActive: false }));
+    await assertFails(updateDoc(doc(mod, 'users/alice'), { ...banMap('mod'), role: 'student' }));
+    await assertFails(updateDoc(doc(mod, 'users/cm'), banMap('mod')));
+    await assertFails(updateDoc(doc(mod, 'users/oldadmin'), banMap('mod')));
+    // Support has view_users but not moderate_users.
+    await assertFails(updateDoc(doc(db('sup', { role: 'support' }), 'users/alice'), banMap('sup')));
+    // super_admin may ban anyone and change premium.
+    const root = db('root', { role: 'super_admin' });
+    await assertSucceeds(updateDoc(doc(root, 'users/cm'), banMap('root')));
+    await assertSucceeds(updateDoc(doc(root, 'users/alice'), { subscription: { tier: 'yearly', expires_at: Timestamp.now() } }));
+  });
+
+  it('owners cannot set or clear ban fields on their own profile', async () => {
+    await seed('users/alice', { ...freeProfile, role: 'student', is_banned: true, ban_reason: 'spam', banned_by: 'mod' });
+    const a = db('alice');
+    await assertFails(updateDoc(doc(a, 'users/alice'), { is_banned: false }));
+    await assertFails(updateDoc(doc(a, 'users/alice'), { ban_reason: null }));
+    await assertFails(updateDoc(doc(a, 'users/alice'), { banned_by: null }));
+    await assertFails(setDoc(doc(db('bob'), 'users/bob'), { ...freeProfile, ban_reason: 'x' }));
+  });
+
+  it('reminder fields stay owner-writable (D12: enable, disable, sign-out token removal)', async () => {
+    await seed('users/alice', { ...freeProfile, role: 'student', fcm_tokens: ['tok1'], daily_reminder_enabled: true });
+    const a = db('alice');
+    await assertSucceeds(
+      setDoc(doc(a, 'users/alice'), { daily_reminder_enabled: false, fcm_tokens: arrayRemove('tok1'), reminder_timezone: 'Asia/Bishkek' }, { merge: true }),
+    );
+  });
+
   it('a valid claim overrides the legacy field', async () => {
     await seed('users/cm', { ...freeProfile, role: 'admin' });
     await seed('users/alice', freeProfile);
@@ -143,6 +195,51 @@ describe('exam content', () => {
     await assertSucceeds(updateDoc(doc(cm, 'exam_questions/q1'), { review: { status: 'ai_verified' } }));
     const me = db('me', { role: 'methodologist' });
     await assertSucceeds(updateDoc(doc(me, 'exam_questions/q1'), { review: { status: 'methodologist_approved' } }));
+  });
+
+  it('content_manager may edit metadata of approved questions but not reviewed content (AUTH-ADM-04)', async () => {
+    await seed('exam_questions/qa', {
+      stem: 'x', options: [{ id: 'A', text: '1' }], topic_id: 't1', difficulty: 2, part_id: 'p1', language: 'ru',
+      review: { status: 'methodologist_approved' }, content_hash: 'sha256:abc',
+    });
+    await seed('exam_questions/qr', { stem: 'y', review: { status: 'rejected' } });
+    const cm = db('cm', { role: 'content_manager' });
+    await assertSucceeds(
+      updateDoc(doc(cm, 'exam_questions/qa'), { topic_id: 't2', difficulty: 3, part_id: 'p2', edited_in_cms_at: serverTimestamp(), updated_at: serverTimestamp() }),
+    );
+    await assertSucceeds(updateDoc(doc(cm, 'exam_questions/qa'), { translation_group_id: 'tg_1' }));
+    await assertSucceeds(updateDoc(doc(cm, 'exam_questions/qr'), { translation_group_id: null }));
+    await assertFails(updateDoc(doc(cm, 'exam_questions/qa'), { stem: 'changed' }));
+    await assertFails(updateDoc(doc(cm, 'exam_questions/qa'), { table: { headers: ['A', 'B'], rows: [{ cells: ['1', '2'] }] } }));
+    await assertFails(updateDoc(doc(cm, 'exam_questions/qa'), { review: { status: 'rejected' } }));
+    // A content edit is allowed together with the reset to draft.
+    await assertSucceeds(updateDoc(doc(cm, 'exam_questions/qa'), { stem: 'changed', review: { status: 'draft' } }));
+  });
+
+  it('answer keys: non-reviewers change `correct` only with a draft question (AUTH-ADM-07)', async () => {
+    await seed('exam_questions/qa', { stem: 'x', review: { status: 'methodologist_approved' } });
+    await seed('exam_question_keys/qa', { correct: 'A', explanation: 'old' });
+    const cm = db('cm', { role: 'content_manager' });
+    await assertFails(updateDoc(doc(cm, 'exam_question_keys/qa'), { correct: 'B' }));
+    await assertSucceeds(updateDoc(doc(cm, 'exam_question_keys/qa'), { explanation: 'better explanation' }));
+    // Key change + reset of the question to draft in the same batch (what the CMS does).
+    const batch = writeBatch(cm);
+    batch.update(doc(cm, 'exam_questions/qa'), { review: { status: 'draft' } });
+    batch.set(doc(cm, 'exam_question_keys/qa'), { correct: 'B', explanation: 'x' });
+    await assertSucceeds(batch.commit());
+    // New draft question + key in one batch.
+    const create = writeBatch(cm);
+    create.set(doc(cm, 'exam_questions/qnew'), { stem: 'n', review: { status: 'draft' } });
+    create.set(doc(cm, 'exam_question_keys/qnew'), { correct: 'C' });
+    await assertSucceeds(create.commit());
+    // A key for an approved question cannot be created by a non-reviewer.
+    await seed('exam_questions/qb', { stem: 'x', review: { status: 'methodologist_approved' } });
+    await assertFails(setDoc(doc(cm, 'exam_question_keys/qb'), { correct: 'D' }));
+    // Reviewers write keys freely; only publish roles delete them.
+    const me = db('me', { role: 'methodologist' });
+    await assertSucceeds(setDoc(doc(me, 'exam_question_keys/qb'), { correct: 'D' }));
+    await assertFails(deleteDoc(doc(me, 'exam_question_keys/qb')));
+    await assertSucceeds(deleteDoc(doc(cm, 'exam_question_keys/qb')));
   });
 
   it('students read published variants only (and may query by status)', async () => {
@@ -201,6 +298,21 @@ describe('exam attempts and drafts', () => {
     );
     await assertFails(
       setDoc(doc(db('alice'), 'exam_attempts/a1/drafts/math'), { answers: { q1: 'B' }, client_updated_at: 'yesterday' }),
+    );
+  });
+
+  it('accepts the exact map FirestoreExamDraftSink writes (D1, EXAM-01/SEC-DRAFT-01)', async () => {
+    await seedAttempt('a1');
+    const a = db('alice');
+    // lib/features/exam/data/exam_draft_sink.dart: {answers, flags, client_updated_at: serverTimestamp()}
+    const sinkMap = { answers: { q1: 'A', q2: null }, flags: ['q2'], client_updated_at: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(a, 'exam_attempts/a1/drafts/math'), sinkMap));
+    await assertSucceeds(setDoc(doc(a, 'exam_attempts/a1/drafts/math'), { ...sinkMap, answers: { q1: 'B' } }));
+    // The pre-D1 client map (extra keys) stays rejected.
+    await assertFails(
+      setDoc(doc(a, 'exam_attempts/a1/drafts/math'), {
+        section_id: 'math', answers: { q1: 'A' }, flags: [], client_saved_at: Date.now(), updated_at: serverTimestamp(),
+      }),
     );
   });
 
@@ -270,6 +382,24 @@ describe('server-owned collections', () => {
     await assertFails(getDoc(doc(db(null), 'leaderboards/all_time/entries/alice')));
   });
 
+  it('super_admin, support and moderator read entitlements, ledger and user_stats (D6)', async () => {
+    for (const role of ['super_admin', 'support', 'moderator']) {
+      const s = db(`u_${role}`, { role });
+      await assertSucceeds(getDoc(doc(s, 'entitlements/alice')));
+      await assertSucceeds(getDocs(collection(s, 'entitlements/alice/ledger')));
+      await assertSucceeds(getDoc(doc(s, 'user_stats/alice')));
+      await assertFails(setDoc(doc(s, 'entitlements/alice'), { credits: 100 }));
+      await assertFails(setDoc(doc(s, 'user_stats/alice'), { xp: 1 }));
+    }
+    for (const role of ['content_manager', 'methodologist']) {
+      const s = db(`u_${role}`, { role });
+      await assertFails(getDoc(doc(s, 'entitlements/alice')));
+      await assertFails(getDoc(doc(s, 'entitlements/alice/ledger/l1')));
+      await assertFails(getDoc(doc(s, 'user_stats/alice')));
+    }
+    await assertFails(getDoc(doc(db('bob'), 'entitlements/alice/ledger/l1')));
+  });
+
   it('pricing is readable, tutor config is not', async () => {
     await assertSucceeds(getDoc(doc(db('alice'), 'config/pricing')));
     await assertFails(getDoc(doc(db('alice'), 'config/ai_tutor')));
@@ -290,6 +420,16 @@ describe('user_mistakes', () => {
     await seed('user_mistakes/alice/items/eq1', { question_id: 'eq1', source: 'exam', wrong_count: 1, resolved: false });
     const a = db('alice');
     await assertSucceeds(updateDoc(doc(a, 'user_mistakes/alice/items/eq1'), { resolved: true, interval_days: 3 }));
+    // Exact maps of the client exam-review path (MistakesService reviewExamItem / markExamResolved).
+    await assertSucceeds(
+      setDoc(
+        doc(a, 'user_mistakes/alice/items/eq1'),
+        { next_review_at: Timestamp.fromMillis(Date.now() + 3 * 86_400_000), interval_days: 3, resolved: false,
+          last_reviewed_at: serverTimestamp(), review_count: increment(1) },
+        { merge: true },
+      ),
+    );
+    await assertSucceeds(setDoc(doc(a, 'user_mistakes/alice/items/eq1'), { resolved: true, last_reviewed_at: serverTimestamp() }, { merge: true }));
     await assertFails(updateDoc(doc(a, 'user_mistakes/alice/items/eq1'), { source: 'practice' }));
     await assertFails(updateDoc(doc(a, 'user_mistakes/alice/items/eq1'), { wrong_count: 0 }));
     await assertFails(deleteDoc(doc(a, 'user_mistakes/alice/items/eq1')));
@@ -328,6 +468,15 @@ describe('legacy collections', () => {
     await assertFails(setDoc(doc(a, 'payments/p1'), { uid: 'alice', status: 'confirmed', amount: 0 }));
     await assertSucceeds(setDoc(doc(a, 'forum_posts/f1'), { author_uid: 'alice', text: 'hi' }));
     await assertFails(setDoc(doc(a, 'forum_posts/f2'), { author_uid: 'bob', text: 'impersonation' }));
+  });
+
+  it('banned users cannot post or edit forum posts (D5)', async () => {
+    await seed('users/troll', { ...freeProfile, is_banned: true });
+    await seed('forum_posts/old', { author_uid: 'troll', text: 'before the ban' });
+    const t = db('troll');
+    await assertFails(setDoc(doc(t, 'forum_posts/f3'), { author_uid: 'troll', text: 'spam' }));
+    await assertFails(updateDoc(doc(t, 'forum_posts/old'), { text: 'edited spam' }));
+    await assertSucceeds(deleteDoc(doc(t, 'forum_posts/old')));
   });
 
   it('progress docs cannot be re-assigned to another user', async () => {

@@ -1,8 +1,17 @@
 /**
  * accountDelete {} -> {ok: true}  (Google Play User Data policy, ACC-01)
  *
- * Deletes every per-user document (new and legacy collections, including
- * sub-collections), the user's Storage files and finally the Auth user.
+ * Requires a recent sign-in: the ID token's auth_time must be at most 5
+ * minutes old, else HttpsError failed-precondition with reason
+ * REQUIRES_RECENT_LOGIN (the client re-authenticates and retries).
+ *
+ * Deletes the Auth user FIRST, then every per-user document (new and legacy
+ * collections, including sub-collections) and the user's Storage files.
+ * Deleting Auth first means the still-valid ID token can no longer be used
+ * against examStart/billing/aiTutor/recordActivity (they check that the Auth
+ * user exists), so wiping entitlements cannot be abused to re-claim the free
+ * exam. A retry after a partial failure (Auth user already gone) skips the
+ * recent-login check and only finishes the data cleanup of the caller's uid.
  * Purchases and legacy payments are kept for finance/fraud review but
  * anonymized: uid -> 'deleted:' + sha256(uid).
  */
@@ -12,9 +21,10 @@ import { FieldPath, type DocumentReference, type Query } from 'firebase-admin/fi
 import { getStorage } from 'firebase-admin/storage';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
+import { assertRecentLogin, dailyQuestIdRange } from '../domain/access';
 import { sha256Hex } from '../domain/hash';
 import { anonymizedUid } from '../domain/purchase';
-import { callableOptions, db, FieldValue, requireAuth, wrap } from './common';
+import { callableOptions, db, FieldValue, findAuthUser, requireAuth, wrap } from './common';
 
 /** Single documents keyed by uid. */
 export const UID_DOCS = [
@@ -86,11 +96,12 @@ export async function deleteUserData(uid: string): Promise<Record<string, number
     counts[collection] = await deleteQueryTrees(db().collection(collection).where(field, '==', uid));
   }
   // daily_quests ids are `${uid}_${date}` even when the userId field is missing.
+  const questRange = dailyQuestIdRange(uid);
   counts['daily_quests_by_id'] = await deleteQueryTrees(
     db()
       .collection('daily_quests')
-      .where(FieldPath.documentId(), '>=', `${uid}_`)
-      .where(FieldPath.documentId(), '<', `${uid}_`),
+      .where(FieldPath.documentId(), '>=', questRange.start)
+      .where(FieldPath.documentId(), '<', questRange.end),
   );
   counts['leaderboard_entries'] = await deleteQueryTrees(db().collectionGroup('entries').where('uid', '==', uid));
 
@@ -111,7 +122,26 @@ export const accountDelete = onCall(
   callableOptions({ timeoutSeconds: 300, memory: '512MiB' }),
   wrap('accountDelete', async (req) => {
     const uid = requireAuth(req);
-    const counts = await deleteUserData(uid);
+    const authUser = await findAuthUser(uid);
+    if (authUser) {
+      assertRecentLogin(req.auth?.token?.auth_time, Date.now());
+      try {
+        await getAuth().deleteUser(uid);
+      } catch (e) {
+        if ((e as { code?: string }).code !== 'auth/user-not-found') throw e;
+      }
+    } else {
+      logger.warn('accountDelete retry: auth user already deleted, finishing data cleanup', { uid_hash: sha256Hex(uid) });
+    }
+    let counts: Record<string, number>;
+    try {
+      counts = await deleteUserData(uid);
+    } catch (e) {
+      // The Auth user is gone; the client can retry with its still-valid token
+      // (the retry skips the recent-login check), and ops can re-run cleanup.
+      logger.error('accountDelete: data cleanup failed after auth deletion', { uid_hash: sha256Hex(uid), error: String(e) });
+      throw e;
+    }
     await db().collection('admin_logs').add({
       actor_uid: 'self',
       actor_role: 'user',
@@ -120,12 +150,6 @@ export const accountDelete = onCall(
       details: counts,
       at: FieldValue.serverTimestamp(),
     });
-    try {
-      await getAuth().deleteUser(uid);
-    } catch (e) {
-      const code = (e as { code?: string }).code;
-      if (code !== 'auth/user-not-found') throw e;
-    }
     logger.info('account deleted', { uid_hash: sha256Hex(uid), counts });
     return { ok: true };
   }),

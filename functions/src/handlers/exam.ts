@@ -31,6 +31,7 @@ import {
   optString,
   payload,
   reqId,
+  requireActiveUser,
   requireAuth,
   Timestamp,
   wrap,
@@ -99,7 +100,8 @@ function answersFromSnap(snap: DocumentSnapshot | undefined): Record<string, str
 export const examStart = onCall(
   callableOptions(),
   wrap('examStart', async (req) => {
-    const uid = requireAuth(req);
+    // Deleted accounts (token still valid) and banned users cannot start or claim the free exam.
+    const { uid } = await requireActiveUser(req);
     const data = payload(req);
     const variantId = reqId(data['variantId'], 'variantId');
     const clientAppVersion = optString(data['clientAppVersion'], 'clientAppVersion', 40) ?? '';

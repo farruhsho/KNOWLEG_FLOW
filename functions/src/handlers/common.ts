@@ -5,10 +5,11 @@
 import '../config';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { FieldValue, getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestore';
+import { FieldValue, getFirestore, Timestamp, type DocumentSnapshot, type Firestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { HttpsError, type CallableOptions, type CallableRequest } from 'firebase-functions/v2/https';
-import { APP_CHECK_ENFORCE } from '../config';
+import { APP_CHECK_ENFORCE, APP_CHECK_ENFORCE_ADMIN } from '../config';
+import { decideAccess, isBannedProfile } from '../domain/access';
 import { DomainError, Reasons, type ErrorCode, type Reason } from '../domain/reasons';
 import { hasPermission, resolveRole, type Permission, type Role } from '../domain/roles';
 import { isRecord } from '../domain/types';
@@ -21,9 +22,19 @@ export function db(): Firestore {
 
 export { FieldValue, Timestamp };
 
-/** Base options for every onCall: App Check enforced unless APP_CHECK_ENFORCE=false. */
+/** Base options for every student onCall: App Check enforced unless APP_CHECK_ENFORCE=false. */
 export function callableOptions(extra: Omit<CallableOptions, 'enforceAppCheck'> = {}): CallableOptions {
   return { enforceAppCheck: APP_CHECK_ENFORCE, timeoutSeconds: 60, ...extra };
+}
+
+/**
+ * Options for the admin* callables. They already require a staff role (fresh
+ * custom claims), so App Check is controlled by the separate
+ * APP_CHECK_ENFORCE_ADMIN param (default false): the CMS also runs on web and
+ * desktop builds where App Check may not be configured.
+ */
+export function adminCallableOptions(extra: Omit<CallableOptions, 'enforceAppCheck'> = {}): CallableOptions {
+  return { enforceAppCheck: APP_CHECK_ENFORCE_ADMIN, timeoutSeconds: 60, ...extra };
 }
 
 export function httpsError(reason: Reason, message: string, extra?: Record<string, unknown>, code?: ErrorCode): HttpsError {
@@ -55,6 +66,43 @@ export function requireAuth(req: CallableRequest<unknown>): string {
   const uid = req.auth?.uid;
   if (!uid) throw new HttpsError('unauthenticated', 'Sign in required.');
   return uid;
+}
+
+/** getAuth().getUser(uid), or null when the Auth user no longer exists. */
+export async function findAuthUser(uid: string) {
+  try {
+    return await getAuth().getUser(uid);
+  } catch (e) {
+    if ((e as { code?: string }).code === 'auth/user-not-found') return null;
+    throw e;
+  }
+}
+
+export interface ActiveUser {
+  uid: string;
+  /** users/{uid} (may not exist). */
+  profile: DocumentSnapshot;
+}
+
+/**
+ * requireAuth + account-state checks for entitlement-consuming callables.
+ * An ID token stays valid for up to an hour after accountDelete, so the Auth
+ * user must still exist (and not be disabled): HttpsError 'unauthenticated'
+ * otherwise. Unless `allowBanned`, a moderation ban (users/{uid}.is_banned)
+ * is rejected with permission-denied + reason USER_BANNED.
+ */
+export async function requireActiveUser(req: CallableRequest<unknown>, opts: { allowBanned?: boolean } = {}): Promise<ActiveUser> {
+  const uid = requireAuth(req);
+  const [authUser, profile] = await Promise.all([findAuthUser(uid), db().doc(`users/${uid}`).get()]);
+  const decision = decideAccess({ authUserExists: authUser !== null, disabled: authUser?.disabled, profile: profile.data() });
+  if (decision === 'deleted' || decision === 'disabled') {
+    logger.warn('callable from a deleted/disabled account', { uid, decision });
+    throw new HttpsError('unauthenticated', 'This account is no longer active. Please sign in again.');
+  }
+  if (decision === 'banned' && !opts.allowBanned) {
+    throw httpsError(Reasons.USER_BANNED, 'This account is blocked.');
+  }
+  return { uid, profile };
 }
 
 // ---------------------------------------------------------------------------
@@ -125,7 +173,11 @@ export interface AdminActor {
  * hour-old ID token, so revocations apply immediately) with the legacy
  * users/{uid}.role == 'admin' fallback, then checks the permission matrix.
  */
-export async function requirePermission(req: CallableRequest<unknown>, permission: Permission): Promise<AdminActor> {
+export async function requirePermission(
+  req: CallableRequest<unknown>,
+  permission: Permission,
+  opts: { rejectBanned?: boolean } = {},
+): Promise<AdminActor> {
   const uid = requireAuth(req);
   const [user, profile] = await Promise.all([
     getAuth().getUser(uid),
@@ -135,6 +187,9 @@ export async function requirePermission(req: CallableRequest<unknown>, permissio
   if (!hasPermission(role, permission)) {
     logger.warn('admin permission denied', { uid, role, permission });
     throw httpsError(Reasons.FORBIDDEN_ROLE, `permission ${permission} required`, { permission });
+  }
+  if (opts.rejectBanned && isBannedProfile(profile.data())) {
+    throw httpsError(Reasons.USER_BANNED, 'This account is blocked.');
   }
   return { uid, role: role as Role };
 }

@@ -12,7 +12,7 @@ import { isValidProductId } from '../domain/purchase';
 import { DomainError, Reasons } from '../domain/reasons';
 import { isRole, legacyUserRoleFor, ROLES, type Role } from '../domain/roles';
 import { isRecord, num } from '../domain/types';
-import { callableOptions, db, FieldValue, payload, reqId, reqInt, reqString, requirePermission, wrap, writeAdminLog } from './common';
+import { adminCallableOptions, db, FieldValue, payload, reqId, reqInt, reqString, requirePermission, wrap, writeAdminLog } from './common';
 import { loadBlueprint, loadKeys, loadPassages, loadQuestions, loadVariant } from './content';
 
 async function requireUser(uid: string) {
@@ -29,7 +29,7 @@ const ROLE_RANK: Record<Role, number> = { super_admin: 5, content_manager: 4, me
 // adminSetRole {uid, role|null} -> {ok}
 
 export const adminSetRole = onCall(
-  callableOptions(),
+  adminCallableOptions(),
   wrap('adminSetRole', async (req) => {
     const actor = await requirePermission(req, 'manage_roles');
     const data = payload(req);
@@ -74,7 +74,7 @@ export const adminSetRole = onCall(
 // adminGrantCredits {uid, delta, reason} -> {credits}
 
 export const adminGrantCredits = onCall(
-  callableOptions(),
+  adminCallableOptions(),
   wrap('adminGrantCredits', async (req) => {
     const actor = await requirePermission(req, 'grant_credits');
     const data = payload(req);
@@ -108,7 +108,7 @@ export const adminGrantCredits = onCall(
 // adminPublishVariant {variantId, publish} -> {status, problems}
 
 export const adminPublishVariant = onCall(
-  callableOptions({ timeoutSeconds: 120, memory: '512MiB' }),
+  adminCallableOptions({ timeoutSeconds: 120, memory: '512MiB' }),
   wrap('adminPublishVariant', async (req) => {
     const actor = await requirePermission(req, 'publish_variants');
     const data = payload(req);
@@ -153,7 +153,7 @@ export const adminPublishVariant = onCall(
 // adminUpdatePricing {products, freeExamsPerUser} -> {ok}
 
 export const adminUpdatePricing = onCall(
-  callableOptions(),
+  adminCallableOptions(),
   wrap('adminUpdatePricing', async (req) => {
     const actor = await requirePermission(req, 'manage_pricing');
     const data = payload(req);

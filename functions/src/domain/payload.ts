@@ -6,7 +6,7 @@
  */
 import type { AttemptState } from './exam_session';
 import type { ExamResult } from './scoring';
-import type { Blueprint, BlueprintPart, ExamQuestion, Passage, QuestionOption } from './types';
+import type { Blueprint, BlueprintPart, ExamQuestion, Passage, QuestionOption, QuestionTable } from './types';
 import { partForIndex, pickLang } from './types';
 
 export interface ClientQuestion {
@@ -16,7 +16,8 @@ export interface ClientQuestion {
   passageId: string | null;
   imageUrl: string | null;
   imagePath: string | null;
-  table: unknown;
+  /** Always the wire shape `{headers, rows: [[...]]}` (see normalizeTable). */
+  table: QuestionTable | null;
   topicId: string | null;
   partId: string | null;
   type: string;

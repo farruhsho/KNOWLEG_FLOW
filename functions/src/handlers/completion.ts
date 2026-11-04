@@ -8,6 +8,7 @@
 import type { DocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { isLeaderboardEligible, type AttemptState } from '../domain/exam_session';
+import { leaderboardSubjectKey } from '../domain/leaderboard';
 import { buildExamResult, scoreAttempt, wrongOutcomes, type ExamResult } from '../domain/scoring';
 import { round1 } from '../domain/scoring';
 import { DAY_MS } from '../domain/time';
@@ -100,6 +101,8 @@ export function writeCompletion(tx: Transaction, ctx: CompletionContext, reads: 
       nowMs,
     });
     xpTotal = award.total;
+    const profile = profileFromUserDoc(reads.user);
+    const toLeaderboard = eligible && !profile.banned;
     tx.set(xpEventRef(uid, examXpEventId(ctx.attemptId)), {
       kind: 'exam_completed',
       ref: ctx.attemptId,
@@ -107,13 +110,12 @@ export function writeCompletion(tx: Transaction, ctx: CompletionContext, reads: 
       base: award.baseXp,
       improved_bonus: award.improvedBonus,
       daily_goal_bonus: award.dailyGoalBonus,
-      leaderboard_xp: eligible ? award.total : 0,
+      leaderboard_xp: toLeaderboard ? award.total : 0,
       at: FieldValue.serverTimestamp(),
     });
     tx.set(statsRef(uid), statsToDoc(award.stats), { merge: true });
-    if (eligible) {
-      const subjectId = ctx.blueprint.kind === 'subject' ? ctx.blueprint.subject_id : null;
-      addLeaderboardXp(tx, uid, profileFromUserDoc(reads.user), award.total, nowMs, subjectId);
+    if (toLeaderboard) {
+      addLeaderboardXp(tx, uid, profile, award.total, nowMs, leaderboardSubjectKey(ctx.blueprint));
     }
   }
 

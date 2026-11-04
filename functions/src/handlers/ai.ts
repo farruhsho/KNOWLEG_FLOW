@@ -8,6 +8,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { logger } from 'firebase-functions';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { AI_TUTOR_MODEL, ANTHROPIC_API_KEY } from '../config';
+import { assertNoLiveExam } from '../domain/access';
 import { assertOwner } from '../domain/exam_session';
 import { clientOptions } from '../domain/payload';
 import { DomainError, Reasons } from '../domain/reasons';
@@ -16,6 +17,7 @@ import {
   buildContextBlock,
   buildTutorMessages,
   emptyReplyText,
+  examContextStem,
   refusalText,
   TUTOR_SYSTEM_PROMPT,
   type QuestionContext,
@@ -26,11 +28,22 @@ import {
   normalizeUsage,
   parseTutorConfig,
   sanitizeTutorInput,
-  type TutorInput,
   type UsageNumbers,
 } from '../domain/tutor_quota';
 import { isRecord, localized, partForIndex, pickLang, str, strOrNull, type BlueprintPart } from '../domain/types';
-import { callableOptions, db, FieldValue, payload, reqId, reqInt, requireAuth, requirePermission, wrap, writeAdminLog } from './common';
+import {
+  adminCallableOptions,
+  callableOptions,
+  db,
+  FieldValue,
+  payload,
+  reqId,
+  reqInt,
+  requireActiveUser,
+  requirePermission,
+  wrap,
+  writeAdminLog,
+} from './common';
 import { attemptFromDoc, attemptRef, bundledBlueprints, loadBlueprint, loadKeys, loadPassages, loadQuestions } from './content';
 import { parseBlueprint } from '../domain/types';
 
@@ -95,23 +108,14 @@ function textOf(content: readonly { type: string }[]): string {
 // ---------------------------------------------------------------------------
 // Exam integrity + question context
 
-async function assertNotInLiveExam(uid: string, input: TutorInput): Promise<void> {
-  if (input.attemptId) {
-    const snap = await attemptRef(input.attemptId).get();
-    const a = snap.exists ? attemptFromDoc(snap.data()) : null;
-    if (a && a.uid === uid && a.status === 'in_progress') {
-      throw new DomainError(Reasons.AI_EXAM_IN_PROGRESS, 'finish the exam first');
-    }
-  }
-  if (input.questionId) {
-    const live = await db().collection('exam_attempts').where('uid', '==', uid).where('status', '==', 'in_progress').limit(10).get();
-    for (const d of live.docs) {
-      const a = attemptFromDoc(d.data());
-      if (a?.sections.some((s) => s.question_ids.includes(input.questionId!))) {
-        throw new DomainError(Reasons.AI_EXAM_IN_PROGRESS, 'question belongs to an exam in progress');
-      }
-    }
-  }
+/**
+ * Decision D8: while the user has ANY in-progress exam attempt, every tutor
+ * request is rejected (AI_EXAM_IN_PROGRESS), whatever questionId/attemptId
+ * the client sends or omits. Uses the (uid, status) index.
+ */
+async function assertNotInLiveExam(uid: string): Promise<void> {
+  const live = await db().collection('exam_attempts').where('uid', '==', uid).where('status', '==', 'in_progress').limit(1).get();
+  assertNoLiveExam(live.size);
 }
 
 /** Exam question context: only from the user's own COMPLETED attempt (keys are paid content). */
@@ -142,7 +146,9 @@ async function examQuestionContext(uid: string, attemptId: string, questionId: s
   const answers = answersSnap.get('answers');
   const userAnswer = isRecord(answers) && typeof answers[questionId] === 'string' ? (answers[questionId] as string) : null;
   const key = keys.get(questionId);
-  const stem = [q.stem, q.column_a ? `Column A: ${q.column_a}` : '', q.column_b ? `Column B: ${q.column_b}` : ''].filter(Boolean).join('\n');
+  // Quantitative-comparison quantities live in column_a/column_b or (pipeline
+  // items) only in the table; include both so the tutor sees the values.
+  const stem = examContextStem(q);
   return {
     stem,
     options: clientOptions(q, part, attempt.language),
@@ -183,12 +189,13 @@ async function practiceQuestionContext(questionId: string, language: string): Pr
 export const aiTutor = onCall(
   callableOptions({ secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 120, memory: '512MiB' }),
   wrap('aiTutor', async (req) => {
-    const uid = requireAuth(req);
+    // Deleted accounts and banned users never reach the (paid) model.
+    const { uid } = await requireActiveUser(req);
     const input = sanitizeTutorInput(req.data);
     const cfg = parseTutorConfig((await db().doc('config/ai_tutor').get()).data());
     if (!cfg.enabled || cfg.daily_limit === 0) throw new DomainError(Reasons.AI_DISABLED, 'AI tutor is disabled');
 
-    await assertNotInLiveExam(uid, input);
+    await assertNotInLiveExam(uid);
 
     let context: QuestionContext | null = null;
     if (input.questionId) {
@@ -326,9 +333,9 @@ const DRAFT_SCHEMA = {
 const DRAFT_SYSTEM = `You write original practice items for the Kyrgyz ORT (national university admission test) in the exact format of the official test. Items must be original (never copied from published tests), factually correct, unambiguous, with exactly one correct option, plausible distractors based on typical student mistakes, and appropriate for school-leavers. Kyrgyz text must be natural Cyrillic Kyrgyz with ң, ө, ү. Write mathematics in LaTeX between single dollar signs. Every draft is reviewed by a methodologist before use.`;
 
 export const adminAiDraftQuestions = onCall(
-  callableOptions({ secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 300, memory: '512MiB' }),
+  adminCallableOptions({ secrets: [ANTHROPIC_API_KEY], timeoutSeconds: 300, memory: '512MiB' }),
   wrap('adminAiDraftQuestions', async (req) => {
-    const actor = await requirePermission(req, 'edit_questions');
+    const actor = await requirePermission(req, 'edit_questions', { rejectBanned: true });
     const data = payload(req);
     const subjectId = reqId(data['subjectId'], 'subjectId');
     const sectionId = reqId(data['sectionId'], 'sectionId');

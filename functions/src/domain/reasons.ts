@@ -17,6 +17,10 @@ export const Reasons = {
   AI_EXAM_IN_PROGRESS: 'AI_EXAM_IN_PROGRESS',
   FORBIDDEN_ROLE: 'FORBIDDEN_ROLE',
   VALIDATION_FAILED: 'VALIDATION_FAILED',
+  /** The caller's users/{uid}.is_banned is true (moderation, ARCHITECTURE §2). */
+  USER_BANNED: 'USER_BANNED',
+  /** accountDelete needs a sign-in (ID token auth_time) from the last 5 minutes. */
+  REQUIRES_RECENT_LOGIN: 'REQUIRES_RECENT_LOGIN',
 } as const;
 
 export type Reason = (typeof Reasons)[keyof typeof Reasons];
@@ -47,6 +51,8 @@ export const defaultCodeFor: Record<Reason, ErrorCode> = {
   AI_EXAM_IN_PROGRESS: 'failed-precondition',
   FORBIDDEN_ROLE: 'permission-denied',
   VALIDATION_FAILED: 'invalid-argument',
+  USER_BANNED: 'permission-denied',
+  REQUIRES_RECENT_LOGIN: 'failed-precondition',
 };
 
 /**

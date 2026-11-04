@@ -26,7 +26,7 @@ import {
 } from '../domain/purchase';
 import { DomainError, Reasons } from '../domain/reasons';
 import { int, str } from '../domain/types';
-import { callableOptions, db, FieldValue, mapLimit, optString, payload, requireAuth, Timestamp, wrap } from './common';
+import { callableOptions, db, FieldValue, mapLimit, optString, payload, requireActiveUser, Timestamp, wrap } from './common';
 import { consumePurchase, fetchPurchase, listVoided } from './play';
 
 export type VerifyStatus = 'granted' | 'already_processed' | 'pending' | 'invalid';
@@ -220,7 +220,9 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
 export const billingVerifyPurchase = onCall(
   callableOptions({ timeoutSeconds: 60 }),
   wrap('billingVerifyPurchase', async (req) => {
-    const uid = requireAuth(req);
+    // The Auth user must still exist (an ID token outlives accountDelete by up to 1 h).
+    // Banned users may still record purchases they paid for.
+    const { uid } = await requireActiveUser(req, { allowBanned: true });
     const data = payload(req);
     const productId = data['productId'];
     if (!isValidProductId(productId)) throw new DomainError(Reasons.PURCHASE_INVALID, 'productId is invalid');

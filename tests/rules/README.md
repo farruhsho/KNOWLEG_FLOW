@@ -19,25 +19,35 @@ npm run test:storage
 
 `npm test` starts the emulators via `firebase emulators:exec` with the repo's `firebase.json`
 (Firestore 8080, Storage 9199) under the demo project `demo-ort-rules`, so nothing touches the
-real project.
+real project. The test files run one after another (`--test-concurrency=1`): both use the
+Firestore emulator, and `storage.rules` reads `users/{uid}` through cross-service rules, so the
+storage tests also need the Firestore emulator.
 
 What is covered:
 
 - `users/{uid}`: create cannot claim privileges (`role`, `roles`, `is_premium`, paid
-  `subscription`, …); owners cannot change privileged fields or delete the profile; staff access
-  by role; a valid custom claim overrides the legacy `users.role == 'admin'`.
+  `subscription`, ban fields, …); owners cannot change privileged fields or delete the profile;
+  staff access by role; a valid custom claim overrides the legacy `users.role == 'admin'`.
+  Moderators ban/unban with the exact CMS map (`is_banned`, `ban_reason`, `banned_by` = self,
+  `banned_at`) but cannot touch premium/roles or ban staff; reminder fields stay owner-writable.
 - Exam content: students never read `exam_questions`, `exam_question_keys`, `exam_passages`;
   only published variants are visible; variants cannot be published by a direct write; only
-  reviewers approve questions.
+  reviewers approve questions; content managers may edit metadata of approved questions but not
+  reviewed fields; non-reviewers change a key's `correct` only together with a draft question.
 - Attempts: owner read-only; drafts only for the current section, before deadline + 2 min, with
-  the allowed keys and size limits.
+  the allowed keys and size limits, including the exact map the app's draft sink writes
+  (`{answers, flags, client_updated_at: serverTimestamp()}`).
 - Server-owned collections (`entitlements`, `purchases` incl. the private token,
-  `user_stats`, `xp_events`, `leaderboards`, `ai_usage`, `config`, `admin_logs`): no client writes.
-- `user_mistakes`: owner writes practice items; exam items only allow schedule updates.
+  `user_stats`, `xp_events`, `leaderboards`, `ai_usage`, `config`, `admin_logs`): no client writes;
+  super_admin, support and moderator read `entitlements`, its ledger and `user_stats`.
+- `user_mistakes`: owner writes practice items; exam items only allow schedule updates (the exact
+  maps of the app's exam-review path).
+- `forum_posts`: banned users cannot post or edit.
 - Legacy collections (`user_gamification`, `user_achievements`, `daily_quests`, `gamification`,
   `daily_lessons`, content collections, `payments`, `forum_posts`, progress docs) and default deny.
-- Storage: content media by role with type/size limits, avatars, `temp_uploads` images ≤ 5 MB,
-  deletes where writes are allowed.
+- Storage: content media by role (claim, or legacy `users.role == 'admin'` without a claim) with
+  type/size limits (SVG rejected), avatars, `temp_uploads` images ≤ 5 MB, deletes where writes are
+  allowed.
 
 CI: add a job with `actions/setup-java` (21) + `actions/setup-node` (22) running `npm ci && npm test`
 in this directory (the existing `.github/workflows/flutter-ci.yml` has a commented-out

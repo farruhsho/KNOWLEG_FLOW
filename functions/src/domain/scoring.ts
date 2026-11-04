@@ -51,7 +51,12 @@ export interface ExamScore {
   correct: number;
   total: number;
   percent: number;
+  /** Answers given, including answers to unscored (key-less) questions. */
   answered: number;
+  /** Scored questions answered wrongly. correct + incorrect + skipped == total. */
+  incorrect: number;
+  /** Scored questions left unanswered. */
+  skipped: number;
   unscored: number;
   sections: SectionScore[];
   topics: TopicScore[];
@@ -95,6 +100,8 @@ export function scoreAttempt(input: ScoringInput, options: ScoringOptions = {}):
   let correct = 0;
   let total = 0;
   let answered = 0;
+  let incorrect = 0;
+  let skipped = 0;
   let unscored = 0;
 
   for (const section of input.sections) {
@@ -124,6 +131,8 @@ export function scoreAttempt(input: ScoringInput, options: ScoringOptions = {}):
       }
       sTotal++;
       if (isCorrect) sCorrect++;
+      else if (userAnswer === null) skipped++;
+      else incorrect++;
       if (topicId) {
         const agg = topicAgg.get(topicId) ?? { correct: 0, total: 0 };
         agg.total++;
@@ -163,6 +172,8 @@ export function scoreAttempt(input: ScoringInput, options: ScoringOptions = {}):
     total,
     percent: percentOf(correct, total),
     answered,
+    incorrect,
+    skipped,
     unscored,
     sections,
     topics,
@@ -182,6 +193,10 @@ export interface ExamResult {
   total: number;
   percent: number;
   answered: number;
+  /** Scored questions answered wrongly (decision D4). */
+  incorrect: number;
+  /** Scored questions left unanswered (decision D4). */
+  skipped: number;
   sections: SectionScore[];
   topics: TopicScore[];
   weak_topics: string[];
@@ -197,6 +212,8 @@ export function buildExamResult(score: ExamScore, xpAwarded: number, leaderboard
     total: score.total,
     percent: score.percent,
     answered: score.answered,
+    incorrect: score.incorrect,
+    skipped: score.skipped,
     sections: score.sections,
     topics: score.topics,
     weak_topics: score.weak_topics,

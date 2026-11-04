@@ -46,6 +46,14 @@ abstract final class BackendReasons {
   static const forbiddenRole = 'FORBIDDEN_ROLE';
   static const validationFailed = 'VALIDATION_FAILED';
 
+  /// The account is banned by a moderator (permission-denied). Sent by
+  /// examStart, aiTutor, recordActivity and adminAiDraftQuestions.
+  static const userBanned = 'USER_BANNED';
+
+  /// accountDelete needs a sign-in from the last 5 minutes
+  /// (failed-precondition): re-authenticate, then retry once.
+  static const requiresRecentLogin = 'REQUIRES_RECENT_LOGIN';
+
   /// Extracts `details.reason` from a callable error, if present.
   static String? of(Object error) {
     if (error is FirebaseFunctionsException) {
