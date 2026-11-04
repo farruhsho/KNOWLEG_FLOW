@@ -12,7 +12,7 @@ class TextSimilarityService {
     final len2 = s2.length;
     
     // Create distance matrix
-    List<List<int>> matrix = List.generate(
+    final List<List<int>> matrix = List.generate(
       len1 + 1,
       (i) => List.filled(len2 + 1, 0),
     );

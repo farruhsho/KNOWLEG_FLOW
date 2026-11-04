@@ -54,7 +54,7 @@ class LearningActivityService {
   }
 
   void _commitPracticeBatch(String uid, PracticeSessionResult s) {
-    final inc = FieldValue.increment;
+    const inc = FieldValue.increment;
     final batch = _db.batch();
     final now = DateTime.now();
 
