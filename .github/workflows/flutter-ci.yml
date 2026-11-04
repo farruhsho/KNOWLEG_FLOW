@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch: {}
 
 jobs:
   # Analyze and Test
@@ -95,6 +96,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The runner's default JDK (25) cannot run Gradle 8.12; build with the
+      # same JDK 21 the branch was verified with locally.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -147,7 +155,11 @@ jobs:
 
   # Build iOS
   # iOS is not a release target yet (docs/modernization/TZ.md): informational.
+  # Run manually (Actions → Flutter CI/CD → Run workflow): macOS runners are
+  # scarce (PR runs were cancelled for lack of capacity) and iOS is not a
+  # release target yet.
   build-ios:
+    if: github.event_name == 'workflow_dispatch'
     needs: analyze-test
     runs-on: macos-latest
     continue-on-error: true
