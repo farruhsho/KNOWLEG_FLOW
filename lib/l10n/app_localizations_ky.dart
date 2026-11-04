@@ -162,6 +162,54 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminAccountMenu => 'Аккаунт';
 
   @override
+  String adminAchDefaultHint(String text) {
+    return 'Демейки: $text';
+  }
+
+  @override
+  String get adminAchDisabled => 'Өчүрүлгөн';
+
+  @override
+  String get adminAchDisabledHelp => 'Өчүрүлгөн: окуучуларга көрүнбөйт.';
+
+  @override
+  String get adminAchEnabled => 'Күйгүзүлгөн';
+
+  @override
+  String get adminAchFieldDescription => 'Сүрөттөмө';
+
+  @override
+  String get adminAchFieldTitle => 'Аталышы';
+
+  @override
+  String get adminAchFixErrors => 'Белгиленген талааларды оңдоңуз';
+
+  @override
+  String get adminAchIntro =>
+      'Жетишкендиктердин тексттери жана көрүнүшү. Босоголор жана берүү эрежелери серверде калат. Талаа бош болсо, тиркеменин өз тексти колдонулат.';
+
+  @override
+  String get adminAchMissingTranslation =>
+      'Эки тилди тең толтуруңуз же экөөн тең бош калтырыңыз';
+
+  @override
+  String get adminAchNoDoc =>
+      'config/achievements документи азырынча жок: бардык жерде тиркеменин тексттери колдонулат. Сактоо аны түзөт.';
+
+  @override
+  String get adminAchPreview => 'Алдын ала көрүү';
+
+  @override
+  String get adminAchPreviewHelp =>
+      'Окуучулар орусча жана кыргызча ушундай көрүшөт.';
+
+  @override
+  String get adminAchReset => 'Тексттерди тазалоо';
+
+  @override
+  String get adminAchUnsaved => 'Сакталбаган өзгөртүүлөр бар';
+
+  @override
   String get adminActivate => 'Активировать';
 
   @override
@@ -324,6 +372,10 @@ class AppLocalizationsKy extends AppLocalizations {
       'Для этого фильтра нужен индекс Firestore. Измените фильтр или создайте индекс.';
 
   @override
+  String get adminErrLimitReached =>
+      'Бул аракеттин чеги толду. Кийинчерээк кайталаңыз.';
+
+  @override
   String get adminErrNetwork =>
       'Нет связи с сервером. Проверьте сеть и повторите.';
 
@@ -332,6 +384,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminErrQuota => 'Достигнут лимит. Повторите позже.';
+
+  @override
+  String get adminErrRateLimited =>
+      'Суроо-талаптар өтө көп. Бир аз күтүп, кайра аракет кылыңыз.';
 
   @override
   String get adminErrSessionExpired =>
@@ -660,6 +716,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminFieldPoints => 'Баллы';
+
+  @override
+  String get adminFieldRequired => 'Милдеттүү талаа';
 
   @override
   String get adminFieldReview => 'Проверка';
@@ -1031,6 +1090,9 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminMoveUp => 'Выше';
 
   @override
+  String get adminNavAchievements => 'Жетишкендиктер';
+
+  @override
   String get adminNavAiDrafts => 'Черновики ИИ';
 
   @override
@@ -1046,6 +1108,9 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminNavLogs => 'Журнал действий';
 
   @override
+  String get adminNavNotifications => 'Билдирүүлөр';
+
+  @override
   String get adminNavPayments => 'Платежи';
 
   @override
@@ -1053,6 +1118,9 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminNavPricing => 'Тарифы';
+
+  @override
+  String get adminNavPromoCodes => 'Промокоддор';
 
   @override
   String get adminNavSubjects => 'Предметы и темы';
@@ -1068,6 +1136,156 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminNone => 'Не задано';
+
+  @override
+  String get adminNotifAudienceAll => 'Баары';
+
+  @override
+  String get adminNotifAudienceAllHint =>
+      'Билдирүүлөрү күйгүзүлгөн бардык колдонуучулар.';
+
+  @override
+  String get adminNotifAudienceAllUsers => 'Бардык колдонуучулар';
+
+  @override
+  String get adminNotifAudienceGroup => 'Топ';
+
+  @override
+  String adminNotifAudienceGroupIs(String group) {
+    return 'Топ: $group';
+  }
+
+  @override
+  String get adminNotifAudienceLanguage => 'Тил боюнча';
+
+  @override
+  String adminNotifAudienceLanguageIs(String language) {
+    return 'Тил: $language';
+  }
+
+  @override
+  String get adminNotifAudienceRegion => 'Аймак боюнча';
+
+  @override
+  String adminNotifAudienceRegionIs(String region) {
+    return 'Аймак: $region';
+  }
+
+  @override
+  String get adminNotifAudienceTitle => 'Аудитория';
+
+  @override
+  String get adminNotifAudienceValueRequired => 'Кимге жөнөтүүнү тандаңыз';
+
+  @override
+  String get adminNotifCheckFirst =>
+      'Билдирүүнү канча адам аларын билүү үчүн камтууну текшериңиз.';
+
+  @override
+  String get adminNotifCheckReach => 'Камтууну текшерүү';
+
+  @override
+  String get adminNotifCheckStale =>
+      'Текст же аудитория өзгөрдү — камтууну кайра текшериңиз.';
+
+  @override
+  String adminNotifConfirmBody(int count, String audience) {
+    return 'Билдирүүнү $count колдонуучу алат ($audience). Жөнөтүлгөн билдирүүнү кайтарып алууга болбойт.';
+  }
+
+  @override
+  String get adminNotifConfirmTitle => 'Билдирүүнү жөнөтөсүзбү?';
+
+  @override
+  String adminNotifFailedShort(int count) {
+    return 'жеткирилген жок: $count';
+  }
+
+  @override
+  String get adminNotifFieldBody => 'Билдирүүнүн тексти';
+
+  @override
+  String get adminNotifFieldTitle => 'Аталышы';
+
+  @override
+  String get adminNotifFixErrors =>
+      'Эки тилде тең текстти толтуруп, аудиторияны тандаңыз.';
+
+  @override
+  String get adminNotifGroupId => 'Топтун ID';
+
+  @override
+  String get adminNotifGroupIdHelp =>
+      'Топтун документинин ID (groups коллекциясы)';
+
+  @override
+  String get adminNotifGroupIdInvalid =>
+      'Латын тамгалары, сандар, _ жана - гана, 128 белгиге чейин';
+
+  @override
+  String get adminNotifHistoryEmpty => 'Азырынча билдирүүлөр жок';
+
+  @override
+  String adminNotifIntro(int limit) {
+    return 'Push-билдирүүнү билдирүүлөрү күйгүзүлгөн колдонуучулар өз тиркемесинин тилинде алышат. Адегенде камтууну текшериңиз, андан кийин жөнөтүңүз. Суткасына $limit билдирүүдөн ашпайт.';
+  }
+
+  @override
+  String adminNotifLimitReached(int limit) {
+    return 'Бүгүнкү билдирүү чеги түгөндү (суткасына $limit). Кийинкисин эртең жөнөтсөңүз болот.';
+  }
+
+  @override
+  String get adminNotifNoRecipients =>
+      'Бул аудиторияда алуучулар жок. Башкасын тандаңыз.';
+
+  @override
+  String adminNotifRecipients(int count) {
+    return 'Алуучулар: $count';
+  }
+
+  @override
+  String adminNotifRecipientsShort(int count) {
+    return 'алуучулар: $count';
+  }
+
+  @override
+  String adminNotifResult(int recipients, int sent, int failed) {
+    return 'Алуучулар: $recipients · жөнөтүлдү: $sent · жеткирилген жок: $failed';
+  }
+
+  @override
+  String get adminNotifResultLabel => 'Жыйынтык';
+
+  @override
+  String get adminNotifSend => 'Жөнөтүү';
+
+  @override
+  String get adminNotifSendTitle => 'Камтуу жана жөнөтүү';
+
+  @override
+  String adminNotifSentShort(int count) {
+    return 'жөнөтүлдү: $count';
+  }
+
+  @override
+  String adminNotifSentSnack(int count) {
+    return 'Жөнөтүлдү: $count';
+  }
+
+  @override
+  String get adminNotifTabCompose => 'Жаңы билдирүү';
+
+  @override
+  String get adminNotifTabHistory => 'Тарых';
+
+  @override
+  String get adminNotifTextTitle => 'Текст';
+
+  @override
+  String adminNotifTodayCount(int count, int limit) {
+    return 'Бүгүн жөнөтүлдү: $limit ичинен $count. Чекти сервер текшерет.';
+  }
 
   @override
   String adminOptionN(String id) {
@@ -1167,6 +1385,167 @@ class AppLocalizationsKy extends AppLocalizations {
   @override
   String get adminPricingWarning =>
       'Цены задаются в Google Play Console, а не здесь. На этой странице — только соответствие продуктов и кредитов. Базовую цену 100 сом (exam_single) нельзя менять без согласия владельца.';
+
+  @override
+  String get adminPromoActive => 'Активдүү';
+
+  @override
+  String get adminPromoActiveHelp =>
+      'Окуучулар активдүү коддорду гана колдоно алышат.';
+
+  @override
+  String get adminPromoClearDate => 'Мөөнөтсүз';
+
+  @override
+  String get adminPromoCode => 'Код';
+
+  @override
+  String adminPromoCodeHelp(int min, int max) {
+    return 'Латын тамгалары A–Z жана сандар, $min–$max белги';
+  }
+
+  @override
+  String adminPromoConfirmBody(
+    String code,
+    int credits,
+    String max,
+    String expiry,
+    String status,
+  ) {
+    return '$code коду: бир активдештирүүгө акысыз кредит — $credits; активдештирүүнүн максимуму: $max; мөөнөтү: $expiry; абалы: $status. Өзгөртүү аракеттер журналына жазылат.';
+  }
+
+  @override
+  String get adminPromoConfirmCreateTitle => 'Промокод түзөсүзбү?';
+
+  @override
+  String get adminPromoConfirmEditTitle => 'Өзгөртүүлөрдү сактайсызбы?';
+
+  @override
+  String get adminPromoCreate => 'Жаңы промокод';
+
+  @override
+  String get adminPromoCredits => 'Бир активдештирүүгө кредит';
+
+  @override
+  String adminPromoCreditsValue(int n) {
+    return 'кредит: $n';
+  }
+
+  @override
+  String get adminPromoDeactivate => 'Өчүрүү';
+
+  @override
+  String get adminPromoDeactivateBody =>
+      'Окуучулар аны мындан ары колдоно алышпайт. Мурда берилген кредиттер сакталат. Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String adminPromoDeactivateTitle(String code) {
+    return '$code өчүрүлсүнбү?';
+  }
+
+  @override
+  String adminPromoDeactivated(String code) {
+    return '$code өчүрүлдү';
+  }
+
+  @override
+  String get adminPromoDialogWarning =>
+      'Ар бир активдештирүү акысыз кредит берет. Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String adminPromoEditTitle(String code) {
+    return '$code промокоду';
+  }
+
+  @override
+  String get adminPromoEmpty => 'Азырынча промокоддор жок';
+
+  @override
+  String adminPromoErrCode(int min, int max) {
+    return '$min–$max белги: A–Z жана 0–9 гана';
+  }
+
+  @override
+  String adminPromoErrCredits(int min, int max) {
+    return 'Кредит саны: $min–$max';
+  }
+
+  @override
+  String get adminPromoErrExpiry =>
+      'Бул күн өтүп кетти: келечектеги күндү тандаңыз же кодду өчүрүңүз';
+
+  @override
+  String adminPromoErrMax(int limit) {
+    return '1 – $limit аралыгында';
+  }
+
+  @override
+  String adminPromoErrMaxBelow(int used) {
+    return 'Буга чейин $used жолу колдонулган — чек андан аз болбошу керек';
+  }
+
+  @override
+  String get adminPromoExpiry => 'Жарактуулук мөөнөтү';
+
+  @override
+  String get adminPromoExpiryHelp =>
+      'Код тандалган күнү Бишкек убактысы боюнча 23:59 чейин иштейт.';
+
+  @override
+  String get adminPromoGenerate => 'Жаңы код түзүү';
+
+  @override
+  String get adminPromoMaxHelp => 'Бош болсо — чексиз.';
+
+  @override
+  String get adminPromoMaxRedemptions => 'Активдештирүүнүн максимуму';
+
+  @override
+  String get adminPromoNoExpiry => 'мөөнөтсүз';
+
+  @override
+  String get adminPromoNote => 'Эскертме (ички)';
+
+  @override
+  String get adminPromoNoteHelp => 'Код ким үчүн: кампания, өнөктөш, мектеп.';
+
+  @override
+  String get adminPromoPickDate => 'Күндү тандоо';
+
+  @override
+  String adminPromoSaved(String code) {
+    return '$code промокоду сакталды';
+  }
+
+  @override
+  String get adminPromoStatusActive => 'Активдүү';
+
+  @override
+  String get adminPromoStatusExhausted => 'Түгөндү';
+
+  @override
+  String get adminPromoStatusExpired => 'Мөөнөтү бүттү';
+
+  @override
+  String get adminPromoStatusInactive => 'Өчүрүлгөн';
+
+  @override
+  String get adminPromoUnlimited => 'чексиз';
+
+  @override
+  String adminPromoUntil(String date) {
+    return '$date чейин жарактуу';
+  }
+
+  @override
+  String adminPromoUsage(int used, String max) {
+    return 'колдонулду: $used / $max';
+  }
+
+  @override
+  String get adminPromoWarning =>
+      'Промокоддор экзамендер үчүн акысыз кредит берет (1 кредит = 1 экзамен) — бул каржылык операция: аларды суперадмин гана башкарат, ар бир өзгөртүү аракеттер журналына жазылат.';
 
   @override
   String get adminPublished => 'Опубликован';
@@ -1356,6 +1735,11 @@ class AppLocalizationsKy extends AppLocalizations {
       'Id темы имеет вид предмет.тема (например, math.quadratic_equations) и используется в вопросах экзамена.';
 
   @override
+  String adminTextTooLong(int max) {
+    return '$max белгиден ашпашы керек';
+  }
+
+  @override
   String get adminTitleRequired =>
       'Введите название на русском или кыргызском.';
 
@@ -1454,6 +1838,17 @@ class AppLocalizationsKy extends AppLocalizations {
   String get adminUserGrantTitle => 'Начислить кредиты';
 
   @override
+  String get adminUserGroupMissing => 'Топ табылган жок (өчүрүлгөнбү?)';
+
+  @override
+  String adminUserGroups(int count) {
+    return 'Топтор ($count)';
+  }
+
+  @override
+  String get adminUserGrowth => 'Рефералдар жана топтор';
+
+  @override
   String get adminUserLanguage => 'Язык';
 
   @override
@@ -1468,6 +1863,12 @@ class AppLocalizationsKy extends AppLocalizations {
   @override
   String get adminUserNoEntitlements =>
       'Записи о доступе пока нет (первый тест не использован).';
+
+  @override
+  String get adminUserNoGroups => 'Эч бир топто жок';
+
+  @override
+  String get adminUserOpenProfile => 'Ачуу';
 
   @override
   String get adminUserPremiumOff => 'Снять премиум';
@@ -1487,6 +1888,15 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get adminUserPremiumOnTitle => 'Выдать премиум?';
+
+  @override
+  String get adminUserReferralCode => 'Реферал коду';
+
+  @override
+  String get adminUserReferralsCount => 'Чакырылгандар';
+
+  @override
+  String get adminUserReferredBy => 'Чакырган';
 
   @override
   String get adminUserRole => 'Роль';

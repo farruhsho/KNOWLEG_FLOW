@@ -157,6 +157,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminAccountMenu => 'Account';
 
   @override
+  String adminAchDefaultHint(String text) {
+    return 'Default: $text';
+  }
+
+  @override
+  String get adminAchDisabled => 'Disabled';
+
+  @override
+  String get adminAchDisabledHelp => 'Disabled: hidden from students.';
+
+  @override
+  String get adminAchEnabled => 'Enabled';
+
+  @override
+  String get adminAchFieldDescription => 'Description';
+
+  @override
+  String get adminAchFieldTitle => 'Title';
+
+  @override
+  String get adminAchFixErrors => 'Fix the highlighted fields';
+
+  @override
+  String get adminAchIntro =>
+      'Texts and visibility of achievements. Thresholds and award rules stay on the server. Leave a field empty to keep the app\'s built-in text.';
+
+  @override
+  String get adminAchMissingTranslation =>
+      'Fill in both languages or leave both empty';
+
+  @override
+  String get adminAchNoDoc =>
+      'config/achievements does not exist yet: the built-in texts are used everywhere. Saving creates it.';
+
+  @override
+  String get adminAchPreview => 'Preview';
+
+  @override
+  String get adminAchPreviewHelp =>
+      'How students see it in Russian and Kyrgyz.';
+
+  @override
+  String get adminAchReset => 'Reset texts';
+
+  @override
+  String get adminAchUnsaved => 'Unsaved changes';
+
+  @override
   String get adminActivate => 'Activate';
 
   @override
@@ -320,6 +368,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Firestore needs an index for this filter. Change the filter or create the index.';
 
   @override
+  String get adminErrLimitReached =>
+      'The limit for this action has been reached. Try again later.';
+
+  @override
   String get adminErrNetwork =>
       'No connection to the server. Check the network and try again.';
 
@@ -328,6 +380,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminErrQuota => 'Limit reached. Try again later.';
+
+  @override
+  String get adminErrRateLimited =>
+      'Too many requests. Wait a little and try again.';
 
   @override
   String get adminErrSessionExpired =>
@@ -656,6 +712,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminFieldPoints => 'Points';
+
+  @override
+  String get adminFieldRequired => 'Required';
 
   @override
   String get adminFieldReview => 'Review';
@@ -1026,6 +1085,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminMoveUp => 'Move up';
 
   @override
+  String get adminNavAchievements => 'Achievements';
+
+  @override
   String get adminNavAiDrafts => 'AI drafts';
 
   @override
@@ -1041,6 +1103,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminNavLogs => 'Admin log';
 
   @override
+  String get adminNavNotifications => 'Notifications';
+
+  @override
   String get adminNavPayments => 'Payments';
 
   @override
@@ -1048,6 +1113,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminNavPricing => 'Pricing';
+
+  @override
+  String get adminNavPromoCodes => 'Promo codes';
 
   @override
   String get adminNavSubjects => 'Subjects & topics';
@@ -1063,6 +1131,156 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminNone => 'Not set';
+
+  @override
+  String get adminNotifAudienceAll => 'Everyone';
+
+  @override
+  String get adminNotifAudienceAllHint =>
+      'All users with notifications enabled.';
+
+  @override
+  String get adminNotifAudienceAllUsers => 'All users';
+
+  @override
+  String get adminNotifAudienceGroup => 'Group';
+
+  @override
+  String adminNotifAudienceGroupIs(String group) {
+    return 'Group: $group';
+  }
+
+  @override
+  String get adminNotifAudienceLanguage => 'By language';
+
+  @override
+  String adminNotifAudienceLanguageIs(String language) {
+    return 'Language: $language';
+  }
+
+  @override
+  String get adminNotifAudienceRegion => 'By region';
+
+  @override
+  String adminNotifAudienceRegionIs(String region) {
+    return 'Region: $region';
+  }
+
+  @override
+  String get adminNotifAudienceTitle => 'Audience';
+
+  @override
+  String get adminNotifAudienceValueRequired => 'Choose who receives it';
+
+  @override
+  String get adminNotifCheckFirst =>
+      'Check the reach to see how many people will receive the notification.';
+
+  @override
+  String get adminNotifCheckReach => 'Check reach';
+
+  @override
+  String get adminNotifCheckStale =>
+      'The text or audience changed — check the reach again.';
+
+  @override
+  String adminNotifConfirmBody(int count, String audience) {
+    return '$count users will receive the notification ($audience). A sent broadcast cannot be recalled.';
+  }
+
+  @override
+  String get adminNotifConfirmTitle => 'Send the broadcast?';
+
+  @override
+  String adminNotifFailedShort(int count) {
+    return 'failed: $count';
+  }
+
+  @override
+  String get adminNotifFieldBody => 'Message';
+
+  @override
+  String get adminNotifFieldTitle => 'Title';
+
+  @override
+  String get adminNotifFixErrors =>
+      'Fill in the texts in both languages and choose the audience.';
+
+  @override
+  String get adminNotifGroupId => 'Group ID';
+
+  @override
+  String get adminNotifGroupIdHelp =>
+      'The group document id (collection groups)';
+
+  @override
+  String get adminNotifGroupIdInvalid =>
+      'Only Latin letters, digits, _ and -, up to 128 characters';
+
+  @override
+  String get adminNotifHistoryEmpty => 'No broadcasts yet';
+
+  @override
+  String adminNotifIntro(int limit) {
+    return 'The push notification goes to users with notifications enabled, in their app language. Check the reach first, then send. At most $limit broadcasts per day.';
+  }
+
+  @override
+  String adminNotifLimitReached(int limit) {
+    return 'Today\'s broadcast limit is used up ($limit per day). You can send the next one tomorrow.';
+  }
+
+  @override
+  String get adminNotifNoRecipients =>
+      'No recipients for this audience. Choose a different one.';
+
+  @override
+  String adminNotifRecipients(int count) {
+    return 'Recipients: $count';
+  }
+
+  @override
+  String adminNotifRecipientsShort(int count) {
+    return 'recipients: $count';
+  }
+
+  @override
+  String adminNotifResult(int recipients, int sent, int failed) {
+    return 'Recipients: $recipients · sent: $sent · failed: $failed';
+  }
+
+  @override
+  String get adminNotifResultLabel => 'Result';
+
+  @override
+  String get adminNotifSend => 'Send';
+
+  @override
+  String get adminNotifSendTitle => 'Reach and sending';
+
+  @override
+  String adminNotifSentShort(int count) {
+    return 'sent: $count';
+  }
+
+  @override
+  String adminNotifSentSnack(int count) {
+    return 'Sent: $count';
+  }
+
+  @override
+  String get adminNotifTabCompose => 'New broadcast';
+
+  @override
+  String get adminNotifTabHistory => 'History';
+
+  @override
+  String get adminNotifTextTitle => 'Text';
+
+  @override
+  String adminNotifTodayCount(int count, int limit) {
+    return 'Sent today: $count of $limit. The server enforces the limit.';
+  }
 
   @override
   String adminOptionN(String id) {
@@ -1163,6 +1381,167 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminPricingWarning =>
       'Prices are set in Google Play Console, not here. This page only maps products to exam credits. Do not change the base price of 100 som (exam_single) without the owner\'s approval.';
+
+  @override
+  String get adminPromoActive => 'Active';
+
+  @override
+  String get adminPromoActiveHelp => 'Students can redeem only active codes.';
+
+  @override
+  String get adminPromoClearDate => 'No expiry';
+
+  @override
+  String get adminPromoCode => 'Code';
+
+  @override
+  String adminPromoCodeHelp(int min, int max) {
+    return 'Latin letters A–Z and digits, $min–$max characters';
+  }
+
+  @override
+  String adminPromoConfirmBody(
+    String code,
+    int credits,
+    String max,
+    String expiry,
+    String status,
+  ) {
+    return 'Code $code: $credits free credits per redemption; max redemptions: $max; expiry: $expiry; status: $status. The change will be recorded in the action log.';
+  }
+
+  @override
+  String get adminPromoConfirmCreateTitle => 'Create the promo code?';
+
+  @override
+  String get adminPromoConfirmEditTitle => 'Save the changes?';
+
+  @override
+  String get adminPromoCreate => 'New promo code';
+
+  @override
+  String get adminPromoCredits => 'Credits per redemption';
+
+  @override
+  String adminPromoCreditsValue(int n) {
+    return 'credits: $n';
+  }
+
+  @override
+  String get adminPromoDeactivate => 'Deactivate';
+
+  @override
+  String get adminPromoDeactivateBody =>
+      'Students will no longer be able to redeem it. Credits already granted stay. The change is recorded in the action log.';
+
+  @override
+  String adminPromoDeactivateTitle(String code) {
+    return 'Deactivate $code?';
+  }
+
+  @override
+  String adminPromoDeactivated(String code) {
+    return '$code deactivated';
+  }
+
+  @override
+  String get adminPromoDialogWarning =>
+      'Every redemption grants free credits. The change is recorded in the action log.';
+
+  @override
+  String adminPromoEditTitle(String code) {
+    return 'Promo code $code';
+  }
+
+  @override
+  String get adminPromoEmpty => 'No promo codes yet';
+
+  @override
+  String adminPromoErrCode(int min, int max) {
+    return '$min–$max characters: A–Z and 0–9 only';
+  }
+
+  @override
+  String adminPromoErrCredits(int min, int max) {
+    return 'From $min to $max credits';
+  }
+
+  @override
+  String get adminPromoErrExpiry =>
+      'The date has passed: pick a future date or deactivate the code';
+
+  @override
+  String adminPromoErrMax(int limit) {
+    return 'From 1 to $limit';
+  }
+
+  @override
+  String adminPromoErrMaxBelow(int used) {
+    return 'Already used $used times — the limit cannot be lower';
+  }
+
+  @override
+  String get adminPromoExpiry => 'Expiry';
+
+  @override
+  String get adminPromoExpiryHelp =>
+      'The code works through 23:59 Bishkek time on the chosen day.';
+
+  @override
+  String get adminPromoGenerate => 'Generate a code';
+
+  @override
+  String get adminPromoMaxHelp => 'Empty = unlimited.';
+
+  @override
+  String get adminPromoMaxRedemptions => 'Max redemptions';
+
+  @override
+  String get adminPromoNoExpiry => 'no expiry';
+
+  @override
+  String get adminPromoNote => 'Note (internal)';
+
+  @override
+  String get adminPromoNoteHelp =>
+      'Who the code is for: campaign, partner, school.';
+
+  @override
+  String get adminPromoPickDate => 'Pick a date';
+
+  @override
+  String adminPromoSaved(String code) {
+    return 'Promo code $code saved';
+  }
+
+  @override
+  String get adminPromoStatusActive => 'Active';
+
+  @override
+  String get adminPromoStatusExhausted => 'Used up';
+
+  @override
+  String get adminPromoStatusExpired => 'Expired';
+
+  @override
+  String get adminPromoStatusInactive => 'Off';
+
+  @override
+  String get adminPromoUnlimited => 'unlimited';
+
+  @override
+  String adminPromoUntil(String date) {
+    return 'valid through $date';
+  }
+
+  @override
+  String adminPromoUsage(int used, String max) {
+    return 'used: $used / $max';
+  }
+
+  @override
+  String get adminPromoWarning =>
+      'Promo codes grant free exam credits (1 credit = 1 exam), so they are a finance operation: only super admins manage them, and every change is recorded in the action log.';
 
   @override
   String get adminPublished => 'Published';
@@ -1352,6 +1731,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Topic ids become subject.topic (e.g. math.quadratic_equations) and are used by exam questions.';
 
   @override
+  String adminTextTooLong(int max) {
+    return 'No longer than $max characters';
+  }
+
+  @override
   String get adminTitleRequired => 'Enter a title in Russian or Kyrgyz.';
 
   @override
@@ -1449,6 +1833,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminUserGrantTitle => 'Grant credits';
 
   @override
+  String get adminUserGroupMissing => 'Group not found (deleted?)';
+
+  @override
+  String adminUserGroups(int count) {
+    return 'Groups ($count)';
+  }
+
+  @override
+  String get adminUserGrowth => 'Referrals and groups';
+
+  @override
   String get adminUserLanguage => 'Language';
 
   @override
@@ -1463,6 +1858,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminUserNoEntitlements =>
       'No entitlement record yet (first exam not used).';
+
+  @override
+  String get adminUserNoGroups => 'Not in any group';
+
+  @override
+  String get adminUserOpenProfile => 'Open';
 
   @override
   String get adminUserPremiumOff => 'Remove premium';
@@ -1482,6 +1883,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminUserPremiumOnTitle => 'Grant premium?';
+
+  @override
+  String get adminUserReferralCode => 'Referral code';
+
+  @override
+  String get adminUserReferralsCount => 'Invited';
+
+  @override
+  String get adminUserReferredBy => 'Invited by';
 
   @override
   String get adminUserRole => 'Role';

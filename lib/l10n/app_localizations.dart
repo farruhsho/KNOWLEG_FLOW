@@ -352,6 +352,90 @@ abstract class AppLocalizations {
   /// **'Account'**
   String get adminAccountMenu;
 
+  /// No description provided for @adminAchDefaultHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {text}'**
+  String adminAchDefaultHint(String text);
+
+  /// No description provided for @adminAchDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get adminAchDisabled;
+
+  /// No description provided for @adminAchDisabledHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled: hidden from students.'**
+  String get adminAchDisabledHelp;
+
+  /// No description provided for @adminAchEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get adminAchEnabled;
+
+  /// No description provided for @adminAchFieldDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get adminAchFieldDescription;
+
+  /// No description provided for @adminAchFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get adminAchFieldTitle;
+
+  /// No description provided for @adminAchFixErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix the highlighted fields'**
+  String get adminAchFixErrors;
+
+  /// No description provided for @adminAchIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Texts and visibility of achievements. Thresholds and award rules stay on the server. Leave a field empty to keep the app\'s built-in text.'**
+  String get adminAchIntro;
+
+  /// No description provided for @adminAchMissingTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in both languages or leave both empty'**
+  String get adminAchMissingTranslation;
+
+  /// No description provided for @adminAchNoDoc.
+  ///
+  /// In en, this message translates to:
+  /// **'config/achievements does not exist yet: the built-in texts are used everywhere. Saving creates it.'**
+  String get adminAchNoDoc;
+
+  /// No description provided for @adminAchPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get adminAchPreview;
+
+  /// No description provided for @adminAchPreviewHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How students see it in Russian and Kyrgyz.'**
+  String get adminAchPreviewHelp;
+
+  /// No description provided for @adminAchReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset texts'**
+  String get adminAchReset;
+
+  /// No description provided for @adminAchUnsaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved changes'**
+  String get adminAchUnsaved;
+
   /// No description provided for @adminActivate.
   ///
   /// In en, this message translates to:
@@ -628,6 +712,12 @@ abstract class AppLocalizations {
   /// **'Firestore needs an index for this filter. Change the filter or create the index.'**
   String get adminErrIndex;
 
+  /// No description provided for @adminErrLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'The limit for this action has been reached. Try again later.'**
+  String get adminErrLimitReached;
+
   /// No description provided for @adminErrNetwork.
   ///
   /// In en, this message translates to:
@@ -645,6 +735,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Limit reached. Try again later.'**
   String get adminErrQuota;
+
+  /// No description provided for @adminErrRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many requests. Wait a little and try again.'**
+  String get adminErrRateLimited;
 
   /// A server function answered unauthenticated without an App Check hint
   ///
@@ -1233,6 +1329,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Points'**
   String get adminFieldPoints;
+
+  /// No description provided for @adminFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get adminFieldRequired;
 
   /// No description provided for @adminFieldReview.
   ///
@@ -1906,6 +2008,12 @@ abstract class AppLocalizations {
   /// **'Move up'**
   String get adminMoveUp;
 
+  /// No description provided for @adminNavAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get adminNavAchievements;
+
   /// No description provided for @adminNavAiDrafts.
   ///
   /// In en, this message translates to:
@@ -1936,6 +2044,12 @@ abstract class AppLocalizations {
   /// **'Admin log'**
   String get adminNavLogs;
 
+  /// No description provided for @adminNavNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get adminNavNotifications;
+
   /// No description provided for @adminNavPayments.
   ///
   /// In en, this message translates to:
@@ -1953,6 +2067,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pricing'**
   String get adminNavPricing;
+
+  /// No description provided for @adminNavPromoCodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Promo codes'**
+  String get adminNavPromoCodes;
 
   /// No description provided for @adminNavSubjects.
   ///
@@ -1983,6 +2103,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not set'**
   String get adminNone;
+
+  /// No description provided for @adminNotifAudienceAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone'**
+  String get adminNotifAudienceAll;
+
+  /// No description provided for @adminNotifAudienceAllHint.
+  ///
+  /// In en, this message translates to:
+  /// **'All users with notifications enabled.'**
+  String get adminNotifAudienceAllHint;
+
+  /// No description provided for @adminNotifAudienceAllUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'All users'**
+  String get adminNotifAudienceAllUsers;
+
+  /// No description provided for @adminNotifAudienceGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get adminNotifAudienceGroup;
+
+  /// No description provided for @adminNotifAudienceGroupIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Group: {group}'**
+  String adminNotifAudienceGroupIs(String group);
+
+  /// No description provided for @adminNotifAudienceLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'By language'**
+  String get adminNotifAudienceLanguage;
+
+  /// No description provided for @adminNotifAudienceLanguageIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Language: {language}'**
+  String adminNotifAudienceLanguageIs(String language);
+
+  /// No description provided for @adminNotifAudienceRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'By region'**
+  String get adminNotifAudienceRegion;
+
+  /// No description provided for @adminNotifAudienceRegionIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Region: {region}'**
+  String adminNotifAudienceRegionIs(String region);
+
+  /// No description provided for @adminNotifAudienceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audience'**
+  String get adminNotifAudienceTitle;
+
+  /// No description provided for @adminNotifAudienceValueRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose who receives it'**
+  String get adminNotifAudienceValueRequired;
+
+  /// No description provided for @adminNotifCheckFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the reach to see how many people will receive the notification.'**
+  String get adminNotifCheckFirst;
+
+  /// No description provided for @adminNotifCheckReach.
+  ///
+  /// In en, this message translates to:
+  /// **'Check reach'**
+  String get adminNotifCheckReach;
+
+  /// No description provided for @adminNotifCheckStale.
+  ///
+  /// In en, this message translates to:
+  /// **'The text or audience changed — check the reach again.'**
+  String get adminNotifCheckStale;
+
+  /// No description provided for @adminNotifConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} users will receive the notification ({audience}). A sent broadcast cannot be recalled.'**
+  String adminNotifConfirmBody(int count, String audience);
+
+  /// No description provided for @adminNotifConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the broadcast?'**
+  String get adminNotifConfirmTitle;
+
+  /// No description provided for @adminNotifFailedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'failed: {count}'**
+  String adminNotifFailedShort(int count);
+
+  /// No description provided for @adminNotifFieldBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get adminNotifFieldBody;
+
+  /// No description provided for @adminNotifFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get adminNotifFieldTitle;
+
+  /// No description provided for @adminNotifFixErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in the texts in both languages and choose the audience.'**
+  String get adminNotifFixErrors;
+
+  /// No description provided for @adminNotifGroupId.
+  ///
+  /// In en, this message translates to:
+  /// **'Group ID'**
+  String get adminNotifGroupId;
+
+  /// No description provided for @adminNotifGroupIdHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The group document id (collection groups)'**
+  String get adminNotifGroupIdHelp;
+
+  /// No description provided for @adminNotifGroupIdInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Only Latin letters, digits, _ and -, up to 128 characters'**
+  String get adminNotifGroupIdInvalid;
+
+  /// No description provided for @adminNotifHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No broadcasts yet'**
+  String get adminNotifHistoryEmpty;
+
+  /// No description provided for @adminNotifIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'The push notification goes to users with notifications enabled, in their app language. Check the reach first, then send. At most {limit} broadcasts per day.'**
+  String adminNotifIntro(int limit);
+
+  /// No description provided for @adminNotifLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s broadcast limit is used up ({limit} per day). You can send the next one tomorrow.'**
+  String adminNotifLimitReached(int limit);
+
+  /// No description provided for @adminNotifNoRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipients for this audience. Choose a different one.'**
+  String get adminNotifNoRecipients;
+
+  /// No description provided for @adminNotifRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipients: {count}'**
+  String adminNotifRecipients(int count);
+
+  /// No description provided for @adminNotifRecipientsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'recipients: {count}'**
+  String adminNotifRecipientsShort(int count);
+
+  /// No description provided for @adminNotifResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipients: {recipients} · sent: {sent} · failed: {failed}'**
+  String adminNotifResult(int recipients, int sent, int failed);
+
+  /// No description provided for @adminNotifResultLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get adminNotifResultLabel;
+
+  /// No description provided for @adminNotifSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get adminNotifSend;
+
+  /// No description provided for @adminNotifSendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reach and sending'**
+  String get adminNotifSendTitle;
+
+  /// No description provided for @adminNotifSentShort.
+  ///
+  /// In en, this message translates to:
+  /// **'sent: {count}'**
+  String adminNotifSentShort(int count);
+
+  /// No description provided for @adminNotifSentSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent: {count}'**
+  String adminNotifSentSnack(int count);
+
+  /// No description provided for @adminNotifTabCompose.
+  ///
+  /// In en, this message translates to:
+  /// **'New broadcast'**
+  String get adminNotifTabCompose;
+
+  /// No description provided for @adminNotifTabHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get adminNotifTabHistory;
+
+  /// No description provided for @adminNotifTextTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get adminNotifTextTitle;
+
+  /// No description provided for @adminNotifTodayCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent today: {count} of {limit}. The server enforces the limit.'**
+  String adminNotifTodayCount(int count, int limit);
 
   /// No description provided for @adminOptionN.
   ///
@@ -2151,6 +2505,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Prices are set in Google Play Console, not here. This page only maps products to exam credits. Do not change the base price of 100 som (exam_single) without the owner\'s approval.'**
   String get adminPricingWarning;
+
+  /// No description provided for @adminPromoActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get adminPromoActive;
+
+  /// No description provided for @adminPromoActiveHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Students can redeem only active codes.'**
+  String get adminPromoActiveHelp;
+
+  /// No description provided for @adminPromoClearDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No expiry'**
+  String get adminPromoClearDate;
+
+  /// No description provided for @adminPromoCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get adminPromoCode;
+
+  /// No description provided for @adminPromoCodeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Latin letters A–Z and digits, {min}–{max} characters'**
+  String adminPromoCodeHelp(int min, int max);
+
+  /// No description provided for @adminPromoConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Code {code}: {credits} free credits per redemption; max redemptions: {max}; expiry: {expiry}; status: {status}. The change will be recorded in the action log.'**
+  String adminPromoConfirmBody(
+    String code,
+    int credits,
+    String max,
+    String expiry,
+    String status,
+  );
+
+  /// No description provided for @adminPromoConfirmCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create the promo code?'**
+  String get adminPromoConfirmCreateTitle;
+
+  /// No description provided for @adminPromoConfirmEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the changes?'**
+  String get adminPromoConfirmEditTitle;
+
+  /// No description provided for @adminPromoCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'New promo code'**
+  String get adminPromoCreate;
+
+  /// No description provided for @adminPromoCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits per redemption'**
+  String get adminPromoCredits;
+
+  /// No description provided for @adminPromoCreditsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'credits: {n}'**
+  String adminPromoCreditsValue(int n);
+
+  /// No description provided for @adminPromoDeactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get adminPromoDeactivate;
+
+  /// No description provided for @adminPromoDeactivateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Students will no longer be able to redeem it. Credits already granted stay. The change is recorded in the action log.'**
+  String get adminPromoDeactivateBody;
+
+  /// No description provided for @adminPromoDeactivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate {code}?'**
+  String adminPromoDeactivateTitle(String code);
+
+  /// No description provided for @adminPromoDeactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'{code} deactivated'**
+  String adminPromoDeactivated(String code);
+
+  /// No description provided for @adminPromoDialogWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Every redemption grants free credits. The change is recorded in the action log.'**
+  String get adminPromoDialogWarning;
+
+  /// No description provided for @adminPromoEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Promo code {code}'**
+  String adminPromoEditTitle(String code);
+
+  /// No description provided for @adminPromoEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No promo codes yet'**
+  String get adminPromoEmpty;
+
+  /// No description provided for @adminPromoErrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}–{max} characters: A–Z and 0–9 only'**
+  String adminPromoErrCode(int min, int max);
+
+  /// No description provided for @adminPromoErrCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'From {min} to {max} credits'**
+  String adminPromoErrCredits(int min, int max);
+
+  /// No description provided for @adminPromoErrExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'The date has passed: pick a future date or deactivate the code'**
+  String get adminPromoErrExpiry;
+
+  /// No description provided for @adminPromoErrMax.
+  ///
+  /// In en, this message translates to:
+  /// **'From 1 to {limit}'**
+  String adminPromoErrMax(int limit);
+
+  /// No description provided for @adminPromoErrMaxBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Already used {used} times — the limit cannot be lower'**
+  String adminPromoErrMaxBelow(int used);
+
+  /// No description provided for @adminPromoExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry'**
+  String get adminPromoExpiry;
+
+  /// No description provided for @adminPromoExpiryHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The code works through 23:59 Bishkek time on the chosen day.'**
+  String get adminPromoExpiryHelp;
+
+  /// No description provided for @adminPromoGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a code'**
+  String get adminPromoGenerate;
+
+  /// No description provided for @adminPromoMaxHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty = unlimited.'**
+  String get adminPromoMaxHelp;
+
+  /// No description provided for @adminPromoMaxRedemptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Max redemptions'**
+  String get adminPromoMaxRedemptions;
+
+  /// No description provided for @adminPromoNoExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'no expiry'**
+  String get adminPromoNoExpiry;
+
+  /// No description provided for @adminPromoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (internal)'**
+  String get adminPromoNote;
+
+  /// No description provided for @adminPromoNoteHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Who the code is for: campaign, partner, school.'**
+  String get adminPromoNoteHelp;
+
+  /// No description provided for @adminPromoPickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date'**
+  String get adminPromoPickDate;
+
+  /// No description provided for @adminPromoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Promo code {code} saved'**
+  String adminPromoSaved(String code);
+
+  /// No description provided for @adminPromoStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get adminPromoStatusActive;
+
+  /// No description provided for @adminPromoStatusExhausted.
+  ///
+  /// In en, this message translates to:
+  /// **'Used up'**
+  String get adminPromoStatusExhausted;
+
+  /// No description provided for @adminPromoStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get adminPromoStatusExpired;
+
+  /// No description provided for @adminPromoStatusInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get adminPromoStatusInactive;
+
+  /// No description provided for @adminPromoUnlimited.
+  ///
+  /// In en, this message translates to:
+  /// **'unlimited'**
+  String get adminPromoUnlimited;
+
+  /// No description provided for @adminPromoUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'valid through {date}'**
+  String adminPromoUntil(String date);
+
+  /// No description provided for @adminPromoUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'used: {used} / {max}'**
+  String adminPromoUsage(int used, String max);
+
+  /// No description provided for @adminPromoWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Promo codes grant free exam credits (1 credit = 1 exam), so they are a finance operation: only super admins manage them, and every change is recorded in the action log.'**
+  String get adminPromoWarning;
 
   /// No description provided for @adminPublished.
   ///
@@ -2494,6 +3100,12 @@ abstract class AppLocalizations {
   /// **'Topic ids become subject.topic (e.g. math.quadratic_equations) and are used by exam questions.'**
   String get adminSubjectsTopicsHelp;
 
+  /// No description provided for @adminTextTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'No longer than {max} characters'**
+  String adminTextTooLong(int max);
+
   /// No description provided for @adminTitleRequired.
   ///
   /// In en, this message translates to:
@@ -2680,6 +3292,24 @@ abstract class AppLocalizations {
   /// **'Grant credits'**
   String get adminUserGrantTitle;
 
+  /// No description provided for @adminUserGroupMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Group not found (deleted?)'**
+  String get adminUserGroupMissing;
+
+  /// No description provided for @adminUserGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups ({count})'**
+  String adminUserGroups(int count);
+
+  /// No description provided for @adminUserGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Referrals and groups'**
+  String get adminUserGrowth;
+
   /// No description provided for @adminUserLanguage.
   ///
   /// In en, this message translates to:
@@ -2709,6 +3339,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No entitlement record yet (first exam not used).'**
   String get adminUserNoEntitlements;
+
+  /// No description provided for @adminUserNoGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in any group'**
+  String get adminUserNoGroups;
+
+  /// No description provided for @adminUserOpenProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get adminUserOpenProfile;
 
   /// No description provided for @adminUserPremiumOff.
   ///
@@ -2745,6 +3387,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Grant premium?'**
   String get adminUserPremiumOnTitle;
+
+  /// No description provided for @adminUserReferralCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Referral code'**
+  String get adminUserReferralCode;
+
+  /// No description provided for @adminUserReferralsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited'**
+  String get adminUserReferralsCount;
+
+  /// No description provided for @adminUserReferredBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Invited by'**
+  String get adminUserReferredBy;
 
   /// No description provided for @adminUserRole.
   ///

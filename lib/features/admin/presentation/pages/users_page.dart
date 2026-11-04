@@ -397,6 +397,7 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
                   ]),
           ),
         ),
+        UserGrowthCard(user: u),
         AdminCard(
           title: l.adminUserStats,
           child: stats.when(
@@ -411,6 +412,92 @@ class _UserDetailState extends ConsumerState<_UserDetail> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Read-only phase-3 data of a user (ARCHITECTURE.md §9.1, §9.3): referral
+/// code, inviter, number of invited people (`count()` over
+/// `referrals/{uid}/items`) and group memberships (`group_ids` → names).
+/// All of it is written by the server only.
+class UserGrowthCard extends ConsumerWidget {
+  const UserGrowthCard({super.key, required this.user});
+  final AdminUserRecord user;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
+    final t = context.tokens;
+    final referrals = ref.watch(adminReferralsCountProvider(user.uid));
+    final referredBy = user.referredBy;
+    return AdminCard(
+      title: l.adminUserGrowth,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AdminKeyValue(l.adminUserReferralCode, user.referralCode ?? '—'),
+          if (referredBy == null)
+            AdminKeyValue(l.adminUserReferredBy, '—')
+          else
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.xs,
+              children: [
+                AdminKeyValue(l.adminUserReferredBy, referredBy),
+                TextButton(
+                  onPressed: () => context.push('/admin/users/$referredBy'),
+                  child: Text(l.adminUserOpenProfile),
+                ),
+              ],
+            ),
+          AdminKeyValue(
+            l.adminUserReferralsCount,
+            referrals.when(
+              loading: () => '…',
+              error: (e, _) => adminErrorMessage(l, e),
+              data: (n) => '$n',
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(l.adminUserGroups(user.groupIds.length), style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: AppSpacing.xs),
+          if (user.groupIds.isEmpty)
+            Text(l.adminUserNoGroups, style: TextStyle(color: t.textSecondary))
+          else
+            for (final gid in user.groupIds) _GroupMembershipRow(groupId: gid),
+        ],
+      ),
+    );
+  }
+}
+
+class _GroupMembershipRow extends ConsumerWidget {
+  const _GroupMembershipRow({required this.groupId});
+  final String groupId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
+    final t = context.tokens;
+    final name = ref.watch(adminGroupNameProvider(groupId));
+    final (String title, String? note, Color? noteColor) = name.when(
+      loading: () => (groupId, null, null),
+      error: (e, _) => (groupId, adminErrorMessage(l, e), t.danger),
+      data: (n) => n == null
+          ? (groupId, l.adminUserGroupMissing, t.warning)
+          : (n.isEmpty ? groupId : n, n.isEmpty ? null : groupId, t.textTertiary),
+    );
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+      leading: const Icon(Icons.groups_outlined),
+      title: Text(title, overflow: TextOverflow.ellipsis),
+      subtitle: note == null
+          ? null
+          : Text(note, style: TextStyle(color: noteColor), maxLines: 2, overflow: TextOverflow.ellipsis),
+      trailing: name.isLoading
+          ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2))
+          : null,
     );
   }
 }

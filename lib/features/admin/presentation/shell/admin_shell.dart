@@ -24,6 +24,9 @@ String adminSectionLabel(AppLocalizations l, AdminSection s) => switch (s) {
       AdminSection.payments => l.adminNavPayments,
       AdminSection.pricing => l.adminNavPricing,
       AdminSection.logs => l.adminNavLogs,
+      AdminSection.notifications => l.adminNavNotifications,
+      AdminSection.promoCodes => l.adminNavPromoCodes,
+      AdminSection.achievements => l.adminNavAchievements,
     };
 
 IconData adminSectionIcon(AdminSection s) => switch (s) {
@@ -38,6 +41,9 @@ IconData adminSectionIcon(AdminSection s) => switch (s) {
       AdminSection.payments => Icons.receipt_long_outlined,
       AdminSection.pricing => Icons.sell_outlined,
       AdminSection.logs => Icons.history_outlined,
+      AdminSection.notifications => Icons.campaign_outlined,
+      AdminSection.promoCodes => Icons.confirmation_number_outlined,
+      AdminSection.achievements => Icons.emoji_events_outlined,
     };
 
 String adminRoleLabel(AppLocalizations l, AdminRole r) => switch (r) {

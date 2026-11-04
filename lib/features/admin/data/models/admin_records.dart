@@ -13,6 +13,16 @@ String? _sn(Object? v) {
   return (s == null || s.isEmpty) ? null : s;
 }
 
+/// Non-empty, de-duplicated strings of a list field (anything else → empty).
+List<String> _strings(Object? v) {
+  if (v is! List) return const [];
+  final out = <String>[];
+  for (final e in v) {
+    if (e is String && e.trim().isNotEmpty && !out.contains(e.trim())) out.add(e.trim());
+  }
+  return out;
+}
+
 /// Row of `users/{uid}` as the CMS shows it (FB-22: real snake_case fields).
 class AdminUserRecord {
   final String uid;
@@ -31,6 +41,15 @@ class AdminUserRecord {
   final int? grade;
   final String? school;
 
+  /// `referral_code` (privileged, written by `referralGetCode`, §9.1).
+  final String? referralCode;
+
+  /// `referred_by`: uid of the inviter (privileged, §9.1).
+  final String? referredBy;
+
+  /// `group_ids` (privileged, ≤ 5 — §9.3).
+  final List<String> groupIds;
+
   const AdminUserRecord({
     required this.uid,
     required this.name,
@@ -44,17 +63,22 @@ class AdminUserRecord {
     this.preferredLanguage = 'ru',
     this.grade,
     this.school,
+    this.referralCode,
+    this.referredBy,
+    this.groupIds = const [],
   });
 
   bool get isPremium =>
       subscriptionTier != 'free' &&
       (subscriptionExpiresAt == null || subscriptionExpiresAt!.isAfter(DateTime.now()));
 
-  factory AdminUserRecord.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final d = doc.data() ?? const <String, dynamic>{};
+  factory AdminUserRecord.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      AdminUserRecord.fromMap(doc.id, doc.data() ?? const <String, dynamic>{});
+
+  factory AdminUserRecord.fromMap(String uid, Map<String, dynamic> d) {
     final sub = d['subscription'];
     return AdminUserRecord(
-      uid: doc.id,
+      uid: uid,
       name: _s(d['name'] ?? d['display_name'] ?? d['displayName']),
       email: _s(d['email']),
       legacyRole: _sn(d['role']) ?? 'student',
@@ -66,6 +90,9 @@ class AdminUserRecord {
       preferredLanguage: _sn(d['preferred_language']) ?? 'ru',
       grade: d['grade'] is num ? (d['grade'] as num).toInt() : null,
       school: _sn(d['school']),
+      referralCode: _sn(d['referral_code']),
+      referredBy: _sn(d['referred_by']),
+      groupIds: _strings(d['group_ids']),
     );
   }
 }

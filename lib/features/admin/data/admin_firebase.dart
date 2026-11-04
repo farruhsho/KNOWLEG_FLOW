@@ -33,6 +33,12 @@ abstract final class AdminCollections {
   static const config = 'config';
   static const pricingDoc = 'pricing';
   static const adminLogs = 'admin_logs';
+
+  // Phase 3 (ARCHITECTURE §9). Shared names live in `Collections`
+  // (backend_contract.dart); these are the ones only the CMS reads.
+  static const promoCodes = 'promo_codes';
+  static const promoRedemptions = 'redemptions'; // sub-collection of promo_codes
+  static const achievementsDoc = 'achievements'; // config/achievements
 }
 
 /// Page of documents for cursor pagination (FB-17: never scan collections).

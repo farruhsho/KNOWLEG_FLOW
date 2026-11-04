@@ -1,7 +1,8 @@
 # Admin CMS (`lib/features/admin`)
 
 Role-based content and operations console for ORT Master KG. Contract:
-`docs/modernization/ARCHITECTURE.md` (§1 collections, §2 roles, §3 callables).
+`docs/modernization/ARCHITECTURE.md` (§1 collections, §2 roles, §3 callables,
+§9 phase 3: promo codes, broadcasts, achievements, referrals and groups).
 
 ## Access
 
@@ -28,10 +29,13 @@ Role-based content and operations console for ORT Master KG. Contract:
 | `/admin/exam-bank`, `/admin/exam-bank/:id` | `exam_questions` + keys + passages, review | edit_questions (approve/reject: review_questions) |
 | `/admin/variants`, `/admin/variants/:id` | Variant builder, publish via `adminPublishVariant` | view: edit_questions; create/edit/publish: publish_variants |
 | `/admin/ai-drafts` | `adminAiDraftQuestions` → drafts | super_admin, content_manager, methodologist |
-| `/admin/users`, `/admin/users/:uid` | Users, entitlements, ledger; ban (moderate_users: only `is_banned`, `ban_reason`, `banned_at`, `banned_by`, `updated_at`); premium, `adminSetRole`, `adminGrantCredits` (super_admin) | view_users / moderate_users / super_admin |
+| `/admin/users`, `/admin/users/:uid` | Users, entitlements, ledger; ban (moderate_users: only `is_banned`, `ban_reason`, `banned_at`, `banned_by`, `updated_at`); premium, `adminSetRole`, `adminGrantCredits` (super_admin); read-only referral code, `referred_by`, invited count (`count()` of `referrals/{uid}/items`) and groups (`group_ids` → `groups/{gid}.name`) | view_users / moderate_users / super_admin |
 | `/admin/payments` | Read-only `purchases` | view_payments |
 | `/admin/pricing` | `config/pricing` via `adminUpdatePricing` | manage_pricing |
 | `/admin/logs` | `admin_logs` | super_admin, support |
+| `/admin/notifications` | Push broadcasts via `adminSendNotification`: ru + ky title/body, audience (all / language / region / group), reach check (dry run) required before a confirmed send; paginated `notifications` history | send_notifications |
+| `/admin/promo-codes` | `promo_codes` list (paginated) and create / edit / deactivate via `adminUpsertPromoCode` | grant_credits (super_admin) |
+| `/admin/achievements` | `config/achievements` editor: ru/ky title and description overrides, enabled switch, preview | manage_achievements |
 
 `/admin/generate-questions` (old template generator) redirects to AI drafts.
 
@@ -72,5 +76,30 @@ presentation/  shell (sidebar ↔ drawer), pages, widgets (Markdown+LaTeX, l10n 
   `admin*` keys equal the Russian text.
 * No secrets in the client: AI generation, role changes, credits, pricing and
   publishing go through callables.
+
+## Phase 3 (ARCHITECTURE §9)
+
+* Broadcasts (`domain/notification_draft.dart`): both languages required,
+  title ≤ 65 and body ≤ 240 code points (what a phone shows untruncated; the
+  callable validates again). The audience `region` value is the canonical
+  oblast stored in `users/{uid}.region.oblast` (`oblast` in
+  `assets/data/kg_regions.json`, the server's `region_id`), `group` is the
+  group document id, `language` is `ru` / `ky`. "Send" is enabled only for
+  the exact text and audience of the last reach check; any edit, a finished
+  send or a failed send (a timeout may still have delivered) requires a new
+  check. `LIMIT_REACHED` / `RATE_LIMITED` show the 3-per-day limit; the
+  "sent today" hint is counted from the history by Bishkek day, the server
+  enforces the real limit. History is ordered by `created_at`.
+* Promo codes (`domain/promo_code.dart`): code `A-Z0-9`, 4–20, upper-cased;
+  1–10 credits; optional max redemptions (≥ current redemptions while active)
+  and expiry (end of the chosen day, 23:59 Bishkek; must be in the future
+  while active). Unset optional fields are omitted from the callable payload.
+  The CMS never writes `promo_codes` directly; deactivation re-sends the code
+  with `active: false` and every other field unchanged.
+* Achievements (`domain/achievements_config.dart`): the CMS writes
+  `config/achievements` with `set()` (no merge) and exactly `titles`,
+  `descriptions`, `disabled`; only the nine server ids, only ru/ky, trimmed,
+  empty values dropped (empty = the app's built-in text); a text is
+  overridden in both languages or neither.
 
 Tests: `flutter test test/admin`.
