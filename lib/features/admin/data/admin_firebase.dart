@@ -24,6 +24,15 @@ abstract final class AdminCollections {
   static const examQuestions = 'exam_questions';
   static const examQuestionKeys = 'exam_question_keys';
   static const examPassages = 'exam_passages';
+  static const examVariants = 'exam_variants';
+  static const examBlueprints = 'exam_blueprints';
+  static const entitlements = 'entitlements';
+  static const ledger = 'ledger';
+  static const userStats = 'user_stats';
+  static const purchases = 'purchases';
+  static const config = 'config';
+  static const pricingDoc = 'pricing';
+  static const adminLogs = 'admin_logs';
 }
 
 /// Page of documents for cursor pagination (FB-17: never scan collections).

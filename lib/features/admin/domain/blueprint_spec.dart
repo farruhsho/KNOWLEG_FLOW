@@ -211,3 +211,30 @@ class BlueprintSpec {
     ];
   }
 }
+
+/// Finds the blueprint section an exam question belongs to (exact subject +
+/// section match first, then section id only).
+({BlueprintSpec blueprint, SectionSpec section})? locateSection(
+  List<BlueprintSpec> blueprints,
+  String subjectId,
+  String sectionId,
+) {
+  ({BlueprintSpec blueprint, SectionSpec section})? loose;
+  for (final b in blueprints) {
+    for (final s in b.sections) {
+      if (s.id != sectionId) continue;
+      if (b.subjectIdFor(s) == subjectId) return (blueprint: b, section: s);
+      loose ??= (blueprint: b, section: s);
+    }
+  }
+  return loose;
+}
+
+/// Fixed option texts of [part] in [language] (quantitative comparison).
+List<({String id, String text})> fixedOptionsFor(PartSpec part, String language) => [
+      for (final id in part.fixedOptionIds)
+        (
+          id: id,
+          text: pickLocalized(part.fixedOptionTexts[id] ?? const {}, language),
+        ),
+    ];

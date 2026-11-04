@@ -1,9 +1,3 @@
-import 'dart:convert';
-
-import 'package:csv/csv.dart';
-
-import 'localized_text.dart';
-
 /// Codec for the legacy practice bank (`questions` collection).
 ///
 /// One tolerant reader for every shape that exists in the wild (snake_case
@@ -13,6 +7,12 @@ import 'localized_text.dart';
 /// (FB-13 / CMS-18) plus a `subjectId` mirror because the student app still
 /// filters practice questions by `subjectId`.
 library;
+
+import 'dart:convert';
+
+import 'package:csv/csv.dart';
+
+import 'localized_text.dart';
 
 /// Canonical `type` wire values understood by the student parser.
 const List<String> kPracticeQuestionTypes = [

@@ -1,12 +1,12 @@
-import 'blueprint_spec.dart';
-import 'review_workflow.dart';
-
 /// Client-side preview of the rules `adminPublishVariant` enforces
 /// (ARCHITECTURE.md §1.2–1.3): the variant must match its blueprint section by
 /// section and part by part, use one language, contain no duplicates, and every
 /// question must be `methodologist_approved` with a key. The server stays the
 /// source of truth — this only lets editors see problems before publishing.
 library;
+
+import 'blueprint_spec.dart';
+import 'review_workflow.dart';
 
 enum ProblemSeverity { error, warning }
 

@@ -34,12 +34,16 @@ class AdminAuthService {
     );
     final user = cred.user;
     if (user == null) throw const NotAnAdminException();
-    return verify(user);
+    return verify(user, signOutIfNotAdmin: true);
   }
 
   /// Re-verifies an already signed-in user (cold start: Firebase Auth kept the
   /// user, but [adminVerified] was reset).
-  Future<AdminSession> verify(User user) async {
+  ///
+  /// [signOutIfNotAdmin] is `true` only for a fresh credential sign-in: a
+  /// student who merely opens the admin login and taps "continue" must not be
+  /// signed out of the student app.
+  Future<AdminSession> verify(User user, {bool signOutIfNotAdmin = false}) async {
     // Force refresh so a role granted or revoked by adminSetRole is seen now.
     final token = await user.getIdTokenResult(true);
     final claim = token.claims?['role'];
@@ -51,7 +55,11 @@ class AdminAuthService {
     }
     final role = resolveAdminRole(claimRole: claim, legacyUserRole: legacy);
     if (role == null) {
-      await signOut();
+      if (signOutIfNotAdmin) {
+        await signOut();
+      } else {
+        _ref.read(adminSessionProvider.notifier).clear();
+      }
       throw const NotAnAdminException();
     }
     final session = AdminSession(
