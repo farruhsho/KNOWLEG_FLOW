@@ -2,6 +2,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/backend/backend_contract.dart';
+import '../domain/notification_draft.dart';
+import '../domain/promo_code.dart';
 import 'admin_firebase.dart';
 
 /// Result of `adminPublishVariant` (ARCHITECTURE.md §3).
@@ -91,6 +93,24 @@ class AdminFunctions {
         if (d is Map) Map<String, dynamic>.from(d),
     ];
   }
+
+  /// `adminSendNotification` (§9.4). With [dryRun] the server only counts
+  /// the recipients ("Проверить охват"); otherwise it sends in batches of
+  /// ≤ 500 and records the broadcast in `notifications`.
+  Future<NotificationSendResult> sendNotification(NotificationDraft draft,
+      {required bool dryRun}) async {
+    final r = await _call(
+      BackendFunctions.adminSendNotification,
+      draft.toCallable(dryRun: dryRun),
+      timeout: Duration(seconds: dryRun ? 60 : 300),
+    );
+    return NotificationSendResult.fromMap(r);
+  }
+
+  /// `adminUpsertPromoCode` (§9.2, super_admin). Creates, edits or
+  /// deactivates a code; the server logs the change in `admin_logs`.
+  Future<void> upsertPromoCode(PromoCodeDraft draft) =>
+      _call(BackendFunctions.adminUpsertPromoCode, draft.toCallable());
 }
 
 final adminFunctionsServiceProvider =

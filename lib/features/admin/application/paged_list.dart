@@ -44,8 +44,13 @@ class PagedState<T> {
 }
 
 /// Cursor-paginated list (FB-17). Loads the first page on creation.
+///
+/// The empty state is created as `PagedState<T>()`, never `const
+/// PagedState()`: a const instance cannot carry the type parameter and is
+/// inferred as `PagedState<Never>`, whose `copyWith(items: List<T>)` then
+/// throws a TypeError on the first non-empty page.
 class PagedListNotifier<T> extends StateNotifier<PagedState<T>> {
-  PagedListNotifier(this._load) : super(const PagedState()) {
+  PagedListNotifier(this._load) : super(PagedState<T>()) {
     loadMore();
   }
 
@@ -76,7 +81,7 @@ class PagedListNotifier<T> extends StateNotifier<PagedState<T>> {
   Future<void> refresh() async {
     _generation++;
     _cursor = null;
-    state = const PagedState();
+    state = PagedState<T>();
     await loadMore();
   }
 

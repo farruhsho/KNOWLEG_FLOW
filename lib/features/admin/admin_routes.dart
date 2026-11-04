@@ -6,8 +6,10 @@ import '../../core/routes/admin_session.dart';
 import '../../core/routes/route_paths.dart';
 import 'domain/admin_nav.dart';
 import 'domain/exam_question.dart';
+import 'presentation/pages/admin_achievements_page.dart';
 import 'presentation/pages/admin_dashboard_page.dart';
 import 'presentation/pages/admin_login_page.dart';
+import 'presentation/pages/admin_notifications_page.dart';
 import 'presentation/pages/ai_drafts_page.dart';
 import 'presentation/pages/exam_bank_page.dart';
 import 'presentation/pages/exam_question_editor_page.dart';
@@ -16,6 +18,7 @@ import 'presentation/pages/lessons_page.dart';
 import 'presentation/pages/ops_pages.dart';
 import 'presentation/pages/practice_question_editor_page.dart';
 import 'presentation/pages/practice_questions_page.dart';
+import 'presentation/pages/promo_codes_page.dart';
 import 'presentation/pages/subjects_page.dart';
 import 'presentation/pages/users_page.dart';
 import 'presentation/pages/variant_builder_page.dart';
@@ -41,6 +44,9 @@ Widget _sectionPage(AdminSection section) => switch (section) {
       AdminSection.payments => const PaymentsPage(),
       AdminSection.pricing => const PricingPage(),
       AdminSection.logs => const AdminLogsPage(),
+      AdminSection.notifications => const AdminNotificationsPage(),
+      AdminSection.promoCodes => const PromoCodesPage(),
+      AdminSection.achievements => const AdminAchievementsPage(),
     };
 
 /// Full-screen editor route (outside the shell, on the root navigator).

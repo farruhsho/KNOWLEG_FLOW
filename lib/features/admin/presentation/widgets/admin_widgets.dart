@@ -46,6 +46,9 @@ String adminErrorMessage(
         break;
     }
     if (reason == BackendReasons.forbiddenRole) return l.adminErrForbidden;
+    // Phase 3 (ARCHITECTURE §9): daily broadcast limit and rate limits.
+    if (reason == BackendReasons.limitReached) return l.adminErrLimitReached;
+    if (reason == BackendReasons.rateLimited) return l.adminErrRateLimited;
     if (reason == BackendReasons.validationFailed) {
       return l.adminErrValidation(error.message ?? '');
     }
@@ -558,6 +561,51 @@ class AdminListTile extends StatelessWidget {
 }
 
 enum AdminTone { neutral, info, success, warning, danger }
+
+/// Full-width notice (finance warnings, limits, read-only hints) using
+/// semantic tokens, so it reads in light and dark mode.
+class AdminBanner extends StatelessWidget {
+  const AdminBanner({
+    super.key,
+    required this.message,
+    this.icon = Icons.info_outline,
+    this.tone = AdminTone.info,
+    this.margin = const EdgeInsets.only(bottom: AppSpacing.lg),
+  });
+
+  final String message;
+  final IconData icon;
+  final AdminTone tone;
+  final EdgeInsetsGeometry margin;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final scheme = Theme.of(context).colorScheme;
+    final (bg, fg) = switch (tone) {
+      AdminTone.neutral => (t.surfaceMuted, t.textSecondary),
+      AdminTone.info => (scheme.primaryContainer, scheme.onPrimaryContainer),
+      AdminTone.success => (t.successContainer, t.success),
+      AdminTone.warning => (t.warningContainer, t.warning),
+      AdminTone.danger => (t.dangerContainer, t.danger),
+    };
+    return Container(
+      margin: margin,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(color: bg, borderRadius: AppRadii.mdAll),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: fg, size: 20),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(message, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: fg)),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 /// Small status pill using semantic tokens (works in dark mode).
 class AdminPill extends StatelessWidget {

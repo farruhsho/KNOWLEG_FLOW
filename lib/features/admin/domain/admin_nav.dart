@@ -1,3 +1,4 @@
+import '../../../core/routes/route_paths.dart';
 import 'admin_role.dart';
 
 /// Sections of the admin CMS and the role check that decides whether a role
@@ -14,7 +15,12 @@ enum AdminSection {
   users('/admin/users'),
   payments('/admin/payments'),
   pricing('/admin/pricing'),
-  logs('/admin/logs');
+  logs('/admin/logs'),
+
+  // Phase 3 (ARCHITECTURE §9.2, §9.4).
+  notifications(RoutePaths.adminNotifications),
+  promoCodes(RoutePaths.adminPromoCodes),
+  achievements(RoutePaths.adminAchievements);
 
   const AdminSection(this.path);
 
@@ -47,6 +53,13 @@ enum AdminSection {
         return role.can(AdminPermission.managePricing);
       case AdminSection.logs:
         return role.canReadAdminLogs;
+      case AdminSection.notifications:
+        return role.can(AdminPermission.sendNotifications);
+      case AdminSection.promoCodes:
+        // Promo codes grant free credits: finance, super_admin only (§9.2).
+        return role.can(AdminPermission.grantCredits);
+      case AdminSection.achievements:
+        return role.can(AdminPermission.manageAchievements);
     }
   }
 

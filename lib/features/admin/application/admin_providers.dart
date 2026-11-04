@@ -7,13 +7,17 @@ import '../data/models/admin_records.dart';
 import '../data/models/subject_doc.dart';
 import '../data/repositories/content_repositories.dart';
 import '../data/repositories/exam_repositories.dart';
+import '../data/repositories/growth_repositories.dart';
 import '../data/repositories/people_repositories.dart';
+import '../domain/achievements_config.dart';
 import '../domain/blueprint_spec.dart';
 import '../domain/callable_errors.dart' show kAdminAppCheckEnforced;
 import '../domain/exam_question.dart';
 import '../domain/lesson_doc.dart';
+import '../domain/notification_draft.dart';
 import '../domain/practice_question_codec.dart';
 import '../domain/pricing_config.dart';
+import '../domain/promo_code.dart';
 import 'paged_list.dart';
 
 // --- Repositories -----------------------------------------------------------
@@ -37,6 +41,12 @@ final paymentsRepoProvider =
 final adminLogsRepoProvider =
     Provider((ref) => AdminLogsRepository(ref.watch(adminFirestoreProvider)));
 final statsRepoProvider = Provider((ref) => StatsRepository(ref.watch(adminFirestoreProvider)));
+final notificationsRepoProvider =
+    Provider((ref) => NotificationsRepository(ref.watch(adminFirestoreProvider)));
+final promoCodesRepoProvider =
+    Provider((ref) => PromoCodesRepository(ref.watch(adminFirestoreProvider)));
+final achievementsConfigRepoProvider =
+    Provider((ref) => AchievementsConfigRepository(ref.watch(adminFirestoreProvider)));
 
 /// Whether this build activates App Check (Android/Apple, or web built with
 /// `APP_CHECK_WEB_SITE_KEY`).
@@ -95,6 +105,20 @@ final adminLedgerProvider = FutureProvider.autoDispose.family<List<LedgerEntry>,
 final adminUserStatsProvider = FutureProvider.autoDispose.family<Map<String, dynamic>?, String>(
     (ref, uid) => ref.watch(usersRepoProvider).stats(uid));
 
+/// `count()` of `referrals/{uid}/items` (§9.1).
+final adminReferralsCountProvider = FutureProvider.autoDispose.family<int, String>(
+    (ref, uid) => ref.watch(usersRepoProvider).referralsCount(uid));
+
+/// `groups/{gid}.name` (§9.3); `null` = the group does not exist.
+final adminGroupNameProvider = FutureProvider.autoDispose.family<String?, String>(
+    (ref, groupId) => ref.watch(usersRepoProvider).groupName(groupId));
+
+// --- Phase 3: growth (ARCHITECTURE §9) -------------------------------------
+
+/// `config/achievements` (§9.4).
+final achievementsConfigProvider = FutureProvider.autoDispose<AchievementsConfig>(
+    (ref) => ref.watch(achievementsConfigRepoProvider).load());
+
 // --- Paginated lists (FB-17) -------------------------------------------------
 
 final practicePageProvider = StateNotifierProvider.autoDispose.family<
@@ -141,6 +165,22 @@ final adminLogsPageProvider = StateNotifierProvider.autoDispose<
     PagedListNotifier<AdminLogRecord>, PagedState<AdminLogRecord>>(
   (ref) {
     final repo = ref.watch(adminLogsRepoProvider);
+    return PagedListNotifier((after) => repo.page(after: after));
+  },
+);
+
+final notificationsPageProvider = StateNotifierProvider.autoDispose<
+    PagedListNotifier<NotificationRecord>, PagedState<NotificationRecord>>(
+  (ref) {
+    final repo = ref.watch(notificationsRepoProvider);
+    return PagedListNotifier((after) => repo.page(after: after));
+  },
+);
+
+final promoCodesPageProvider = StateNotifierProvider.autoDispose<
+    PagedListNotifier<PromoCodeRecord>, PagedState<PromoCodeRecord>>(
+  (ref) {
+    final repo = ref.watch(promoCodesRepoProvider);
     return PagedListNotifier((after) => repo.page(after: after));
   },
 );

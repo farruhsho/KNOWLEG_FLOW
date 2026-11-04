@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../../core/backend/backend_contract.dart';
 import '../../domain/pricing_config.dart';
 import '../../domain/review_workflow.dart';
 import '../admin_firebase.dart';
@@ -54,6 +55,25 @@ class UsersRepository {
 
   Future<Map<String, dynamic>?> stats(String uid) async =>
       (await _db.collection(AdminCollections.userStats).doc(uid).get()).data();
+
+  /// Number of people [uid] invited — a `count()` aggregate over
+  /// `referrals/{uid}/items` (ARCHITECTURE.md §9.1), never a scan.
+  Future<int> referralsCount(String uid) async => (await _db
+              .collection(Collections.referrals)
+              .doc(uid)
+              .collection(Collections.referralItems)
+              .count()
+              .get())
+          .count ??
+      0;
+
+  /// `groups/{gid}.name` (§9.3), or `null` when the group no longer exists.
+  Future<String?> groupName(String groupId) async {
+    final d = await _db.collection(Collections.groups).doc(groupId).get();
+    if (!d.exists) return null;
+    final name = d.data()?['name'];
+    return name is String && name.trim().isNotEmpty ? name.trim() : '';
+  }
 
   /// Longest `ban_reason` the moderator branch of the `users` update rule
   /// accepts (`validModeratorBan()` in firestore.rules:

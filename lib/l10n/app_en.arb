@@ -67,6 +67,27 @@
   "accountReauthSignInAgain": "Sign in again",
   "accountReauthTitle": "Confirm it's you",
   "adminAccountMenu": "Account",
+  "adminAchDefaultHint": "Default: {text}",
+  "@adminAchDefaultHint": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "adminAchDisabled": "Disabled",
+  "adminAchDisabledHelp": "Disabled: hidden from students.",
+  "adminAchEnabled": "Enabled",
+  "adminAchFieldDescription": "Description",
+  "adminAchFieldTitle": "Title",
+  "adminAchFixErrors": "Fix the highlighted fields",
+  "adminAchIntro": "Texts and visibility of achievements. Thresholds and award rules stay on the server. Leave a field empty to keep the app's built-in text.",
+  "adminAchMissingTranslation": "Fill in both languages or leave both empty",
+  "adminAchNoDoc": "config/achievements does not exist yet: the built-in texts are used everywhere. Saving creates it.",
+  "adminAchPreview": "Preview",
+  "adminAchPreviewHelp": "How students see it in Russian and Kyrgyz.",
+  "adminAchReset": "Reset texts",
+  "adminAchUnsaved": "Unsaved changes",
   "adminActivate": "Activate",
   "adminActive": "Active",
   "adminAdd": "Add",
@@ -180,9 +201,11 @@
     }
   },
   "adminErrIndex": "Firestore needs an index for this filter. Change the filter or create the index.",
+  "adminErrLimitReached": "The limit for this action has been reached. Try again later.",
   "adminErrNetwork": "No connection to the server. Check the network and try again.",
   "adminErrNotFound": "Not found.",
   "adminErrQuota": "Limit reached. Try again later.",
+  "adminErrRateLimited": "Too many requests. Wait a little and try again.",
   "adminErrSessionExpired": "Your admin session has expired. Sign in again.",
   "@adminErrSessionExpired": {
     "description": "A server function answered unauthenticated without an App Check hint"
@@ -360,6 +383,7 @@
   "adminFieldOrder": "Order",
   "adminFieldPart": "Part",
   "adminFieldPoints": "Points",
+  "adminFieldRequired": "Required",
   "adminFieldReview": "Review",
   "adminFieldSection": "Section",
   "adminFieldStatus": "Status",
@@ -574,19 +598,164 @@
   "adminMore": "More",
   "adminMoveDown": "Move down",
   "adminMoveUp": "Move up",
+  "adminNavAchievements": "Achievements",
   "adminNavAiDrafts": "AI drafts",
   "adminNavDashboard": "Dashboard",
   "adminNavExamBank": "Exam bank",
   "adminNavLessons": "Lessons",
   "adminNavLogs": "Admin log",
+  "adminNavNotifications": "Notifications",
   "adminNavPayments": "Payments",
   "adminNavPractice": "Practice questions",
   "adminNavPricing": "Pricing",
+  "adminNavPromoCodes": "Promo codes",
   "adminNavSubjects": "Subjects & topics",
   "adminNavUsers": "Users",
   "adminNavVariants": "Exam variants",
   "adminNo": "no",
   "adminNone": "Not set",
+  "adminNotifAudienceAll": "Everyone",
+  "adminNotifAudienceAllHint": "All users with notifications enabled.",
+  "adminNotifAudienceAllUsers": "All users",
+  "adminNotifAudienceGroup": "Group",
+  "adminNotifAudienceGroupIs": "Group: {group}",
+  "@adminNotifAudienceGroupIs": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "adminNotifAudienceLanguage": "By language",
+  "adminNotifAudienceLanguageIs": "Language: {language}",
+  "@adminNotifAudienceLanguageIs": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "adminNotifAudienceRegion": "By region",
+  "adminNotifAudienceRegionIs": "Region: {region}",
+  "@adminNotifAudienceRegionIs": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "adminNotifAudienceTitle": "Audience",
+  "adminNotifAudienceValueRequired": "Choose who receives it",
+  "adminNotifCheckFirst": "Check the reach to see how many people will receive the notification.",
+  "adminNotifCheckReach": "Check reach",
+  "adminNotifCheckStale": "The text or audience changed — check the reach again.",
+  "adminNotifConfirmBody": "{count} users will receive the notification ({audience}). A sent broadcast cannot be recalled.",
+  "@adminNotifConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "audience": {
+        "type": "String"
+      }
+    }
+  },
+  "adminNotifConfirmTitle": "Send the broadcast?",
+  "adminNotifFailedShort": "failed: {count}",
+  "@adminNotifFailedShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifFieldBody": "Message",
+  "adminNotifFieldTitle": "Title",
+  "adminNotifFixErrors": "Fill in the texts in both languages and choose the audience.",
+  "adminNotifGroupId": "Group ID",
+  "adminNotifGroupIdHelp": "The group document id (collection groups)",
+  "adminNotifGroupIdInvalid": "Only Latin letters, digits, _ and -, up to 128 characters",
+  "adminNotifHistoryEmpty": "No broadcasts yet",
+  "adminNotifIntro": "The push notification goes to users with notifications enabled, in their app language. Check the reach first, then send. At most {limit} broadcasts per day.",
+  "@adminNotifIntro": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifLimitReached": "Today's broadcast limit is used up ({limit} per day). You can send the next one tomorrow.",
+  "@adminNotifLimitReached": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifNoRecipients": "No recipients for this audience. Choose a different one.",
+  "adminNotifRecipients": "Recipients: {count}",
+  "@adminNotifRecipients": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifRecipientsShort": "recipients: {count}",
+  "@adminNotifRecipientsShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifResult": "Recipients: {recipients} · sent: {sent} · failed: {failed}",
+  "@adminNotifResult": {
+    "placeholders": {
+      "recipients": {
+        "type": "int"
+      },
+      "sent": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifResultLabel": "Result",
+  "adminNotifSend": "Send",
+  "adminNotifSendTitle": "Reach and sending",
+  "adminNotifSentShort": "sent: {count}",
+  "@adminNotifSentShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifSentSnack": "Sent: {count}",
+  "@adminNotifSentSnack": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminNotifTabCompose": "New broadcast",
+  "adminNotifTabHistory": "History",
+  "adminNotifTextTitle": "Text",
+  "adminNotifTodayCount": "Sent today: {count} of {limit}. The server enforces the limit.",
+  "@adminNotifTodayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
   "adminOptionN": "Option {id}",
   "@adminOptionN": {
     "placeholders": {
@@ -647,6 +816,162 @@
   "adminPricingProducts": "Credits per product",
   "adminPricingSingleHelp": "Fixed: 1 credit = 1 exam",
   "adminPricingWarning": "Prices are set in Google Play Console, not here. This page only maps products to exam credits. Do not change the base price of 100 som (exam_single) without the owner's approval.",
+  "adminPromoActive": "Active",
+  "adminPromoActiveHelp": "Students can redeem only active codes.",
+  "adminPromoClearDate": "No expiry",
+  "adminPromoCode": "Code",
+  "adminPromoCodeHelp": "Latin letters A–Z and digits, {min}–{max} characters",
+  "@adminPromoCodeHelp": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPromoConfirmBody": "Code {code}: {credits} free credits per redemption; max redemptions: {max}; expiry: {expiry}; status: {status}. The change will be recorded in the action log.",
+  "@adminPromoConfirmBody": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "credits": {
+        "type": "int"
+      },
+      "max": {
+        "type": "String"
+      },
+      "expiry": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoConfirmCreateTitle": "Create the promo code?",
+  "adminPromoConfirmEditTitle": "Save the changes?",
+  "adminPromoCreate": "New promo code",
+  "adminPromoCredits": "Credits per redemption",
+  "adminPromoCreditsValue": "credits: {n}",
+  "@adminPromoCreditsValue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPromoDeactivate": "Deactivate",
+  "adminPromoDeactivateBody": "Students will no longer be able to redeem it. Credits already granted stay. The change is recorded in the action log.",
+  "adminPromoDeactivateTitle": "Deactivate {code}?",
+  "@adminPromoDeactivateTitle": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoDeactivated": "{code} deactivated",
+  "@adminPromoDeactivated": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoDialogWarning": "Every redemption grants free credits. The change is recorded in the action log.",
+  "adminPromoEditTitle": "Promo code {code}",
+  "@adminPromoEditTitle": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoEmpty": "No promo codes yet",
+  "adminPromoErrCode": "{min}–{max} characters: A–Z and 0–9 only",
+  "@adminPromoErrCode": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPromoErrCredits": "From {min} to {max} credits",
+  "@adminPromoErrCredits": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPromoErrExpiry": "The date has passed: pick a future date or deactivate the code",
+  "adminPromoErrMax": "From 1 to {limit}",
+  "@adminPromoErrMax": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPromoErrMaxBelow": "Already used {used} times — the limit cannot be lower",
+  "@adminPromoErrMaxBelow": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPromoExpiry": "Expiry",
+  "adminPromoExpiryHelp": "The code works through 23:59 Bishkek time on the chosen day.",
+  "adminPromoGenerate": "Generate a code",
+  "adminPromoMaxHelp": "Empty = unlimited.",
+  "adminPromoMaxRedemptions": "Max redemptions",
+  "adminPromoNoExpiry": "no expiry",
+  "adminPromoNote": "Note (internal)",
+  "adminPromoNoteHelp": "Who the code is for: campaign, partner, school.",
+  "adminPromoPickDate": "Pick a date",
+  "adminPromoSaved": "Promo code {code} saved",
+  "@adminPromoSaved": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoStatusActive": "Active",
+  "adminPromoStatusExhausted": "Used up",
+  "adminPromoStatusExpired": "Expired",
+  "adminPromoStatusInactive": "Off",
+  "adminPromoUnlimited": "unlimited",
+  "adminPromoUntil": "valid through {date}",
+  "@adminPromoUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoUsage": "used: {used} / {max}",
+  "@adminPromoUsage": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPromoWarning": "Promo codes grant free exam credits (1 credit = 1 exam), so they are a finance operation: only super admins manage them, and every change is recorded in the action log.",
   "adminPublished": "Published",
   "adminPurchaseGranted": "Granted",
   "adminPurchaseInvalid": "Invalid",
@@ -752,6 +1077,14 @@
     }
   },
   "adminSubjectsTopicsHelp": "Topic ids become subject.topic (e.g. math.quadratic_equations) and are used by exam questions.",
+  "adminTextTooLong": "No longer than {max} characters",
+  "@adminTextTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "adminTitleRequired": "Enter a title in Russian or Kyrgyz.",
   "adminTypeAnalogy": "Analogy",
   "adminTypeComparison": "Quantitative comparison",
@@ -790,17 +1123,32 @@
   "adminUserGrantDeltaInvalid": "Enter a non-zero number from -100 to 100.",
   "adminUserGrantDone": "Credits updated",
   "adminUserGrantTitle": "Grant credits",
+  "adminUserGroupMissing": "Group not found (deleted?)",
+  "adminUserGroups": "Groups ({count})",
+  "@adminUserGroups": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminUserGrowth": "Referrals and groups",
   "adminUserLanguage": "Language",
   "adminUserLastActive": "Last active",
   "adminUserLedger": "Credit history",
   "adminUserLifetime": "Credits purchased",
   "adminUserNoEntitlements": "No entitlement record yet (first exam not used).",
+  "adminUserNoGroups": "Not in any group",
+  "adminUserOpenProfile": "Open",
   "adminUserPremiumOff": "Remove premium",
   "adminUserPremiumOffBody": "The subscription returns to free.",
   "adminUserPremiumOffTitle": "Remove premium?",
   "adminUserPremiumOn": "Grant premium",
   "adminUserPremiumOnBody": "Sets the subscription to yearly for 365 days. Exam credits are separate and are granted only with credits.",
   "adminUserPremiumOnTitle": "Grant premium?",
+  "adminUserReferralCode": "Referral code",
+  "adminUserReferralsCount": "Invited",
+  "adminUserReferredBy": "Invited by",
   "adminUserRole": "Role",
   "adminUserRoleBody": "Sets the role claim through the server. The user must sign in again for it to apply.",
   "adminUserRoleDone": "Role updated",
