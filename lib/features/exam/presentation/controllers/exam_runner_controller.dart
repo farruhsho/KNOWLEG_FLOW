@@ -11,7 +11,14 @@ import '../../domain/exam_session.dart';
 import '../../domain/question_timing.dart';
 
 /// One-shot messages for the runner UI (snackbars).
-enum ExamRunnerNotice { fiveMinutesLeft, oneMinuteLeft, autoSubmitted }
+enum ExamRunnerNotice {
+  fiveMinutesLeft,
+  oneMinuteLeft,
+  autoSubmitted,
+
+  /// Strict style: a third choice for an already corrected answer was refused.
+  answerLocked,
+}
 
 /// Sink for non-fatal errors the runner cannot show to the user (draft
 /// autosave failures). Wired to crash reporting in the app.
@@ -88,6 +95,13 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   final Duration draftInterval;
   final Duration retryInterval;
 
+  /// Strict style: wait this long before sending a section again after the
+  /// server answered SECTION_NOT_OVER (the device clock ran a little ahead).
+  final Duration sectionNotOverRetry;
+
+  /// Earliest moment of the next automatic retry after SECTION_NOT_OVER.
+  DateTime? _retryNotBefore;
+
   Timer? _ticker;
   Timer? _draftTimer;
   bool _draftDirty = false;
@@ -119,6 +133,7 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     this.tickInterval = const Duration(seconds: 1),
     this.draftInterval = const Duration(seconds: 20),
     this.retryInterval = const Duration(seconds: 15),
+    this.sectionNotOverRetry = const Duration(seconds: 3),
     bool autoLoad = true,
   })  : _remote = remote,
         _store = store,
@@ -200,8 +215,19 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
 
   // --------------------------------------------------------------- edits
 
-  void selectAnswer(String questionId, String optionId) =>
-      _edit((s, now) => s.answer(questionId, optionId, now: now), dirty: true);
+  void selectAnswer(String questionId, String optionId) {
+    final s = state.session;
+    if (s != null &&
+        s.isAnswerLocked(questionId) &&
+        s.answerOf(questionId) != optionId &&
+        s.canEdit(_clock())) {
+      // Strict: the one correction is used up — explain instead of a
+      // silent no-op.
+      _notify(ExamRunnerNotice.answerLocked);
+      return;
+    }
+    _edit((s, now) => s.answer(questionId, optionId, now: now), dirty: true);
+  }
 
   void clearAnswer(String questionId) =>
       _edit((s, now) => s.clearAnswer(questionId, now: now), dirty: true);
@@ -325,13 +351,15 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
   /// Closes the open section (after the user confirmed, or automatically at
   /// the deadline) and sends it. On failure the section stays locked in
   /// [ExamPhase.submitPending] until a retry succeeds.
+  ///
+  /// Strict style never closes a section before its deadline: an early call
+  /// is ignored (there is no "finish section" button in that style anyway).
   Future<void> submitSection({bool automatic = false}) async {
     final s = state.session;
     if (s == null || _submitting) return;
-    if (s.phase != ExamPhase.inSection && s.phase != ExamPhase.submitPending) {
-      return;
-    }
+    if (!s.canSubmit(_clock())) return;
     _submitting = true;
+    _retryNotBefore = null;
     try {
       final locked = s.beginSubmit(
         now: _clock(),
@@ -365,6 +393,16 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
         await _syncWithServer();
         return;
       }
+      if (f.kind == ExamFailureKind.sectionNotOver) {
+        // Strict: the server's clock says the section still runs. Usually a
+        // few seconds: the answers stay locked in and are sent again
+        // shortly. If the device clock was far ahead, the section reopens.
+        _retryNotBefore = _clock().add(sectionNotOverRetry);
+        _commit(state.session!.submitFailed());
+        state = state.copyWith(submitFailure: f, offline: false);
+        await _reopenIfStillRunning();
+        return;
+      }
       _commit(state.session!.submitFailed());
       state = state.copyWith(
           submitFailure: f, offline: f.kind == ExamFailureKind.network);
@@ -374,6 +412,25 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
       return;
     } finally {
       _submitting = false;
+    }
+  }
+
+  /// After SECTION_NOT_OVER: asks the server for its clock. When the open
+  /// section has real time left (the device clock ran ahead), it reopens
+  /// with the corrected deadline instead of waiting on a locked screen.
+  Future<void> _reopenIfStillRunning() async {
+    try {
+      final payload = await _remote.getState(attemptId);
+      if (!mounted) return;
+      final current = state.session;
+      if (current == null) return;
+      final reopened = current.reopenNotOver(payload, clientNow: _clock());
+      if (identical(reopened, current)) return;
+      _retryNotBefore = null;
+      _commit(reopened);
+      state = state.copyWith(clearSubmitFailure: true);
+    } catch (e) {
+      debugPrint('exam: state check after SECTION_NOT_OVER failed ($e)');
     }
   }
 
@@ -472,6 +529,14 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
     if (current.shouldAutoSubmit(now)) {
       unawaited(submitSection(automatic: true));
     } else if (current.phase == ExamPhase.submitPending && !_submitting) {
+      final notBefore = _retryNotBefore;
+      if (notBefore != null) {
+        if (!now.isBefore(notBefore)) {
+          _lastAutoRetry = now;
+          unawaited(submitSection());
+        }
+        return;
+      }
       final last = _lastAutoRetry;
       if (last == null || now.difference(last) >= retryInterval) {
         _lastAutoRetry = now;

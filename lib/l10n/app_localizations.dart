@@ -9872,6 +9872,384 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yearly'**
   String get yearly;
+
+  /// Primary action of a direction: a new variant assembled for this attempt
+  ///
+  /// In en, this message translates to:
+  /// **'New mock exam'**
+  String get examFreshStart;
+
+  /// Fresh mock exam explanation
+  ///
+  /// In en, this message translates to:
+  /// **'A new variant every time, built to the ORT structure from a bank of reviewed questions.'**
+  String get examFreshSubtitle;
+
+  /// Secondary list of published library variants
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made variants'**
+  String get examLibraryTitle;
+
+  /// Fresh exam intro
+  ///
+  /// In en, this message translates to:
+  /// **'A new variant, assembled when you start'**
+  String get examFreshVariantLine;
+
+  /// Fresh exam intro: language choice
+  ///
+  /// In en, this message translates to:
+  /// **'Question language'**
+  String get examFreshLanguageLabel;
+
+  /// Fresh exam intro
+  ///
+  /// In en, this message translates to:
+  /// **'The state language test is in Kyrgyz only.'**
+  String get examFreshKyOnly;
+
+  /// Exam style choice title
+  ///
+  /// In en, this message translates to:
+  /// **'How to take it'**
+  String get examStyleTitle;
+
+  /// Exam style: standard
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get examStyleStandard;
+
+  /// Exam style: standard
+  ///
+  /// In en, this message translates to:
+  /// **'You can flag questions, change answers and finish a section early.'**
+  String get examStyleStandardBody;
+
+  /// Exam style: strict
+  ///
+  /// In en, this message translates to:
+  /// **'Like the ORT'**
+  String get examStyleStrict;
+
+  /// Exam style: strict
+  ///
+  /// In en, this message translates to:
+  /// **'A section ends only when its time is up, you can correct an answer once, there are no flags, and every section starts with instructions.'**
+  String get examStyleStrictBody;
+
+  /// Exam style: strict, honest source note
+  ///
+  /// In en, this message translates to:
+  /// **'The rules follow the official brochure for ORT candidates. This is practice: the result is for study, not an official score.'**
+  String get examStyleStrictSource;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t finish a section early: it ends when its time is up and your answers are sent automatically.'**
+  String get examStrictRuleNoEarlyFinish;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'You can correct an answer only once — like on the answer sheet. An answer can\'t be erased.'**
+  String get examStrictRuleOneCorrection;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'There are no “come back later” flags.'**
+  String get examStrictRuleNoFlags;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'Every section starts with instructions. Its time runs from the moment it opens, including while you read them.'**
+  String get examStrictRuleInstruction;
+
+  /// Strict runner: replaces "Finish section"; {time} is mm:ss
+  ///
+  /// In en, this message translates to:
+  /// **'Section ends in {time}'**
+  String examStrictSectionEndsIn(String time);
+
+  /// Strict runner: a third choice was refused
+  ///
+  /// In en, this message translates to:
+  /// **'This answer was already corrected. As on the ORT answer sheet, it can be corrected only once.'**
+  String get examStrictAnswerLocked;
+
+  /// Strict runner
+  ///
+  /// In en, this message translates to:
+  /// **'You can still correct this answer once.'**
+  String get examStrictCorrectionLeft;
+
+  /// Strict runner
+  ///
+  /// In en, this message translates to:
+  /// **'Answer corrected — it can\'t be changed again.'**
+  String get examStrictCorrectionUsed;
+
+  /// Strict runner: SECTION_NOT_OVER, retrying
+  ///
+  /// In en, this message translates to:
+  /// **'The section\'s time is ending — your answers will be sent in a few seconds.'**
+  String get examStrictWaitingDeadline;
+
+  /// Strict pre-section screen
+  ///
+  /// In en, this message translates to:
+  /// **'Section instructions'**
+  String get examSectionInstructionTitle;
+
+  /// Strict pre-section screen, honest timer note
+  ///
+  /// In en, this message translates to:
+  /// **'The section timer is already running: it started when the section opened.'**
+  String get examStrictTimerRunning;
+
+  /// Fresh variant: repeated questions
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You\'ve already seen 1 question in earlier attempts} other{You\'ve already seen {count} questions in earlier attempts}}'**
+  String examFreshnessRepeated(int count);
+
+  /// Fresh variant: repeated questions
+  ///
+  /// In en, this message translates to:
+  /// **'The bank doesn\'t have enough new questions for this direction yet — the rest are new.'**
+  String get examFreshnessWhy;
+
+  /// POOL_TOO_SMALL
+  ///
+  /// In en, this message translates to:
+  /// **'New variants are being prepared'**
+  String get examPoolTooSmallTitle;
+
+  /// POOL_TOO_SMALL
+  ///
+  /// In en, this message translates to:
+  /// **'There aren\'t enough reviewed questions for this direction ({language}) yet. No credit was charged. Meanwhile you can take a ready-made variant.'**
+  String examPoolTooSmallBody(String language);
+
+  /// POOL_TOO_SMALL
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made variants'**
+  String get examPoolTooSmallAction;
+
+  /// SECTION_NOT_OVER
+  ///
+  /// In en, this message translates to:
+  /// **'The section isn\'t over yet — your answers will be sent when time is up.'**
+  String get examErrorSectionNotOver;
+
+  /// Price of a web product from config/pricing.web_products
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} som'**
+  String billingWebPrice(String amount);
+
+  /// Web store button
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get billingPay;
+
+  /// Web store button semantics
+  ///
+  /// In en, this message translates to:
+  /// **'Pay: {title}, {price}'**
+  String billingPaySemantics(String title, String price);
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is made on the payment provider\'s secure page. Credits are added once the payment is confirmed.'**
+  String get billingWebHonestPayment;
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Payment isn\'t available yet. Please check back later.'**
+  String get billingWebProductsEmpty;
+
+  /// PAYMENTS_DISABLED
+  ///
+  /// In en, this message translates to:
+  /// **'Payments aren\'t connected yet. Please try later.'**
+  String get billingWebPaymentsDisabled;
+
+  /// PRODUCT_UNAVAILABLE
+  ///
+  /// In en, this message translates to:
+  /// **'This package isn\'t available right now. Please choose another.'**
+  String get billingWebProductUnavailable;
+
+  /// RATE_LIMITED
+  ///
+  /// In en, this message translates to:
+  /// **'Too many orders today. Please try again tomorrow.'**
+  String get billingWebRateLimited;
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t create the order. Check your connection and try again.'**
+  String get billingWebOrderError;
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Opening the payment page…'**
+  String get billingWebRedirecting;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Public offer'**
+  String get billingLegalOffer;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Refund policy'**
+  String get billingLegalRefund;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Draft. The final text will be published after legal review.'**
+  String get billingLegalDraftNote;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the document.'**
+  String get billingLegalLoadError;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'This document is available in Russian only for now.'**
+  String get billingLegalRuOnly;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payReturnTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your payment…'**
+  String get payReturnChecking;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received'**
+  String get payReturnPaidTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'{credits, plural, =1{1 credit added.} other{{credits} credits added.}}'**
+  String payReturnPaidBody(int credits);
+
+  /// Web payment return page; {balance} is e.g. "3 кредита"
+  ///
+  /// In en, this message translates to:
+  /// **'Balance: {balance}'**
+  String payReturnBalance(String balance);
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Start a mock exam'**
+  String get payReturnStartExam;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment didn\'t go through'**
+  String get payReturnFailedTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'No credits were added. If you were charged anyway, contact support and we\'ll check the order.'**
+  String get payReturnFailedBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Order expired'**
+  String get payReturnExpiredTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'The payment didn\'t arrive in time and no credits were added. You can place a new order.'**
+  String get payReturnExpiredBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment refunded'**
+  String get payReturnRefundedTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Credits from this order were withdrawn.'**
+  String get payReturnRefundedBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is still processing'**
+  String get payReturnPendingTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'The provider hasn\'t confirmed the payment yet. Credits are added automatically as soon as it does — check your balance later.'**
+  String get payReturnPendingBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get payReturnCheckAgain;
+
+  /// ORDER_NOT_FOUND
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found. If you paid, please contact support.'**
+  String get payReturnNotFound;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t tell which order this is. Check your balance on the exam access page.'**
+  String get payReturnNoOrder;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t check the payment. Check your connection.'**
+  String get payReturnNetworkError;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'To my balance'**
+  String get payReturnToStore;
 }
 
 class _AppLocalizationsDelegate

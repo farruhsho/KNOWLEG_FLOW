@@ -21,11 +21,15 @@ class QuestionPalette extends StatelessWidget {
   final List<PaletteGroup> groups;
   final ValueChanged<int> onSelect;
 
+  /// False in strict style (no flags): the "marked" legend is hidden.
+  final bool showFlags;
+
   const QuestionPalette({
     super.key,
     required this.cells,
     required this.onSelect,
     this.groups = const [],
+    this.showFlags = true,
   });
 
   @override
@@ -45,7 +49,8 @@ class QuestionPalette extends StatelessWidget {
           runSpacing: AppSpacing.sm,
           children: [
             _Legend(kind: _CellKind.answered, label: '${l.examPaletteAnswered} · $answered'),
-            _Legend(kind: _CellKind.flagged, label: '${l.examPaletteFlagged} · $flagged'),
+            if (showFlags)
+              _Legend(kind: _CellKind.flagged, label: '${l.examPaletteFlagged} · $flagged'),
             _Legend(
                 kind: _CellKind.empty,
                 label: '${l.examPaletteUnanswered} · ${cells.length - answered}'),

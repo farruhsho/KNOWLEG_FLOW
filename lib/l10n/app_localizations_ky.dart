@@ -5766,4 +5766,246 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get yearly => 'Жылдык';
+
+  @override
+  String get examFreshStart => 'Жаңы сынамык экзамен';
+
+  @override
+  String get examFreshSubtitle =>
+      'Ар жолу — ЖРТнын түзүлүшү боюнча текшерилген тапшырмалар банкынан жаңы вариант.';
+
+  @override
+  String get examLibraryTitle => 'Даяр варианттар';
+
+  @override
+  String get examFreshVariantLine => 'Жаңы вариант — баштаганда түзүлөт';
+
+  @override
+  String get examFreshLanguageLabel => 'Тапшырмалардын тили';
+
+  @override
+  String get examFreshKyOnly =>
+      'Мамлекеттик тил боюнча тест кыргыз тилинде гана өтөт.';
+
+  @override
+  String get examStyleTitle => 'Кантип өтүү';
+
+  @override
+  String get examStyleStandard => 'Машыгуу';
+
+  @override
+  String get examStyleStandardBody =>
+      'Тапшырмаларды белгилеп, жоопторду өзгөртүп, бөлүмдү убактысынан мурда бүтүрсөңүз болот.';
+
+  @override
+  String get examStyleStrict => 'ЖРТдагыдай';
+
+  @override
+  String get examStyleStrictBody =>
+      'Бөлүм убакыт бүткөндө гана аяктайт, жоопту бир жолу гана оңдоого болот, белгилер жок, ар бир бөлүмдүн алдында — нускама.';
+
+  @override
+  String get examStyleStrictSource =>
+      'Эрежелер ЖРТ катышуучулары үчүн ЦООМОнун брошюрасынан алынган. Бул машыгуу: жыйынтык окуу үчүн, расмий балл эмес.';
+
+  @override
+  String get examStrictRuleNoEarlyFinish =>
+      'Бөлүмдү мөөнөтүнөн мурда бүтүрүүгө болбойт: убакыт бүткөндө ал аяктайт жана жооптор автоматтык түрдө жөнөтүлөт.';
+
+  @override
+  String get examStrictRuleOneCorrection =>
+      'Тапшырманын жообун бир гана жолу оңдоого болот — бланктагыдай. Жоопту өчүрүүгө болбойт.';
+
+  @override
+  String get examStrictRuleNoFlags => '«Кийин кайтуу» белгилери жок.';
+
+  @override
+  String get examStrictRuleInstruction =>
+      'Ар бир бөлүмдүн алдында — нускама. Бөлүмдүн убактысы ал ачылган учурдан тартып жүрөт, нускаманы окуп жатканда да.';
+
+  @override
+  String examStrictSectionEndsIn(String time) {
+    return 'Бөлүм $time кийин аяктайт';
+  }
+
+  @override
+  String get examStrictAnswerLocked =>
+      'Жооп оңдолгон. ЖРТнын бланкындагыдай, аны бир гана жолу оңдоого болот.';
+
+  @override
+  String get examStrictCorrectionLeft => 'Жоопту дагы бир жолу оңдоого болот.';
+
+  @override
+  String get examStrictCorrectionUsed =>
+      'Жооп оңдолду — мындан ары өзгөртүүгө болбойт.';
+
+  @override
+  String get examStrictWaitingDeadline =>
+      'Бөлүмдүн убактысы бүтүп жатат — жооптор бир нече секунддан кийин жөнөтүлөт.';
+
+  @override
+  String get examSectionInstructionTitle => 'Бөлүмгө нускама';
+
+  @override
+  String get examStrictTimerRunning =>
+      'Бөлүмдүн таймери жүрүп жатат: ал бөлүм ачылганда башталган.';
+
+  @override
+  String examFreshnessRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count тапшырманы мурунку аракеттерде көргөнсүз',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get examFreshnessWhy =>
+      'Банкта бул багыт боюнча жаңы тапшырмалар азырынча жетишсиз — калган тапшырмалар жаңы.';
+
+  @override
+  String get examPoolTooSmallTitle => 'Жаңы варианттар даярдалып жатат';
+
+  @override
+  String examPoolTooSmallBody(String language) {
+    return 'Бул багыт боюнча ($language) текшерилген тапшырмалар азырынча жетишсиз. Кредит алынган жок. Азырынча даяр вариантты өтсөңүз болот.';
+  }
+
+  @override
+  String get examPoolTooSmallAction => 'Даяр варианттарга';
+
+  @override
+  String get examErrorSectionNotOver =>
+      'Бөлүм али аяктай элек — жооптор убакыт бүткөндө жөнөтүлөт.';
+
+  @override
+  String billingWebPrice(String amount) {
+    return '$amount сом';
+  }
+
+  @override
+  String get billingPay => 'Төлөө';
+
+  @override
+  String billingPaySemantics(String title, String price) {
+    return 'Төлөө: $title, $price';
+  }
+
+  @override
+  String get billingWebHonestPayment =>
+      'Төлөм төлөм провайдеринин корголгон барагында өтөт. Кредиттер төлөм ырасталгандан кийин кошулат.';
+
+  @override
+  String get billingWebProductsEmpty =>
+      'Төлөө азырынча жеткиликсиз. Кийинчерээк кириңиз.';
+
+  @override
+  String get billingWebPaymentsDisabled =>
+      'Төлөм азырынча туташтырыла элек. Кийинчерээк аракет кылыңыз.';
+
+  @override
+  String get billingWebProductUnavailable =>
+      'Бул пакет азыр жеткиликсиз. Башкасын тандаңыз.';
+
+  @override
+  String get billingWebRateLimited =>
+      'Бүгүн заказ өтө көп болду. Эртең кайталап көрүңүз.';
+
+  @override
+  String get billingWebOrderError =>
+      'Заказ түзүлгөн жок. Интернетти текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String get billingWebRedirecting => 'Төлөм барагы ачылып жатат…';
+
+  @override
+  String get billingLegalOffer => 'Коомдук оферта';
+
+  @override
+  String get billingLegalRefund => 'Кайтаруу эрежелери';
+
+  @override
+  String get billingLegalDraftNote =>
+      'Долбоор. Акыркы текст юрист текшергенден кийин жарыяланат.';
+
+  @override
+  String get billingLegalLoadError => 'Документ ачылган жок.';
+
+  @override
+  String get billingLegalRuOnly =>
+      'Документ азырынча орус тилинде гана жеткиликтүү.';
+
+  @override
+  String get payReturnTitle => 'Төлөм';
+
+  @override
+  String get payReturnChecking => 'Төлөм текшерилип жатат…';
+
+  @override
+  String get payReturnPaidTitle => 'Төлөм өттү';
+
+  @override
+  String payReturnPaidBody(int credits) {
+    String _temp0 = intl.Intl.pluralLogic(
+      credits,
+      locale: localeName,
+      other: '$credits кредит кошулду.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String payReturnBalance(String balance) {
+    return 'Баланс: $balance';
+  }
+
+  @override
+  String get payReturnStartExam => 'Сынамык экзаменди баштоо';
+
+  @override
+  String get payReturnFailedTitle => 'Төлөм өткөн жок';
+
+  @override
+  String get payReturnFailedBody =>
+      'Кредиттер кошулган жок. Эгер акча алынып калса, колдоо кызматына жазыңыз — заказды текшеребиз.';
+
+  @override
+  String get payReturnExpiredTitle => 'Заказдын мөөнөтү бүттү';
+
+  @override
+  String get payReturnExpiredBody =>
+      'Төлөм өз убагында келген жок, кредиттер кошулган жок. Жаңы заказ берсеңиз болот.';
+
+  @override
+  String get payReturnRefundedTitle => 'Төлөм кайтарылды';
+
+  @override
+  String get payReturnRefundedBody =>
+      'Бул заказ боюнча кредиттер кайтарылып алынды.';
+
+  @override
+  String get payReturnPendingTitle => 'Төлөм дагы эле иштетилүүдө';
+
+  @override
+  String get payReturnPendingBody =>
+      'Провайдер төлөмдү азырынча ырастай элек. Ырастоо келери менен кредиттер автоматтык түрдө кошулат — балансты кийинчерээк текшериңиз.';
+
+  @override
+  String get payReturnCheckAgain => 'Кайра текшерүү';
+
+  @override
+  String get payReturnNotFound =>
+      'Заказ табылган жок. Эгер төлөсөңүз, колдоо кызматына жазыңыз.';
+
+  @override
+  String get payReturnNoOrder =>
+      'Заказ аныкталган жок. Балансты тесттерге жеткиликтүүлүк барагынан текшериңиз.';
+
+  @override
+  String get payReturnNetworkError =>
+      'Төлөмдү текшерүү мүмкүн болгон жок. Интернетти текшериңиз.';
+
+  @override
+  String get payReturnToStore => 'Баланска';
 }

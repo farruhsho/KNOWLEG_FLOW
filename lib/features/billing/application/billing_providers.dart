@@ -3,20 +3,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/backend/backend_contract.dart';
+import '../../../core/backend/callable_platform.dart';
 import '../data/billing_history_repository.dart';
 import '../data/purchase_verifier.dart';
 import '../data/store_gateway.dart';
+import '../data/web_payment_gateway.dart';
 import '../domain/billing_mode.dart';
 import '../domain/pricing_config.dart';
 import 'billing_service.dart';
 
-/// Build-time billing mode (`--dart-define=BILLING_MODE=play|external`).
+/// Build-time billing mode (`--dart-define=BILLING_MODE=play|external|web`;
+/// `web` only in a web build, see [BillingMode.resolve]).
 final billingModeProvider = Provider<BillingMode>((ref) => BillingMode.current);
 
 /// Whether this build may show purchase buttons, prices or "buy" wording.
 /// False in `BILLING_MODE=external` (consumption-only Play build): every
 /// screen must then drop its purchase call-to-action and must not route to
-/// the store as a way to pay (ARCHITECTURE §5, Play payments policy).
+/// the store as a way to pay (ARCHITECTURE §5, Play payments policy). True
+/// for `play` (Google Play) and `web` (site payments, §10.3).
 final canSellProvider = Provider<bool>((ref) => ref.watch(billingModeProvider).sellsInApp);
 
 /// Whether this platform can talk to Google Play Billing at all.
@@ -24,7 +28,7 @@ final playBillingPlatformProvider = Provider<bool>((ref) => isPlayBillingPlatfor
 
 final storeGatewayProvider = Provider<StoreGateway>((ref) {
   final mode = ref.watch(billingModeProvider);
-  if (!mode.sellsInApp || !ref.watch(playBillingPlatformProvider)) {
+  if (!mode.usesPlayBilling || !ref.watch(playBillingPlatformProvider)) {
     return const UnsupportedStoreGateway();
   }
   return InAppPurchaseGateway();
@@ -104,3 +108,22 @@ final pricingConfigProvider = StreamProvider<PricingConfig>((ref) async* {
 
 final billingHistoryRepositoryProvider =
     Provider<BillingHistoryRepository>((ref) => BillingHistoryRepository());
+
+// ------------------------------------------------- web payments (§10.3)
+
+/// Server-side payment orders (`paymentCreateOrder` / `paymentGetOrder`).
+final webPaymentGatewayProvider =
+    Provider<WebPaymentGateway>((ref) => const CallableWebPaymentGateway());
+
+/// The order being paid, kept across the redirect to the provider.
+final pendingWebOrderStoreProvider =
+    Provider<PendingWebOrderStore>((ref) => const PrefsPendingWebOrderStore());
+
+/// Payment callables need App Check like every student callable (D7): on
+/// web only with `APP_CHECK_WEB_SITE_KEY` (or against the emulators).
+final webPaymentsAvailableProvider =
+    Provider<bool>((ref) => callablesSupportedOnThisPlatform);
+
+/// URL of the page the app runs on (origin for the return URL, `?order=`
+/// placed before the `#` by a provider). Overridden in tests.
+final webPageUriProvider = Provider<Uri>((ref) => Uri.base);

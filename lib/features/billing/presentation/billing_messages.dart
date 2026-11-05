@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../application/billing_service.dart';
+import '../data/web_payment_gateway.dart';
 import '../domain/billing_records.dart';
 import '../domain/entitlements.dart';
 import '../domain/pricing_config.dart';
@@ -60,6 +61,25 @@ extension BillingL10n on AppLocalizations {
     if (e.freeExamsUsedCount > 0) return billingFreeExamUsed;
     return null;
   }
+
+  /// Site payment errors (§10.3).
+  String billingWebIssueMessage(WebPaymentIssue issue) => switch (issue) {
+        WebPaymentIssue.paymentsDisabled => billingWebPaymentsDisabled,
+        WebPaymentIssue.productUnavailable => billingWebProductUnavailable,
+        WebPaymentIssue.rateLimited => billingWebRateLimited,
+        WebPaymentIssue.unauthenticated => billingErrorNotSignedIn,
+        WebPaymentIssue.orderNotFound => payReturnNotFound,
+        WebPaymentIssue.invalidCheckout ||
+        WebPaymentIssue.network ||
+        WebPaymentIssue.unknown =>
+          billingWebOrderError,
+      };
+
+  /// Title of a web product: the `config/pricing` label override, else
+  /// "1 тест" / "5 тестов" from its own credit count.
+  String billingWebProductTitle(PricingConfig pricing, WebProduct product, String languageCode) =>
+      pricing.labelFor(product.productId, languageCode) ??
+      billingProductTests(product.credits);
 
   /// "1 тест" / "5 тестов", or the `config/pricing` label override.
   String billingProductTitle(PricingConfig pricing, String productId, String languageCode) =>

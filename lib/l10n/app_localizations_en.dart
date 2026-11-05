@@ -5780,4 +5780,247 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearly => 'Yearly';
+
+  @override
+  String get examFreshStart => 'New mock exam';
+
+  @override
+  String get examFreshSubtitle =>
+      'A new variant every time, built to the ORT structure from a bank of reviewed questions.';
+
+  @override
+  String get examLibraryTitle => 'Ready-made variants';
+
+  @override
+  String get examFreshVariantLine => 'A new variant, assembled when you start';
+
+  @override
+  String get examFreshLanguageLabel => 'Question language';
+
+  @override
+  String get examFreshKyOnly => 'The state language test is in Kyrgyz only.';
+
+  @override
+  String get examStyleTitle => 'How to take it';
+
+  @override
+  String get examStyleStandard => 'Practice';
+
+  @override
+  String get examStyleStandardBody =>
+      'You can flag questions, change answers and finish a section early.';
+
+  @override
+  String get examStyleStrict => 'Like the ORT';
+
+  @override
+  String get examStyleStrictBody =>
+      'A section ends only when its time is up, you can correct an answer once, there are no flags, and every section starts with instructions.';
+
+  @override
+  String get examStyleStrictSource =>
+      'The rules follow the official brochure for ORT candidates. This is practice: the result is for study, not an official score.';
+
+  @override
+  String get examStrictRuleNoEarlyFinish =>
+      'You can\'t finish a section early: it ends when its time is up and your answers are sent automatically.';
+
+  @override
+  String get examStrictRuleOneCorrection =>
+      'You can correct an answer only once — like on the answer sheet. An answer can\'t be erased.';
+
+  @override
+  String get examStrictRuleNoFlags => 'There are no “come back later” flags.';
+
+  @override
+  String get examStrictRuleInstruction =>
+      'Every section starts with instructions. Its time runs from the moment it opens, including while you read them.';
+
+  @override
+  String examStrictSectionEndsIn(String time) {
+    return 'Section ends in $time';
+  }
+
+  @override
+  String get examStrictAnswerLocked =>
+      'This answer was already corrected. As on the ORT answer sheet, it can be corrected only once.';
+
+  @override
+  String get examStrictCorrectionLeft =>
+      'You can still correct this answer once.';
+
+  @override
+  String get examStrictCorrectionUsed =>
+      'Answer corrected — it can\'t be changed again.';
+
+  @override
+  String get examStrictWaitingDeadline =>
+      'The section\'s time is ending — your answers will be sent in a few seconds.';
+
+  @override
+  String get examSectionInstructionTitle => 'Section instructions';
+
+  @override
+  String get examStrictTimerRunning =>
+      'The section timer is already running: it started when the section opened.';
+
+  @override
+  String examFreshnessRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You\'ve already seen $count questions in earlier attempts',
+      one: 'You\'ve already seen 1 question in earlier attempts',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get examFreshnessWhy =>
+      'The bank doesn\'t have enough new questions for this direction yet — the rest are new.';
+
+  @override
+  String get examPoolTooSmallTitle => 'New variants are being prepared';
+
+  @override
+  String examPoolTooSmallBody(String language) {
+    return 'There aren\'t enough reviewed questions for this direction ($language) yet. No credit was charged. Meanwhile you can take a ready-made variant.';
+  }
+
+  @override
+  String get examPoolTooSmallAction => 'Ready-made variants';
+
+  @override
+  String get examErrorSectionNotOver =>
+      'The section isn\'t over yet — your answers will be sent when time is up.';
+
+  @override
+  String billingWebPrice(String amount) {
+    return '$amount som';
+  }
+
+  @override
+  String get billingPay => 'Pay';
+
+  @override
+  String billingPaySemantics(String title, String price) {
+    return 'Pay: $title, $price';
+  }
+
+  @override
+  String get billingWebHonestPayment =>
+      'Payment is made on the payment provider\'s secure page. Credits are added once the payment is confirmed.';
+
+  @override
+  String get billingWebProductsEmpty =>
+      'Payment isn\'t available yet. Please check back later.';
+
+  @override
+  String get billingWebPaymentsDisabled =>
+      'Payments aren\'t connected yet. Please try later.';
+
+  @override
+  String get billingWebProductUnavailable =>
+      'This package isn\'t available right now. Please choose another.';
+
+  @override
+  String get billingWebRateLimited =>
+      'Too many orders today. Please try again tomorrow.';
+
+  @override
+  String get billingWebOrderError =>
+      'Couldn\'t create the order. Check your connection and try again.';
+
+  @override
+  String get billingWebRedirecting => 'Opening the payment page…';
+
+  @override
+  String get billingLegalOffer => 'Public offer';
+
+  @override
+  String get billingLegalRefund => 'Refund policy';
+
+  @override
+  String get billingLegalDraftNote =>
+      'Draft. The final text will be published after legal review.';
+
+  @override
+  String get billingLegalLoadError => 'Couldn\'t open the document.';
+
+  @override
+  String get billingLegalRuOnly =>
+      'This document is available in Russian only for now.';
+
+  @override
+  String get payReturnTitle => 'Payment';
+
+  @override
+  String get payReturnChecking => 'Checking your payment…';
+
+  @override
+  String get payReturnPaidTitle => 'Payment received';
+
+  @override
+  String payReturnPaidBody(int credits) {
+    String _temp0 = intl.Intl.pluralLogic(
+      credits,
+      locale: localeName,
+      other: '$credits credits added.',
+      one: '1 credit added.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String payReturnBalance(String balance) {
+    return 'Balance: $balance';
+  }
+
+  @override
+  String get payReturnStartExam => 'Start a mock exam';
+
+  @override
+  String get payReturnFailedTitle => 'Payment didn\'t go through';
+
+  @override
+  String get payReturnFailedBody =>
+      'No credits were added. If you were charged anyway, contact support and we\'ll check the order.';
+
+  @override
+  String get payReturnExpiredTitle => 'Order expired';
+
+  @override
+  String get payReturnExpiredBody =>
+      'The payment didn\'t arrive in time and no credits were added. You can place a new order.';
+
+  @override
+  String get payReturnRefundedTitle => 'Payment refunded';
+
+  @override
+  String get payReturnRefundedBody => 'Credits from this order were withdrawn.';
+
+  @override
+  String get payReturnPendingTitle => 'Payment is still processing';
+
+  @override
+  String get payReturnPendingBody =>
+      'The provider hasn\'t confirmed the payment yet. Credits are added automatically as soon as it does — check your balance later.';
+
+  @override
+  String get payReturnCheckAgain => 'Check again';
+
+  @override
+  String get payReturnNotFound =>
+      'Order not found. If you paid, please contact support.';
+
+  @override
+  String get payReturnNoOrder =>
+      'We couldn\'t tell which order this is. Check your balance on the exam access page.';
+
+  @override
+  String get payReturnNetworkError =>
+      'Couldn\'t check the payment. Check your connection.';
+
+  @override
+  String get payReturnToStore => 'To my balance';
 }

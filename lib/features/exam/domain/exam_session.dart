@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'exam_blueprint.dart';
 import 'exam_payload.dart';
 import 'exam_question.dart';
+import 'exam_start.dart';
 import 'json_utils.dart';
 import 'localized_text.dart';
 
@@ -160,6 +161,11 @@ class QuestionCellState {
 ///   device time corrected by `serverNow` (clock skew);
 /// * warnings at 5 and 1 minute, automatic submission at 0.
 ///
+/// Strict style («Как на ОРТ», §10.2) adds: an instruction screen before
+/// every section (the first one included), an answer can be chosen and then
+/// corrected once (a third choice is refused), no flags, no clearing, and no
+/// early finish — the section is sent only at its deadline.
+///
 /// Every transition returns a new instance; a transition that is not allowed
 /// in the current state returns `this` unchanged.
 @immutable
@@ -184,6 +190,18 @@ class ExamSession {
   final SectionSubmission? pendingSubmission;
   final ExamResult? result;
 
+  /// Standard («Тренировка») or strict («Как на ОРТ», §10.2).
+  final ExamStyle style;
+
+  /// Strict style: how many times an option was chosen per question of the
+  /// open section (1 = first choice, 2 = corrected once — the limit). Saved
+  /// with the session so the limit survives an app restart. Empty in
+  /// standard style.
+  final Map<String, int> choiceCounts;
+
+  /// Repeated questions of a fresh variant (§10.1), shown once at the start.
+  final ExamFreshness? freshness;
+
   const ExamSession._({
     required this.attemptId,
     required this.variantId,
@@ -202,9 +220,15 @@ class ExamSession {
     required this.submitted,
     required this.pendingSubmission,
     required this.result,
+    this.style = ExamStyle.standard,
+    this.choiceCounts = const {},
+    this.freshness,
   });
 
   /// Builds a session from a server payload received at [clientNow].
+  ///
+  /// [style] is what the client asked `examStart` for; the payload's own
+  /// `examStyle` wins when the server reports it.
   factory ExamSession.fromPayload(
     ExamSessionPayload payload, {
     required DateTime clientNow,
@@ -212,6 +236,7 @@ class ExamSession {
     String? uid,
     String? fallbackLanguage,
     LocalizedText? variantTitle,
+    ExamStyle? style,
   }) {
     final bp = payload.blueprint ?? blueprint;
     final section = payload.section;
@@ -224,6 +249,7 @@ class ExamSession {
     final lang = payload.language ??
         (fallbackLanguage != null ? bp.languageFor(fallbackLanguage) : null) ??
         bp.languages.first;
+    final effectiveStyle = payload.examStyle ?? style ?? ExamStyle.standard;
     return ExamSession._(
       attemptId: payload.attemptId,
       variantId: payload.variantId,
@@ -245,11 +271,18 @@ class ExamSession {
       answers: const {},
       flags: const {},
       currentIndex: 0,
-      phase: payload.isCompleted ? ExamPhase.completed : ExamPhase.inSection,
+      // Strict: the first section also opens with its instruction screen.
+      phase: payload.isCompleted
+          ? ExamPhase.completed
+          : effectiveStyle.isStrict
+              ? ExamPhase.sectionIntro
+              : ExamPhase.inSection,
       warned: const {},
       submitted: const {},
       pendingSubmission: null,
       result: payload.result,
+      style: effectiveStyle,
+      freshness: payload.freshness,
     );
   }
 
@@ -268,6 +301,7 @@ class ExamSession {
     SectionSubmission? pendingSubmission,
     bool clearPending = false,
     ExamResult? result,
+    Map<String, int>? choiceCounts,
   }) =>
       ExamSession._(
         attemptId: attemptId,
@@ -288,6 +322,9 @@ class ExamSession {
         pendingSubmission:
             clearPending ? null : (pendingSubmission ?? this.pendingSubmission),
         result: result ?? this.result,
+        style: style,
+        choiceCounts: choiceCounts ?? this.choiceCounts,
+        freshness: freshness,
       );
 
   // ---------------------------------------------------------------- queries
@@ -337,6 +374,33 @@ class ExamSession {
 
   String? answerOf(String questionId) => answers[questionId];
   bool isFlagged(String questionId) => flags.contains(questionId);
+
+  bool get isStrict => style.isStrict;
+
+  /// Strict style has no "come back later" flags (§10.2).
+  bool get allowsFlags => !isStrict;
+
+  /// Strict style: the section is sent only at its deadline.
+  bool get canFinishEarly => !isStrict;
+
+  /// Strict style: an answer cannot be removed, only corrected once.
+  bool get allowsClearing => !isStrict;
+
+  /// Strict: the most choices per question (the first one + one correction).
+  static const int strictMaxChoices = 2;
+
+  /// Times an option was chosen for [questionId] in the open section. An
+  /// answer restored without a count (older local copy) counts as one.
+  int choicesMade(String questionId) {
+    final n = choiceCounts[questionId] ?? 0;
+    return answers.containsKey(questionId) && n < 1 ? 1 : n;
+  }
+
+  /// Strict: the answer was already corrected; another option is refused.
+  bool isAnswerLocked(String questionId) =>
+      isStrict &&
+      answers.containsKey(questionId) &&
+      choicesMade(questionId) >= strictMaxChoices;
 
   QuestionCellState cell(int index) {
     final q = questions[index];
@@ -393,8 +457,23 @@ class ExamSession {
     return null;
   }
 
+  /// The open section must be sent now: its time is up. In strict style
+  /// this also applies while the instruction screen is still shown (the
+  /// section's time runs there too, and it is sent only at the deadline).
   bool shouldAutoSubmit(DateTime clientNow) =>
-      phase == ExamPhase.inSection && isExpired(clientNow);
+      _canClose && isExpired(clientNow);
+
+  bool get _canClose =>
+      phase == ExamPhase.inSection ||
+      (isStrict && phase == ExamPhase.sectionIntro);
+
+  /// Whether [beginSubmit] may close the section now: in strict style only
+  /// once its time is up (the server answers SECTION_NOT_OVER otherwise).
+  bool canSubmit(DateTime clientNow) {
+    if (phase == ExamPhase.submitPending) return pendingSubmission != null;
+    if (!_canClose) return false;
+    return !isStrict || isExpired(clientNow);
+  }
 
   // ------------------------------------------------------------ transitions
 
@@ -405,16 +484,27 @@ class ExamSession {
     if (index < 0) return this;
     if (!optionsFor(index).any((o) => o.id == optionId)) return this;
     if (answers[questionId] == optionId) return this;
-    return _copy(answers: Map.unmodifiable({...answers, questionId: optionId}));
+    final nextAnswers = Map<String, String>.unmodifiable(
+        {...answers, questionId: optionId});
+    if (!isStrict) return _copy(answers: nextAnswers);
+    // Strict: first choice, then one correction — a third choice is refused.
+    if (isAnswerLocked(questionId)) return this;
+    return _copy(
+      answers: nextAnswers,
+      choiceCounts: Map.unmodifiable(
+          {...choiceCounts, questionId: choicesMade(questionId) + 1}),
+    );
   }
 
   ExamSession clearAnswer(String questionId, {required DateTime now}) {
+    if (!allowsClearing) return this;
     if (!canEdit(now) || !answers.containsKey(questionId)) return this;
     final next = Map<String, String>.of(answers)..remove(questionId);
     return _copy(answers: Map.unmodifiable(next));
   }
 
   ExamSession toggleFlag(String questionId, {required DateTime now}) {
+    if (!allowsFlags) return this;
     if (!canEdit(now)) return this;
     if (!questions.any((q) => q.id == questionId)) return this;
     final next = Set<String>.of(flags);
@@ -457,7 +547,9 @@ class ExamSession {
     if (phase == ExamPhase.submitPending && pendingSubmission != null) {
       return _copy(phase: ExamPhase.submitting);
     }
-    if (phase != ExamPhase.inSection) return this;
+    if (!_canClose) return this;
+    // Strict: no early finish — the section closes only at its deadline.
+    if (isStrict && !isExpired(now)) return this;
     final total = section.durationSec > 0
         ? section.durationSec
         : sectionSpec.durationMinutes * 60;
@@ -467,9 +559,11 @@ class ExamSession {
       attemptId: attemptId,
       sectionId: section.sectionId,
       answers: {for (final q in questions) q.id: answers[q.id]},
+      // Strict attempts have no flags (the server ignores them anyway).
       flags: [
-        for (final q in questions)
-          if (flags.contains(q.id)) q.id,
+        if (allowsFlags)
+          for (final q in questions)
+            if (flags.contains(q.id)) q.id,
       ],
       clientElapsedSec: elapsed,
       automatic: automatic,
@@ -520,6 +614,7 @@ class ExamSession {
       clockOffsetMs: next.serverNowMs - clientNow.millisecondsSinceEpoch,
       answers: const {},
       flags: const {},
+      choiceCounts: const {},
       currentIndex: 0,
       warned: const {},
       phase: ExamPhase.sectionIntro,
@@ -547,6 +642,41 @@ class ExamSession {
       clearPending: true,
     );
   }
+
+  /// Strict style, after SECTION_NOT_OVER: the server reports that the open
+  /// section still runs (the device clock was ahead of the estimate). The
+  /// section is reopened with the server's clock and deadline; answers and
+  /// corrections are kept. Anything else returns `this`.
+  ExamSession reopenNotOver(ExamSessionPayload server,
+      {required DateTime clientNow}) {
+    final sec = server.section;
+    if (!isStrict || server.isCompleted || sec == null) return this;
+    if (phase != ExamPhase.submitPending && phase != ExamPhase.submitting) {
+      return this;
+    }
+    if (server.currentSectionIndex != sectionIndex ||
+        sec.sectionId != section.sectionId) {
+      return this;
+    }
+    final reopened = _copy(
+      phase: ExamPhase.inSection,
+      clearPending: true,
+      clockOffsetMs: server.serverNowMs - clientNow.millisecondsSinceEpoch,
+      section: SectionPayload(
+        sectionId: section.sectionId,
+        deadlineAtMs: sec.deadlineAtMs > 0 ? sec.deadlineAtMs : section.deadlineAtMs,
+        durationSec: section.durationSec,
+        questions: section.questions,
+        passages: section.passages,
+      ),
+    );
+    // A few seconds short is not worth reopening: wait and send again.
+    return reopened.remaining(clientNow) > strictReopenThreshold ? reopened : this;
+  }
+
+  /// SECTION_NOT_OVER with less time left than this keeps the "sending
+  /// shortly" screen instead of reopening the section.
+  static const Duration strictReopenThreshold = Duration(seconds: 10);
 
   /// Merges authoritative server state (from `examGetState`) into the local
   /// session after a restart or reconnect. Local answers of the same open
@@ -594,6 +724,7 @@ class ExamSession {
       clockOffsetMs: offset,
       answers: const {},
       flags: const {},
+      choiceCounts: const {},
       currentIndex: 0,
       warned: const {},
       phase: ExamPhase.sectionIntro,
@@ -625,6 +756,9 @@ class ExamSession {
           'pending_submission': pendingSubmission!.toJson(),
         if (result != null) 'result': result!.toJson(),
         if (savedAtMs != null) 'saved_at': savedAtMs,
+        'exam_style': style.wire,
+        if (choiceCounts.isNotEmpty) 'choice_counts': choiceCounts,
+        if (freshness != null) 'freshness': freshness!.toJson(),
       };
 
   /// Large, rarely changing part (blueprint and open section content).
@@ -687,6 +821,12 @@ class ExamSession {
       pendingSubmission:
           pending is Map ? SectionSubmission.fromJson(pending) : null,
       result: result is Map ? ExamResult.fromJson(result) : null,
+      style: ExamStyle.parse(state['exam_style']),
+      choiceCounts: Map.unmodifiable(<String, int>{
+        for (final e in asJsonMap(state['choice_counts']).entries)
+          if (asInt(e.value) case final n? when n > 0) e.key: n,
+      }),
+      freshness: ExamFreshness.fromJson(state['freshness']),
     );
   }
 }

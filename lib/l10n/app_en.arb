@@ -3818,5 +3818,295 @@
   "tutorYou": "You",
   "weakTopics": "Weak Topics",
   "welcome": "Welcome",
-  "yearly": "Yearly"
+  "yearly": "Yearly",
+  "examFreshStart": "New mock exam",
+  "@examFreshStart": {
+    "description": "Primary action of a direction: a new variant assembled for this attempt"
+  },
+  "examFreshSubtitle": "A new variant every time, built to the ORT structure from a bank of reviewed questions.",
+  "@examFreshSubtitle": {
+    "description": "Fresh mock exam explanation"
+  },
+  "examLibraryTitle": "Ready-made variants",
+  "@examLibraryTitle": {
+    "description": "Secondary list of published library variants"
+  },
+  "examFreshVariantLine": "A new variant, assembled when you start",
+  "@examFreshVariantLine": {
+    "description": "Fresh exam intro"
+  },
+  "examFreshLanguageLabel": "Question language",
+  "@examFreshLanguageLabel": {
+    "description": "Fresh exam intro: language choice"
+  },
+  "examFreshKyOnly": "The state language test is in Kyrgyz only.",
+  "@examFreshKyOnly": {
+    "description": "Fresh exam intro"
+  },
+  "examStyleTitle": "How to take it",
+  "@examStyleTitle": {
+    "description": "Exam style choice title"
+  },
+  "examStyleStandard": "Practice",
+  "@examStyleStandard": {
+    "description": "Exam style: standard"
+  },
+  "examStyleStandardBody": "You can flag questions, change answers and finish a section early.",
+  "@examStyleStandardBody": {
+    "description": "Exam style: standard"
+  },
+  "examStyleStrict": "Like the ORT",
+  "@examStyleStrict": {
+    "description": "Exam style: strict"
+  },
+  "examStyleStrictBody": "A section ends only when its time is up, you can correct an answer once, there are no flags, and every section starts with instructions.",
+  "@examStyleStrictBody": {
+    "description": "Exam style: strict"
+  },
+  "examStyleStrictSource": "The rules follow the official brochure for ORT candidates. This is practice: the result is for study, not an official score.",
+  "@examStyleStrictSource": {
+    "description": "Exam style: strict, honest source note"
+  },
+  "examStrictRuleNoEarlyFinish": "You can't finish a section early: it ends when its time is up and your answers are sent automatically.",
+  "@examStrictRuleNoEarlyFinish": {
+    "description": "Strict rule"
+  },
+  "examStrictRuleOneCorrection": "You can correct an answer only once — like on the answer sheet. An answer can't be erased.",
+  "@examStrictRuleOneCorrection": {
+    "description": "Strict rule"
+  },
+  "examStrictRuleNoFlags": "There are no “come back later” flags.",
+  "@examStrictRuleNoFlags": {
+    "description": "Strict rule"
+  },
+  "examStrictRuleInstruction": "Every section starts with instructions. Its time runs from the moment it opens, including while you read them.",
+  "@examStrictRuleInstruction": {
+    "description": "Strict rule"
+  },
+  "examStrictSectionEndsIn": "Section ends in {time}",
+  "@examStrictSectionEndsIn": {
+    "description": "Strict runner: replaces \"Finish section\"; {time} is mm:ss",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "examStrictAnswerLocked": "This answer was already corrected. As on the ORT answer sheet, it can be corrected only once.",
+  "@examStrictAnswerLocked": {
+    "description": "Strict runner: a third choice was refused"
+  },
+  "examStrictCorrectionLeft": "You can still correct this answer once.",
+  "@examStrictCorrectionLeft": {
+    "description": "Strict runner"
+  },
+  "examStrictCorrectionUsed": "Answer corrected — it can't be changed again.",
+  "@examStrictCorrectionUsed": {
+    "description": "Strict runner"
+  },
+  "examStrictWaitingDeadline": "The section's time is ending — your answers will be sent in a few seconds.",
+  "@examStrictWaitingDeadline": {
+    "description": "Strict runner: SECTION_NOT_OVER, retrying"
+  },
+  "examSectionInstructionTitle": "Section instructions",
+  "@examSectionInstructionTitle": {
+    "description": "Strict pre-section screen"
+  },
+  "examStrictTimerRunning": "The section timer is already running: it started when the section opened.",
+  "@examStrictTimerRunning": {
+    "description": "Strict pre-section screen, honest timer note"
+  },
+  "examFreshnessRepeated": "{count, plural, =1{You've already seen 1 question in earlier attempts} other{You've already seen {count} questions in earlier attempts}}",
+  "@examFreshnessRepeated": {
+    "description": "Fresh variant: repeated questions",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examFreshnessWhy": "The bank doesn't have enough new questions for this direction yet — the rest are new.",
+  "@examFreshnessWhy": {
+    "description": "Fresh variant: repeated questions"
+  },
+  "examPoolTooSmallTitle": "New variants are being prepared",
+  "@examPoolTooSmallTitle": {
+    "description": "POOL_TOO_SMALL"
+  },
+  "examPoolTooSmallBody": "There aren't enough reviewed questions for this direction ({language}) yet. No credit was charged. Meanwhile you can take a ready-made variant.",
+  "@examPoolTooSmallBody": {
+    "description": "POOL_TOO_SMALL",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "examPoolTooSmallAction": "Ready-made variants",
+  "@examPoolTooSmallAction": {
+    "description": "POOL_TOO_SMALL"
+  },
+  "examErrorSectionNotOver": "The section isn't over yet — your answers will be sent when time is up.",
+  "@examErrorSectionNotOver": {
+    "description": "SECTION_NOT_OVER"
+  },
+  "billingWebPrice": "{amount} som",
+  "@billingWebPrice": {
+    "description": "Price of a web product from config/pricing.web_products",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPay": "Pay",
+  "@billingPay": {
+    "description": "Web store button"
+  },
+  "billingPaySemantics": "Pay: {title}, {price}",
+  "@billingPaySemantics": {
+    "description": "Web store button semantics",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "billingWebHonestPayment": "Payment is made on the payment provider's secure page. Credits are added once the payment is confirmed.",
+  "@billingWebHonestPayment": {
+    "description": "Web store"
+  },
+  "billingWebProductsEmpty": "Payment isn't available yet. Please check back later.",
+  "@billingWebProductsEmpty": {
+    "description": "Web store"
+  },
+  "billingWebPaymentsDisabled": "Payments aren't connected yet. Please try later.",
+  "@billingWebPaymentsDisabled": {
+    "description": "PAYMENTS_DISABLED"
+  },
+  "billingWebProductUnavailable": "This package isn't available right now. Please choose another.",
+  "@billingWebProductUnavailable": {
+    "description": "PRODUCT_UNAVAILABLE"
+  },
+  "billingWebRateLimited": "Too many orders today. Please try again tomorrow.",
+  "@billingWebRateLimited": {
+    "description": "RATE_LIMITED"
+  },
+  "billingWebOrderError": "Couldn't create the order. Check your connection and try again.",
+  "@billingWebOrderError": {
+    "description": "Web store"
+  },
+  "billingWebRedirecting": "Opening the payment page…",
+  "@billingWebRedirecting": {
+    "description": "Web store"
+  },
+  "billingLegalOffer": "Public offer",
+  "@billingLegalOffer": {
+    "description": "Legal document"
+  },
+  "billingLegalRefund": "Refund policy",
+  "@billingLegalRefund": {
+    "description": "Legal document"
+  },
+  "billingLegalDraftNote": "Draft. The final text will be published after legal review.",
+  "@billingLegalDraftNote": {
+    "description": "Legal document"
+  },
+  "billingLegalLoadError": "Couldn't open the document.",
+  "@billingLegalLoadError": {
+    "description": "Legal document"
+  },
+  "billingLegalRuOnly": "This document is available in Russian only for now.",
+  "@billingLegalRuOnly": {
+    "description": "Legal document"
+  },
+  "payReturnTitle": "Payment",
+  "@payReturnTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnChecking": "Checking your payment…",
+  "@payReturnChecking": {
+    "description": "Web payment return page"
+  },
+  "payReturnPaidTitle": "Payment received",
+  "@payReturnPaidTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnPaidBody": "{credits, plural, =1{1 credit added.} other{{credits} credits added.}}",
+  "@payReturnPaidBody": {
+    "description": "Web payment return page",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "payReturnBalance": "Balance: {balance}",
+  "@payReturnBalance": {
+    "description": "Web payment return page; {balance} is e.g. \"3 кредита\"",
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "payReturnStartExam": "Start a mock exam",
+  "@payReturnStartExam": {
+    "description": "Web payment return page"
+  },
+  "payReturnFailedTitle": "Payment didn't go through",
+  "@payReturnFailedTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnFailedBody": "No credits were added. If you were charged anyway, contact support and we'll check the order.",
+  "@payReturnFailedBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnExpiredTitle": "Order expired",
+  "@payReturnExpiredTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnExpiredBody": "The payment didn't arrive in time and no credits were added. You can place a new order.",
+  "@payReturnExpiredBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnRefundedTitle": "Payment refunded",
+  "@payReturnRefundedTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnRefundedBody": "Credits from this order were withdrawn.",
+  "@payReturnRefundedBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnPendingTitle": "Payment is still processing",
+  "@payReturnPendingTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnPendingBody": "The provider hasn't confirmed the payment yet. Credits are added automatically as soon as it does — check your balance later.",
+  "@payReturnPendingBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnCheckAgain": "Check again",
+  "@payReturnCheckAgain": {
+    "description": "Web payment return page"
+  },
+  "payReturnNotFound": "Order not found. If you paid, please contact support.",
+  "@payReturnNotFound": {
+    "description": "ORDER_NOT_FOUND"
+  },
+  "payReturnNoOrder": "We couldn't tell which order this is. Check your balance on the exam access page.",
+  "@payReturnNoOrder": {
+    "description": "Web payment return page"
+  },
+  "payReturnNetworkError": "Couldn't check the payment. Check your connection.",
+  "@payReturnNetworkError": {
+    "description": "Web payment return page"
+  },
+  "payReturnToStore": "To my balance",
+  "@payReturnToStore": {
+    "description": "Web payment return page"
+  }
 }

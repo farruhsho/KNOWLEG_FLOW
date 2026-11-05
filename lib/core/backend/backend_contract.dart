@@ -32,6 +32,13 @@ abstract final class BackendFunctions {
   static const String groupRemoveMember = 'groupRemoveMember';
   static const String adminSendNotification = 'adminSendNotification';
 
+  // Phase 4 (ARCHITECTURE §10): fresh variants, strict mode, web payments.
+  static const String paymentCreateOrder = 'paymentCreateOrder';
+  static const String paymentGetOrder = 'paymentGetOrder';
+  static const String adminRefundOrder = 'adminRefundOrder';
+  static const String adminUpdateExamPool = 'adminUpdateExamPool';
+  static const String adminExamPoolHealth = 'adminExamPoolHealth';
+
   static FirebaseFunctions get instance =>
       FirebaseFunctions.instanceFor(region: region);
 
@@ -76,6 +83,26 @@ abstract final class BackendReasons {
   static const limitReached = 'LIMIT_REACHED';
   static const notGroupOwner = 'NOT_GROUP_OWNER';
 
+  // Phase 4 (ARCHITECTURE §10).
+
+  /// `examStart` mode `fresh`: the verified bank cannot cover the blueprint
+  /// in this language even with repeats; no credit was charged.
+  /// `details: {section_id, part_id}`.
+  static const poolTooSmall = 'POOL_TOO_SMALL';
+
+  /// `examSubmitSection` of a strict attempt before `deadline_at − 5 s`.
+  static const sectionNotOver = 'SECTION_NOT_OVER';
+
+  /// `paymentCreateOrder` while no payment provider is configured.
+  static const paymentsDisabled = 'PAYMENTS_DISABLED';
+
+  /// `paymentGetOrder` / `adminRefundOrder`: unknown or someone else's order.
+  static const orderNotFound = 'ORDER_NOT_FOUND';
+
+  /// `paymentCreateOrder`: product disabled or unknown in
+  /// `config/pricing.web_products`.
+  static const productUnavailable = 'PRODUCT_UNAVAILABLE';
+
   /// Extracts `details.reason` from a callable error, if present.
   static String? of(Object error) {
     if (error is FirebaseFunctionsException) {
@@ -83,6 +110,18 @@ abstract final class BackendReasons {
       if (d is Map && d['reason'] is String) return d['reason'] as String;
     }
     return null;
+  }
+
+  /// The whole `details` map of a callable error (empty when absent), e.g.
+  /// `{reason: 'POOL_TOO_SMALL', section_id: 'math', part_id: 'p1'}`.
+  static Map<String, Object?> detailsOf(Object error) {
+    if (error is FirebaseFunctionsException) {
+      final d = error.details;
+      if (d is Map) {
+        return {for (final e in d.entries) e.key.toString(): e.value};
+      }
+    }
+    return const {};
   }
 }
 
@@ -115,6 +154,38 @@ abstract final class Collections {
   static const groupAssignments = 'assignments'; // sub-collection of groups
   static const assignmentSubmissions = 'submissions'; // sub-collection of assignments
   static const notifications = 'notifications';
+
+  // Phase 4 (ARCHITECTURE §10.3). Server-written; the owner reads own
+  // orders, super_admin and support read all.
+  static const paymentOrders = 'payment_orders';
+
+  /// Webhook idempotency records (server only).
+  static const paymentEvents = 'payment_events';
+}
+
+/// Document ids inside [Collections.config].
+abstract final class ConfigDocs {
+  /// Credits per product, free exams per user, `web_products` (§10.3).
+  static const pricing = 'pricing';
+
+  /// `{fresh_enabled, min_review_status, updated_at, updated_by}` (§10.1).
+  /// Read by signed-in users; written only by `adminUpdateExamPool`.
+  static const examPool = 'exam_pool';
+  static const aiTutor = 'ai_tutor';
+  static const achievements = 'achievements';
+}
+
+/// `payment_orders/{id}.status` values (ARCHITECTURE §10.3).
+abstract final class PaymentOrderStatuses {
+  static const created = 'created';
+  static const pending = 'pending';
+  static const paid = 'paid';
+  static const failed = 'failed';
+  static const expired = 'expired';
+  static const refunded = 'refunded';
+
+  /// Final states: polling stops once an order reaches one of these.
+  static const terminal = {paid, failed, expired, refunded};
 }
 
 /// Google Play product ids (consumables). Credits per product live

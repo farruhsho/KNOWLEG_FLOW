@@ -64,6 +64,9 @@ class QuestionBody extends StatelessWidget {
   final ValueChanged<String> onSelect;
   final VoidCallback? onClear;
 
+  /// Extra line under the options (strict style: corrections left).
+  final Widget? footer;
+
   const QuestionBody({
     super.key,
     required this.question,
@@ -73,6 +76,7 @@ class QuestionBody extends StatelessWidget {
     required this.enabled,
     required this.onSelect,
     this.onClear,
+    this.footer,
   });
 
   @override
@@ -121,6 +125,7 @@ class QuestionBody extends StatelessWidget {
               label: Text(context.l10n.examClearAnswer),
             ),
           ),
+        if (footer != null) footer!,
       ],
     );
   }

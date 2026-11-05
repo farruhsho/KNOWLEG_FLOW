@@ -14,6 +14,7 @@ import '../../features/gamification/gamification_routes.dart';
 import '../../features/gamification/presentation/pages/achievements_page.dart';
 import '../../features/handbook/presentation/pages/handbook_content_page.dart';
 import '../../features/handbook/presentation/pages/handbook_page.dart';
+import '../../features/legal/legal_routes.dart';
 import '../../features/lessons/presentation/pages/daily_lesson_page.dart';
 import '../../features/lessons/presentation/pages/lesson_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
@@ -263,6 +264,7 @@ class AppRouter {
         // Feature packages.
         ...examRoutes,
         ...billingRoutes,
+        ...legalRoutes,
         ...tutorRoutes,
         ...accountRoutes,
         ...gamificationRoutes,

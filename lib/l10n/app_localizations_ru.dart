@@ -5848,4 +5848,251 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get yearly => 'Годовая';
+
+  @override
+  String get examFreshStart => 'Новый пробный';
+
+  @override
+  String get examFreshSubtitle =>
+      'Каждый раз — новый вариант по структуре ОРТ из проверенного банка заданий.';
+
+  @override
+  String get examLibraryTitle => 'Готовые варианты';
+
+  @override
+  String get examFreshVariantLine => 'Новый вариант — соберём при старте';
+
+  @override
+  String get examFreshLanguageLabel => 'Язык заданий';
+
+  @override
+  String get examFreshKyOnly =>
+      'Тест по государственному языку проводится только на кыргызском.';
+
+  @override
+  String get examStyleTitle => 'Как проходить';
+
+  @override
+  String get examStyleStandard => 'Тренировка';
+
+  @override
+  String get examStyleStandardBody =>
+      'Можно отмечать задания, менять ответы и завершить раздел раньше времени.';
+
+  @override
+  String get examStyleStrict => 'Как на ОРТ';
+
+  @override
+  String get examStyleStrictBody =>
+      'Раздел заканчивается только по времени, ответ можно исправить один раз, пометок нет, перед каждым разделом — инструкция.';
+
+  @override
+  String get examStyleStrictSource =>
+      'Правила взяты из брошюры ЦООМО для участников ОРТ. Это тренировка: результат учебный, а не официальный балл.';
+
+  @override
+  String get examStrictRuleNoEarlyFinish =>
+      'Раздел нельзя завершить досрочно: он закончится, когда выйдет время, и ответы отправятся автоматически.';
+
+  @override
+  String get examStrictRuleOneCorrection =>
+      'Ответ на задание можно исправить только один раз — как на бланке. Стереть ответ нельзя.';
+
+  @override
+  String get examStrictRuleNoFlags => 'Пометок «вернуться позже» нет.';
+
+  @override
+  String get examStrictRuleInstruction =>
+      'Перед каждым разделом — инструкция. Время раздела идёт с момента, когда он открылся, в том числе пока вы читаете инструкцию.';
+
+  @override
+  String examStrictSectionEndsIn(String time) {
+    return 'Раздел закончится через $time';
+  }
+
+  @override
+  String get examStrictAnswerLocked =>
+      'Ответ уже исправлен. Как на бланке ОРТ, исправить его можно только один раз.';
+
+  @override
+  String get examStrictCorrectionLeft => 'Ответ можно исправить ещё один раз.';
+
+  @override
+  String get examStrictCorrectionUsed =>
+      'Ответ исправлен — больше изменить нельзя.';
+
+  @override
+  String get examStrictWaitingDeadline =>
+      'Время раздела заканчивается — ответы отправятся через несколько секунд.';
+
+  @override
+  String get examSectionInstructionTitle => 'Инструкция к разделу';
+
+  @override
+  String get examStrictTimerRunning =>
+      'Таймер раздела уже идёт: он запустился, когда раздел открылся.';
+
+  @override
+  String examFreshnessRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count задания вы уже встречали в прошлых попытках',
+      many: '$count заданий вы уже встречали в прошлых попытках',
+      few: '$count задания вы уже встречали в прошлых попытках',
+      one: '$count задание вы уже встречали в прошлых попытках',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get examFreshnessWhy =>
+      'В банке пока не хватает новых заданий для этого направления — остальные задания новые.';
+
+  @override
+  String get examPoolTooSmallTitle => 'Новые варианты ещё готовятся';
+
+  @override
+  String examPoolTooSmallBody(String language) {
+    return 'Для этого направления ($language) пока недостаточно проверенных заданий. Кредит не списан. Пока можно пройти готовый вариант.';
+  }
+
+  @override
+  String get examPoolTooSmallAction => 'К готовым вариантам';
+
+  @override
+  String get examErrorSectionNotOver =>
+      'Раздел ещё не закончился — ответы отправятся по окончании времени.';
+
+  @override
+  String billingWebPrice(String amount) {
+    return '$amount сом';
+  }
+
+  @override
+  String get billingPay => 'Оплатить';
+
+  @override
+  String billingPaySemantics(String title, String price) {
+    return 'Оплатить: $title, $price';
+  }
+
+  @override
+  String get billingWebHonestPayment =>
+      'Оплата проходит на защищённой странице платёжного провайдера. Кредиты начисляются после подтверждения оплаты.';
+
+  @override
+  String get billingWebProductsEmpty =>
+      'Оплата пока недоступна. Загляните позже.';
+
+  @override
+  String get billingWebPaymentsDisabled =>
+      'Оплата пока не подключена. Попробуйте позже.';
+
+  @override
+  String get billingWebProductUnavailable =>
+      'Этот пакет сейчас недоступен. Выберите другой.';
+
+  @override
+  String get billingWebRateLimited =>
+      'Слишком много заказов за сегодня. Попробуйте завтра.';
+
+  @override
+  String get billingWebOrderError =>
+      'Не удалось создать заказ. Проверьте интернет и попробуйте ещё раз.';
+
+  @override
+  String get billingWebRedirecting => 'Открываем страницу оплаты…';
+
+  @override
+  String get billingLegalOffer => 'Публичная оферта';
+
+  @override
+  String get billingLegalRefund => 'Правила возврата';
+
+  @override
+  String get billingLegalDraftNote =>
+      'Черновик. Окончательный текст появится после проверки юристом.';
+
+  @override
+  String get billingLegalLoadError => 'Не удалось открыть документ.';
+
+  @override
+  String get billingLegalRuOnly =>
+      'Документ пока доступен только на русском языке.';
+
+  @override
+  String get payReturnTitle => 'Оплата';
+
+  @override
+  String get payReturnChecking => 'Проверяем оплату…';
+
+  @override
+  String get payReturnPaidTitle => 'Оплата прошла';
+
+  @override
+  String payReturnPaidBody(int credits) {
+    String _temp0 = intl.Intl.pluralLogic(
+      credits,
+      locale: localeName,
+      other: 'Начислено $credits кредита.',
+      many: 'Начислено $credits кредитов.',
+      few: 'Начислено $credits кредита.',
+      one: 'Начислен $credits кредит.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String payReturnBalance(String balance) {
+    return 'Баланс: $balance';
+  }
+
+  @override
+  String get payReturnStartExam => 'Начать пробный';
+
+  @override
+  String get payReturnFailedTitle => 'Оплата не прошла';
+
+  @override
+  String get payReturnFailedBody =>
+      'Кредиты не начислены. Если деньги всё же списались, напишите в поддержку — мы проверим заказ.';
+
+  @override
+  String get payReturnExpiredTitle => 'Заказ истёк';
+
+  @override
+  String get payReturnExpiredBody =>
+      'Оплата не поступила вовремя, кредиты не начислены. Можно оформить новый заказ.';
+
+  @override
+  String get payReturnRefundedTitle => 'Оплата возвращена';
+
+  @override
+  String get payReturnRefundedBody => 'Кредиты по этому заказу отозваны.';
+
+  @override
+  String get payReturnPendingTitle => 'Оплата ещё обрабатывается';
+
+  @override
+  String get payReturnPendingBody =>
+      'Провайдер пока не подтвердил оплату. Кредиты начислятся автоматически, как только придёт подтверждение, — проверьте баланс позже.';
+
+  @override
+  String get payReturnCheckAgain => 'Проверить ещё раз';
+
+  @override
+  String get payReturnNotFound =>
+      'Заказ не найден. Если вы оплатили, напишите в поддержку.';
+
+  @override
+  String get payReturnNoOrder =>
+      'Не удалось определить заказ. Проверьте баланс на странице доступа к тестам.';
+
+  @override
+  String get payReturnNetworkError =>
+      'Не удалось проверить оплату. Проверьте интернет.';
+
+  @override
+  String get payReturnToStore => 'К балансу';
 }
