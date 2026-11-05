@@ -709,3 +709,149 @@ Application Default Credentials функции, приглашённый в Play
   Уменьшение `member_count` в транзакции — только если документ участника ещё существует.
 * **Рассылки:** dry-run и отправка на клиенте ждут до 540 с (как сервер); сервер читает
   пользователей с `select(...)` только нужных полей.
+
+## 10. Фаза 4: новый вариант на каждую попытку, режим «как на ОРТ», оплата на сайте (контракт, 2026-11-05)
+
+Решения владельца (2026-11-05):
+
+1. **Каждый полный пробный — новый вариант.** Сервер собирает его заново из
+   проверенного банка по структуре ОРТ (разделы, части, число заданий, время,
+   матрица тем, доля сложности, тексты для чтения). Цена не меняется: первый
+   пробный бесплатно, каждый следующий — 1 кредит (= 100 сом).
+2. **Оплата — на сайте** (web-версия приложения на Firebase Hosting). Провайдер
+   подключается адаптером; пока договора нет, оплата выключена. В Android-сборке
+   `external` по-прежнему нет цен, кнопок покупки и ссылок на оплату.
+
+Новые коды `details.reason`: `POOL_TOO_SMALL`, `SECTION_NOT_OVER`,
+`PAYMENTS_DISABLED`, `ORDER_NOT_FOUND`, `PRODUCT_UNAVAILABLE`.
+
+### 10.1 Новый вариант на попытку (`examStart`, режим `fresh`)
+
+* Вход `examStart`: `{variantId?, blueprintId?, language?, mode?: 'library'|'fresh',
+  examStyle?: 'standard'|'strict', clientAppVersion}`.
+  * `mode` по умолчанию: `library`, если передан `variantId` (как сейчас);
+    `fresh` требует `blueprintId` (активный blueprint) и `language` (`ru`|`ky`;
+    `ort_state_language_*` — только `ky`). Иначе `VALIDATION_FAILED`.
+  * Незавершённая попытка того же пользователя возвращается как сейчас (resume),
+    новую не создаём и кредит не списываем.
+* **Пул** — `exam_questions` с тем же `language`, слотом
+  `{blueprint_id, section_id, part_id}` из blueprint, `review.status` не ниже
+  `config/exam_pool.min_review_status` (по умолчанию `methodologist_approved`),
+  с ключом в `exam_question_keys`; для заданий к тексту — с документом
+  `exam_passages`. Задания, исключённые дедупликацией или со статусом
+  `rejected`, в пул не входят.
+* **Сборка** — тот же алгоритм, что у пайплайна (`tools/content_pipeline/src/assemble.ts`),
+  перенесённый в `functions/src/domain/assembly.ts` как чистая функция:
+  точное число заданий в каждой части, матрица тем (точные ячейки → точные
+  суммы → диапазоны), доля сложности, раскладка текстов (чтение: 2 отдельных
+  текста + 1 пара). Порядок внутри части — **от лёгких к трудным** (брошюра
+  ЦООМО: задания идут по возрастанию трудности); задания к тексту идут группой в
+  порядке текста.
+* **Без повторов.** «Виденные» задания — `question_ids` из последних 50 попыток
+  пользователя по тому же blueprint и языку. Сначала берутся невиданные; если их
+  не хватает, добавляются виденные давнее всего. Ответ содержит
+  `freshness: {total, repeated}`, клиент честно показывает «N заданий вы уже
+  встречали». Если пул не покрывает blueprint даже с повторами →
+  `POOL_TOO_SMALL` (кредит не списывается), `details: {section_id, part_id}`.
+* **Хранение.** Собранный вариант пишется в `exam_variants/fresh_{attemptId}`:
+  `{..., status: 'generated', source: 'fresh', generated_for: uid, seed}`.
+  Клиент такие документы не читает (правило пропускает только `published`), в
+  библиотеке они не видны. Попытка ссылается на него обычным `variant_id`, так что
+  `examGetState`, `examSubmitSection`, `examGetReview`, `examExpireStale` работают без
+  изменений.
+* **Списание** — в той же транзакции, что и создание попытки (как сейчас):
+  бесплатная первая или 1 кредит.
+* `config/exam_pool` (читают вошедшие, пишет только функция):
+  `{fresh_enabled: bool (по умолчанию true), min_review_status:
+  'methodologist_approved'|'ai_verified', updated_at, updated_by}`.
+  `adminUpdateExamPool({freshEnabled?, minReviewStatus?})` — только super_admin,
+  запись в `admin_logs`. `ai_verified` — осознанное решение владельца для пилота:
+  такие задания проверены независимым AI-решателем, но не методистом.
+* `adminExamPoolHealth({blueprintId, language})` (super_admin, content_manager,
+  methodologist) → `{sections: [{section_id, parts: [{part_id, needed,
+  available_by_status: {methodologist_approved, ai_verified, draft},
+  eligible, passages: {standalone, paired}}]}], disjoint_variants, shortfalls: [...]}`:
+  сколько полностью непересекающихся вариантов можно собрать сейчас и каких тем
+  не хватает.
+* Библиотечные варианты (`mode: 'library'`) остаются: их назначают учителя в
+  домашних заданиях, и они нужны, пока пул мал.
+
+### 10.2 Режим «как на ОРТ» (`examStyle: 'strict'`)
+
+Попытка хранит `exam_style: 'standard'|'strict'` (по умолчанию `standard`, как сейчас).
+`strict` повторяет правила бумажного ОРТ (брошюра ЦООМО, п. 2.3.13–2.3.14):
+
+* следующий раздел открывается **только когда время текущего вышло**:
+  `examSubmitSection` раньше `deadline_at − 5 с` → `SECTION_NOT_OVER` (клиент в этом
+  режиме не показывает «Завершить раздел», показывает обратный отсчёт и
+  отправляет раздел сам по окончании времени);
+* ответ на задание можно **исправить один раз** (как на бланке): клиент
+  блокирует третий выбор; сервер хранит только итоговый ответ;
+* **флажков нет** (пометки в буклете запрещены): клиент их не показывает,
+  сервер игнорирует `flags`;
+* перед каждым разделом — экран-инструкция (раздел, заданий, минут, правила,
+  черновик — только где разрешён `allow_scratchpad`), раздел стартует по кнопке
+  «Начать раздел», таймер идёт с момента, когда раздел выдал сервер (как сейчас);
+* калькулятора нет (как и в `standard`).
+
+### 10.3 Оплата на сайте
+
+* `BILLING_MODE=web` — сборка Flutter web для Firebase Hosting: магазин
+  показывает товары и цены из `config/pricing.web_products` и кнопку «Оплатить».
+  `play` и `external` не меняются; в `external` по-прежнему ни цен, ни ссылок.
+* `config/pricing.web_products`:
+  `{exam_single: {credits: 1, amount_som: 100, enabled: true},
+  exam_pack_5: {credits: 5, amount_som: 450, enabled: false},
+  exam_pack_10: {credits: 10, amount_som: 800, enabled: false}}`.
+  Пакеты выключены, пока владелец не утвердит цены; меняет `adminUpdatePricing`
+  (super_admin). Базовая цена 100 сом — только с согласия владельца.
+* `payment_orders/{orderId}` (читает владелец; super_admin и support — все):
+  `{uid, product_id, credits, amount_som, currency: 'KGS', provider,
+  status: 'created'|'pending'|'paid'|'failed'|'expired'|'refunded',
+  provider_ref, checkout_url, created_at, updated_at, paid_at, granted: bool,
+  refund: null|{at, source: 'provider'|'admin', credits_clawed_back}, failure?}`.
+  Клиент не пишет.
+* **Адаптер провайдера** (`functions/src/payments/`): интерфейс
+  `createCheckout(order, returnUrl) → {checkoutUrl, providerRef}`,
+  `parseWebhook(rawBody, headers) → {eventId, orderId|providerRef, status:
+  'paid'|'failed'|'refunded', amountSom, currency}` (бросает при неверной
+  подписи), `refund(order) → {status: 'refunded'|'pending'}`. Выбор — параметр
+  `PAYMENT_PROVIDER` (`none` по умолчанию | `sandbox` | имя провайдера); секреты —
+  `defineSecret('PAYMENT_PROVIDER_SECRET')` и т. п. `none` →
+  `paymentCreateOrder` отвечает `PAYMENTS_DISABLED`.
+* **`sandbox`** — только эмулятор: загружается, лишь если
+  `FUNCTIONS_EMULATOR === 'true'` **и** проект `demo-*`; иначе
+  `PAYMENTS_DISABLED`. Его `checkoutUrl` ведёт на HTTP-функцию
+  `paymentSandboxCheckout`: страница «Тестовая оплата — только эмулятор» с
+  кнопками «Оплатить (тест)» и «Отменить», которые отправляют подписанный
+  вебхук. Это способ проверить поток целиком, а не фиктивные платежи.
+* `paymentCreateOrder({productId, returnUrl})` → `{orderId, checkoutUrl,
+  amountSom, credits, expiresAt}`. `returnUrl` — только с разрешённых origin
+  (параметр `PAYMENT_RETURN_ORIGINS`), иначе `VALIDATION_FAILED`. Выключенный или
+  неизвестный товар → `PRODUCT_UNAVAILABLE`. Не больше 10 заказов на пользователя в
+  день (`RATE_LIMITED`).
+* `paymentWebhook` (onRequest, POST): проверка подписи адаптером;
+  идемпотентность по `payment_events/{eventId}`; `paid` с совпадающими суммой и
+  валютой → в одной транзакции: заказ `paid` и `granted: true`, кредиты +N,
+  `lifetime_credits_purchased` +N, строка журнала `{reason: 'purchase', ref:
+  'web_' + orderId}`, реферальная награда по тем же правилам, что у Google Play
+  (первая оплата приглашённого, §9.1). Несовпадение суммы → `failed` + запись в
+  `admin_logs`, кредитов нет. `refunded` → отзыв кредитов тем же clawback, что у
+  Play (долг, если потрачены), включая реферальные награды (§9.7).
+* `paymentGetOrder({orderId})` → `{status, credits, balance}`; чужой или
+  несуществующий → `ORDER_NOT_FOUND`.
+* `adminRefundOrder({orderId, reason})` — только super_admin: `refund` у
+  адаптера, затем clawback (или ждём вебхук `refunded`); `admin_logs`.
+* `paymentExpireOrders` — раз в час: `created`/`pending` старше 24 ч → `expired`.
+* Клиент (web): магазин → `paymentCreateOrder` → переход на `checkoutUrl` в той же
+  вкладке → провайдер возвращает на `/pay/return?order={id}` → страница опрашивает
+  `paymentGetOrder` (до 2 мин), показывает результат и баланс → «Начать пробный».
+  Рядом с кнопкой — ссылки на публичную оферту и правила возврата.
+* Hosting: `firebase.json` `hosting` (`build/web`, SPA-rewrite на `/index.html`,
+  кэш для статики), сборка `flutter build web --dart-define=BILLING_MODE=web`;
+  деплой — в `deploy-backend.yml` (вручную).
+* Юридическое: `docs/legal/OFFER_ru.md` (публичная оферта: цифровой товар,
+  1 кредит = 1 полный пробный экзамен = 100 сом, возврат неиспользованных
+  кредитов) и `docs/legal/REFUND_ru.md` — черновики для юриста.
+* CMS: страница «Платежи» показывает и web-заказы (фильтр по статусу, карточка
+  заказа, возврат — super_admin), выручку по дням.
