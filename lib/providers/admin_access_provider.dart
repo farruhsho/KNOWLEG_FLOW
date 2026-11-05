@@ -1,175 +1,74 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../shared/models/admin_user_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Provider for current admin user
-final adminUserProvider = StreamProvider<AdminUser?>((ref) {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return Stream.value(null);
+import '../core/routes/admin_session.dart';
+import '../features/admin/domain/admin_role.dart';
+import 'auth_provider.dart';
 
-  return FirebaseFirestore.instance
-      .collection('admins')
-      .doc(user.uid)
-      .snapshots()
-      .map((doc) {
-    if (!doc.exists) return null;
-    return AdminUser.fromFirestore(doc);
+/// Verified admin session. Single source of truth for admin authority on the
+/// client is the resolved [AdminRole] (custom claim `role`, legacy
+/// `users.role == 'admin'` → super_admin). The old `/admins/{uid}` collection
+/// and `AdminGuard` (DEAD-01 / FB-28) are gone.
+///
+/// The server (Firestore rules + callables) re-checks every action; this state
+/// only decides which screens and buttons the CMS shows.
+class AdminSession {
+  final String uid;
+  final String? email;
+  final AdminRole role;
+
+  /// `true` when the role came from the legacy `users.role` field rather than
+  /// a custom claim (shown as a hint in the UI).
+  final bool fromLegacyField;
+
+  const AdminSession({
+    required this.uid,
+    required this.role,
+    this.email,
+    this.fromLegacyField = false,
   });
-});
-
-/// Admin access control middleware
-class AdminAccessControl {
-  static Future<bool> isAdmin(String uid) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('admins')
-          .doc(uid)
-          .get();
-      
-      if (!doc.exists) return false;
-      
-      final adminUser = AdminUser.fromFirestore(doc);
-      return adminUser.isActive;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static Future<AdminUser?> getAdminUser(String uid) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('admins')
-          .doc(uid)
-          .get();
-      
-      if (!doc.exists) return null;
-      
-      return AdminUser.fromFirestore(doc);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  static Future<bool> hasPermission(String uid, String permission) async {
-    final adminUser = await getAdminUser(uid);
-    if (adminUser == null) return false;
-    
-    return adminUser.hasPermission(permission);
-  }
-
-  static Future<void> updateLastLogin(String uid) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('admins')
-          .doc(uid)
-          .update({
-        'last_login': Timestamp.now(),
-      });
-    } catch (e) {
-      // Silently fail - not critical
-    }
-  }
 }
 
-/// Widget to protect admin-only routes
-class AdminGuard extends ConsumerWidget {
-  final Widget child;
-  final String? requiredPermission;
-  final Widget? fallback;
-
-  const AdminGuard({
-    super.key,
-    required this.child,
-    this.requiredPermission,
-    this.fallback,
-  });
-
+class AdminSessionNotifier extends Notifier<AdminSession?> {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final adminUserAsync = ref.watch(adminUserProvider);
+  AdminSession? build() {
+    void onVerifiedChanged() {
+      if (!adminVerified.value && state != null) state = null;
+    }
 
-    return adminUserAsync.when(
-      data: (adminUser) {
-        if (adminUser == null || !adminUser.isActive) {
-          return fallback ?? _buildUnauthorized(context);
-        }
+    adminVerified.addListener(onVerifiedChanged);
+    ref.onDispose(() => adminVerified.removeListener(onVerifiedChanged));
 
-        if (requiredPermission != null && !adminUser.hasPermission(requiredPermission!)) {
-          return fallback ?? _buildUnauthorized(context);
-        }
-
-        return child;
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildError(context, error.toString()),
-    );
+    // Another account signing in (or a sign-out through any code path) must
+    // drop the admin session.
+    ref.listen<AsyncValue<User?>>(authStateProvider, (_, next) {
+      final user = next.valueOrNull;
+      final current = state;
+      if (current == null || next.isLoading) return;
+      if (user == null || user.uid != current.uid) clear();
+    });
+    return null;
   }
 
-  Widget _buildUnauthorized(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.lock_outline,
-              size: 64,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Доступ запрещен',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'У вас нет прав для доступа к этой странице',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Назад'),
-            ),
-          ],
-        ),
-      ),
-    );
+  void start(AdminSession session) {
+    state = session;
+    adminVerified.value = true;
   }
 
-  Widget _buildError(BuildContext context, String error) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Ошибка',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: const TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
+  void clear() {
+    state = null;
+    adminVerified.value = false;
   }
 }
+
+final adminSessionProvider =
+    NotifierProvider<AdminSessionNotifier, AdminSession?>(AdminSessionNotifier.new);
+
+/// The verified admin role, or `null` when no admin session is active.
+final adminRoleProvider =
+    Provider<AdminRole?>((ref) => ref.watch(adminSessionProvider)?.role);
+
+/// Convenience: whether the current admin may perform [permission].
+final adminCanProvider = Provider.family<bool, AdminPermission>(
+  (ref, permission) => ref.watch(adminRoleProvider)?.can(permission) ?? false,
+);

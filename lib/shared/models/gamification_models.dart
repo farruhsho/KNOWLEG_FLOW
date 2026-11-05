@@ -1,3 +1,6 @@
+import '../../core/utils/json_read.dart';
+import 'user_stats_model.dart';
+
 /// Рарность достижения
 enum AchievementRarity {
   common,    // Обычное (серое)
@@ -79,21 +82,42 @@ class UserGamification {
     );
   }
 
-  factory UserGamification.fromJson(Map<String, dynamic> json) {
+  /// Display model built from server-owned [UserStats] plus the cosmetic
+  /// coin balance from legacy `user_gamification`. [xp]/[xpToNextLevel]
+  /// are the progress inside the current level.
+  factory UserGamification.fromStats(UserStats stats, {int coins = 0, DateTime? now}) {
+    final p = stats.levelProgress;
     return UserGamification(
-      userId: json['userId'] as String,
-      level: json['level'] as int,
-      xp: json['xp'] as int,
-      xpToNextLevel: json['xpToNextLevel'] as int,
-      coins: json['coins'] as int,
-      streakDays: json['streakDays'] as int? ?? 0,
-      lastActivityDate: json['lastActivityDate'] != null
-          ? DateTime.parse(json['lastActivityDate'] as String)
-          : null,
-      statistics: (json['statistics'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, e as int),
-          ) ??
-          const {},
+      userId: stats.uid,
+      level: stats.level,
+      xp: p.inLevel,
+      xpToNextLevel: p.levelSize,
+      coins: coins,
+      streakDays: stats.liveStreak(now ?? DateTime.now()),
+      statistics: {
+        'totalXp': stats.xp,
+        'examsCompleted': stats.examsCompleted,
+        'activeDaysTotal': stats.activeDaysTotal,
+        'bestStreak': stats.bestStreak,
+      },
+    );
+  }
+
+  /// Tolerant parser for legacy `user_gamification` documents.
+  factory UserGamification.fromJson(Map<String, dynamic> json) {
+    final stats = JsonRead.map(json, ['statistics']) ?? const {};
+    return UserGamification(
+      userId: JsonRead.stringOr(json, ['userId', 'user_id']),
+      level: JsonRead.intOr(json, ['level'], 1),
+      xp: JsonRead.intOr(json, ['xp'], 0),
+      xpToNextLevel: JsonRead.intOr(json, ['xpToNextLevel'], 100),
+      coins: JsonRead.intOr(json, ['coins'], 0),
+      streakDays: JsonRead.intOr(json, ['streakDays'], 0),
+      lastActivityDate: JsonRead.date(json, ['lastActivityDate']),
+      statistics: {
+        for (final e in stats.entries)
+          if (JsonRead.toInt(e.value) != null) e.key: JsonRead.toInt(e.value)!,
+      },
     );
   }
 
@@ -279,17 +303,18 @@ class DailyQuest {
   }
 
   factory DailyQuest.fromJson(Map<String, dynamic> json) {
+    final typeIndex = JsonRead.intOr(json, ['type'], 0);
     return DailyQuest(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      type: QuestType.values[json['type'] as int],
-      targetValue: json['targetValue'] as int,
-      currentValue: json['currentValue'] as int? ?? 0,
-      xpReward: json['xpReward'] as int,
-      coinsReward: json['coinsReward'] as int,
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
-      relatedTopicId: json['relatedTopicId'] as String?,
+      id: JsonRead.stringOr(json, ['id']),
+      title: JsonRead.stringOr(json, ['title']),
+      description: JsonRead.stringOr(json, ['description']),
+      type: QuestType.values[typeIndex.clamp(0, QuestType.values.length - 1)],
+      targetValue: JsonRead.intOr(json, ['targetValue'], 1),
+      currentValue: JsonRead.intOr(json, ['currentValue'], 0),
+      xpReward: JsonRead.intOr(json, ['xpReward'], 0),
+      coinsReward: JsonRead.intOr(json, ['coinsReward'], 0),
+      expiresAt: JsonRead.date(json, ['expiresAt']) ?? DateTime.now().add(const Duration(days: 1)),
+      relatedTopicId: JsonRead.string(json, ['relatedTopicId']),
     );
   }
 

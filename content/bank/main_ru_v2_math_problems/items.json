@@ -1,0 +1,2735 @@
+{
+  "schema_version": 1,
+  "batch": {
+    "id": "main_ru_v2_math_problems",
+    "kind": "generated",
+    "created_at": "2026-11-05T17:46:27.639Z",
+    "note": "Партия v2 ort_main_2026 / math / math_problems (ru): 30 ОРИГИНАЛЬНЫХ задач single_choice с пятью вариантами A–E. Написано с нуля (claude-v2-author), не по материалам ЦООМО/testing.kg, Secom или других сборников и сайтов; задания, сюжеты, числа и тексты пилота main_ru_v1 не повторяются. Ячейки тема × сложность — как в пилоте (PILOT_main_ru_v1 §1) и матрице: 12 тем, сложность 9/15/6; ключи A/B/C/D/E = 6/6/6/6/6; числовые варианты по возрастанию. Каждый ключ решён двумя способами и подтверждён независимым машинным пересчётом. Статус draft до независимой проверки и проверки методистом; ids/hashes вычислены функциями пайплайна (bank.ts)."
+  },
+  "passages": [],
+  "items": [
+    {
+      "id": "q_e172d141a990763b5250",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.divisibility",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_e172d141a990763b",
+        "type": "single_choice",
+        "stem": "Найдите наименьшее четырёхзначное число, которое делится на 9, а при делении на 5 даёт остаток 2.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$1002$"
+          },
+          {
+            "id": "B",
+            "text": "$1007$"
+          },
+          {
+            "id": "C",
+            "text": "$1008$"
+          },
+          {
+            "id": "D",
+            "text": "$1017$"
+          },
+          {
+            "id": "E",
+            "text": "$1062$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: признаки делимости на 5 и на 9, деление с остатком",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e172d141a990763b52508383cd24d25ba967a1320facefbd2540e78676bbf663",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "При делении на 5 остаток 2 дают числа, которые оканчиваются цифрой 2 или 7. Четырёхзначные числа, кратные 9, по возрастанию: 1008, 1017, 1026, … (сумма цифр делится на 9). Число 1008 оканчивается на 8 и при делении на 5 даёт остаток 3, а 1017 оканчивается на 7: $1017 = 9 \\cdot 113$ и $1017 = 5 \\cdot 203 + 2$. Значит, искомое число — 1017.",
+        "wrong_option_notes": {
+          "A": "Число 1002 при делении на 5 даёт остаток 2, но сумма его цифр равна 3, поэтому оно делится на 3, а на 9 не делится.",
+          "B": "Число 1007 при делении на 5 даёт остаток 2, но сумма его цифр равна 8 — на 9 оно не делится.",
+          "C": "Число 1008 — наименьшее четырёхзначное число, кратное 9, но оно оканчивается на 8 и при делении на 5 даёт остаток 3, а не 2.",
+          "E": "Число 1062 удовлетворяет обоим условиям, но оно не наименьшее: так получается, если рассматривать только числа, оканчивающиеся на 2, и забыть про окончание 7."
+        },
+        "solution_steps": [
+          "Остаток 2 при делении на 5 дают числа, оканчивающиеся на 2 или 7.",
+          "Четырёхзначные числа, кратные 9, по возрастанию: 1008, 1017, 1026, …",
+          "1008 оканчивается на 8 (остаток 3), а 1017 оканчивается на 7 — подходит.",
+          "Проверка другим способом: число делится на 9 и даёт остаток 2 при делении на 5 тогда и только тогда, когда оно имеет вид $45m + 27$; наименьшее четырёхзначное такое число $45 \\cdot 22 + 27 = 1017$ (при $m = 21$ получается трёхзначное 972)."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_91832275d226c92eeb4d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.powers_roots",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_91832275d226c92e",
+        "type": "single_choice",
+        "stem": "Сколько цифр содержит десятичная запись числа $4^{12} \\cdot 5^{22}$?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$20$"
+          },
+          {
+            "id": "B",
+            "text": "$22$"
+          },
+          {
+            "id": "C",
+            "text": "$23$"
+          },
+          {
+            "id": "D",
+            "text": "$34$"
+          },
+          {
+            "id": "E",
+            "text": "$46$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6–7 кл., математика и алгебра: степень с натуральным показателем, свойства степеней, разрядная запись числа",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:91832275d226c92eeb4d0c6c833cabe2d1c94be41438308eccafd031f596571e",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Так как $4^{12} = (2^2)^{12} = 2^{24}$, получаем $4^{12} \\cdot 5^{22} = 2^{24} \\cdot 5^{22} = 2^2 \\cdot (2 \\cdot 5)^{22} = 4 \\cdot 10^{22}$. Это число записывается цифрой 4, за которой идут 22 нуля, — всего 23 цифры.",
+        "wrong_option_notes": {
+          "A": "20 получится, если ошибочно записать $4^{12} = 2^{14}$ (сложить показатели вместо умножения): тогда $2^{14} \\cdot 5^{22} = 5^8 \\cdot 10^{14} = 390\\,625 \\cdot 10^{14}$ — это 20 цифр.",
+          "B": "22 — это число нулей в записи $4 \\cdot 10^{22}$; первую цифру 4 не учли.",
+          "D": "34 — сумма показателей $12 + 22$; число цифр так не находится: степени с разными основаниями нельзя перемножать, складывая показатели.",
+          "E": "46 — сумма показателей $24 + 22$ после перехода к основанию 2; но $2^{24} \\cdot 5^{22} \\ne 10^{46}$: в десятки объединяются только 22 пары множителей $2 \\cdot 5$."
+        },
+        "solution_steps": [
+          "$4^{12} = (2^2)^{12} = 2^{24}$.",
+          "$2^{24} \\cdot 5^{22} = 2^2 \\cdot 2^{22} \\cdot 5^{22} = 4 \\cdot 10^{22}$.",
+          "Число $4 \\cdot 10^{22}$ записывается цифрой 4 и 22 нулями, то есть содержит 23 цифры.",
+          "Проверка: $10^{22} < 4 \\cdot 10^{22} < 10^{23}$, а все натуральные числа от $10^{22}$ до $10^{23} - 1$ имеют ровно 23 цифры."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e7e958739e175c559e24",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.decimals",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_e7e958739e175c55",
+        "type": "single_choice",
+        "stem": "Вычислите: $2{,}4 \\cdot 0{,}5 - 0{,}36 : 1{,}2$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-1{,}8$"
+          },
+          {
+            "id": "B",
+            "text": "$-0{,}18$"
+          },
+          {
+            "id": "C",
+            "text": "$0{,}28$"
+          },
+          {
+            "id": "D",
+            "text": "$0{,}7$"
+          },
+          {
+            "id": "E",
+            "text": "$0{,}9$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., математика: действия с десятичными дробями, порядок действий",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e7e958739e175c559e24c7d942f664e8b3140b2d18162f441f404abcbc304753",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "E",
+        "explanation": "Сначала выполняются умножение и деление, затем вычитание: $2{,}4 \\cdot 0{,}5 = 1{,}2$, $0{,}36 : 1{,}2 = 0{,}3$, $1{,}2 - 0{,}3 = 0{,}9$.",
+        "wrong_option_notes": {
+          "A": "Ошибка в делении десятичных дробей: $0{,}36 : 1{,}2$ приняли за 3 (а это $0{,}3$); $1{,}2 - 3 = -1{,}8$.",
+          "B": "Ошибка в умножении десятичных дробей: $2{,}4 \\cdot 0{,}5$ приняли за $0{,}12$ (а это $1{,}2$); $0{,}12 - 0{,}3 = -0{,}18$.",
+          "C": "Вычитание выполнили раньше умножения: $2{,}4 \\cdot (0{,}5 - 0{,}36) : 1{,}2 = 2{,}4 \\cdot 0{,}14 : 1{,}2 = 0{,}28$.",
+          "D": "Вычитание выполнили раньше деления (действия слева направо): $(1{,}2 - 0{,}36) : 1{,}2 = 0{,}84 : 1{,}2 = 0{,}7$."
+        },
+        "solution_steps": [
+          "$2{,}4 \\cdot 0{,}5 = 1{,}2$.",
+          "$0{,}36 : 1{,}2 = 3{,}6 : 12 = 0{,}3$.",
+          "$1{,}2 - 0{,}3 = 0{,}9$.",
+          "Проверка обыкновенными дробями: $\\frac{12}{5} \\cdot \\frac{1}{2} - \\frac{9}{25} : \\frac{6}{5} = \\frac{6}{5} - \\frac{3}{10} = \\frac{9}{10}$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e0f9ffab1d1c204f4d4a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.percent_of_number",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_e0f9ffab1d1c204f",
+        "type": "single_choice",
+        "stem": "Велотурист проехал маршрут за три дня. В первый день он проехал 25 % всего маршрута, во второй — 40 % оставшейся части, а в третий — последние 63 км. Найдите длину всего маршрута в километрах.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$84$"
+          },
+          {
+            "id": "B",
+            "text": "$105$"
+          },
+          {
+            "id": "C",
+            "text": "$140$"
+          },
+          {
+            "id": "D",
+            "text": "$180$"
+          },
+          {
+            "id": "E",
+            "text": "$210$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., математика: проценты, нахождение числа по его проценту",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e0f9ffab1d1c204f4d4a52f514459d7af43c26e40f7b64ed84b4db80e77c5b18",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "После первого дня осталось $100\\,\\% - 25\\,\\% = 75\\,\\%$ маршрута. Во второй день велотурист проехал 40 % этого остатка, то есть $0{,}4 \\cdot 75\\,\\% = 30\\,\\%$ маршрута. На третий день осталось $75\\,\\% - 30\\,\\% = 45\\,\\%$ маршрута, и это 63 км. Длина маршрута: $63 : 0{,}45 = 140$ км.",
+        "wrong_option_notes": {
+          "A": "84 получится, если забыть про второй день и считать, что 63 км — это 75 % маршрута: $63 : 0{,}75 = 84$.",
+          "B": "105 получится, если забыть про первый день и считать, что 63 км — это 60 % маршрута: $63 : 0{,}6 = 105$.",
+          "D": "180 получится, если взять 40 % от всего маршрута, а не от остатка: тогда на третий день остаётся $100\\,\\% - 25\\,\\% - 40\\,\\% = 35\\,\\%$, и $63 : 0{,}35 = 180$.",
+          "E": "210 получится, если принять 63 км за те 30 % маршрута, которые пройдены во второй день: $63 : 0{,}3 = 210$."
+        },
+        "solution_steps": [
+          "После первого дня осталось 75 % маршрута.",
+          "Во второй день пройдено $0{,}4 \\cdot 75\\,\\% = 30\\,\\%$ маршрута, осталось $75\\,\\% - 30\\,\\% = 45\\,\\%$.",
+          "45 % маршрута — это 63 км, поэтому длина маршрута $63 : 0{,}45 = 140$ км.",
+          "Проверка: $0{,}25 \\cdot 140 = 35$ км, $0{,}4 \\cdot (140 - 35) = 42$ км, $140 - 35 - 42 = 63$ км."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_4d3d6c6d7596332d3dde",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.common_fractions",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_4d3d6c6d7596332d",
+        "type": "single_choice",
+        "stem": "Бак для полива был заполнен водой на $\\frac{3}{5}$ своего объёма. Когда из него взяли 36 л воды, бак оказался заполнен на $\\frac{1}{3}$ объёма. Сколько литров воды вмещает бак?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$36$"
+          },
+          {
+            "id": "B",
+            "text": "$60$"
+          },
+          {
+            "id": "C",
+            "text": "$108$"
+          },
+          {
+            "id": "D",
+            "text": "$135$"
+          },
+          {
+            "id": "E",
+            "text": "$270$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., математика: обыкновенные дроби, нахождение числа по его дроби",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:4d3d6c6d7596332d3dde1503a9178fa55471803fbeaaa09a23c2c215180917d3",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Взятые 36 л составляют разность долей: $\\frac{3}{5} - \\frac{1}{3} = \\frac{9}{15} - \\frac{5}{15} = \\frac{4}{15}$ объёма бака. Весь объём: $36 : \\frac{4}{15} = 36 \\cdot \\frac{15}{4} = 135$ л.",
+        "wrong_option_notes": {
+          "A": "36 получится, если вычитать дроби «по частям»: $\\frac{3 - 1}{5 - 3} = 1$ — тогда 36 л ошибочно принимают за весь бак.",
+          "B": "60 получится, если считать, что 36 л — это $\\frac{3}{5}$ бака (то есть вся вода, которая была сначала).",
+          "C": "108 получится, если считать, что 36 л — это $\\frac{1}{3}$ бака (то есть вода, которая осталась).",
+          "E": "270 получится при ошибке в вычитании дробей: $\\frac{3}{5} - \\frac{1}{3} = \\frac{2}{15}$ (числители вычли без домножения на дополнительные множители); $36 : \\frac{2}{15} = 270$."
+        },
+        "solution_steps": [
+          "Взятая вода составляет $\\frac{3}{5} - \\frac{1}{3} = \\frac{4}{15}$ объёма бака.",
+          "$\\frac{4}{15}$ объёма — это 36 л, значит, объём бака $36 : \\frac{4}{15} = 135$ л.",
+          "Проверка: $135 \\cdot \\frac{3}{5} = 81$ л, $81 - 36 = 45$ л, и $45 = 135 \\cdot \\frac{1}{3}$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_4b311a52c2d44a5742be",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.ratios_proportions",
+        "subtopic_id": "math.ratios_proportions.ratio",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_4b311a52c2d44a57",
+        "type": "single_choice",
+        "stem": "Для приготовления строительного раствора цемент и песок берут в отношении $2 : 7$ по массе. Сколько килограммов цемента нужно взять на 630 кг песка?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$90$"
+          },
+          {
+            "id": "B",
+            "text": "$140$"
+          },
+          {
+            "id": "C",
+            "text": "$180$"
+          },
+          {
+            "id": "D",
+            "text": "$810$"
+          },
+          {
+            "id": "E",
+            "text": "$2205$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: отношения, деление числа в данном отношении",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | Исправлено автором 2026-11-05 по замечанию независимого слепого верификатора (раунд 1): в примечаниях к B и D сумма цемента и песка называлась массой всего раствора, но в растворе есть ещё вода; формулировки уточнены («смесь цемента и песка»). Условие, варианты и ключ C не изменились, id прежний. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:4b311a52c2d44a5742be3f6bcda07b062f7fff267bab7a027721f0086fccbb93",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:56:35.522Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "На 7 частей песка приходится 2 части цемента. Одна часть: $630 : 7 = 90$ кг, поэтому цемента нужно $2 \\cdot 90 = 180$ кг.",
+        "wrong_option_notes": {
+          "A": "90 кг — это только одна часть ($630 : 7$), а на цемент приходятся две части.",
+          "B": "140 получится, если считать 630 кг массой всей смеси цемента и песка (9 частей): $630 : 9 \\cdot 2 = 140$. Но 630 кг — это только песок.",
+          "D": "810 кг — масса смеси цемента и песка ($630 + 180$), а спрашивали только о цементе.",
+          "E": "2205 получится, если перепутать члены отношения: $630 : 2 \\cdot 7 = 2205$. Цемента должно быть меньше, чем песка."
+        },
+        "solution_steps": [
+          "Песку соответствуют 7 частей, значит, одна часть равна $630 : 7 = 90$ кг.",
+          "Цементу соответствуют 2 части: $2 \\cdot 90 = 180$ кг.",
+          "Проверка пропорцией: $\\frac{x}{630} = \\frac{2}{7}$, откуда $x = \\frac{630 \\cdot 2}{7} = 180$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b7410a4de786e394ad00",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.ratios_proportions",
+        "subtopic_id": "math.ratios_proportions.direct_inverse",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_b7410a4de786e394",
+        "type": "single_choice",
+        "stem": "Два зубчатых колеса находятся в зацеплении. У большого колеса 48 зубцов, у малого — 16. Сколько оборотов сделает малое колесо, пока большое сделает 12 оборотов?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$4$"
+          },
+          {
+            "id": "B",
+            "text": "$36$"
+          },
+          {
+            "id": "C",
+            "text": "$44$"
+          },
+          {
+            "id": "D",
+            "text": "$192$"
+          },
+          {
+            "id": "E",
+            "text": "$576$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: прямая и обратная пропорциональные зависимости",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b7410a4de786e394ad0089b558f8a89e841db19d2c26d652d56a3c2e0396558c",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "За то же время через точку зацепления проходит одинаковое число зубцов обоих колёс. За 12 оборотов большого колеса пройдёт $12 \\cdot 48 = 576$ зубцов, значит, малое колесо сделает $576 : 16 = 36$ оборотов. Число оборотов обратно пропорционально числу зубцов.",
+        "wrong_option_notes": {
+          "A": "4 получится, если считать зависимость прямой пропорциональностью: $12 \\cdot 16 : 48 = 4$. Но малое колесо вращается быстрее большого, а не медленнее.",
+          "C": "44 получится, если прибавить разность числа зубцов: $12 + (48 - 16) = 44$. Зависимость здесь не разностная, а обратно пропорциональная.",
+          "D": "192 получится, если умножить число оборотов на число зубцов малого колеса: $12 \\cdot 16 = 192$; нужно умножать на число зубцов большого колеса и делить на число зубцов малого.",
+          "E": "576 — это число зубцов, прошедших через точку зацепления; его нужно ещё разделить на 16 — число зубцов малого колеса."
+        },
+        "solution_steps": [
+          "За 12 оборотов через точку зацепления пройдёт $12 \\cdot 48 = 576$ зубцов большого колеса.",
+          "Столько же зубцов малого колеса пройдёт через эту точку: $576 : 16 = 36$ оборотов.",
+          "Другим способом: у малого колеса зубцов в $48 : 16 = 3$ раза меньше, значит, оборотов оно сделает в 3 раза больше: $12 \\cdot 3 = 36$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_494ceee0ef0fbd4ae265",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.polynomials",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_494ceee0ef0fbd4a",
+        "type": "single_choice",
+        "stem": "Найдите значение выражения $3(2x - 5) - 2(3x - 4)$ при $x = 2026$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-7$"
+          },
+          {
+            "id": "B",
+            "text": "$-1$"
+          },
+          {
+            "id": "C",
+            "text": "$3$"
+          },
+          {
+            "id": "D",
+            "text": "$7$"
+          },
+          {
+            "id": "E",
+            "text": "$24\\,289$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: раскрытие скобок, приведение подобных слагаемых, значение выражения с переменной",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:494ceee0ef0fbd4ae26521beb648a803e64746b8aed74797487eb2c318eda863",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Раскроем скобки: $3(2x - 5) - 2(3x - 4) = 6x - 15 - 6x + 8 = -7$. Переменная сокращается, поэтому при любом $x$, в том числе при $x = 2026$, значение выражения равно $-7$.",
+        "wrong_option_notes": {
+          "B": "$-1$ получится, если в обеих скобках умножить на множитель только первое слагаемое: $6x - 5 - 6x + 4 = -1$.",
+          "C": "3 получится, если в первой скобке умножить на 3 только $2x$: $6x - 5 - 6x + 8 = 3$.",
+          "D": "7 — ошибка в знаке при сложении чисел с разными знаками: $-15 + 8 = -7$, а не 7.",
+          "E": "$24\\,289$ получится, если потерять минус перед вторыми скобками: $6x - 15 + 6x - 8 = 12x - 23$, и при $x = 2026$ это $24\\,289$."
+        },
+        "solution_steps": [
+          "$3(2x - 5) = 6x - 15$.",
+          "$-2(3x - 4) = -6x + 8$.",
+          "$6x - 15 - 6x + 8 = -7$ — значение не зависит от $x$.",
+          "Проверка подстановкой: $3 \\cdot 4047 - 2 \\cdot 6074 = 12\\,141 - 12\\,148 = -7$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_0eaed9fd68e98ce81c8a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.factoring",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_0eaed9fd68e98ce8",
+        "type": "single_choice",
+        "stem": "Найдите значение выражения $ab - 3a + 2b - 6$ при $a = 1{,}6$ и $b = 2{,}9$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-0{,}36$"
+          },
+          {
+            "id": "B",
+            "text": "$-0{,}036$"
+          },
+          {
+            "id": "C",
+            "text": "$0{,}04$"
+          },
+          {
+            "id": "D",
+            "text": "$0{,}36$"
+          },
+          {
+            "id": "E",
+            "text": "$21{,}24$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: разложение многочлена на множители способом группировки; действия с десятичными дробями",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:0eaed9fd68e98ce81c8a14a65624180eb96e2b619166c8905051b80887cfb6a0",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Разложим на множители группировкой: $ab - 3a + 2b - 6 = a(b - 3) + 2(b - 3) = (a + 2)(b - 3)$. При $a = 1{,}6$ и $b = 2{,}9$ получаем $(1{,}6 + 2)(2{,}9 - 3) = 3{,}6 \\cdot (-0{,}1) = -0{,}36$.",
+        "wrong_option_notes": {
+          "B": "Ошибка в положении запятой: $3{,}6 \\cdot 0{,}1 = 0{,}36$, а не $0{,}036$.",
+          "C": "$0{,}04$ получится при ошибке в знаке при группировке: $(a - 2)(b - 3) = (-0{,}4) \\cdot (-0{,}1) = 0{,}04$. Но $(a - 2)(b - 3) = ab - 3a - 2b + 6$ — это другое выражение.",
+          "D": "$0{,}36$ — потерян знак: $2{,}9 - 3 = -0{,}1$, поэтому произведение отрицательно.",
+          "E": "$21{,}24$ получится, если записать второй множитель как $b + 3$: $(a + 2)(b + 3) = 3{,}6 \\cdot 5{,}9 = 21{,}24$. Но $(a + 2)(b + 3) = ab + 3a + 2b + 6$."
+        },
+        "solution_steps": [
+          "$ab - 3a + 2b - 6 = a(b - 3) + 2(b - 3) = (a + 2)(b - 3)$.",
+          "$a + 2 = 3{,}6$, $b - 3 = -0{,}1$.",
+          "$3{,}6 \\cdot (-0{,}1) = -0{,}36$.",
+          "Проверка прямой подстановкой: $4{,}64 - 4{,}8 + 5{,}8 - 6 = -0{,}36$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_973016034d9390e4f6b4",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.short_multiplication",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_973016034d9390e4",
+        "type": "single_choice",
+        "stem": "Найдите значение выражения $(2x - 3)^2 - (2x + 3)(2x - 3)$ при $x = -\\frac{1}{4}$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$0$"
+          },
+          {
+            "id": "B",
+            "text": "$3$"
+          },
+          {
+            "id": "C",
+            "text": "$15$"
+          },
+          {
+            "id": "D",
+            "text": "$19{,}5$"
+          },
+          {
+            "id": "E",
+            "text": "$21$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: формулы сокращённого умножения (квадрат разности, разность квадратов)",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:973016034d9390e4f6b457d346e9a1f53a57eee0ad07072e2bea58c754d4e1e0",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "E",
+        "explanation": "По формулам сокращённого умножения $(2x - 3)^2 = 4x^2 - 12x + 9$ и $(2x + 3)(2x - 3) = 4x^2 - 9$. Разность: $4x^2 - 12x + 9 - 4x^2 + 9 = 18 - 12x$. При $x = -\\frac{1}{4}$ получаем $18 - 12 \\cdot \\left(-\\frac{1}{4}\\right) = 18 + 3 = 21$.",
+        "wrong_option_notes": {
+          "A": "0 получится, если ошибочно считать $(2x - 3)^2 = 4x^2 - 9$ (квадрат разности спутали с разностью квадратов): тогда выражение обращается в нуль.",
+          "B": "3 получится, если неверно раскрыть скобки после минуса: $-(4x^2 - 9) = -4x^2 - 9$; тогда остаётся $-12x = 3$.",
+          "C": "15 получится, если потерять знак у $x$ и подставить $x = \\frac{1}{4}$: $18 - 3 = 15$.",
+          "D": "$19{,}5$ получится, если в квадрате разности взять удвоенное произведение без множителя 2: $(2x - 3)^2 = 4x^2 - 6x + 9$; тогда $18 - 6x = 18 + 1{,}5 = 19{,}5$."
+        },
+        "solution_steps": [
+          "$(2x - 3)^2 = 4x^2 - 12x + 9$; $(2x + 3)(2x - 3) = 4x^2 - 9$.",
+          "$(4x^2 - 12x + 9) - (4x^2 - 9) = 18 - 12x$.",
+          "При $x = -\\frac{1}{4}$: $18 - 12 \\cdot \\left(-\\frac{1}{4}\\right) = 18 + 3 = 21$.",
+          "Проверка подстановкой: $2x - 3 = -3{,}5$, $2x + 3 = 2{,}5$; $(-3{,}5)^2 - 2{,}5 \\cdot (-3{,}5) = 12{,}25 + 8{,}75 = 21$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_0cc5ee56894b316d013c",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.linear",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_0cc5ee56894b316d",
+        "type": "single_choice",
+        "stem": "Решите уравнение $\\frac{x - 1}{3} = \\frac{x + 5}{5}$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-14$"
+          },
+          {
+            "id": "B",
+            "text": "$2{,}5$"
+          },
+          {
+            "id": "C",
+            "text": "$3$"
+          },
+          {
+            "id": "D",
+            "text": "$5$"
+          },
+          {
+            "id": "E",
+            "text": "$10$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6–7 кл., математика и алгебра: линейное уравнение с одной переменной, основное свойство пропорции",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:0cc5ee56894b316d013ca2d20f3abb596d98a441aa18a8c51de9837dc2413933",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "E",
+        "explanation": "Умножим обе части на 15: $5(x - 1) = 3(x + 5)$, $5x - 5 = 3x + 15$, $2x = 20$, $x = 10$. Проверка: $\\frac{10 - 1}{3} = 3$ и $\\frac{10 + 5}{5} = 3$.",
+        "wrong_option_notes": {
+          "A": "$-14$ получится, если при умножении на 15 перепутать множители: $3(x - 1) = 5(x + 5)$, откуда $-2x = 28$.",
+          "B": "$2{,}5$ получится, если перенести $3x$ в левую часть, не сменив знак: $5x + 3x = 15 + 5$, $8x = 20$.",
+          "C": "3 получится, если умножить на 5 и на 3 только $x$, но не свободные члены: $5x - 1 = 3x + 5$, $2x = 6$.",
+          "D": "5 получится, если в правой части не умножить 5 на 3: $5x - 5 = 3x + 5$, $2x = 10$."
+        },
+        "solution_steps": [
+          "Умножим обе части на 15: $5(x - 1) = 3(x + 5)$.",
+          "$5x - 5 = 3x + 15$, откуда $2x = 20$.",
+          "$x = 10$.",
+          "Проверка: $\\frac{10 - 1}{3} = 3$, $\\frac{10 + 5}{5} = 3$ — равенство верное."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_0a03f3b6d8fcb9a93642",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.quadratic_vieta",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_0a03f3b6d8fcb9a9",
+        "type": "single_choice",
+        "stem": "Число 2 является корнем уравнения $x^2 + px - 18 = 0$. Найдите второй корень этого уравнения.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-9$"
+          },
+          {
+            "id": "B",
+            "text": "$-7$"
+          },
+          {
+            "id": "C",
+            "text": "$7$"
+          },
+          {
+            "id": "D",
+            "text": "$9$"
+          },
+          {
+            "id": "E",
+            "text": "$16$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: приведённое квадратное уравнение, теорема Виета",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:0a03f3b6d8fcb9a93642a101b7910a7fa5ec26f02c7f9992a6c592ee92a89f2b",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "По теореме Виета произведение корней приведённого квадратного уравнения равно свободному члену: $2 \\cdot x_2 = -18$, откуда $x_2 = -9$. Проверка: подставив $x = 2$, получаем $4 + 2p - 18 = 0$, $p = 7$; уравнение $x^2 + 7x - 18 = 0$ имеет корни 2 и $-9$.",
+        "wrong_option_notes": {
+          "B": "$-7$ — это сумма корней $2 + (-9) = -p$, а не второй корень.",
+          "C": "7 — это значение коэффициента $p$, а не корень уравнения.",
+          "D": "9 получится, если не учесть знак свободного члена: $2 \\cdot x_2 = 18$.",
+          "E": "16 получится, если считать, что сумма корней равна 18 (свободный член спутали с суммой корней): $x_2 = 18 - 2$."
+        },
+        "solution_steps": [
+          "По теореме Виета $x_1 \\cdot x_2 = -18$.",
+          "$x_1 = 2$, значит, $x_2 = -18 : 2 = -9$.",
+          "Проверка: из $4 + 2p - 18 = 0$ находим $p = 7$; $x^2 + 7x - 18 = (x - 2)(x + 9)$, корни 2 и $-9$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_3813ba1345613fb16eca",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.systems",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_3813ba1345613fb1",
+        "type": "single_choice",
+        "stem": "За 3 тетради и 2 ручки заплатили 66 сомов, а за 2 такие же тетради и 3 такие же ручки — 64 сома. Сколько сомов стоит одна тетрадь?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$2$"
+          },
+          {
+            "id": "B",
+            "text": "$12$"
+          },
+          {
+            "id": "C",
+            "text": "$13$"
+          },
+          {
+            "id": "D",
+            "text": "$14$"
+          },
+          {
+            "id": "E",
+            "text": "$26$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: системы двух линейных уравнений с двумя переменными, решение задач с помощью систем",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:3813ba1345613fb16eca754d6b7fc5355070bcbbd6a2797b5923c04e84125591",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Пусть тетрадь стоит $t$ сомов, а ручка — $r$ сомов. Тогда $3t + 2r = 66$ и $2t + 3r = 64$. Сложив уравнения, получим $5t + 5r = 130$, то есть $t + r = 26$; вычтя второе уравнение из первого, получим $t - r = 2$. Отсюда $t = 14$, $r = 12$.",
+        "wrong_option_notes": {
+          "A": "2 — это разность цен $t - r$, а не цена тетради.",
+          "B": "12 сомов стоит ручка, а не тетрадь.",
+          "C": "13 получится, если считать цены тетради и ручки одинаковыми (10 предметов за 130 сомов). Но тогда обе покупки стоили бы одинаково, а они стоят 66 и 64 сома.",
+          "E": "26 сомов — это стоимость тетради и ручки вместе ($t + r$)."
+        },
+        "solution_steps": [
+          "Составим систему: $3t + 2r = 66$, $2t + 3r = 64$.",
+          "Сложим уравнения: $5t + 5r = 130$, $t + r = 26$.",
+          "Вычтем второе уравнение из первого: $t - r = 2$.",
+          "$t = (26 + 2) : 2 = 14$; проверка: $3 \\cdot 14 + 2 \\cdot 12 = 66$, $2 \\cdot 14 + 3 \\cdot 12 = 64$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_4bfd2ac77566a00642a9",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.rational_irrational",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_4bfd2ac77566a006",
+        "type": "single_choice",
+        "stem": "Решите уравнение $\\frac{3}{x - 2} + \\frac{2}{x} = \\frac{8}{x^2 - 2x}$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$0{,}8$"
+          },
+          {
+            "id": "B",
+            "text": "$1{,}6$"
+          },
+          {
+            "id": "C",
+            "text": "$2$"
+          },
+          {
+            "id": "D",
+            "text": "$2{,}4$"
+          },
+          {
+            "id": "E",
+            "text": "$2{,}8$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: дробные рациональные уравнения, область допустимых значений",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:4bfd2ac77566a00642a90b4cf7dd74d419b8e8fd7554224916b956c8a4b08a66",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Общий знаменатель $x^2 - 2x = x(x - 2)$; допустимые значения: $x \\ne 0$, $x \\ne 2$. Умножим обе части на $x(x - 2)$: $3x + 2(x - 2) = 8$, $5x - 4 = 8$, $x = 2{,}4$. Это значение допустимо. Проверка: $\\frac{3}{0{,}4} + \\frac{2}{2{,}4} = 7{,}5 + \\frac{5}{6} = \\frac{25}{3}$ и $\\frac{8}{2{,}4 \\cdot 0{,}4} = \\frac{8}{0{,}96} = \\frac{25}{3}$.",
+        "wrong_option_notes": {
+          "A": "$0{,}8$ получится при ошибке в знаке: $2(x - 2) = 2x + 4$; тогда $5x + 4 = 8$.",
+          "B": "$1{,}6$ получится, если второе слагаемое умножить на $x$ вместо дополнительного множителя $x - 2$: $3x + 2x = 8$.",
+          "C": "2 получится, если второе слагаемое не домножить на $x - 2$: $3x + 2 = 8$. К тому же при $x = 2$ знаменатели $x - 2$ и $x^2 - 2x$ обращаются в нуль, поэтому 2 не может быть корнем.",
+          "E": "$2{,}8$ получится, если перепутать дополнительные множители: $3(x - 2) + 2x = 8$, $5x = 14$."
+        },
+        "solution_steps": [
+          "Допустимые значения: $x \\ne 0$, $x \\ne 2$; общий знаменатель $x(x - 2)$.",
+          "Умножаем обе части на $x(x - 2)$: $3x + 2(x - 2) = 8$.",
+          "$5x - 4 = 8$, $x = 2{,}4$ — значение допустимо.",
+          "Проверка: левая часть $7{,}5 + \\frac{5}{6} = \\frac{25}{3}$, правая часть $\\frac{8}{0{,}96} = \\frac{25}{3}$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_7cc0ee3f04140d13234d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.inequalities",
+        "subtopic_id": "math.inequalities.linear",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_7cc0ee3f04140d13",
+        "type": "single_choice",
+        "stem": "Найдите наибольшее целое решение неравенства $3(x - 2) < x + 7$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$3$"
+          },
+          {
+            "id": "B",
+            "text": "$4$"
+          },
+          {
+            "id": "C",
+            "text": "$6$"
+          },
+          {
+            "id": "D",
+            "text": "$7$"
+          },
+          {
+            "id": "E",
+            "text": "$12$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: линейные неравенства с одной переменной",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:7cc0ee3f04140d13234d8f9310d6a035af84b7311760c06701ecbc95327276e9",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Раскроем скобки: $3x - 6 < x + 7$, откуда $2x < 13$ и $x < 6{,}5$. Наибольшее целое число, меньшее $6{,}5$, — это 6. Проверка: при $x = 6$ получаем $12 < 13$ — верно; при $x = 7$ получаем $15 < 14$ — неверно.",
+        "wrong_option_notes": {
+          "A": "3 получится, если перенести $x$ в левую часть, не сменив знак: $3x + x < 7 + 6$, $4x < 13$, $x < 3{,}25$.",
+          "B": "4 получится, если раскрыть скобки как $3x - 2$: $2x < 9$, $x < 4{,}5$.",
+          "D": "7 получится, если округлить $6{,}5$ вверх; но 7 не удовлетворяет неравенству: $15 < 14$ неверно.",
+          "E": "12 получится, если забыть разделить на 2: из $2x < 13$ записать $x < 13$."
+        },
+        "solution_steps": [
+          "$3x - 6 < x + 7$.",
+          "$2x < 13$, $x < 6{,}5$.",
+          "Наибольшее целое решение — 6.",
+          "Проверка: $3 \\cdot (6 - 2) = 12 < 13$, а $3 \\cdot (7 - 2) = 15$ не меньше $14$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_518a9c93b14f4ed84f09",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.inequalities",
+        "subtopic_id": "math.inequalities.absolute_value",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_518a9c93b14f4ed8",
+        "type": "single_choice",
+        "stem": "Найдите сумму всех целых решений неравенства $|2x - 3| < 7$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$7$"
+          },
+          {
+            "id": "B",
+            "text": "$9$"
+          },
+          {
+            "id": "C",
+            "text": "$10$"
+          },
+          {
+            "id": "D",
+            "text": "$12$"
+          },
+          {
+            "id": "E",
+            "text": "$14$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., алгебра: модуль числа, неравенства с модулем, двойные неравенства",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:518a9c93b14f4ed84f09b0caa63736c7cffaba6ce82e442310ee47ec5638c879",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Неравенство $|2x - 3| < 7$ равносильно двойному неравенству $-7 < 2x - 3 < 7$, откуда $-4 < 2x < 10$ и $-2 < x < 5$. Целые решения: $-1$, 0, 1, 2, 3, 4; их сумма $-1 + 0 + 1 + 2 + 3 + 4 = 9$.",
+        "wrong_option_notes": {
+          "A": "7 получится, если включить в ответ $x = -2$; но при $x = -2$ имеем $|-7| = 7$, а неравенство строгое.",
+          "C": "10 получится, если потерять отрицательное решение $x = -1$ (например, рассматривать только неотрицательные $x$).",
+          "D": "12 получится, если включить в ответ обе границы $-2$ и 5, то есть решить нестрогое неравенство $|2x - 3| \\le 7$.",
+          "E": "14 получится, если включить в ответ $x = 5$; но при $x = 5$ имеем $|7| = 7$, а неравенство строгое."
+        },
+        "solution_steps": [
+          "$-7 < 2x - 3 < 7$.",
+          "$-4 < 2x < 10$, то есть $-2 < x < 5$.",
+          "Целые решения: $-1$, 0, 1, 2, 3, 4.",
+          "Сумма: $-1 + 0 + 1 + 2 + 3 + 4 = 9$. Проверка: решения симметричны относительно $1{,}5$ и образуют три пары с суммой 3."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_4d8cd8fd81aad77020e6",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.functions_graphs",
+        "subtopic_id": "math.functions_graphs.inverse_proportion",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_4d8cd8fd81aad770",
+        "type": "single_choice",
+        "stem": "График функции $y = \\frac{k}{x}$ проходит через точку $A(-3;\\,4)$. Найдите значение этой функции при $x = 6$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-12$"
+          },
+          {
+            "id": "B",
+            "text": "$-8$"
+          },
+          {
+            "id": "C",
+            "text": "$-2$"
+          },
+          {
+            "id": "D",
+            "text": "$-0{,}5$"
+          },
+          {
+            "id": "E",
+            "text": "$2$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: обратная пропорциональность и её график",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:4d8cd8fd81aad77020e6626c3cbbe64db449ee4156f83e1fe8c7a52f25f7bba3",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Координаты точки $A$ удовлетворяют уравнению графика: $4 = \\frac{k}{-3}$, откуда $k = -12$. Тогда при $x = 6$ получаем $y = \\frac{-12}{6} = -2$.",
+        "wrong_option_notes": {
+          "A": "$-12$ — это коэффициент $k$, а не значение функции при $x = 6$.",
+          "B": "$-8$ получится, если перепутать обратную пропорциональность с прямой ($y = kx$): тогда $k = -\\frac{4}{3}$ и $y = -\\frac{4}{3} \\cdot 6 = -8$.",
+          "D": "$-0{,}5$ получится, если разделить $x$ на $k$: $6 : (-12)$; а нужно $k : x$.",
+          "E": "2 получится, если потерять знак и взять $k = 12$ вместо $-12$."
+        },
+        "solution_steps": [
+          "Подставим координаты точки $A$: $4 = \\frac{k}{-3}$.",
+          "$k = 4 \\cdot (-3) = -12$, то есть $y = -\\frac{12}{x}$.",
+          "При $x = 6$: $y = -\\frac{12}{6} = -2$.",
+          "Проверка: для обратной пропорциональности произведение $xy$ постоянно: $(-3) \\cdot 4 = 6 \\cdot (-2) = -12$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_8a51f5ff81d448bcade0",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.functions_graphs",
+        "subtopic_id": "math.functions_graphs.quadratic",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_8a51f5ff81d448bc",
+        "type": "single_choice",
+        "stem": "Парабола $y = x^2 + bx + c$ пересекает ось абсцисс в точках $(-1;\\,0)$ и $(5;\\,0)$. Найдите ординату вершины этой параболы.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$-9$"
+          },
+          {
+            "id": "B",
+            "text": "$-8$"
+          },
+          {
+            "id": "C",
+            "text": "$-5$"
+          },
+          {
+            "id": "D",
+            "text": "$2$"
+          },
+          {
+            "id": "E",
+            "text": "$9$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., алгебра: квадратичная функция, нули функции, вершина параболы",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:8a51f5ff81d448bcade0e6d385260814b55929652b162e52b21e09ff484b240c",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Числа $-1$ и 5 — корни трёхчлена, поэтому $y = (x + 1)(x - 5) = x^2 - 4x - 5$. Абсцисса вершины — середина отрезка между корнями: $x_0 = \\frac{-1 + 5}{2} = 2$. Ордината вершины: $y_0 = (2 + 1)(2 - 5) = -9$.",
+        "wrong_option_notes": {
+          "B": "$-8$ получится, если найти абсциссу вершины как полуразность корней: $\\frac{5 - (-1)}{2} = 3$; тогда $(3 + 1)(3 - 5) = -8$. Вершина лежит посередине между корнями, в точке $x = 2$.",
+          "C": "$-5$ — это свободный член $c$, то есть ордината точки пересечения параболы с осью ординат, а не вершины.",
+          "D": "2 — это абсцисса вершины, а спрашивали ординату.",
+          "E": "9 получится, если потерять знак. Ветви параболы направлены вверх, и она пересекает ось абсцисс, поэтому вершина лежит ниже этой оси и её ордината отрицательна."
+        },
+        "solution_steps": [
+          "$y = (x + 1)(x - 5) = x^2 - 4x - 5$, то есть $b = -4$, $c = -5$.",
+          "$x_0 = -\\frac{b}{2} = 2$.",
+          "$y_0 = 2^2 - 4 \\cdot 2 - 5 = -9$.",
+          "Проверка выделением полного квадрата: $x^2 - 4x - 5 = (x - 2)^2 - 9$, вершина $(2;\\,-9)$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_126946089bbf9aca00a0",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.sequences",
+        "subtopic_id": "math.sequences.arithmetic",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_126946089bbf9aca",
+        "type": "single_choice",
+        "stem": "В арифметической прогрессии $(a_n)$ известно, что $a_4 = 11$ и $a_9 = 31$. Найдите $a_{20}$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$71$"
+          },
+          {
+            "id": "B",
+            "text": "$75$"
+          },
+          {
+            "id": "C",
+            "text": "$79$"
+          },
+          {
+            "id": "D",
+            "text": "$86$"
+          },
+          {
+            "id": "E",
+            "text": "$91$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: арифметическая прогрессия, формула n-го члена",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:126946089bbf9aca00a0b362e0fef5c20a7ae9b6551bd9aabf0bff94397726b0",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Так как $a_9 = a_4 + 5d$, имеем $5d = 31 - 11 = 20$ и $d = 4$. Тогда $a_{20} = a_9 + 11d = 31 + 44 = 75$.",
+        "wrong_option_notes": {
+          "A": "71 получится, если найти первый член как $a_1 = a_4 - 4d = -5$ (верно $a_1 = a_4 - 3d = -1$): $-5 + 19 \\cdot 4 = 71$.",
+          "C": "79 получится, если считать $a_{20} = a_1 + 20d$ (верно $a_1 + 19d$): $-1 + 80 = 79$.",
+          "D": "86 получится, если считать, что от $a_4$ до $a_9$ четыре шага: $d = 20 : 4 = 5$, и $31 + 11 \\cdot 5 = 86$.",
+          "E": "91 получится при той же ошибке $d = 5$, если затем вычислить $a_1 = 11 - 3 \\cdot 5 = -4$ и $a_{20} = -4 + 19 \\cdot 5 = 91$."
+        },
+        "solution_steps": [
+          "$a_9 = a_4 + 5d$, значит, $5d = 20$, $d = 4$.",
+          "$a_{20} = a_9 + 11d = 31 + 44 = 75$.",
+          "Проверка через первый член: $a_1 = a_4 - 3d = 11 - 12 = -1$, $a_{20} = -1 + 19 \\cdot 4 = 75$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_81845452fe66560a53d4",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.sequences",
+        "subtopic_id": "math.sequences.geometric",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_81845452fe66560a",
+        "type": "single_choice",
+        "stem": "Сумма первых трёх членов геометрической прогрессии равна 26, а сумма трёх следующих её членов равна 702. Найдите первый член прогрессии.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$2$"
+          },
+          {
+            "id": "B",
+            "text": "$3$"
+          },
+          {
+            "id": "C",
+            "text": "$6$"
+          },
+          {
+            "id": "D",
+            "text": "$18$"
+          },
+          {
+            "id": "E",
+            "text": "$27$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: геометрическая прогрессия, формула n-го члена и суммы первых n членов",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:81845452fe66560a53d4e2809e00ed6ca85f38d6c831b5b7e2171282c1d7af18",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Каждый из членов $b_4$, $b_5$, $b_6$ получается из $b_1$, $b_2$, $b_3$ умножением на $q^3$, поэтому $b_4 + b_5 + b_6 = q^3(b_1 + b_2 + b_3)$. Отсюда $q^3 = 702 : 26 = 27$ и $q = 3$. Тогда $b_1(1 + q + q^2) = 13b_1 = 26$, откуда $b_1 = 2$. Проверка: члены прогрессии 2, 6, 18, 54, 162, 486; $2 + 6 + 18 = 26$, $54 + 162 + 486 = 702$.",
+        "wrong_option_notes": {
+          "B": "3 — это знаменатель прогрессии $q$, а не первый член.",
+          "C": "6 — это второй член прогрессии $b_2 = 2 \\cdot 3$.",
+          "D": "18 — это третий член прогрессии $b_3$.",
+          "E": "27 — это $q^3 = 702 : 26$; отношение сумм равно кубу знаменателя, а не первому члену."
+        },
+        "solution_steps": [
+          "$b_4 + b_5 + b_6 = b_1 q^3 + b_2 q^3 + b_3 q^3 = q^3(b_1 + b_2 + b_3)$.",
+          "$q^3 = 702 : 26 = 27$, $q = 3$.",
+          "$b_1(1 + 3 + 9) = 26$, $b_1 = 2$.",
+          "Проверка через сумму шести членов: $S_6 = b_1 \\cdot \\frac{3^6 - 1}{3 - 1} = 2 \\cdot 364 = 728 = 26 + 702$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_bb27002c976d9ae897c9",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.triangles",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_bb27002c976d9ae8",
+        "type": "single_choice",
+        "stem": "В треугольнике $ABC$ угол $A$ равен $52^\\circ$, а внешний угол при вершине $C$ равен $119^\\circ$. Найдите угол $B$.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$9^\\circ$"
+          },
+          {
+            "id": "B",
+            "text": "$59{,}5^\\circ$"
+          },
+          {
+            "id": "C",
+            "text": "$61^\\circ$"
+          },
+          {
+            "id": "D",
+            "text": "$67^\\circ$"
+          },
+          {
+            "id": "E",
+            "text": "$128^\\circ$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., геометрия: сумма углов треугольника, внешний угол треугольника",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:bb27002c976d9ae897c95e1d34431527d5587fdda6aaa16e9611c1296742f26c",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Внешний угол треугольника равен сумме двух внутренних углов, не смежных с ним: $\\angle A + \\angle B = 119^\\circ$, откуда $\\angle B = 119^\\circ - 52^\\circ = 67^\\circ$.",
+        "wrong_option_notes": {
+          "A": "$9^\\circ$ получится, если принять внешний угол $119^\\circ$ за внутренний угол $C$: $180^\\circ - 52^\\circ - 119^\\circ = 9^\\circ$.",
+          "B": "$59{,}5^\\circ$ получится, если считать, что внешний угол делится поровну между двумя не смежными с ним углами; это верно только при $\\angle A = \\angle B$.",
+          "C": "$61^\\circ$ — это внутренний угол $C$ ($180^\\circ - 119^\\circ$), а не угол $B$.",
+          "E": "$128^\\circ$ — это внешний угол при вершине $A$ ($180^\\circ - 52^\\circ$)."
+        },
+        "solution_steps": [
+          "Внешний угол при вершине $C$ равен $\\angle A + \\angle B$.",
+          "$\\angle B = 119^\\circ - 52^\\circ = 67^\\circ$.",
+          "Проверка: $\\angle C = 180^\\circ - 119^\\circ = 61^\\circ$, и $52^\\circ + 67^\\circ + 61^\\circ = 180^\\circ$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_2dfd671f96ea18d0a4e4",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.quadrilaterals",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_d09f733229a79a5e",
+        "type": "single_choice",
+        "stem": "Диагонали ромба равны 14 см и 48 см. Найдите периметр ромба (в сантиметрах).",
+        "options": [
+          {
+            "id": "A",
+            "text": "$25$"
+          },
+          {
+            "id": "B",
+            "text": "$100$"
+          },
+          {
+            "id": "C",
+            "text": "$124$"
+          },
+          {
+            "id": "D",
+            "text": "$200$"
+          },
+          {
+            "id": "E",
+            "text": "$336$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., геометрия: ромб и его свойства, теорема Пифагора",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | Исправлено автором 2026-11-05 по замечанию независимого слепого верификатора (раунд 1): диагонали 16 и 30 см давали треугольник 8-15-17, тот же, что в задании о призме этой партии и в пилотном math_problems № 22 (q_e1aee925c9b8e8b574e9). Диагонали заменены на 14 и 48 см (половины 7 и 24, сторона 25, P = 100); варианты, пояснение, шаги и разбор ошибок пересчитаны, ключ по-прежнему B. Предложенные верификатором 10 и 24 см не взяты: треугольник 5-12-13 — промежуточный шаг задания о параллелепипеде 3, 4, 12 в main_ru_v2_math_comparison (q_a67ebe6bee2f6fdd9315). Прежний id q_d09f733229a79a5e6fd0. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:2dfd671f96ea18d0a4e40ab5643ad92e8c0352b20ae22d28bf8538bcdba93ed7",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:56:35.522Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Диагонали ромба перпендикулярны и точкой пересечения делятся пополам, поэтому сторона ромба — гипотенуза прямоугольного треугольника с катетами 7 см и 24 см: $a = \\sqrt{7^2 + 24^2} = \\sqrt{625} = 25$ см. Периметр: $P = 4 \\cdot 25 = 100$ см.",
+        "wrong_option_notes": {
+          "A": "25 см — это длина стороны ромба, а не периметр.",
+          "C": "124 получится, если считать периметр удвоенной суммой диагоналей: $2 \\cdot (14 + 48) = 124$.",
+          "D": "200 получится, если взять катетами целые диагонали, а не их половины: $\\sqrt{14^2 + 48^2} = 50$, $4 \\cdot 50 = 200$.",
+          "E": "336 — это площадь ромба в квадратных сантиметрах ($\\frac{14 \\cdot 48}{2}$), а не периметр."
+        },
+        "solution_steps": [
+          "Половины диагоналей равны 7 см и 24 см, и они перпендикулярны.",
+          "Сторона: $a = \\sqrt{7^2 + 24^2} = \\sqrt{49 + 576} = \\sqrt{625} = 25$ см.",
+          "$P = 4a = 100$ см.",
+          "Проверка по свойству ромба $d_1^2 + d_2^2 = 4a^2$: $196 + 2304 = 2500 = 4 \\cdot 625$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_eb5ed35fb34b2ddc9def",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.circle",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_eb5ed35fb34b2ddc",
+        "type": "single_choice",
+        "stem": "Хорда окружности равна 16 см и удалена от центра окружности на 6 см. Найдите радиус окружности (в сантиметрах).",
+        "options": [
+          {
+            "id": "A",
+            "text": "$8$"
+          },
+          {
+            "id": "B",
+            "text": "$10$"
+          },
+          {
+            "id": "C",
+            "text": "$14$"
+          },
+          {
+            "id": "D",
+            "text": "$2\\sqrt{73}$"
+          },
+          {
+            "id": "E",
+            "text": "$20$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., геометрия: окружность, хорда, перпендикуляр из центра к хорде, теорема Пифагора",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:eb5ed35fb34b2ddc9def9e34f95104be59ca827502a706552530b777428c9416",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Перпендикуляр, опущенный из центра на хорду, делит её пополам. Радиус, проведённый в конец хорды, — гипотенуза прямоугольного треугольника с катетами 8 см (половина хорды) и 6 см (расстояние до центра): $R = \\sqrt{8^2 + 6^2} = \\sqrt{100} = 10$ см.",
+        "wrong_option_notes": {
+          "A": "8 см — это половина хорды, а не радиус.",
+          "C": "14 получится, если сложить катеты ($8 + 6$) вместо применения теоремы Пифагора.",
+          "D": "$2\\sqrt{73}$ получится, если взять катетом всю хорду, а не её половину: $\\sqrt{16^2 + 6^2} = \\sqrt{292} = 2\\sqrt{73}$.",
+          "E": "20 см — это диаметр окружности, а не радиус."
+        },
+        "solution_steps": [
+          "Перпендикуляр из центра делит хорду пополам: половина хорды равна 8 см.",
+          "$R^2 = 8^2 + 6^2 = 100$.",
+          "$R = 10$ см.",
+          "Проверка: в окружности радиуса 10 см хорда, удалённая от центра на 6 см, имеет длину $2\\sqrt{10^2 - 6^2} = 2 \\cdot 8 = 16$ см."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b4323a811dc7c8831b86",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.similarity",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_b4323a811dc7c883",
+        "type": "single_choice",
+        "stem": "Основания трапеции $ABCD$ равны $AD = 15$ и $BC = 6$, её диагонали пересекаются в точке $O$. Площадь треугольника $BOC$ равна 8. Найдите площадь трапеции.",
+        "options": [
+          {
+            "id": "A",
+            "text": "$58$"
+          },
+          {
+            "id": "B",
+            "text": "$68$"
+          },
+          {
+            "id": "C",
+            "text": "$74$"
+          },
+          {
+            "id": "D",
+            "text": "$98$"
+          },
+          {
+            "id": "E",
+            "text": "$116$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., геометрия: трапеция, подобие треугольников, отношение площадей треугольников",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b4323a811dc7c8831b86f03ac94eb694a4c02b8d44dbcdfe51ff6ee05c510521",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Треугольники $BOC$ и $DOA$ подобны (их углы при вершине $O$ вертикальные, а углы $OBC$ и $ODA$ — накрест лежащие при параллельных прямых $BC$ и $AD$) с коэффициентом $\\frac{AD}{BC} = \\frac{15}{6} = 2{,}5$. Поэтому $S_{AOD} = 8 \\cdot 2{,}5^2 = 50$, а $AO : OC = DO : OB = 2{,}5$. Треугольники $ABO$ и $CBO$ имеют общую высоту из вершины $B$, поэтому $S_{ABO} = 2{,}5 \\cdot S_{CBO} = 20$; так же $S_{CDO} = 2{,}5 \\cdot S_{CBO} = 20$. Площадь трапеции: $8 + 50 + 20 + 20 = 98$.",
+        "wrong_option_notes": {
+          "A": "58 получится, если забыть боковые треугольники $ABO$ и $CDO$: $8 + 50 = 58$.",
+          "B": "68 получится, если считать, что площади подобных треугольников относятся как коэффициент подобия, а не его квадрат: $S_{AOD} = 8 \\cdot 2{,}5 = 20$, и $8 + 20 + 20 + 20 = 68$.",
+          "C": "74 получится, если считать площади боковых треугольников равными площади треугольника $BOC$: $8 + 50 + 8 + 8 = 74$.",
+          "E": "116 получится, если площадь каждого бокового треугольника взять равной среднему арифметическому $\\frac{8 + 50}{2} = 29$; на самом деле она равна среднему геометрическому $\\sqrt{8 \\cdot 50} = 20$."
+        },
+        "solution_steps": [
+          "$\\triangle BOC \\sim \\triangle DOA$ с коэффициентом $\\frac{15}{6} = 2{,}5$, поэтому $S_{AOD} = 8 \\cdot 6{,}25 = 50$.",
+          "$S_{ABO} = \\frac{AO}{OC} \\cdot S_{CBO} = 2{,}5 \\cdot 8 = 20$ и $S_{CDO} = \\frac{DO}{OB} \\cdot S_{CBO} = 20$.",
+          "$S_{ABCD} = 8 + 50 + 20 + 20 = 98$.",
+          "Проверка через высоту: высота треугольника $BOC$, проведённая к $BC$, равна $\\frac{2 \\cdot 8}{6} = \\frac{8}{3}$, высота треугольника $AOD$ — $\\frac{8}{3} \\cdot 2{,}5 = \\frac{20}{3}$, высота трапеции $\\frac{28}{3}$, и $S = \\frac{15 + 6}{2} \\cdot \\frac{28}{3} = 98$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_661794e28a33f7a8f022",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.solid_geometry",
+        "subtopic_id": "math.solid_geometry.prism_pyramid",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_926750d920ab96d4",
+        "type": "single_choice",
+        "stem": "Основание прямой призмы — прямоугольный треугольник с катетами 9 см и 12 см, высота призмы равна 5 см. Найдите площадь полной поверхности призмы (в квадратных сантиметрах).",
+        "options": [
+          {
+            "id": "A",
+            "text": "$180$"
+          },
+          {
+            "id": "B",
+            "text": "$213$"
+          },
+          {
+            "id": "C",
+            "text": "$234$"
+          },
+          {
+            "id": "D",
+            "text": "$270$"
+          },
+          {
+            "id": "E",
+            "text": "$288$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 10–11 кл., геометрия: прямая призма, площадь боковой и полной поверхности; теорема Пифагора (8 кл.)",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | Исправлено автором 2026-11-05 по замечанию независимого слепого верификатора (раунд 1): катеты 8 и 15 см (треугольник 8-15-17) совпадали с заданием о ромбе этой партии и с пилотным math_problems № 22 (q_e1aee925c9b8e8b574e9). Основание заменено на катеты 9 и 12 см, высота 5 см (гипотенуза 15, боковая поверхность 180, два основания 108, полная 288); варианты, пояснение, шаги и разбор ошибок пересчитаны, ключ по-прежнему E. Прежний id q_926750d920ab96d4f519. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:661794e28a33f7a8f0220825db9f299f980ec0033bdf83d1384c00a8df46abc6",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:56:35.522Z"
+      },
+      "key": {
+        "correct": "E",
+        "explanation": "Гипотенуза основания: $\\sqrt{9^2 + 12^2} = 15$ см. Площадь боковой поверхности прямой призмы равна произведению периметра основания на высоту: $(9 + 12 + 15) \\cdot 5 = 180$ см². Площадь основания $\\frac{9 \\cdot 12}{2} = 54$ см², двух оснований — 108 см². Площадь полной поверхности: $180 + 108 = 288$ см².",
+        "wrong_option_notes": {
+          "A": "180 см² — это только боковая поверхность, без двух оснований.",
+          "B": "213 получится, если забыть боковую грань, содержащую гипотенузу основания: $(9 + 12) \\cdot 5 + 108 = 213$.",
+          "C": "234 получится, если прибавить к боковой поверхности только одно основание: $180 + 54 = 234$.",
+          "D": "270 — это объём призмы в кубических сантиметрах ($54 \\cdot 5$), а не площадь поверхности."
+        },
+        "solution_steps": [
+          "Гипотенуза основания: $\\sqrt{81 + 144} = \\sqrt{225} = 15$ см.",
+          "Боковые грани: $9 \\cdot 5 = 45$, $12 \\cdot 5 = 60$, $15 \\cdot 5 = 75$; вместе 180 см².",
+          "Два основания: $2 \\cdot \\frac{9 \\cdot 12}{2} = 108$ см².",
+          "$S = 180 + 108 = 288$ см²."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_6af1c5032d28a61cca6d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.solid_geometry",
+        "subtopic_id": "math.solid_geometry.solids_of_revolution",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_6af1c5032d28a61c",
+        "type": "single_choice",
+        "stem": "Шар вписан в цилиндр: он касается обоих оснований и боковой поверхности цилиндра. Объём цилиндра равен $54\\pi$ см³. Найдите объём шара (в кубических сантиметрах).",
+        "options": [
+          {
+            "id": "A",
+            "text": "$36\\pi$"
+          },
+          {
+            "id": "B",
+            "text": "$72\\pi$"
+          },
+          {
+            "id": "C",
+            "text": "$81\\pi$"
+          },
+          {
+            "id": "D",
+            "text": "$108\\pi$"
+          },
+          {
+            "id": "E",
+            "text": "$288\\pi$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 11 кл., геометрия: цилиндр и шар, объёмы тел вращения, шар, вписанный в цилиндр",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6af1c5032d28a61cca6de44d6d1f1d6a9704c16d8fffc8d0330a9cbda7a83771",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Пусть радиус шара равен $r$. Тогда радиус основания цилиндра тоже равен $r$, а высота цилиндра равна диаметру шара $2r$. Объём цилиндра: $\\pi r^2 \\cdot 2r = 2\\pi r^3 = 54\\pi$, откуда $r^3 = 27$ и $r = 3$ см. Объём шара: $\\frac{4}{3}\\pi r^3 = \\frac{4}{3}\\pi \\cdot 27 = 36\\pi$ см³.",
+        "wrong_option_notes": {
+          "B": "$72\\pi$ получится, если принять высоту цилиндра равной $r$, а не $2r$: $\\pi r^3 = 54\\pi$, $r^3 = 54$, $\\frac{4}{3}\\pi \\cdot 54 = 72\\pi$.",
+          "C": "$81\\pi$ получится, если перевернуть отношение объёмов: объём шара составляет $\\frac{2}{3}$ объёма описанного цилиндра, а не $\\frac{3}{2}$; шар не может быть больше цилиндра, в который он вписан.",
+          "D": "$108\\pi$ получится, если забыть множитель $\\frac{1}{3}$ в формуле объёма шара: $4\\pi r^3 = 108\\pi$.",
+          "E": "$288\\pi$ получится, если подставить в формулу объёма шара диаметр 6 см вместо радиуса: $\\frac{4}{3}\\pi \\cdot 6^3 = 288\\pi$."
+        },
+        "solution_steps": [
+          "Радиус основания цилиндра равен $r$, высота цилиндра равна $2r$.",
+          "Объём цилиндра: $2\\pi r^3 = 54\\pi$, значит, $r^3 = 27$ и $r = 3$ см.",
+          "Объём шара: $\\frac{4}{3}\\pi \\cdot 27 = 36\\pi$ см³.",
+          "Проверка: объём шара относится к объёму описанного цилиндра как $\\frac{4}{3}\\pi r^3 : 2\\pi r^3 = 2 : 3$, и $\\frac{2}{3} \\cdot 54\\pi = 36\\pi$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_103d95f2cf6457292d69",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.word_problems",
+        "subtopic_id": "math.word_problems.percent",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_12987f585fcc10e0",
+        "type": "single_choice",
+        "stem": "Электрочайник продают со скидкой 15 %. Со скидкой он стоит 3400 сомов. Сколько сомов стоил электрочайник без скидки?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$510$"
+          },
+          {
+            "id": "B",
+            "text": "$600$"
+          },
+          {
+            "id": "C",
+            "text": "$2890$"
+          },
+          {
+            "id": "D",
+            "text": "$3910$"
+          },
+          {
+            "id": "E",
+            "text": "$4000$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: проценты, нахождение числа по его проценту",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | Исправлено автором 2026-11-05 по замечанию независимого слепого верификатора (раунд 1): куртка повторяла предмет пилотного math_comparison № 7 (q_bed73e836f28ea61cd18; цена куртки в процентах). Предмет заменён на электрочайник, числа и ключ E (4000) не изменились; род исправлен в условии и в примечании к A. Прежний id q_12987f585fcc10e03768. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:103d95f2cf6457292d691a745c5ce44884aed20e10c9d9c220a13501c4521dbc",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:56:35.522Z"
+      },
+      "key": {
+        "correct": "E",
+        "explanation": "Цена со скидкой составляет $100\\,\\% - 15\\,\\% = 85\\,\\%$ первоначальной цены. Значит, первоначальная цена равна $3400 : 0{,}85 = 4000$ сомов.",
+        "wrong_option_notes": {
+          "A": "510 — это 15 % от 3400, а не цена электрочайника; к тому же скидку считают от первоначальной цены, а не от цены со скидкой.",
+          "B": "600 сомов — это размер скидки (15 % от 4000), а не первоначальная цена.",
+          "C": "2890 получится, если ещё раз уменьшить цену на 15 %: $3400 \\cdot 0{,}85 = 2890$.",
+          "D": "3910 получится, если прибавить к цене со скидкой 15 % от неё самой: $3400 \\cdot 1{,}15 = 3910$. Но 15 % считаются от первоначальной цены."
+        },
+        "solution_steps": [
+          "Цена со скидкой составляет 85 % первоначальной цены.",
+          "$3400 : 0{,}85 = 4000$ сомов.",
+          "Проверка: скидка $4000 \\cdot 0{,}15 = 600$ сомов, и $4000 - 600 = 3400$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_08bfdc5fbbeb74f2e0d6",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.word_problems",
+        "subtopic_id": "math.word_problems.motion",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_dcd744e02486c0c5",
+        "type": "single_choice",
+        "stem": "Из Балыкчы выехал велосипедист со скоростью 14 км/ч. Через $1{,}5$ ч из Балыкчы по той же дороге вслед за ним выехал мотоциклист со скоростью 56 км/ч. Через сколько минут после своего выезда мотоциклист догонит велосипедиста?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$18$"
+          },
+          {
+            "id": "B",
+            "text": "$30$"
+          },
+          {
+            "id": "C",
+            "text": "$50$"
+          },
+          {
+            "id": "D",
+            "text": "$90$"
+          },
+          {
+            "id": "E",
+            "text": "$120$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., математика: задачи на движение вдогонку, скорость сближения",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | Исправлено автором 2026-11-05 по замечанию независимого слепого верификатора (раунд 1): велосипедист со скоростью 12 км/ч, выезжающий из села, повторял контекст и число пилотного math_problems № 27 (q_ccdb5a584e1894c50e3a). Скорости заменены на 14 и 56 км/ч, место — на город Балыкчы; фора 21 км, скорость сближения 42 км/ч, ответ 30 мин (ключ B), неверные варианты 18/50/90/120 сохраняют прежний смысл. Пояснение, шаги и примечание к A пересчитаны. Прежний id q_dcd744e02486c0c54431. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:08bfdc5fbbeb74f2e0d6ed308e3f634c67cc70bcd71fceab72bda5ede49af076",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:56:35.522Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "За $1{,}5$ ч велосипедист проехал $14 \\cdot 1{,}5 = 21$ км. Мотоциклист догоняет его со скоростью сближения $56 - 14 = 42$ км/ч, поэтому догонит через $21 : 42 = 0{,}5$ ч, то есть через 30 мин.",
+        "wrong_option_notes": {
+          "A": "18 получится, если сложить скорости, как при движении навстречу: $21 : (56 + 14) = 0{,}3$ ч $= 18$ мин. При движении вдогонку скорости вычитают.",
+          "C": "50 получится при неверном переводе часов в минуты: $0{,}5$ ч — это 30 мин, а не 50.",
+          "D": "90 мин — это $1{,}5$ ч, на которые велосипедист выехал раньше, а не время, за которое мотоциклист его догонит.",
+          "E": "120 мин (2 ч) — это время от выезда велосипедиста до момента, когда его догнали, а спрашивали время от выезда мотоциклиста."
+        },
+        "solution_steps": [
+          "К моменту выезда мотоциклиста велосипедист проехал $14 \\cdot 1{,}5 = 21$ км.",
+          "Скорость сближения: $56 - 14 = 42$ км/ч.",
+          "Время погони: $21 : 42 = 0{,}5$ ч $= 30$ мин.",
+          "Проверка: за $0{,}5$ ч мотоциклист проедет $56 \\cdot 0{,}5 = 28$ км, а велосипедист за $1{,}5 + 0{,}5 = 2$ ч — $14 \\cdot 2 = 28$ км."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_503a9d4f7ea498e86bed",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.word_problems",
+        "subtopic_id": "math.word_problems.work",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_503a9d4f7ea498e8",
+        "type": "single_choice",
+        "stem": "Две бригады, работая вместе, могут отремонтировать участок дороги за 6 дней. Первая бригада, работая одна, выполнила бы эту работу на 5 дней быстрее, чем вторая, работающая одна. За сколько дней может отремонтировать этот участок вторая бригада, работая одна?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$2$"
+          },
+          {
+            "id": "B",
+            "text": "$10$"
+          },
+          {
+            "id": "C",
+            "text": "$11$"
+          },
+          {
+            "id": "D",
+            "text": "$12$"
+          },
+          {
+            "id": "E",
+            "text": "$15$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: решение задач на совместную работу с помощью дробных рациональных и квадратных уравнений",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:503a9d4f7ea498e86bed8120fbd571e07eba61a9256daabfc51018c8e7f1a46e",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "E",
+        "explanation": "Пусть вторая бригада выполняет работу за $x$ дней, тогда первая — за $x - 5$ дней, причём $x > 5$. За день вместе они выполняют $\\frac{1}{x} + \\frac{1}{x - 5} = \\frac{1}{6}$ работы. Умножив на $6x(x - 5)$, получим $6(x - 5) + 6x = x(x - 5)$, то есть $x^2 - 17x + 30 = 0$, откуда $x = 15$ или $x = 2$. Условию $x > 5$ удовлетворяет только $x = 15$.",
+        "wrong_option_notes": {
+          "A": "2 — второй корень квадратного уравнения; он не подходит по смыслу задачи: тогда первая бригада работала бы $2 - 5 = -3$ дня.",
+          "B": "10 дней — это время первой бригады, а спрашивали о второй.",
+          "C": "11 получится, если просто прибавить 5 к 6. Но время совместной работы меньше времени каждой бригады, поэтому так считать нельзя.",
+          "D": "12 получится, если считать бригады одинаковыми (каждая за $2 \\cdot 6 = 12$ дней); но по условию первая бригада работает быстрее второй."
+        },
+        "solution_steps": [
+          "Вторая бригада — $x$ дней, первая — $x - 5$ дней; $\\frac{1}{x} + \\frac{1}{x - 5} = \\frac{1}{6}$.",
+          "$6(x - 5) + 6x = x(x - 5)$, $x^2 - 17x + 30 = 0$.",
+          "$x_1 = 15$, $x_2 = 2$; так как $x > 5$, получаем $x = 15$.",
+          "Проверка: $\\frac{1}{15} + \\frac{1}{10} = \\frac{2}{30} + \\frac{3}{30} = \\frac{1}{6}$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_2577c29cbd66237ee90f",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_problems"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.data_probability",
+        "subtopic_id": "math.data_probability.probability",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_2577c29cbd66237e",
+        "type": "single_choice",
+        "stem": "Из цифр 1, 2, 3, 4, 5 составили все трёхзначные числа, в записи которых цифры не повторяются. Какова вероятность того, что наугад выбранное из этих чисел делится на 4?",
+        "options": [
+          {
+            "id": "A",
+            "text": "$\\frac{1}{15}$"
+          },
+          {
+            "id": "B",
+            "text": "$\\frac{12}{125}$"
+          },
+          {
+            "id": "C",
+            "text": "$\\frac{1}{5}$"
+          },
+          {
+            "id": "D",
+            "text": "$\\frac{1}{4}$"
+          },
+          {
+            "id": "E",
+            "text": "$\\frac{2}{5}$"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: элементы комбинаторики (правило произведения) и классическая вероятность; признак делимости на 4 (6 кл.)",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Партия main_ru_v2 (математика, задачи); задание написано с нуля (claude-v2-author). Ключ решён автором двумя способами и подтверждён машинным пересчётом (перебор/координаты); арифметика каждого неверного варианта сверена с описанной ошибкой. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:2577c29cbd66237ee90fd33639ac29041595a587cced1564f9e08d4a44c73d88",
+        "created_at": "2026-11-05T17:46:27.639Z",
+        "updated_at": "2026-11-05T17:46:27.639Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Всего таких чисел $5 \\cdot 4 \\cdot 3 = 60$. Число делится на 4 тогда и только тогда, когда на 4 делится число, образованное двумя его последними цифрами. Из различных цифр 1–5 подходят окончания 12, 24, 32 и 52 (окончание 44 не подходит: цифры повторяются). К каждому окончанию первую цифру можно выбрать тремя способами, поэтому подходящих чисел $4 \\cdot 3 = 12$. Вероятность: $\\frac{12}{60} = \\frac{1}{5}$.",
+        "wrong_option_notes": {
+          "A": "$\\frac{1}{15}$ получится, если подсчитать только окончания (4 варианта) и забыть, что к каждому из них подходят три первые цифры: $\\frac{4}{60}$.",
+          "B": "$\\frac{12}{125}$ получится, если благоприятные исходы подсчитать верно, а общее число исходов — с повторением цифр ($5^3 = 125$).",
+          "D": "$\\frac{1}{4}$ получится, если включить окончание 44 с повторяющейся цифрой: $\\frac{15}{60}$.",
+          "E": "$\\frac{2}{5}$ — это вероятность того, что число чётное (оканчивается на 2 или 4: $\\frac{24}{60}$); но не каждое чётное число делится на 4."
+        },
+        "solution_steps": [
+          "Всего чисел: $5 \\cdot 4 \\cdot 3 = 60$.",
+          "Подходящие окончания из различных цифр: 12, 24, 32, 52.",
+          "К каждому окончанию — 3 варианта первой цифры: $4 \\cdot 3 = 12$ чисел.",
+          "$P = \\frac{12}{60} = \\frac{1}{5}$. Проверка: две последние цифры — упорядоченная пара различных цифр, всего $5 \\cdot 4 = 20$ равновозможных пар, из них подходят 4, и $\\frac{4}{20} = \\frac{1}{5}$."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_problems",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 5,
+          "batch_round2_failures": 0
+        }
+      }
+    }
+  ]
+}

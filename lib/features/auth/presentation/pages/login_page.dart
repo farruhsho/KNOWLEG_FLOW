@@ -1,11 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/routes/app_router.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../providers/auth_provider.dart';
 
+import '../../../../core/design/tokens.dart';
+import '../../../../core/navigation/route_guards.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../providers/auth_provider.dart';
+import '../../domain/auth_validation.dart';
+import '../widgets/auth_widgets.dart';
+
+/// E-mail / Google sign-in (SEC-005R, AUTH-03, AUTH-04).
+///
+/// Navigation after a successful sign-in is done by the router's auth guard
+/// (login → `?from=` or home); the page only shows progress and errors.
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -17,8 +25,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
   bool _isLoading = false;
+  String? _error;
 
   @override
   void dispose() {
@@ -27,146 +35,73 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-
+  String _destination() {
+    String? from;
     try {
-      final authService = ref.read(authServiceProvider);
-      await authService.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      from = GoRouterState.of(context).uri.queryParameters[RouteGuards.fromParam];
+    } catch (_) {}
+    return RouteGuards.isSafeReturnLocation(from) ? from! : RoutePaths.home;
+  }
 
-      if (mounted) {
-        context.go(AppRouter.dashboard);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        String errorMessage;
-        switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'Пользователь с таким email не найден';
-            break;
-          case 'wrong-password':
-            errorMessage = 'Неверный пароль';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Неверный формат email';
-            break;
-          case 'user-disabled':
-            errorMessage = 'Этот аккаунт заблокирован';
-            break;
-          case 'too-many-requests':
-            errorMessage = 'Слишком много попыток входа. Попробуйте позже';
-            break;
-          default:
-            errorMessage = 'Ошибка входа: ${e.message}';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+  Future<void> _run(Future<void> Function() action) async {
+    final l = AppLocalizations.of(context)!;
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      await action();
+      if (!mounted) return;
+      // Usually the router has already redirected; this covers the rest.
+      context.go(_destination());
     } catch (e) {
+      final failure = classifyAuthError(e);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка входа: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        setState(() => _error =
+            failure == null ? null : l.shellAuthFailureText(failure));
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _handleLogin() async {
+    if (_isLoading) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    FocusScope.of(context).unfocus();
+    await _run(() => ref.read(authServiceProvider).signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ));
   }
 
   Future<void> _handleGoogleSignIn() async {
-    setState(() => _isLoading = true);
-    try {
-      final authService = ref.read(authServiceProvider);
-      await authService.signInWithGoogle();
-
-      if (mounted) {
-        context.go(AppRouter.dashboard);
-      }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка входа через Google: ${e.message}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        // User cancelled the sign in
-        if (e.toString().contains('cancelled')) {
-          return;
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка входа через Google: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+    if (_isLoading) return;
+    await _run(() => ref.read(authServiceProvider).signInWithGoogle());
   }
 
   Future<void> _handleForgotPassword() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Введите email для восстановления пароля'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
+    final l = AppLocalizations.of(context)!;
+    final email = await showDialog<String>(
+      context: context,
+      builder: (context) =>
+          _ResetPasswordDialog(initialEmail: _emailController.text.trim()),
+    );
+    if (email == null || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
     try {
-      final authService = ref.read(authServiceProvider);
-      await authService.sendPasswordResetEmail(email);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Письмо для восстановления пароля отправлено'),
-            backgroundColor: Colors.green,
-          ),
-        );
+      await ref.read(authServiceProvider).sendPasswordResetEmail(email);
+      // Same message whether or not the account exists (no enumeration).
+      messenger.showSnackBar(SnackBar(content: Text(l.shellAuthResetSent)));
+    } catch (e) {
+      final failure = classifyAuthError(e);
+      if (failure == AuthFailure.userNotFound) {
+        messenger.showSnackBar(SnackBar(content: Text(l.shellAuthResetSent)));
+        return;
       }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        String errorMessage;
-        switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'Пользователь с таким email не найден';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Неверный формат email';
-            break;
-          default:
-            errorMessage = 'Ошибка: ${e.message}';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-          ),
+      if (failure != null) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l.shellAuthFailureText(failure))),
         );
       }
     }
@@ -174,199 +109,171 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final gutter = AppSpacing.gutter(context);
+    final googleAvailable = GoogleSignInSupport.isAvailable;
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        actions: const [LanguageActionButton()],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 48),
-
-                // Logo
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.school,
-                    size: 50,
-                    color: AppColors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Title
-                Text(
-                  'Добро пожаловать',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.xxl),
+              child: AutofillGroup(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AuthHeader(
+                        title: l.shellLoginTitle,
+                        subtitle: l.shellLoginSubtitle,
                       ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  'Войдите в свой аккаунт',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: AppSpacing.xxl),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        autocorrect: false,
+                        autofillHints: const [AutofillHints.email],
+                        decoration: InputDecoration(
+                          labelText: l.shellAuthEmailLabel,
+                          hintText: 'name@example.com',
+                          prefixIcon: const Icon(Icons.alternate_email_rounded),
+                        ),
+                        validator: (v) =>
+                            l.shellValidate(AuthValidators.email(v)),
                       ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 48),
-
-                // Email field
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'example@mail.com',
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Введите корректный email';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Password field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: !_isPasswordVisible,
-                  decoration: InputDecoration(
-                    labelText: 'Пароль',
-                    hintText: '••••••••',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                      const SizedBox(height: AppSpacing.lg),
+                      PasswordField(
+                        controller: _passwordController,
+                        label: l.shellAuthPasswordLabel,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _handleLogin(),
+                        validator: (v) =>
+                            l.shellValidate(AuthValidators.loginPassword(v)),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите пароль';
-                    }
-                    if (value.length < 6) {
-                      return 'Пароль должен содержать минимум 6 символов';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 8),
-
-                // Forgot password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: _handleForgotPassword,
-                    child: const Text('Забыли пароль?'),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: TextButton(
+                          onPressed: _isLoading ? null : _handleForgotPassword,
+                          child: Text(l.shellAuthForgotPassword),
+                        ),
+                      ),
+                      if (_error != null) ...[
+                        AuthErrorBox(message: _error!),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      FilledButton(
+                        onPressed: _isLoading ? null : _handleLogin,
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text(l.shellLoginButton),
+                      ),
+                      if (googleAvailable) ...[
+                        const SizedBox(height: AppSpacing.xl),
+                        const OrDivider(),
+                        const SizedBox(height: AppSpacing.xl),
+                        OutlinedButton.icon(
+                          onPressed: _isLoading ? null : _handleGoogleSignIn,
+                          icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
+                          label: Text(l.shellAuthContinueWithGoogle),
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.xxl),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(l.shellLoginNoAccount),
+                          TextButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => context.push(RoutePaths.signup),
+                            child: Text(l.shellLoginCreateAccount),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-
-                const SizedBox(height: 24),
-
-                // Login button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Войти'),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Divider
-                Row(
-                  children: [
-                    const Expanded(child: Divider()),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'или',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                    const Expanded(child: Divider()),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // Google sign in
-                OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _handleGoogleSignIn,
-                  icon: const Icon(Icons.g_mobiledata, size: 28),
-                  label: const Text('Войти через Google'),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Phone sign in
-                OutlinedButton.icon(
-                  onPressed: _isLoading
-                      ? null
-                      : () {
-                          // TODO: Implement phone sign in
-                        },
-                  icon: const Icon(Icons.phone),
-                  label: const Text('Войти через телефон'),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Sign up link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Нет аккаунта?'),
-                    TextButton(
-                      onPressed: () => context.push(AppRouter.signup),
-                      child: const Text('Зарегистрироваться'),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ResetPasswordDialog extends StatefulWidget {
+  const _ResetPasswordDialog({required this.initialEmail});
+
+  final String initialEmail;
+
+  @override
+  State<_ResetPasswordDialog> createState() => _ResetPasswordDialogState();
+}
+
+class _ResetPasswordDialogState extends State<_ResetPasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.initialEmail);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    if (_formKey.currentState?.validate() ?? false) {
+      Navigator.of(context).pop(_controller.text.trim());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return AlertDialog(
+      title: Text(l.shellAuthResetTitle),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l.shellAuthResetMessage),
+              const SizedBox(height: AppSpacing.lg),
+              TextFormField(
+                controller: _controller,
+                autofocus: widget.initialEmail.isEmpty,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(labelText: l.shellAuthEmailLabel),
+                validator: (v) => l.shellValidate(AuthValidators.email(v)),
+                onFieldSubmitted: (_) => _submit(),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.shellCancel),
+        ),
+        FilledButton(onPressed: _submit, child: Text(l.shellAuthResetSend)),
+      ],
     );
   }
 }

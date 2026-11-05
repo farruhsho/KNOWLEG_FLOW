@@ -1,0 +1,1381 @@
+{
+ "schema_version": 1,
+ "source": "content/curriculum/topics.json",
+ "names": {
+  "math": {
+   "ru": "Математика",
+   "ky": "Математика",
+   "en": "Mathematics"
+  },
+  "math.arithmetic": {
+   "ru": "Арифметика",
+   "ky": "Арифметика",
+   "en": "Arithmetic"
+  },
+  "math.arithmetic.order_of_operations": {
+   "ru": "Порядок действий",
+   "ky": "Амалдардын аткарылуу тартиби",
+   "en": "Order of operations"
+  },
+  "math.arithmetic.divisibility": {
+   "ru": "Признаки делимости, простые числа",
+   "ky": "Бөлүнүүчүлүк белгилери, жөнөкөй сандар",
+   "en": "Divisibility, primes"
+  },
+  "math.arithmetic.gcd_lcm": {
+   "ru": "НОД и НОК",
+   "ky": "Эң чоң жалпы бөлүүчү жана эң кичине жалпы эселүү",
+   "en": "GCD and LCM"
+  },
+  "math.arithmetic.powers_roots": {
+   "ru": "Степени и квадратные корни",
+   "ky": "Даража жана квадраттык тамыр",
+   "en": "Powers and square roots"
+  },
+  "math.arithmetic.estimation": {
+   "ru": "Сравнение и оценка чисел",
+   "ky": "Сандарды салыштыруу жана баалоо",
+   "en": "Comparing and estimating numbers"
+  },
+  "math.fractions_percents": {
+   "ru": "Дроби и проценты",
+   "ky": "Бөлчөктөр жана пайыздар",
+   "en": "Fractions and percents"
+  },
+  "math.fractions_percents.common_fractions": {
+   "ru": "Действия с обыкновенными дробями",
+   "ky": "Жөнөкөй бөлчөктөр менен амалдар",
+   "en": "Operations with common fractions"
+  },
+  "math.fractions_percents.decimals": {
+   "ru": "Десятичные дроби",
+   "ky": "Ондук бөлчөктөр",
+   "en": "Decimals"
+  },
+  "math.fractions_percents.percent_of_number": {
+   "ru": "Процент от числа и число по проценту",
+   "ky": "Сандын пайызы жана пайызы боюнча санды табуу",
+   "en": "Percent of a number"
+  },
+  "math.fractions_percents.percent_change": {
+   "ru": "Процентное изменение",
+   "ky": "Пайыздык өзгөрүү",
+   "en": "Percent change"
+  },
+  "math.ratios_proportions": {
+   "ru": "Отношения и пропорции",
+   "ky": "Катыштар жана пропорциялар",
+   "en": "Ratios and proportions"
+  },
+  "math.ratios_proportions.ratio": {
+   "ru": "Отношение величин",
+   "ky": "Чоңдуктардын катышы",
+   "en": "Ratio"
+  },
+  "math.ratios_proportions.direct_inverse": {
+   "ru": "Прямая и обратная пропорциональность",
+   "ky": "Түз жана тескери пропорционалдык",
+   "en": "Direct and inverse proportion"
+  },
+  "math.ratios_proportions.scale": {
+   "ru": "Масштаб",
+   "ky": "Масштаб",
+   "en": "Scale"
+  },
+  "math.algebraic_expressions": {
+   "ru": "Алгебраические выражения",
+   "ky": "Алгебралык туюнтмалар",
+   "en": "Algebraic expressions"
+  },
+  "math.algebraic_expressions.polynomials": {
+   "ru": "Многочлены",
+   "ky": "Көп мүчөлөр",
+   "en": "Polynomials"
+  },
+  "math.algebraic_expressions.short_multiplication": {
+   "ru": "Формулы сокращённого умножения",
+   "ky": "Кыскача көбөйтүүнүн формулалары",
+   "en": "Special products"
+  },
+  "math.algebraic_expressions.factoring": {
+   "ru": "Разложение на множители",
+   "ky": "Көбөйтүүчүлөргө ажыратуу",
+   "en": "Factoring"
+  },
+  "math.algebraic_expressions.algebraic_fractions": {
+   "ru": "Алгебраические дроби",
+   "ky": "Алгебралык бөлчөктөр",
+   "en": "Rational expressions"
+  },
+  "math.algebraic_expressions.expressions_with_variables": {
+   "ru": "Значение выражения с переменной",
+   "ky": "Өзгөрмөсү бар туюнтманын мааниси",
+   "en": "Evaluating expressions"
+  },
+  "math.equations_systems": {
+   "ru": "Уравнения и системы уравнений",
+   "ky": "Теңдемелер жана теңдемелер системасы",
+   "en": "Equations and systems"
+  },
+  "math.equations_systems.linear": {
+   "ru": "Линейные уравнения",
+   "ky": "Сызыктуу теңдемелер",
+   "en": "Linear equations"
+  },
+  "math.equations_systems.quadratic_vieta": {
+   "ru": "Квадратные уравнения, теорема Виета",
+   "ky": "Квадраттык теңдемелер, Виета теоремасы",
+   "en": "Quadratic equations, Vieta"
+  },
+  "math.equations_systems.systems": {
+   "ru": "Системы уравнений",
+   "ky": "Теңдемелер системасы",
+   "en": "Systems of equations"
+  },
+  "math.equations_systems.rational_irrational": {
+   "ru": "Дробно-рациональные и иррациональные уравнения",
+   "ky": "Бөлчөк-рационалдык жана иррационалдык теңдемелер",
+   "en": "Rational and radical equations"
+  },
+  "math.inequalities": {
+   "ru": "Неравенства",
+   "ky": "Барабарсыздыктар",
+   "en": "Inequalities"
+  },
+  "math.inequalities.linear": {
+   "ru": "Линейные неравенства",
+   "ky": "Сызыктуу барабарсыздыктар",
+   "en": "Linear inequalities"
+  },
+  "math.inequalities.quadratic": {
+   "ru": "Квадратные неравенства",
+   "ky": "Квадраттык барабарсыздыктар",
+   "en": "Quadratic inequalities"
+  },
+  "math.inequalities.systems": {
+   "ru": "Системы неравенств",
+   "ky": "Барабарсыздыктар системасы",
+   "en": "Systems of inequalities"
+  },
+  "math.inequalities.absolute_value": {
+   "ru": "Модуль числа",
+   "ky": "Сандын модулу",
+   "en": "Absolute value"
+  },
+  "math.functions_graphs": {
+   "ru": "Функции и графики",
+   "ky": "Функциялар жана графиктер",
+   "en": "Functions and graphs"
+  },
+  "math.functions_graphs.linear": {
+   "ru": "Линейная функция",
+   "ky": "Сызыктуу функция",
+   "en": "Linear function"
+  },
+  "math.functions_graphs.quadratic": {
+   "ru": "Квадратичная функция",
+   "ky": "Квадраттык функция",
+   "en": "Quadratic function"
+  },
+  "math.functions_graphs.inverse_proportion": {
+   "ru": "Обратная пропорциональность",
+   "ky": "Тескери пропорционалдык",
+   "en": "Inverse proportion"
+  },
+  "math.functions_graphs.reading_graphs": {
+   "ru": "Чтение графиков",
+   "ky": "Графикти окуу",
+   "en": "Reading graphs"
+  },
+  "math.sequences": {
+   "ru": "Последовательности и прогрессии",
+   "ky": "Удаалаштыктар жана прогрессиялар",
+   "en": "Sequences and progressions"
+  },
+  "math.sequences.arithmetic": {
+   "ru": "Арифметическая прогрессия",
+   "ky": "Арифметикалык прогрессия",
+   "en": "Arithmetic progression"
+  },
+  "math.sequences.geometric": {
+   "ru": "Геометрическая прогрессия",
+   "ky": "Геометриялык прогрессия",
+   "en": "Geometric progression"
+  },
+  "math.sequences.patterns": {
+   "ru": "Закономерности в числовых рядах",
+   "ky": "Сандык катарлардагы мыйзам ченемдүүлүктөр",
+   "en": "Number patterns"
+  },
+  "math.plane_geometry": {
+   "ru": "Планиметрия",
+   "ky": "Планиметрия",
+   "en": "Plane geometry"
+  },
+  "math.plane_geometry.angles_parallel": {
+   "ru": "Углы и параллельные прямые",
+   "ky": "Бурчтар жана параллелдүү түз сызыктар",
+   "en": "Angles and parallel lines"
+  },
+  "math.plane_geometry.triangles": {
+   "ru": "Треугольники, теорема Пифагора",
+   "ky": "Үч бурчтуктар, Пифагор теоремасы",
+   "en": "Triangles, Pythagoras"
+  },
+  "math.plane_geometry.quadrilaterals": {
+   "ru": "Четырёхугольники",
+   "ky": "Төрт бурчтуктар",
+   "en": "Quadrilaterals"
+  },
+  "math.plane_geometry.circle": {
+   "ru": "Окружность и круг",
+   "ky": "Айлана жана тегерек",
+   "en": "Circle"
+  },
+  "math.plane_geometry.areas": {
+   "ru": "Площади фигур",
+   "ky": "Фигуралардын аянттары",
+   "en": "Areas"
+  },
+  "math.plane_geometry.similarity": {
+   "ru": "Подобие треугольников",
+   "ky": "Үч бурчтуктардын окшоштугу",
+   "en": "Similar triangles"
+  },
+  "math.solid_geometry": {
+   "ru": "Стереометрия",
+   "ky": "Стереометрия",
+   "en": "Solid geometry"
+  },
+  "math.solid_geometry.cuboid": {
+   "ru": "Куб и прямоугольный параллелепипед",
+   "ky": "Куб жана тик бурчтуу параллелепипед",
+   "en": "Cube and cuboid"
+  },
+  "math.solid_geometry.prism_pyramid": {
+   "ru": "Призма и пирамида",
+   "ky": "Призма жана пирамида",
+   "en": "Prism and pyramid"
+  },
+  "math.solid_geometry.solids_of_revolution": {
+   "ru": "Цилиндр, конус, шар",
+   "ky": "Цилиндр, конус, шар",
+   "en": "Cylinder, cone, sphere"
+  },
+  "math.solid_geometry.volume_surface": {
+   "ru": "Объём и площадь поверхности",
+   "ky": "Көлөм жана бетинин аянты",
+   "en": "Volume and surface area"
+  },
+  "math.word_problems": {
+   "ru": "Текстовые задачи",
+   "ky": "Тексттик маселелер",
+   "en": "Word problems"
+  },
+  "math.word_problems.motion": {
+   "ru": "Задачи на движение",
+   "ky": "Кыймылга маселелер",
+   "en": "Motion problems"
+  },
+  "math.word_problems.work": {
+   "ru": "Задачи на совместную работу",
+   "ky": "Биргелешкен жумушка маселелер",
+   "en": "Work problems"
+  },
+  "math.word_problems.percent": {
+   "ru": "Задачи на проценты",
+   "ky": "Пайызга маселелер",
+   "en": "Percent problems"
+  },
+  "math.word_problems.mixtures": {
+   "ru": "Задачи на смеси и сплавы",
+   "ky": "Аралашмаларга жана эритмелерге маселелер",
+   "en": "Mixture problems"
+  },
+  "math.word_problems.logic": {
+   "ru": "Логические задачи",
+   "ky": "Логикалык маселелер",
+   "en": "Logic problems"
+  },
+  "math.data_probability": {
+   "ru": "Данные и вероятность",
+   "ky": "Маалыматтар жана ыктымалдык",
+   "en": "Data and probability"
+  },
+  "math.data_probability.charts_tables": {
+   "ru": "Диаграммы и таблицы",
+   "ky": "Диаграммалар жана таблицалар",
+   "en": "Charts and tables"
+  },
+  "math.data_probability.averages": {
+   "ru": "Среднее арифметическое, медиана, мода",
+   "ky": "Орточо арифметикалык, медиана, мода",
+   "en": "Mean, median, mode"
+  },
+  "math.data_probability.probability": {
+   "ru": "Классическая вероятность",
+   "ky": "Классикалык ыктымалдык",
+   "en": "Classical probability"
+  },
+  "math.data_probability.combinatorics": {
+   "ru": "Комбинаторика",
+   "ky": "Комбинаторика",
+   "en": "Combinatorics"
+  },
+  "math.trigonometry": {
+   "ru": "Тригонометрия",
+   "ky": "Тригонометрия",
+   "en": "Trigonometry"
+  },
+  "math.trigonometry.values_identities": {
+   "ru": "Значения и тождества",
+   "ky": "Маанилери жана тепе-теңдиктер",
+   "en": "Values and identities"
+  },
+  "math.trigonometry.equations": {
+   "ru": "Тригонометрические уравнения",
+   "ky": "Тригонометриялык теңдемелер",
+   "en": "Trigonometric equations"
+  },
+  "math.trigonometry.functions": {
+   "ru": "Тригонометрические функции",
+   "ky": "Тригонометриялык функциялар",
+   "en": "Trigonometric functions"
+  },
+  "math.exponential_logarithmic": {
+   "ru": "Показательная и логарифмическая функции",
+   "ky": "Көрсөткүчтүү жана логарифмдик функциялар",
+   "en": "Exponents and logarithms"
+  },
+  "math.exponential_logarithmic.log_properties": {
+   "ru": "Свойства логарифмов",
+   "ky": "Логарифмдердин касиеттери",
+   "en": "Properties of logarithms"
+  },
+  "math.exponential_logarithmic.equations": {
+   "ru": "Показательные и логарифмические уравнения",
+   "ky": "Көрсөткүчтүү жана логарифмдик теңдемелер",
+   "en": "Exponential and log equations"
+  },
+  "math.calculus": {
+   "ru": "Начала анализа",
+   "ky": "Анализдин башталыштары",
+   "en": "Elements of calculus"
+  },
+  "math.calculus.derivative": {
+   "ru": "Производная и её применение",
+   "ky": "Туунду жана анын колдонулушу",
+   "en": "Derivative and applications"
+  },
+  "math.calculus.integral": {
+   "ru": "Первообразная и интеграл",
+   "ky": "Баштапкы функция жана интеграл",
+   "en": "Antiderivative and integral"
+  },
+  "verbal": {
+   "ru": "Аналогии и дополнение предложений",
+   "ky": "Аналогиялар жана сүйлөмдөрдү толуктоо",
+   "en": "Analogies and sentence completion"
+  },
+  "analogies.synonym": {
+   "ru": "Аналогии: синонимы",
+   "ky": "Аналогиялар: синонимдик байланыш",
+   "en": "Analogies: synonyms"
+  },
+  "analogies.antonym": {
+   "ru": "Аналогии: антонимы",
+   "ky": "Аналогиялар: антонимдик байланыш",
+   "en": "Analogies: antonyms"
+  },
+  "analogies.part_whole": {
+   "ru": "Аналогии: часть и целое",
+   "ky": "Аналогиялар: бөлүк жана бүтүн",
+   "en": "Analogies: part–whole"
+  },
+  "analogies.cause_effect": {
+   "ru": "Аналогии: причина и следствие",
+   "ky": "Аналогиялар: себеп жана натыйжа",
+   "en": "Analogies: cause–effect"
+  },
+  "analogies.function": {
+   "ru": "Аналогии: предмет и его назначение",
+   "ky": "Аналогиялар: буюм жана анын милдети",
+   "en": "Analogies: object–function"
+  },
+  "analogies.degree": {
+   "ru": "Аналогии: степень признака",
+   "ky": "Аналогиялар: белгинин даражасы",
+   "en": "Analogies: degree"
+  },
+  "analogies.category_member": {
+   "ru": "Аналогии: род и вид",
+   "ky": "Аналогиялар: тек жана түр",
+   "en": "Analogies: category–member"
+  },
+  "analogies.worker_tool_product": {
+   "ru": "Аналогии: профессия, инструмент, результат труда",
+   "ky": "Аналогиялар: кесип, курал, эмгектин натыйжасы",
+   "en": "Analogies: worker–tool/product"
+  },
+  "analogies.object_property": {
+   "ru": "Аналогии: предмет и его признак",
+   "ky": "Аналогиялар: нерсе жана анын белгиси",
+   "en": "Analogies: object–property"
+  },
+  "analogies.material_product": {
+   "ru": "Аналогии: материал и изделие",
+   "ky": "Аналогиялар: материал жана андан жасалган буюм",
+   "en": "Analogies: material–product"
+  },
+  "analogies.sequence": {
+   "ru": "Аналогии: последовательность",
+   "ky": "Аналогиялар: удаалаштык",
+   "en": "Analogies: sequence"
+  },
+  "completion.logical_connectors": {
+   "ru": "Дополнение: логические связки",
+   "ky": "Толуктоо: логикалык байламталар",
+   "en": "Completion: logical connectors"
+  },
+  "completion.logical_connectors.contrast": {
+   "ru": "Противопоставление и уступка",
+   "ky": "Каршы коюу жана жол берүү",
+   "en": "Contrast and concession"
+  },
+  "completion.logical_connectors.cause_result": {
+   "ru": "Причина и следствие",
+   "ky": "Себеп жана натыйжа",
+   "en": "Cause and result"
+  },
+  "completion.logical_connectors.addition_example": {
+   "ru": "Добавление и пример",
+   "ky": "Кошумчалоо жана мисал",
+   "en": "Addition and example"
+  },
+  "completion.vocabulary_in_context": {
+   "ru": "Дополнение: слово в контексте",
+   "ky": "Толуктоо: сөздүн контексттеги мааниси",
+   "en": "Completion: vocabulary in context"
+  },
+  "completion.collocations": {
+   "ru": "Дополнение: сочетаемость слов",
+   "ky": "Толуктоо: сөз айкаштары",
+   "en": "Completion: collocations"
+  },
+  "completion.sentence_logic": {
+   "ru": "Дополнение: логика предложения (два пропуска)",
+   "ky": "Толуктоо: сүйлөмдүн логикасы (эки боштук)",
+   "en": "Completion: sentence logic (two blanks)"
+  },
+  "reading": {
+   "ru": "Чтение и понимание",
+   "ky": "Окуу жана түшүнүү",
+   "en": "Reading comprehension"
+  },
+  "reading.main_idea": {
+   "ru": "Основная мысль текста",
+   "ky": "Тексттин негизги ою",
+   "en": "Main idea"
+  },
+  "reading.detail": {
+   "ru": "Поиск информации в тексте",
+   "ky": "Тексттен маалымат табуу",
+   "en": "Detail"
+  },
+  "reading.inference": {
+   "ru": "Вывод из прочитанного",
+   "ky": "Тексттен корутунду чыгаруу",
+   "en": "Inference"
+  },
+  "reading.vocabulary_in_context": {
+   "ru": "Значение слова в тексте",
+   "ky": "Сөздүн тексттеги мааниси",
+   "en": "Vocabulary in context"
+  },
+  "reading.authors_purpose": {
+   "ru": "Цель и позиция автора",
+   "ky": "Автордун максаты жана позициясы",
+   "en": "Author's purpose"
+  },
+  "reading.paired_comparison": {
+   "ru": "Сравнение двух текстов",
+   "ky": "Эки текстти салыштыруу",
+   "en": "Paired-passage comparison"
+  },
+  "grammar": {
+   "ru": "Практическая грамматика",
+   "ky": "Практикалык грамматика",
+   "en": "Practical grammar"
+  },
+  "grammar_ru.spelling": {
+   "ru": "Орфография",
+   "ky": "Орфография (орус тили)",
+   "en": "Spelling (Russian)"
+  },
+  "grammar_ru.spelling.unstressed_vowels": {
+   "ru": "Безударные гласные в корне",
+   "ky": "Уңгудагы басымсыз үндүүлөр",
+   "en": "Unstressed vowels"
+  },
+  "grammar_ru.spelling.n_nn": {
+   "ru": "Н и НН в суффиксах",
+   "ky": "Мүчөлөрдөгү Н жана НН",
+   "en": "Single and double N"
+  },
+  "grammar_ru.spelling.ne_with_words": {
+   "ru": "НЕ с разными частями речи",
+   "ky": "НЕ бөлүкчөсүнүн ар кандай сөз түркүмдөрү менен жазылышы",
+   "en": "NE with parts of speech"
+  },
+  "grammar_ru.spelling.prefixes": {
+   "ru": "Приставки ПРЕ- и ПРИ-",
+   "ky": "ПРЕ- жана ПРИ- префикстери",
+   "en": "Prefixes PRE-/PRI-"
+  },
+  "grammar_ru.spelling.joined_separate": {
+   "ru": "Слитное, раздельное и дефисное написание",
+   "ky": "Бирге, бөлөк жана дефис менен жазылышы",
+   "en": "Joined, separate, hyphenated spelling"
+  },
+  "grammar_ru.punctuation": {
+   "ru": "Пунктуация",
+   "ky": "Пунктуация (орус тили)",
+   "en": "Punctuation (Russian)"
+  },
+  "grammar_ru.punctuation.homogeneous": {
+   "ru": "Однородные члены предложения",
+   "ky": "Сүйлөмдүн бир өңчөй мүчөлөрү",
+   "en": "Homogeneous parts"
+  },
+  "grammar_ru.punctuation.participial_phrases": {
+   "ru": "Причастный и деепричастный обороты",
+   "ky": "Атоочтук жана чакчыл түрмөктөр",
+   "en": "Participial phrases"
+  },
+  "grammar_ru.punctuation.complex_sentences": {
+   "ru": "Сложное предложение",
+   "ky": "Татаал сүйлөм",
+   "en": "Complex sentences"
+  },
+  "grammar_ru.punctuation.parenthetical": {
+   "ru": "Вводные слова и обращения",
+   "ky": "Киринди сөздөр жана кайрылуулар",
+   "en": "Parenthetical words"
+  },
+  "grammar_ru.word_formation": {
+   "ru": "Словообразование",
+   "ky": "Сөз жасоо (орус тили)",
+   "en": "Word formation (Russian)"
+  },
+  "grammar_ru.word_formation.morphemes": {
+   "ru": "Морфемный состав слова",
+   "ky": "Сөздүн морфемалык курамы",
+   "en": "Morphemes"
+  },
+  "grammar_ru.word_formation.methods": {
+   "ru": "Способы словообразования",
+   "ky": "Сөз жасоо жолдору",
+   "en": "Word-formation methods"
+  },
+  "grammar_ru.completion": {
+   "ru": "Дополнение (выбор формы и слова)",
+   "ky": "Толуктоо (орус тили)",
+   "en": "Completion (Russian)"
+  },
+  "grammar_ru.completion.word_form": {
+   "ru": "Выбор формы слова",
+   "ky": "Сөздүн формасын тандоо",
+   "en": "Choosing a word form"
+  },
+  "grammar_ru.completion.word_choice": {
+   "ru": "Выбор слова по смыслу",
+   "ky": "Мааниси боюнча сөз тандоо",
+   "en": "Choosing a word by meaning"
+  },
+  "grammar_ru.lexical_grammatical_meaning": {
+   "ru": "Лексико-грамматическое значение",
+   "ky": "Лексикалык-грамматикалык маани (орус тили)",
+   "en": "Lexical and grammatical meaning (Russian)"
+  },
+  "grammar_ru.lexical_grammatical_meaning.parts_of_speech": {
+   "ru": "Части речи",
+   "ky": "Сөз түркүмдөрү",
+   "en": "Parts of speech"
+  },
+  "grammar_ru.lexical_grammatical_meaning.paronyms": {
+   "ru": "Паронимы",
+   "ky": "Паронимдер",
+   "en": "Paronyms"
+  },
+  "grammar_ru.lexical_grammatical_meaning.word_meaning": {
+   "ru": "Лексическое значение слова",
+   "ky": "Сөздүн лексикалык мааниси",
+   "en": "Word meaning"
+  },
+  "grammar_ru.usage_norms": {
+   "ru": "Нормы употребления",
+   "ky": "Колдонуу нормалары (орус тили)",
+   "en": "Usage norms (Russian)"
+  },
+  "grammar_ru.usage_norms.agreement_government": {
+   "ru": "Согласование и управление",
+   "ky": "Ээрчишүү жана башкаруу",
+   "en": "Agreement and government"
+  },
+  "grammar_ru.usage_norms.collocation": {
+   "ru": "Лексическая сочетаемость",
+   "ky": "Сөздөрдүн лексикалык айкалышы",
+   "en": "Lexical collocation"
+  },
+  "grammar_ru.usage_norms.word_forms": {
+   "ru": "Формы слов (род, число, падеж)",
+   "ky": "Сөздүн формалары (род, сан, жөндөмө)",
+   "en": "Word forms"
+  },
+  "grammar_ky.spelling": {
+   "ru": "Орфография (кыргызский язык)",
+   "ky": "Орфография",
+   "en": "Spelling (Kyrgyz)"
+  },
+  "grammar_ky.spelling.vowel_harmony": {
+   "ru": "Закон сингармонизма",
+   "ky": "Үндүүлөрдүн үндөшүү мыйзамы",
+   "en": "Vowel harmony"
+  },
+  "grammar_ky.spelling.consonants": {
+   "ru": "Правописание согласных",
+   "ky": "Үнсүздөрдүн жазылышы",
+   "en": "Consonants"
+  },
+  "grammar_ky.spelling.compound_words": {
+   "ru": "Правописание сложных слов",
+   "ky": "Кош жана татаал сөздөрдүн жазылышы",
+   "en": "Compound words"
+  },
+  "grammar_ky.spelling.loanwords": {
+   "ru": "Правописание заимствованных слов",
+   "ky": "Кирме сөздөрдүн жазылышы",
+   "en": "Loanwords"
+  },
+  "grammar_ky.punctuation": {
+   "ru": "Пунктуация (кыргызский язык)",
+   "ky": "Пунктуация",
+   "en": "Punctuation (Kyrgyz)"
+  },
+  "grammar_ky.punctuation.homogeneous": {
+   "ru": "Однородные члены предложения",
+   "ky": "Бир өңчөй мүчөлөрдөгү тыныш белгилер",
+   "en": "Homogeneous parts"
+  },
+  "grammar_ky.punctuation.compound_sentences": {
+   "ru": "Сложные предложения",
+   "ky": "Татаал сүйлөмдөрдөгү тыныш белгилер",
+   "en": "Complex sentences"
+  },
+  "grammar_ky.punctuation.parenthetical": {
+   "ru": "Вводные слова",
+   "ky": "Киринди сөздөр",
+   "en": "Parenthetical words"
+  },
+  "grammar_ky.punctuation.direct_speech": {
+   "ru": "Прямая и косвенная речь",
+   "ky": "Төл сөз жана кыйыр сөз",
+   "en": "Direct and reported speech"
+  },
+  "grammar_ky.word_formation": {
+   "ru": "Словообразование (кыргызский язык)",
+   "ky": "Сөз жасоо",
+   "en": "Word formation (Kyrgyz)"
+  },
+  "grammar_ky.word_formation.affixation": {
+   "ru": "Аффиксальный способ",
+   "ky": "Мүчөлөр аркылуу сөз жасоо",
+   "en": "Affixation"
+  },
+  "grammar_ky.word_formation.compounding": {
+   "ru": "Словосложение",
+   "ky": "Сөздөрдү бириктирүү аркылуу сөз жасоо",
+   "en": "Compounding"
+  },
+  "grammar_ky.completion": {
+   "ru": "Дополнение (кыргызский язык)",
+   "ky": "Толуктоо",
+   "en": "Completion (Kyrgyz)"
+  },
+  "grammar_ky.completion.word_choice": {
+   "ru": "Выбор слова по смыслу",
+   "ky": "Сүйлөмгө ылайыктуу сөздү тандоо",
+   "en": "Choosing a word"
+  },
+  "grammar_ky.completion.affix_choice": {
+   "ru": "Выбор аффикса",
+   "ky": "Ылайыктуу мүчөнү тандоо",
+   "en": "Choosing an affix"
+  },
+  "grammar_ky.lexical_grammatical_meaning": {
+   "ru": "Лексико-грамматическое значение (кыргызский язык)",
+   "ky": "Лексикалык-грамматикалык маани",
+   "en": "Lexical and grammatical meaning (Kyrgyz)"
+  },
+  "grammar_ky.lexical_grammatical_meaning.parts_of_speech": {
+   "ru": "Части речи",
+   "ky": "Сөз түркүмдөрү",
+   "en": "Parts of speech"
+  },
+  "grammar_ky.lexical_grammatical_meaning.polysemy": {
+   "ru": "Многозначные слова и омонимы",
+   "ky": "Көп маанилүү сөздөр жана омонимдер",
+   "en": "Polysemy and homonyms"
+  },
+  "grammar_ky.lexical_grammatical_meaning.synonyms_antonyms": {
+   "ru": "Синонимы и антонимы",
+   "ky": "Синонимдер жана антонимдер",
+   "en": "Synonyms and antonyms"
+  },
+  "grammar_ky.usage_norms": {
+   "ru": "Нормы употребления (кыргызский язык)",
+   "ky": "Колдонуу нормалары",
+   "en": "Usage norms (Kyrgyz)"
+  },
+  "grammar_ky.usage_norms.case_endings": {
+   "ru": "Употребление падежных окончаний",
+   "ky": "Жөндөмө мүчөлөрүнүн колдонулушу",
+   "en": "Case endings"
+  },
+  "grammar_ky.usage_norms.verb_tenses": {
+   "ru": "Временные формы глагола",
+   "ky": "Этиштин чак формалары",
+   "en": "Verb tense forms"
+  },
+  "grammar_ky.usage_norms.word_links": {
+   "ru": "Связь слов в словосочетании",
+   "ky": "Сөз айкашындагы сөздөрдүн байланышы",
+   "en": "Word links in phrases"
+  },
+  "chemistry": {
+   "ru": "Химия",
+   "ky": "Химия",
+   "en": "Chemistry"
+  },
+  "chemistry.general": {
+   "ru": "Общая химия",
+   "ky": "Жалпы химия",
+   "en": "General chemistry"
+  },
+  "chemistry.general.atom_structure": {
+   "ru": "Строение атома",
+   "ky": "Атомдун түзүлүшү",
+   "en": "Atomic structure"
+  },
+  "chemistry.general.periodic_law": {
+   "ru": "Периодический закон и система",
+   "ky": "Мезгилдик мыйзам жана мезгилдик система",
+   "en": "Periodic law"
+  },
+  "chemistry.general.chemical_bond": {
+   "ru": "Химическая связь",
+   "ky": "Химиялык байланыш",
+   "en": "Chemical bonding"
+  },
+  "chemistry.general.rate_equilibrium": {
+   "ru": "Скорость реакции и химическое равновесие",
+   "ky": "Реакциянын ылдамдыгы жана химиялык тең салмактуулук",
+   "en": "Rate and equilibrium"
+  },
+  "chemistry.inorganic": {
+   "ru": "Неорганическая химия",
+   "ky": "Органикалык эмес химия",
+   "en": "Inorganic chemistry"
+  },
+  "chemistry.inorganic.compound_classes": {
+   "ru": "Классы неорганических соединений",
+   "ky": "Органикалык эмес бирикмелердин класстары",
+   "en": "Classes of inorganic compounds"
+  },
+  "chemistry.inorganic.metals": {
+   "ru": "Металлы",
+   "ky": "Металлдар",
+   "en": "Metals"
+  },
+  "chemistry.inorganic.nonmetals": {
+   "ru": "Неметаллы",
+   "ky": "Металл эместер",
+   "en": "Non-metals"
+  },
+  "chemistry.organic": {
+   "ru": "Органическая химия",
+   "ky": "Органикалык химия",
+   "en": "Organic chemistry"
+  },
+  "chemistry.organic.hydrocarbons": {
+   "ru": "Углеводороды",
+   "ky": "Көмүрсуутектер",
+   "en": "Hydrocarbons"
+  },
+  "chemistry.organic.oxygen_compounds": {
+   "ru": "Кислородсодержащие соединения",
+   "ky": "Курамында кычкылтек бар бирикмелер",
+   "en": "Oxygen-containing compounds"
+  },
+  "chemistry.organic.nitrogen_compounds": {
+   "ru": "Азотсодержащие соединения и белки",
+   "ky": "Курамында азот бар бирикмелер жана белоктор",
+   "en": "Nitrogen compounds and proteins"
+  },
+  "chemistry.solutions_reactions": {
+   "ru": "Растворы и химические реакции",
+   "ky": "Эритмелер жана химиялык реакциялар",
+   "en": "Solutions and reactions"
+  },
+  "chemistry.solutions_reactions.dissociation": {
+   "ru": "Электролитическая диссоциация",
+   "ky": "Электролиттик диссоциация",
+   "en": "Electrolytic dissociation"
+  },
+  "chemistry.solutions_reactions.redox": {
+   "ru": "Окислительно-восстановительные реакции",
+   "ky": "Кычкылдануу-калыбына келүү реакциялары",
+   "en": "Redox reactions"
+  },
+  "chemistry.solutions_reactions.concentration": {
+   "ru": "Растворы и их концентрация",
+   "ky": "Эритмелер жана алардын концентрациясы",
+   "en": "Solutions and concentration"
+  },
+  "chemistry.calculations": {
+   "ru": "Расчётные задачи",
+   "ky": "Эсептөө маселелери",
+   "en": "Calculations"
+  },
+  "chemistry.calculations.moles": {
+   "ru": "Количество вещества, моль",
+   "ky": "Заттын саны, моль",
+   "en": "Amount of substance"
+  },
+  "chemistry.calculations.mass_fraction": {
+   "ru": "Массовая доля",
+   "ky": "Массалык үлүш",
+   "en": "Mass fraction"
+  },
+  "chemistry.calculations.by_equation": {
+   "ru": "Расчёты по уравнениям реакций",
+   "ky": "Реакциянын теңдемеси боюнча эсептөөлөр",
+   "en": "Stoichiometry"
+  },
+  "biology": {
+   "ru": "Биология",
+   "ky": "Биология",
+   "en": "Biology"
+  },
+  "biology.cell": {
+   "ru": "Клетка",
+   "ky": "Клетка",
+   "en": "The cell"
+  },
+  "biology.cell.structure": {
+   "ru": "Строение клетки",
+   "ky": "Клетканын түзүлүшү",
+   "en": "Cell structure"
+  },
+  "biology.cell.division": {
+   "ru": "Деление клетки",
+   "ky": "Клетканын бөлүнүшү",
+   "en": "Cell division"
+  },
+  "biology.cell.metabolism": {
+   "ru": "Обмен веществ и энергии",
+   "ky": "Зат жана энергия алмашуу",
+   "en": "Metabolism"
+  },
+  "biology.botany": {
+   "ru": "Растения",
+   "ky": "Өсүмдүктөр",
+   "en": "Plants"
+  },
+  "biology.botany.organs": {
+   "ru": "Органы растений",
+   "ky": "Өсүмдүктүн органдары",
+   "en": "Plant organs"
+  },
+  "biology.botany.photosynthesis": {
+   "ru": "Фотосинтез",
+   "ky": "Фотосинтез",
+   "en": "Photosynthesis"
+  },
+  "biology.botany.taxonomy": {
+   "ru": "Систематика растений",
+   "ky": "Өсүмдүктөрдүн систематикасы",
+   "en": "Plant taxonomy"
+  },
+  "biology.zoology": {
+   "ru": "Животные",
+   "ky": "Жаныбарлар",
+   "en": "Animals"
+  },
+  "biology.zoology.invertebrates": {
+   "ru": "Беспозвоночные",
+   "ky": "Омурткасыздар",
+   "en": "Invertebrates"
+  },
+  "biology.zoology.vertebrates": {
+   "ru": "Позвоночные",
+   "ky": "Омурткалуулар",
+   "en": "Vertebrates"
+  },
+  "biology.human": {
+   "ru": "Человек и его здоровье",
+   "ky": "Адам жана анын ден соолугу",
+   "en": "Human biology"
+  },
+  "biology.human.organ_systems": {
+   "ru": "Системы органов",
+   "ky": "Органдар системалары",
+   "en": "Organ systems"
+  },
+  "biology.human.regulation": {
+   "ru": "Нервная и гуморальная регуляция",
+   "ky": "Нерв жана гумордук жөнгө салуу",
+   "en": "Nervous and hormonal regulation"
+  },
+  "biology.human.hygiene": {
+   "ru": "Гигиена и здоровье",
+   "ky": "Гигиена жана ден соолук",
+   "en": "Hygiene and health"
+  },
+  "biology.genetics": {
+   "ru": "Генетика",
+   "ky": "Генетика",
+   "en": "Genetics"
+  },
+  "biology.genetics.mendel": {
+   "ru": "Законы Менделя",
+   "ky": "Мендель мыйзамдары",
+   "en": "Mendel's laws"
+  },
+  "biology.genetics.heredity_variation": {
+   "ru": "Наследственность и изменчивость",
+   "ky": "Тукум куучулук жана өзгөргүчтүк",
+   "en": "Heredity and variation"
+  },
+  "biology.evolution": {
+   "ru": "Эволюция",
+   "ky": "Эволюция",
+   "en": "Evolution"
+  },
+  "biology.evolution.natural_selection": {
+   "ru": "Естественный отбор",
+   "ky": "Табигый тандалуу",
+   "en": "Natural selection"
+  },
+  "biology.ecology": {
+   "ru": "Экология",
+   "ky": "Экология",
+   "en": "Ecology"
+  },
+  "biology.ecology.ecosystems": {
+   "ru": "Экосистемы",
+   "ky": "Экосистемалар",
+   "en": "Ecosystems"
+  },
+  "biology.ecology.kyrgyzstan_nature": {
+   "ru": "Природа Кыргызстана и её охрана",
+   "ky": "Кыргызстандын жаратылышы жана аны коргоо",
+   "en": "Nature of Kyrgyzstan"
+  },
+  "physics": {
+   "ru": "Физика",
+   "ky": "Физика",
+   "en": "Physics"
+  },
+  "physics.mechanics": {
+   "ru": "Механика",
+   "ky": "Механика",
+   "en": "Mechanics"
+  },
+  "physics.mechanics.kinematics": {
+   "ru": "Кинематика",
+   "ky": "Кинематика",
+   "en": "Kinematics"
+  },
+  "physics.mechanics.dynamics": {
+   "ru": "Динамика, законы Ньютона",
+   "ky": "Динамика, Ньютондун мыйзамдары",
+   "en": "Dynamics, Newton's laws"
+  },
+  "physics.mechanics.conservation": {
+   "ru": "Законы сохранения",
+   "ky": "Сакталуу мыйзамдары",
+   "en": "Conservation laws"
+  },
+  "physics.mechanics.statics_hydrostatics": {
+   "ru": "Статика и гидростатика",
+   "ky": "Статика жана гидростатика",
+   "en": "Statics and hydrostatics"
+  },
+  "physics.molecular_thermo": {
+   "ru": "Молекулярная физика и термодинамика",
+   "ky": "Молекулалык физика жана термодинамика",
+   "en": "Molecular physics and thermodynamics"
+  },
+  "physics.molecular_thermo.gas_laws": {
+   "ru": "Газовые законы",
+   "ky": "Газ мыйзамдары",
+   "en": "Gas laws"
+  },
+  "physics.molecular_thermo.heat": {
+   "ru": "Количество теплоты",
+   "ky": "Жылуулуктун саны",
+   "en": "Heat"
+  },
+  "physics.electromagnetism": {
+   "ru": "Электричество и магнетизм",
+   "ky": "Электр жана магнетизм",
+   "en": "Electricity and magnetism"
+  },
+  "physics.electromagnetism.electrostatics": {
+   "ru": "Электростатика",
+   "ky": "Электростатика",
+   "en": "Electrostatics"
+  },
+  "physics.electromagnetism.dc_circuits": {
+   "ru": "Постоянный ток",
+   "ky": "Туруктуу ток",
+   "en": "DC circuits"
+  },
+  "physics.electromagnetism.magnetism_induction": {
+   "ru": "Магнитное поле и электромагнитная индукция",
+   "ky": "Магнит талаасы жана электромагниттик индукция",
+   "en": "Magnetism and induction"
+  },
+  "physics.oscillations_waves": {
+   "ru": "Колебания и волны",
+   "ky": "Термелүүлөр жана толкундар",
+   "en": "Oscillations and waves"
+  },
+  "physics.optics": {
+   "ru": "Оптика",
+   "ky": "Оптика",
+   "en": "Optics"
+  },
+  "physics.atomic_nuclear": {
+   "ru": "Атомная и ядерная физика",
+   "ky": "Атомдук жана ядролук физика",
+   "en": "Atomic and nuclear physics"
+  },
+  "history": {
+   "ru": "История",
+   "ky": "Тарых",
+   "en": "History"
+  },
+  "history.kg_ancient": {
+   "ru": "Древняя история Кыргызстана",
+   "ky": "Кыргызстандын байыркы тарыхы",
+   "en": "Ancient history of Kyrgyzstan"
+  },
+  "history.kg_ancient.saks_usuns": {
+   "ru": "Саки и усуни",
+   "ky": "Сактар жана усундар",
+   "en": "Saka and Wusun"
+  },
+  "history.kg_ancient.yenisei_kyrgyz": {
+   "ru": "Енисейские кыргызы",
+   "ky": "Энесай кыргыздары",
+   "en": "Yenisei Kyrgyz"
+  },
+  "history.kg_medieval": {
+   "ru": "Кыргызстан в Средние века",
+   "ky": "Орто кылымдардагы Кыргызстан",
+   "en": "Medieval Kyrgyzstan"
+  },
+  "history.kg_medieval.karakhanids": {
+   "ru": "Государство Караханидов",
+   "ky": "Карахандар мамлекети",
+   "en": "Karakhanids"
+  },
+  "history.kg_medieval.mongol_period": {
+   "ru": "Монгольский период",
+   "ky": "Монгол доору",
+   "en": "Mongol period"
+  },
+  "history.kg_new_time": {
+   "ru": "Кокандское ханство и Российская империя",
+   "ky": "Кокон хандыгы жана Россия империясы",
+   "en": "Kokand Khanate and the Russian Empire"
+  },
+  "history.kg_new_time.kokand": {
+   "ru": "Кокандское ханство",
+   "ky": "Кокон хандыгы",
+   "en": "Kokand Khanate"
+  },
+  "history.kg_new_time.russian_empire": {
+   "ru": "В составе Российской империи",
+   "ky": "Россия империясынын курамында",
+   "en": "Within the Russian Empire"
+  },
+  "history.kg_new_time.urkun_1916": {
+   "ru": "Восстание 1916 года (Уркун)",
+   "ky": "1916-жылкы көтөрүлүш (Үркүн)",
+   "en": "1916 uprising (Urkun)"
+  },
+  "history.kg_soviet": {
+   "ru": "Советский период",
+   "ky": "Совет доору",
+   "en": "Soviet period"
+  },
+  "history.kg_independence": {
+   "ru": "Независимый Кыргызстан",
+   "ky": "Эгемендүү Кыргызстан",
+   "en": "Independent Kyrgyzstan"
+  },
+  "history.world_ancient": {
+   "ru": "История Древнего мира",
+   "ky": "Байыркы дүйнөнүн тарыхы",
+   "en": "Ancient world"
+  },
+  "history.world_medieval": {
+   "ru": "История Средних веков",
+   "ky": "Орто кылымдардын тарыхы",
+   "en": "Middle Ages"
+  },
+  "history.world_modern": {
+   "ru": "Новая история",
+   "ky": "Жаңы доордун тарыхы",
+   "en": "Modern history"
+  },
+  "history.world_contemporary": {
+   "ru": "Новейшая история",
+   "ky": "Эң жаңы доордун тарыхы",
+   "en": "Contemporary history"
+  },
+  "english": {
+   "ru": "Английский язык",
+   "ky": "Англис тили",
+   "en": "English"
+  },
+  "english.tenses": {
+   "ru": "Времена глагола",
+   "ky": "Этиштин чактары",
+   "en": "Verb tenses"
+  },
+  "english.verb_forms": {
+   "ru": "Модальные глаголы, залог, условные предложения",
+   "ky": "Модалдык этиштер, этиштин мамилеси, шарттуу сүйлөмдөр",
+   "en": "Modals, passive, conditionals"
+  },
+  "english.articles_determiners": {
+   "ru": "Артикли и определители",
+   "ky": "Артиклдер жана аныктагычтар",
+   "en": "Articles and determiners"
+  },
+  "english.prepositions": {
+   "ru": "Предлоги",
+   "ky": "Предлогдор",
+   "en": "Prepositions"
+  },
+  "english.word_formation": {
+   "ru": "Словообразование",
+   "ky": "Сөз жасоо",
+   "en": "Word formation"
+  },
+  "english.vocabulary": {
+   "ru": "Лексика",
+   "ky": "Лексика",
+   "en": "Vocabulary"
+  },
+  "english.sentence_structure": {
+   "ru": "Строение предложения",
+   "ky": "Сүйлөмдүн түзүлүшү",
+   "en": "Sentence structure"
+  },
+  "english.reading_main_idea": {
+   "ru": "Чтение: основная мысль",
+   "ky": "Окуу: негизги ой",
+   "en": "Reading: main idea"
+  },
+  "english.reading_detail": {
+   "ru": "Чтение: детали",
+   "ky": "Окуу: деталдар",
+   "en": "Reading: detail"
+  },
+  "english.reading_inference": {
+   "ru": "Чтение: вывод",
+   "ky": "Окуу: корутунду",
+   "en": "Reading: inference"
+  },
+  "english.reading_vocabulary": {
+   "ru": "Чтение: значение слова",
+   "ky": "Окуу: сөздүн мааниси",
+   "en": "Reading: vocabulary"
+  },
+  "kyrgyz_lit": {
+   "ru": "Кыргызский язык и литература",
+   "ky": "Кыргыз тили жана адабияты",
+   "en": "Kyrgyz language and literature"
+  },
+  "kyrgyz.phonetics": {
+   "ru": "Фонетика",
+   "ky": "Фонетика",
+   "en": "Phonetics"
+  },
+  "kyrgyz.lexicology": {
+   "ru": "Лексика",
+   "ky": "Лексика",
+   "en": "Lexicology"
+  },
+  "kyrgyz.morphology": {
+   "ru": "Морфология",
+   "ky": "Морфология",
+   "en": "Morphology"
+  },
+  "kyrgyz.syntax": {
+   "ru": "Синтаксис",
+   "ky": "Синтаксис",
+   "en": "Syntax"
+  },
+  "kyrgyz.orthography_punctuation": {
+   "ru": "Орфография и пунктуация",
+   "ky": "Орфография жана пунктуация",
+   "en": "Spelling and punctuation"
+  },
+  "kyrgyz.text_work": {
+   "ru": "Работа с текстом",
+   "ky": "Текст менен иштөө",
+   "en": "Working with a text"
+  },
+  "kyrgyz_lit.oral_folklore_manas": {
+   "ru": "Устное народное творчество и эпос «Манас»",
+   "ky": "Оозеки чыгармачылык жана «Манас» эпосу",
+   "en": "Folklore and the Manas epic"
+  },
+  "kyrgyz_lit.akyns_zamanachy": {
+   "ru": "Акыны-импровизаторы и заманачы",
+   "ky": "Төкмө акындар жана заманачылар",
+   "en": "Improvising akyns and zamanachy poets"
+  },
+  "kyrgyz_lit.soviet_period": {
+   "ru": "Литература советского периода",
+   "ky": "Совет доорундагы адабият",
+   "en": "Soviet-period literature"
+  },
+  "kyrgyz_lit.contemporary": {
+   "ru": "Современная литература",
+   "ky": "Азыркы адабият",
+   "en": "Contemporary literature"
+  },
+  "kyrgyz_lit.theory": {
+   "ru": "Теория литературы",
+   "ky": "Адабият теориясы",
+   "en": "Literary theory"
+  },
+  "russian_lit": {
+   "ru": "Русский язык и литература",
+   "ky": "Орус тили жана адабияты",
+   "en": "Russian language and literature"
+  },
+  "russian.phonetics": {
+   "ru": "Фонетика и орфоэпия",
+   "ky": "Фонетика жана орфоэпия",
+   "en": "Phonetics and orthoepy"
+  },
+  "russian.lexicology": {
+   "ru": "Лексика и фразеология",
+   "ky": "Лексика жана фразеология",
+   "en": "Lexicology and idioms"
+  },
+  "russian.morphology": {
+   "ru": "Морфология",
+   "ky": "Морфология",
+   "en": "Morphology"
+  },
+  "russian.syntax": {
+   "ru": "Синтаксис",
+   "ky": "Синтаксис",
+   "en": "Syntax"
+  },
+  "russian.orthography": {
+   "ru": "Орфография",
+   "ky": "Орфография",
+   "en": "Spelling"
+  },
+  "russian.punctuation": {
+   "ru": "Пунктуация",
+   "ky": "Пунктуация",
+   "en": "Punctuation"
+  },
+  "russian.text_work": {
+   "ru": "Работа с текстом",
+   "ky": "Текст менен иштөө",
+   "en": "Working with a text"
+  },
+  "russian_lit.old_and_18th_century": {
+   "ru": "Древнерусская литература и литература XVIII века",
+   "ky": "Байыркы орус адабияты жана XVIII кылымдын адабияты",
+   "en": "Old Russian and 18th-century literature"
+  },
+  "russian_lit.century_19": {
+   "ru": "Литература XIX века",
+   "ky": "XIX кылымдын адабияты",
+   "en": "19th-century literature"
+  },
+  "russian_lit.century_20": {
+   "ru": "Литература XX века",
+   "ky": "XX кылымдын адабияты",
+   "en": "20th-century literature"
+  },
+  "russian_lit.theory": {
+   "ru": "Теория литературы",
+   "ky": "Адабият теориясы",
+   "en": "Literary theory"
+  },
+  "state_language": {
+   "ru": "Государственный язык",
+   "ky": "Мамлекеттик тил",
+   "en": "State language"
+  },
+  "state_language.lexicon": {
+   "ru": "Лексика",
+   "ky": "Лексика",
+   "en": "Vocabulary"
+  },
+  "state_language.morphology": {
+   "ru": "Морфология",
+   "ky": "Морфология",
+   "en": "Morphology"
+  },
+  "state_language.syntax": {
+   "ru": "Синтаксис",
+   "ky": "Синтаксис",
+   "en": "Syntax"
+  },
+  "state_language.phrases_style": {
+   "ru": "Словосочетания и стилистика",
+   "ky": "Сөз айкаштары жана стилистика",
+   "en": "Phrases and style"
+  },
+  "state_language.speech_culture": {
+   "ru": "Культура речи",
+   "ky": "Кеп маданияты",
+   "en": "Speech culture"
+  },
+  "state_language.reading_main_idea": {
+   "ru": "Чтение: основная мысль",
+   "ky": "Окуу: тексттин негизги ою",
+   "en": "Reading: main idea"
+  },
+  "state_language.reading_detail": {
+   "ru": "Чтение: информация в тексте",
+   "ky": "Окуу: тексттеги маалымат",
+   "en": "Reading: detail"
+  },
+  "state_language.reading_inference": {
+   "ru": "Чтение: вывод",
+   "ky": "Окуу: корутунду чыгаруу",
+   "en": "Reading: inference"
+  },
+  "state_language.reading_vocabulary": {
+   "ru": "Чтение: значение слова в тексте",
+   "ky": "Окуу: сөздүн тексттеги мааниси",
+   "en": "Reading: vocabulary"
+  }
+ }
+}

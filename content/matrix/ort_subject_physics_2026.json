@@ -1,0 +1,324 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_physics_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ru",
+      "sections": [
+        {
+          "section_id": "physics",
+          "order": 1,
+          "subject_id": "physics",
+          "duration_minutes": 80,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_physics_2026/physics/physics",
+              "section_id": "physics",
+              "part_id": "physics",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "physics.mechanics",
+                  "subject_id": "physics",
+                  "title_ru": "Механика",
+                  "grades": [
+                    7,
+                    10
+                  ],
+                  "weight": 12,
+                  "target": 12,
+                  "min": 8,
+                  "max": 16,
+                  "difficulty_targets": {
+                    "1": 4,
+                    "2": 6,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "physics.mechanics.kinematics",
+                    "physics.mechanics.dynamics",
+                    "physics.mechanics.conservation",
+                    "physics.mechanics.statics_hydrostatics"
+                  ]
+                },
+                {
+                  "topic_id": "physics.molecular_thermo",
+                  "subject_id": "physics",
+                  "title_ru": "Молекулярная физика и термодинамика",
+                  "grades": [
+                    8,
+                    10
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "physics.molecular_thermo.gas_laws",
+                    "physics.molecular_thermo.heat"
+                  ]
+                },
+                {
+                  "topic_id": "physics.electromagnetism",
+                  "subject_id": "physics",
+                  "title_ru": "Электричество и магнетизм",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 10,
+                  "target": 10,
+                  "min": 7,
+                  "max": 13,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 5,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "physics.electromagnetism.electrostatics",
+                    "physics.electromagnetism.dc_circuits",
+                    "physics.electromagnetism.magnetism_induction"
+                  ]
+                },
+                {
+                  "topic_id": "physics.oscillations_waves",
+                  "subject_id": "physics",
+                  "title_ru": "Колебания и волны",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "physics.optics",
+                  "subject_id": "physics",
+                  "title_ru": "Оптика",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "physics.atomic_nuclear",
+                  "subject_id": "physics",
+                  "title_ru": "Атомная и ядерная физика",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "physics",
+          "order": 1,
+          "subject_id": "physics",
+          "duration_minutes": 80,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_physics_2026/physics/physics",
+              "section_id": "physics",
+              "part_id": "physics",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "physics.mechanics",
+                  "subject_id": "physics",
+                  "title_ru": "Механика",
+                  "grades": [
+                    7,
+                    10
+                  ],
+                  "weight": 12,
+                  "target": 12,
+                  "min": 8,
+                  "max": 16,
+                  "difficulty_targets": {
+                    "1": 4,
+                    "2": 6,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "physics.mechanics.kinematics",
+                    "physics.mechanics.dynamics",
+                    "physics.mechanics.conservation",
+                    "physics.mechanics.statics_hydrostatics"
+                  ]
+                },
+                {
+                  "topic_id": "physics.molecular_thermo",
+                  "subject_id": "physics",
+                  "title_ru": "Молекулярная физика и термодинамика",
+                  "grades": [
+                    8,
+                    10
+                  ],
+                  "weight": 6,
+                  "target": 6,
+                  "min": 4,
+                  "max": 8,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 3,
+                    "3": 1
+                  },
+                  "subtopics": [
+                    "physics.molecular_thermo.gas_laws",
+                    "physics.molecular_thermo.heat"
+                  ]
+                },
+                {
+                  "topic_id": "physics.electromagnetism",
+                  "subject_id": "physics",
+                  "title_ru": "Электричество и магнетизм",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 10,
+                  "target": 10,
+                  "min": 7,
+                  "max": 13,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 5,
+                    "3": 2
+                  },
+                  "subtopics": [
+                    "physics.electromagnetism.electrostatics",
+                    "physics.electromagnetism.dc_circuits",
+                    "physics.electromagnetism.magnetism_induction"
+                  ]
+                },
+                {
+                  "topic_id": "physics.oscillations_waves",
+                  "subject_id": "physics",
+                  "title_ru": "Колебания и волны",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "physics.optics",
+                  "subject_id": "physics",
+                  "title_ru": "Оптика",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "physics.atomic_nuclear",
+                  "subject_id": "physics",
+                  "title_ru": "Атомная и ядерная физика",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

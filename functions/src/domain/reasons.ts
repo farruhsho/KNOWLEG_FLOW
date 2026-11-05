@@ -1,0 +1,121 @@
+/**
+ * `details.reason` codes carried by every HttpsError the backend throws.
+ * Must match docs/modernization/ARCHITECTURE.md §3 and
+ * lib/core/backend/backend_contract.dart (BackendReasons).
+ */
+export const Reasons = {
+  NO_ENTITLEMENT: 'NO_ENTITLEMENT',
+  VARIANT_NOT_AVAILABLE: 'VARIANT_NOT_AVAILABLE',
+  ATTEMPT_NOT_FOUND: 'ATTEMPT_NOT_FOUND',
+  ATTEMPT_NOT_IN_PROGRESS: 'ATTEMPT_NOT_IN_PROGRESS',
+  WRONG_SECTION: 'WRONG_SECTION',
+  PURCHASE_INVALID: 'PURCHASE_INVALID',
+  PURCHASE_ACCOUNT_MISMATCH: 'PURCHASE_ACCOUNT_MISMATCH',
+  PURCHASE_PENDING: 'PURCHASE_PENDING',
+  AI_QUOTA_EXCEEDED: 'AI_QUOTA_EXCEEDED',
+  AI_DISABLED: 'AI_DISABLED',
+  AI_EXAM_IN_PROGRESS: 'AI_EXAM_IN_PROGRESS',
+  FORBIDDEN_ROLE: 'FORBIDDEN_ROLE',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
+  /** The caller's users/{uid}.is_banned is true (moderation, ARCHITECTURE §2). */
+  USER_BANNED: 'USER_BANNED',
+  /** accountDelete needs a sign-in (ID token auth_time) from the last 5 minutes. */
+  REQUIRES_RECENT_LOGIN: 'REQUIRES_RECENT_LOGIN',
+  // Phase 3 (ARCHITECTURE §9).
+  /** Unknown, malformed or inactive promo / referral / friend / group code. */
+  CODE_INVALID: 'CODE_INVALID',
+  /** Promo code past its expires_at. */
+  CODE_EXPIRED: 'CODE_EXPIRED',
+  /** Promo code reached max_redemptions. */
+  CODE_EXHAUSTED: 'CODE_EXHAUSTED',
+  /** This account already redeemed the promo code. */
+  ALREADY_REDEEMED: 'ALREADY_REDEEMED',
+  /** Daily cap reached (promo attempts 10/day, broadcasts 3/day). */
+  RATE_LIMITED: 'RATE_LIMITED',
+  /** referralApply: own code, a different code already applied, or the account already has exams/purchases. */
+  REFERRAL_NOT_ALLOWED: 'REFERRAL_NOT_ALLOWED',
+  /** Count limit: 50 friends, 5 groups (own or joined), group size. */
+  LIMIT_REACHED: 'LIMIT_REACHED',
+  /** Group action reserved for the group owner. */
+  NOT_GROUP_OWNER: 'NOT_GROUP_OWNER',
+  // Phase 4 (ARCHITECTURE §10).
+  /** The verified bank cannot fill a blueprint part even with repeats (details: section_id, part_id); nothing is charged. */
+  POOL_TOO_SMALL: 'POOL_TOO_SMALL',
+  /** Strict ORT style: the section can be submitted only when its time is over (details: deadlineAt, serverNow). */
+  SECTION_NOT_OVER: 'SECTION_NOT_OVER',
+  /** No payment provider is configured (PAYMENT_PROVIDER=none, or sandbox outside the emulator). */
+  PAYMENTS_DISABLED: 'PAYMENTS_DISABLED',
+  /** Unknown payment order, or an order of another account. */
+  ORDER_NOT_FOUND: 'ORDER_NOT_FOUND',
+  /** Unknown or disabled web product (config/pricing.web_products). */
+  PRODUCT_UNAVAILABLE: 'PRODUCT_UNAVAILABLE',
+} as const;
+
+export type Reason = (typeof Reasons)[keyof typeof Reasons];
+
+/** Subset of HttpsError codes the domain layer uses. */
+export type ErrorCode =
+  | 'invalid-argument'
+  | 'failed-precondition'
+  | 'not-found'
+  | 'permission-denied'
+  | 'already-exists'
+  | 'resource-exhausted'
+  | 'unauthenticated'
+  | 'unavailable'
+  | 'internal';
+
+/** Default HttpsError code for each reason (handlers may override). */
+export const defaultCodeFor: Record<Reason, ErrorCode> = {
+  NO_ENTITLEMENT: 'failed-precondition',
+  VARIANT_NOT_AVAILABLE: 'failed-precondition',
+  ATTEMPT_NOT_FOUND: 'not-found',
+  ATTEMPT_NOT_IN_PROGRESS: 'failed-precondition',
+  WRONG_SECTION: 'failed-precondition',
+  PURCHASE_INVALID: 'invalid-argument',
+  PURCHASE_ACCOUNT_MISMATCH: 'permission-denied',
+  PURCHASE_PENDING: 'failed-precondition',
+  AI_QUOTA_EXCEEDED: 'resource-exhausted',
+  AI_DISABLED: 'failed-precondition',
+  AI_EXAM_IN_PROGRESS: 'failed-precondition',
+  FORBIDDEN_ROLE: 'permission-denied',
+  VALIDATION_FAILED: 'invalid-argument',
+  USER_BANNED: 'permission-denied',
+  REQUIRES_RECENT_LOGIN: 'failed-precondition',
+  CODE_INVALID: 'not-found',
+  CODE_EXPIRED: 'failed-precondition',
+  CODE_EXHAUSTED: 'resource-exhausted',
+  ALREADY_REDEEMED: 'already-exists',
+  RATE_LIMITED: 'resource-exhausted',
+  REFERRAL_NOT_ALLOWED: 'failed-precondition',
+  LIMIT_REACHED: 'resource-exhausted',
+  NOT_GROUP_OWNER: 'permission-denied',
+  POOL_TOO_SMALL: 'failed-precondition',
+  SECTION_NOT_OVER: 'failed-precondition',
+  PAYMENTS_DISABLED: 'failed-precondition',
+  ORDER_NOT_FOUND: 'not-found',
+  PRODUCT_UNAVAILABLE: 'failed-precondition',
+};
+
+/**
+ * Error thrown by pure domain code. Handlers translate it into an
+ * HttpsError with `details: {reason}` (see handlers/common.ts), so the
+ * domain layer stays free of Firebase imports and is unit-testable.
+ */
+export class DomainError extends Error {
+  readonly reason: Reason;
+  readonly code: ErrorCode;
+  readonly extra: Record<string, unknown> | undefined;
+
+  constructor(reason: Reason, message?: string, extra?: Record<string, unknown>, code?: ErrorCode) {
+    super(message ?? reason);
+    this.name = 'DomainError';
+    this.reason = reason;
+    this.code = code ?? defaultCodeFor[reason];
+    this.extra = extra;
+  }
+}
+
+export function validationError(message: string, extra?: Record<string, unknown>): DomainError {
+  return new DomainError(Reasons.VALIDATION_FAILED, message, extra);
+}

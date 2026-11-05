@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_english_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "en",
+      "sections": [
+        {
+          "section_id": "english",
+          "order": 1,
+          "subject_id": "english",
+          "duration_minutes": 60,
+          "question_count": 50,
+          "parts": [
+            {
+              "slot": "ort_subject_english_2026/english/english_lexgram",
+              "section_id": "english",
+              "part_id": "english_lexgram",
+              "item_type": "single_choice",
+              "question_count": 40,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": false,
+              "difficulty_counts": {
+                "1": 12,
+                "2": 20,
+                "3": 8
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "english.tenses",
+                  "subject_id": "english",
+                  "title_ru": "Времена глагола",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.verb_forms",
+                  "subject_id": "english",
+                  "title_ru": "Модальные глаголы, залог, условные предложения",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 3,
+                    "2": 4,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.articles_determiners",
+                  "subject_id": "english",
+                  "title_ru": "Артикли и определители",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.prepositions",
+                  "subject_id": "english",
+                  "title_ru": "Предлоги",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.word_formation",
+                  "subject_id": "english",
+                  "title_ru": "Словообразование",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.vocabulary",
+                  "subject_id": "english",
+                  "title_ru": "Лексика",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 8,
+                  "target": 8,
+                  "min": 5,
+                  "max": 11,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 4,
+                    "3": 2
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.sentence_structure",
+                  "subject_id": "english",
+                  "title_ru": "Строение предложения",
+                  "grades": [
+                    7,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            },
+            {
+              "slot": "ort_subject_english_2026/english/english_reading",
+              "section_id": "english",
+              "part_id": "english_reading",
+              "item_type": "text_based",
+              "question_count": 10,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": false,
+              "difficulty_counts": {
+                "1": 3,
+                "2": 5,
+                "3": 2
+              },
+              "passage_plan": {
+                "standalone_texts": 2,
+                "paired_texts": 0,
+                "questions_per_text": 5,
+                "words": [
+                  200,
+                  400
+                ]
+              },
+              "topics": [
+                {
+                  "topic_id": "english.reading_main_idea",
+                  "subject_id": "english",
+                  "title_ru": "Чтение: основная мысль",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.reading_detail",
+                  "subject_id": "english",
+                  "title_ru": "Чтение: детали",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.reading_inference",
+                  "subject_id": "english",
+                  "title_ru": "Чтение: вывод",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "english.reading_vocabulary",
+                  "subject_id": "english",
+                  "title_ru": "Чтение: значение слова",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 1,
+                  "target": 1,
+                  "min": 0,
+                  "max": 2,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 0,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

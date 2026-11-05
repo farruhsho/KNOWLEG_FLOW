@@ -1,14 +1,27 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fl_chart/fl_chart.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/models/user_progress_model.dart';
-import '../../../../shared/services/firebase_data_service.dart';
-import '../../../../shared/widgets/loading_view.dart';
-import '../../../../shared/widgets/error_view.dart';
-import '../../../../providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-/// Progress page with detailed analytics and charts
+import '../../../../core/content/topic_names.dart';
+import '../../../../core/design/tokens.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../core/utils/content_locale.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/exam_attempt_summary.dart';
+import '../../../../shared/models/user_progress_model.dart';
+import '../../../../shared/widgets/error_view.dart';
+import '../../../../shared/widgets/loading_view.dart';
+import '../../../gamification/gamification_routes.dart';
+import '../../../social/presentation/social_messages.dart';
+import '../../data/progress_repository.dart';
+import '../../domain/recommendations.dart';
+import '../widgets/motivation_risk_card.dart';
+
+/// Progress built only from real data (GAM-08/09): server stats, practice
+/// aggregates, completed exam attempts and the mistakes queue. No invented
+/// trends, no "AI forecast", no ORT score from practice.
 class ProgressPage extends ConsumerStatefulWidget {
   const ProgressPage({super.key});
 
@@ -16,856 +29,519 @@ class ProgressPage extends ConsumerStatefulWidget {
   ConsumerState<ProgressPage> createState() => _ProgressPageState();
 }
 
-class _ProgressPageState extends ConsumerState<ProgressPage>
-    with SingleTickerProviderStateMixin {
-  final _dataService = FirebaseDataService();
-  UserProgressModel? _progress;
-  bool _isLoading = true;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _slideAnimation;
+/// Display labels for ids shown on the progress page (UX-02): learning
+/// subject titles and blueprint section titles first, then the bundled
+/// curriculum names ([TopicNames]); never a raw id.
+class ProgressLabels {
+  const ProgressLabels({
+    required this.lang,
+    required this.names,
+    this.subjectTitles = const {},
+    this.sectionTitles = const {},
+  });
+
+  final String lang;
+  final TopicNames names;
+  final Map<String, String> subjectTitles;
+  final Map<String, Map<String, String>> sectionTitles;
+
+  String subject(String? id) {
+    if (id == null || id.isEmpty) return '';
+    final t = subjectTitles[id];
+    return (t != null && t.trim().isNotEmpty) ? t : names.label(id, lang);
+  }
+
+  String section(String? id) {
+    if (id == null || id.isEmpty) return '';
+    final t = sectionTitles[id];
+    if (t != null) {
+      final v = pickLocalized(t, lang);
+      if (v.trim().isNotEmpty) return v;
+    }
+    return subject(id);
+  }
+
+  String topic(String? id) => (id == null || id.isEmpty) ? '' : names.label(id, lang);
+}
+
+class _ProgressPageState extends ConsumerState<ProgressPage> {
+  final _repo = ProgressRepository();
+  Future<ProgressSnapshot>? _future;
+
+  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
-    );
-    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
-      ),
-    );
-    _loadProgress();
+    final uid = _uid;
+    if (uid != null) _future = _repo.load(uid);
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadProgress() async {
+  Future<void> _reload() async {
+    final uid = _uid;
+    if (uid == null) return;
+    final f = _repo.load(uid);
+    setState(() => _future = f);
     try {
-      final authService = ref.read(authServiceProvider);
-      final currentUser = authService.currentUser;
-
-      if (currentUser != null) {
-        final progress = await _dataService.getUserProgress(currentUser.uid);
-        if (mounted) {
-          setState(() {
-            _progress = progress;
-            _isLoading = false;
-          });
-          _animationController.forward();
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      await f;
+    } catch (_) {
+      // The FutureBuilder shows the error state with a retry.
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final future = _future;
+    final names = ref.watch(topicNamesProvider).valueOrNull ?? TopicNames.empty;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Мой прогресс'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {
-                _isLoading = true;
-              });
-              _loadProgress();
-            },
+      appBar: AppBar(title: Text(l.learnProgressTitle)),
+      body: future == null
+          ? EmptyView(
+              icon: Icons.lock_outline,
+              message: l.learnSignInToSave,
+              action: FilledButton(onPressed: () => context.go(RoutePaths.login), child: Text(l.learnSignIn)),
+            )
+          : FutureBuilder<ProgressSnapshot>(
+              future: future,
+              builder: (context, snap) {
+                if (snap.connectionState != ConnectionState.done) return LoadingView(message: l.loading);
+                if (snap.hasError) return ErrorView.forError(context, snap.error, onRetry: _reload);
+                return RefreshIndicator(onRefresh: _reload, child: _content(context, l, snap.data!, names));
+              },
+            ),
+    );
+  }
+
+  Widget _content(BuildContext context, AppLocalizations l, ProgressSnapshot s, TopicNames names) {
+    final gutter = AppSpacing.gutter(context);
+    final lang = contentLanguageOf(context);
+    final theme = Theme.of(context);
+    final p = s.progress;
+    final stats = s.stats;
+    final completed = s.completedAttempts;
+    final labels = ProgressLabels(
+      lang: lang,
+      names: names,
+      subjectTitles: {for (final x in s.subjects) x.id: x.getTitle(lang)},
+      sectionTitles: s.sectionTitles,
+    );
+    String sectionTitle(String id) => labels.section(id);
+    String blueprintTitle(String id) =>
+        s.blueprintTitles[id] != null ? pickLocalized(s.blueprintTitles[id]!, lang) : id;
+
+    final recs = RecommendationEngine.build(progress: p, attempts: s.attempts ?? const [], dueMistakes: s.dueMistakes);
+    final practiceAcc = p?.practiceAccuracy;
+    final minutes = ((p?.practiceSeconds ?? 0) / 60).round();
+    final risk = s.motivationRisk(DateTime.now());
+
+    final children = <Widget>[
+      if (risk != null) ...[
+        MotivationRiskCard(risk: risk),
+        const SizedBox(height: AppSpacing.lg),
+      ],
+      _Grid(items: [
+        (l.learnStatLevel, stats == null ? '—' : '${stats.level}', l.learnXpTotal(stats?.xp ?? 0)),
+        (l.learnStatStreak, '${stats?.liveStreak(DateTime.now()) ?? 0}', l.learnStatBestStreak(stats?.bestStreak ?? 0)),
+        (l.learnStatAnswered, '${p?.practiceAnswered ?? 0}', l.learnStatSessions(p?.practiceSessions ?? 0)),
+        (l.learnStatPracticeAccuracy, practiceAcc == null ? '—' : '${(practiceAcc * 100).round()}%', l.learnStatPracticeOnly),
+        (l.learnStatPracticeTime, l.learnDurationMinutes(minutes), l.learnStatPracticeTimeHint),
+        (l.learnStatExams, '${completed.length}', l.learnStatLessonsCompleted(p?.completedLessons.length ?? 0)),
+      ]),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.learnRecommendationsTitle),
+      if (recs.isEmpty)
+        _Muted(l.learnRecommendationsNone)
+      else
+        for (final r in recs)
+          _RecommendationCard(
+            rec: r,
+            title: _recTitle(l, r, labels),
+            body: _recBody(l, r),
+            // Reviewing mistakes changes the due count: refresh on return.
+            onReturn: _reload,
           ),
-        ],
-      ),
-      body: _isLoading
-          ? const LoadingView(message: 'Загрузка прогресса...')
-          : _progress == null
-              ? ErrorView(
-                  message: 'Нет данных о прогрессе',
-                  onRetry: _loadProgress,
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadProgress,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Stats overview
-                        _buildAnimatedWidget(_buildStatsOverview(), 0),
-                        const SizedBox(height: 24),
-
-                        // AI Forecast
-                        _buildAnimatedWidget(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Прогноз ОРТ',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildAIForecast(),
-                            ],
-                          ),
-                          1,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Score chart
-                        _buildAnimatedWidget(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Динамика баллов',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildScoreChart(),
-                            ],
-                          ),
-                          2,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Multi-line subject chart
-                        _buildAnimatedWidget(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Прогресс по предметам',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildMultiLineSubjectChart(),
-                            ],
-                          ),
-                          3,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Subject progress bars
-                        _buildAnimatedWidget(
-                          _buildSubjectProgress(),
-                          4,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Error heatmap
-                        _buildAnimatedWidget(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Типичные ошибки',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildErrorHeatmap(),
-                            ],
-                          ),
-                          5,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-    );
-  }
-
-  Widget _buildStatsOverview() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    context,
-                    label: 'Тестов пройдено',
-                    value: '${_progress!.testsCompleted}',
-                    icon: Icons.check_circle,
-                    color: AppColors.success,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildStatItem(
-                    context,
-                    label: 'Средний балл',
-                    value: '${_progress!.averageScore.toInt()}',
-                    icon: Icons.trending_up,
-                    color: AppColors.info,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    context,
-                    label: 'Дней подряд',
-                    value: '${_progress!.streakDays}',
-                    icon: Icons.local_fire_department,
-                    color: AppColors.warning,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildStatItem(
-                    context,
-                    label: 'Часов обучения',
-                    value: '${_progress!.totalStudyHours}',
-                    icon: Icons.access_time,
-                    color: AppColors.accent,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-    BuildContext context, {
-    required String label,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodySmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.learnExamResultsTitle),
+      if (s.attempts == null)
+        _Muted(l.learnExamHistoryUnavailable)
+      else if (completed.isEmpty)
+        _Muted(l.learnExamHistoryEmpty)
+      else ...[
+        ..._bestByDirection(completed).entries.map((e) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.emoji_events_outlined),
+              title: Text(blueprintTitle(e.key)),
+              trailing: Text('${e.value.toStringAsFixed(1)}%', style: theme.textTheme.titleMedium),
+              subtitle: Text(l.learnBestResult),
+            )),
+        _Muted(l.learnExamResultUnofficial),
+        const SizedBox(height: AppSpacing.md),
+        Text(l.learnExamHistoryTitle, style: theme.textTheme.titleSmall),
+        for (final a in completed.take(10))
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(blueprintTitle(a.blueprintId), maxLines: 1, overflow: TextOverflow.ellipsis),
+            subtitle: Text(_date(context, a.completedAt)),
+            trailing: Text('${a.correct}/${a.total} · ${(a.percent ?? 0).round()}%'),
+            onTap: () => context.push(RoutePaths.examResultFor(a.id)),
           ),
-        ],
-      ),
-    );
-  }
+        TextButton(onPressed: () => context.push(RoutePaths.examHistory), child: Text(l.learnExamHistoryAll)),
+        ..._sectionBars(context, l, completed, sectionTitle),
+      ],
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.learnPracticeBySubjectTitle),
+      if ((p?.practiceBySubject ?? const {}).isEmpty)
+        _Muted(l.learnPracticeBySubjectEmpty)
+      else
+        for (final e in (p!.practiceBySubject.entries.toList()..sort((a, b) => b.value.answered.compareTo(a.value.answered))))
+          _AccuracyBar(label: labels.subject(e.key), tally: e.value),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.learnWeakTopicsTitle),
+      ..._weakTopics(context, l, p, labels),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.socialFrequentMistakesTitle),
+      ..._frequentMistakes(context, l, s.frequentMistakes, labels),
+      const SizedBox(height: AppSpacing.xl),
+      _Heading(l.socialTopicTimeTitle),
+      ..._topicTimes(context, l, s.topicTime, labels),
+    ];
 
-  Widget _buildScoreChart() {
-    // Use real weekly trends data
-    final weeklyTrends = _progress?.weeklyTrends ?? {};
-    
-    List<FlSpot> spots;
-    if (weeklyTrends.isNotEmpty) {
-      final sortedWeeks = weeklyTrends.keys.toList()..sort();
-      spots = sortedWeeks.asMap().entries.map((entry) {
-        final index = entry.key.toDouble();
-        final week = entry.value;
-        final score = weeklyTrends[week]?.toDouble() ?? 0;
-        return FlSpot(index, score);
-      }).toList();
-    } else {
-      // Fallback to single point
-      final avgScore = _progress?.averageScore ?? 0;
-      spots = [FlSpot(0, avgScore.toDouble())];
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SizedBox(
-          height: 200,
-          child: LineChart(
-            LineChartData(
-              gridData: const FlGridData(
-                show: true,
-                drawVerticalLine: true,
-                horizontalInterval: 20,
-                verticalInterval: 1,
-              ),
-              titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 40,
-                    getTitlesWidget: (value, meta) {
-                      return Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(fontSize: 10),
-                      );
-                    },
-                  ),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      if (weeklyTrends.isEmpty) return const Text('');
-                      final sortedWeeks = weeklyTrends.keys.toList()..sort();
-                      final index = value.toInt();
-                      if (index >= 0 && index < sortedWeeks.length) {
-                        return Text(
-                          'Н${index + 1}',
-                          style: const TextStyle(fontSize: 10),
-                        );
-                      }
-                      return const Text('');
-                    },
-                  ),
-                ),
-                rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-              ),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: true,
-                  color: AppColors.primary,
-                  barWidth: 3,
-                  isStrokeCapRound: true,
-                  dotData: const FlDotData(show: true),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubjectProgress() {
-    if (_progress!.subjectProgress.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: Text(
-              'Начните проходить тесты, чтобы увидеть прогресс',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: _progress!.subjectProgress.entries.map((entry) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        entry.key,
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '${(entry.value * 100).toInt()}%',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: entry.value,
-                    backgroundColor: AppColors.grey200,
-                    minHeight: 8,
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorHeatmap() {
-    // Use real errors by topic data
-    final errorsByTopic = _progress?.errorsByTopic ?? {};
-    
-    List<BarChartGroupData> barGroups;
-    List<String> topics;
-    
-    if (errorsByTopic.isNotEmpty) {
-      topics = errorsByTopic.keys.toList();
-      barGroups = topics.asMap().entries.map((entry) {
-        final index = entry.key;
-        final topic = entry.value;
-        final errors = errorsByTopic[topic]?.toDouble() ?? 0;
-        
-        return BarChartGroupData(
-          x: index,
-          barRods: [
-            BarChartRodData(
-              toY: errors,
-              color: _getErrorColor(errors.toInt()),
-              width: 16,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-            ),
-          ],
-        );
-      }).toList();
-    } else {
-      // Fallback to empty state
-      topics = ['Нет данных'];
-      barGroups = [
-        BarChartGroupData(
-          x: 0,
-          barRods: [
-            BarChartRodData(
-              toY: 0,
-              color: AppColors.grey200,
-              width: 16,
-            ),
-          ],
-        ),
-      ];
-    }
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (errorsByTopic.isNotEmpty)
-              Text(
-                'Топ ошибок по темам',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 200,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: errorsByTopic.values.isEmpty 
-                      ? 10 
-                      : (errorsByTopic.values.reduce((a, b) => a > b ? a : b) + 5).toDouble(),
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        if (groupIndex < topics.length) {
-                          return BarTooltipItem(
-                            '${topics[groupIndex]}\n${rod.toY.toInt()} ошибок',
-                            const TextStyle(color: Colors.white),
-                          );
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final index = value.toInt();
-                          if (index >= 0 && index < topics.length) {
-                            final topic = topics[index];
-                            final displayText = topic.length > 8 
-                                ? '${topic.substring(0, 6)}...' 
-                                : topic;
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                displayText,
-                                style: const TextStyle(fontSize: 10),
-                              ),
-                            );
-                          }
-                          return const Text('');
-                        },
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            value.toInt().toString(),
-                            style: const TextStyle(fontSize: 10),
-                          );
-                        },
-                      ),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  barGroups: barGroups,
-                  gridData: const FlGridData(show: false),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getErrorColor(int errorCount) {
-    if (errorCount >= 10) return AppColors.error;
-    if (errorCount >= 5) return AppColors.warning;
-    if (errorCount >= 2) return AppColors.info;
-    return AppColors.success;
-  }
-
-  /// Wrap widget with fade and slide animation
-  Widget _buildAnimatedWidget(Widget child, int index) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        final delay = index * 0.1;
-        final adjustedValue = (_animationController.value - delay).clamp(0.0, 1.0);
-        
-        return Opacity(
-          opacity: Tween<double>(begin: 0.0, end: 1.0)
-              .transform(adjustedValue),
-          child: Transform.translate(
-            offset: Offset(
-              0,
-              Tween<double>(begin: 30.0, end: 0.0).transform(adjustedValue),
-            ),
-            child: child,
-          ),
-        );
-      },
-      child: child,
-    );
-  }
-
-  /// Build AI forecast card with predicted ORT score
-  Widget _buildAIForecast() {
-    final predictedScore = _progress?.aiPredictedScore ?? 0;
-    final currentScore = _progress?.averageScore ?? 0;
-    final confidence = _calculateConfidence(currentScore, predictedScore);
-    
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Icons.auto_awesome,
-                    color: AppColors.primary,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Прогнозируемый балл ОРТ',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'На основе вашего прогресса',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildScoreIndicator(
-                  context,
-                  label: 'Текущий',
-                  score: currentScore,
-                  color: AppColors.info,
-                ),
-                Container(
-                  height: 60,
-                  width: 1,
-                  color: Colors.grey[300],
-                ),
-                _buildScoreIndicator(
-                  context,
-                  label: 'Прогноз',
-                  score: predictedScore,
-                  color: AppColors.primary,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(
-              value: confidence,
-              backgroundColor: Colors.grey[200],
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Уверенность прогноза: ${(confidence * 100).toInt()}%',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScoreIndicator(
-    BuildContext context, {
-    required String label,
-    required int score,
-    required Color color,
-  }) {
-    return Column(
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.fromLTRB(gutter, AppSpacing.lg, gutter, AppSpacing.huge),
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '$score',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                color: color,
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        Text(
-          'из 200',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey,
-              ),
-        ),
+        if (s.isEmpty) ...[
+          EmptyView(
+            icon: Icons.insights_outlined,
+            message: l.learnProgressEmptyTitle,
+            subtitle: l.learnProgressEmptyBody,
+            action: FilledButton(onPressed: () => context.push(RoutePaths.quickTest), child: Text(l.learnQuickPracticeTitle)),
+          ),
+        ] else
+          ...children,
       ],
     );
   }
 
-  double _calculateConfidence(int currentScore, int predictedScore) {
-    final testsCompleted = _progress?.testsCompleted ?? 0;
-    if (testsCompleted < 5) return 0.3;
-    if (testsCompleted < 10) return 0.5;
-    if (testsCompleted < 20) return 0.7;
-    return 0.85;
+  static Map<String, double> _bestByDirection(List<ExamAttemptSummary> attempts) {
+    final best = <String, double>{};
+    for (final a in attempts) {
+      final p = a.percent;
+      if (p == null) continue;
+      if ((best[a.blueprintId] ?? -1) < p) best[a.blueprintId] = p;
+    }
+    return best;
   }
 
-  /// Build multi-line chart showing progress per subject over time
-  Widget _buildMultiLineSubjectChart() {
-    final subjectProgress = _progress?.subjectProgress ?? {};
-    
-    if (subjectProgress.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: Text(
-              'Начните проходить тесты по разным предметам',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-        ),
-      );
+  List<Widget> _sectionBars(
+    BuildContext context,
+    AppLocalizations l,
+    List<ExamAttemptSummary> attempts,
+    String Function(String) title,
+  ) {
+    final totals = <String, (int, int)>{};
+    for (final a in attempts) {
+      for (final s in a.sections) {
+        final t = totals[s.id] ?? (0, 0);
+        totals[s.id] = (t.$1 + s.correct, t.$2 + s.total);
+      }
     }
-
-    // Generate mock historical data for demonstration
-    // In production, this should come from Firestore
-    final subjects = subjectProgress.keys.take(5).toList();
-    final colors = [
-      AppColors.primary,
-      AppColors.accent,
-      AppColors.success,
-      AppColors.warning,
-      AppColors.info,
+    if (totals.isEmpty) return const [];
+    return [
+      const SizedBox(height: AppSpacing.md),
+      Text(l.learnExamSectionsTitle, style: Theme.of(context).textTheme.titleSmall),
+      const SizedBox(height: AppSpacing.sm),
+      for (final e in totals.entries)
+        _AccuracyBar(label: title(e.key), tally: PracticeTally(answered: e.value.$2, correct: e.value.$1)),
     ];
+  }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 250,
-              child: LineChart(
-                LineChartData(
-                  gridData: const FlGridData(
-                    show: true,
-                    drawVerticalLine: true,
-                  ),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            '${value.toInt()}%',
-                            style: const TextStyle(fontSize: 10),
-                          );
-                        },
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          return Text(
-                            'Н${value.toInt() + 1}',
-                            style: const TextStyle(fontSize: 10),
-                          );
-                        },
-                      ),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: subjects.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final subject = entry.value;
-                    final progress = subjectProgress[subject] ?? 0.0;
-                    
-                    // Generate mock trend data
-                    final spots = List.generate(6, (i) {
-                      final baseProgress = progress * 100;
-                      final variation = (i - 2.5) * 5;
-                      final value = (baseProgress + variation).clamp(0.0, 100.0);
-                      return FlSpot(i.toDouble(), value);
-                    });
+  List<Widget> _weakTopics(BuildContext context, AppLocalizations l, UserProgressModel? p, ProgressLabels labels) {
+    final topics = (p?.practiceByTopic.entries ?? const <MapEntry<String, PracticeTally>>[])
+        .where((e) => e.value.answered >= RecommendationEngine.minTopicAnswers)
+        .toList()
+      ..sort((a, b) => (a.value.accuracy ?? 1).compareTo(b.value.accuracy ?? 1));
+    if (topics.isEmpty) return [_Muted(l.learnWeakTopicsEmpty)];
+    return [
+      for (final e in topics.take(5)) _AccuracyBar(label: labels.topic(e.key), tally: e.value),
+      TextButton(onPressed: () => context.push(kMistakesPath), child: Text(l.learnOpenMistakes)),
+    ];
+  }
 
-                    return LineChartBarData(
-                      spots: spots,
-                      isCurved: true,
-                      color: colors[index % colors.length],
-                      barWidth: 3,
-                      isStrokeCapRound: true,
-                      dotData: const FlDotData(show: true),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: colors[index % colors.length].withValues(alpha: 0.1),
-                      ),
-                    );
-                  }).toList(),
+  /// "Частые ошибки": top topics by wrong answers in the mistakes queue.
+  List<Widget> _frequentMistakes(
+    BuildContext context,
+    AppLocalizations l,
+    List<TopicMistakes>? items,
+    ProgressLabels labels,
+  ) {
+    if (items == null) return [_Muted(l.learnErrorGeneric)];
+    if (items.isEmpty) return [_Muted(l.socialFrequentMistakesEmpty)];
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final max = items.first.wrongCount;
+    return [
+      for (final m in items)
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(labels.topic(m.topicId),
+                        style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(l.socialMistakesCount(m.wrongCount), style: theme.textTheme.labelSmall),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+                child: LinearProgressIndicator(
+                  value: max <= 0 ? 0 : m.wrongCount / max,
+                  minHeight: 6,
+                  color: t.danger,
+                  backgroundColor: t.surfaceMuted,
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: subjects.asMap().entries.map((entry) {
-                final index = entry.key;
-                final subject = entry.value;
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: colors[index % colors.length],
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      subject,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
-          ],
+            ],
+          ),
         ),
+      TextButton(onPressed: () => context.push(kMistakesPath), child: Text(l.learnOpenMistakes)),
+    ];
+  }
+
+  /// "Время по темам": average seconds per question by topic in the latest
+  /// completed exam that has timings; slow topics are marked.
+  List<Widget> _topicTimes(
+    BuildContext context,
+    AppLocalizations l,
+    TopicTimeSnapshot? snap,
+    ProgressLabels labels,
+  ) {
+    if (snap == null || snap.avgSeconds.isEmpty) return [_Muted(l.socialTopicTimeEmpty)];
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final rows = snap.avgSeconds.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return [
+      if (snap.completedAt != null) _Muted(l.socialTopicTimeCaption(_date(context, snap.completedAt))),
+      const SizedBox(height: AppSpacing.xs),
+      for (final e in rows.take(8))
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(labels.topic(e.key),
+                  style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: AppSpacing.xxs),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xxs,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(l.socialTimePerQuestion(e.value),
+                      style: theme.textTheme.labelSmall?.copyWith(color: t.textSecondary)),
+                  if (snap.slowTopics.contains(e.key))
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+                      decoration: BoxDecoration(
+                        color: t.warningContainer,
+                        borderRadius: BorderRadius.circular(AppRadii.pill),
+                      ),
+                      child: Text(l.socialSlowBadge, style: theme.textTheme.labelSmall?.copyWith(color: t.warning)),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      TextButton(
+        onPressed: () => context.push(RoutePaths.examResultFor(snap.attemptId)),
+        child: Text(l.examResultTitle),
+      ),
+    ];
+  }
+
+  String _date(BuildContext context, DateTime? d) {
+    if (d == null) return '';
+    return DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag()).format(d.toLocal());
+  }
+
+  String _recTitle(AppLocalizations l, Recommendation r, ProgressLabels labels) {
+    switch (r.kind) {
+      case RecommendationKind.dueMistakes:
+        return l.learnRecDueMistakesTitle(r.count ?? 0);
+      case RecommendationKind.noExam:
+        return l.learnRecNoExamTitle;
+      case RecommendationKind.weakSubject:
+        return l.learnRecWeakSubjectTitle(labels.subject(r.refId));
+      case RecommendationKind.weakExamSection:
+        return l.learnRecWeakSectionTitle(labels.section(r.refId));
+      case RecommendationKind.weakTopic:
+        return l.learnRecWeakTopicTitle(labels.topic(r.refId));
+      case RecommendationKind.moreData:
+        return l.learnRecMoreDataTitle(r.count ?? 0);
+    }
+  }
+
+  String _recBody(AppLocalizations l, Recommendation r) {
+    switch (r.kind) {
+      case RecommendationKind.dueMistakes:
+        return l.learnRecDueMistakesWhy;
+      case RecommendationKind.noExam:
+        return l.learnRecNoExamWhy;
+      case RecommendationKind.weakSubject:
+        return l.learnRecWeakSubjectWhy(r.percent ?? 0, r.count ?? 0);
+      case RecommendationKind.weakExamSection:
+        return l.learnRecWeakSectionWhy(r.percent ?? 0);
+      case RecommendationKind.weakTopic:
+        return l.learnRecWeakTopicWhy(r.percent ?? 0);
+      case RecommendationKind.moreData:
+        return l.learnRecMoreDataWhy;
+    }
+  }
+}
+
+class _Heading extends StatelessWidget {
+  final String text;
+  const _Heading(this.text);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: Text(text, style: Theme.of(context).textTheme.titleLarge),
+      );
+}
+
+class _Muted extends StatelessWidget {
+  final String text;
+  const _Muted(this.text);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        child: Text(text, style: Theme.of(context).textTheme.bodySmall),
+      );
+}
+
+class _Grid extends StatelessWidget {
+  final List<(String, String, String)> items;
+  const _Grid({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    return LayoutBuilder(builder: (context, c) {
+      final cols = c.maxWidth >= 560 ? 3 : 2;
+      final w = (c.maxWidth - AppSpacing.sm * (cols - 1)) / cols;
+      return Wrap(
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        children: [
+          for (final (label, value, hint) in items)
+            Container(
+              width: w,
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(borderRadius: AppRadii.mdAll, border: Border.all(color: t.border)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: theme.textTheme.labelSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(value, style: theme.textTheme.titleLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(hint, style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                ],
+              ),
+            ),
+        ],
+      );
+    });
+  }
+}
+
+class _AccuracyBar extends StatelessWidget {
+  final String label;
+  final PracticeTally tally;
+  const _AccuracyBar({required this.label, required this.tally});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final acc = tally.accuracy ?? 0;
+    final color = acc >= 0.75 ? t.success : (acc >= 0.5 ? t.warning : t.danger);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(label, style: theme.textTheme.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis)),
+              Text('${(acc * 100).round()}% · ${l.learnAnswersCount(tally.answered)}', style: theme.textTheme.labelSmall),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadii.pill),
+            child: LinearProgressIndicator(value: acc, minHeight: 6, color: color, backgroundColor: t.surfaceMuted),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendationCard extends StatelessWidget {
+  final Recommendation rec;
+  final String title;
+  final String body;
+  final VoidCallback? onReturn;
+  const _RecommendationCard({required this.rec, required this.title, required this.body, this.onReturn});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    Future<void> openMistakes() async {
+      await context.push(kMistakesPath);
+      onReturn?.call();
+    }
+
+    final (String label, VoidCallback onTap) = switch (rec.kind) {
+      RecommendationKind.dueMistakes => (l.learnOpenMistakes, openMistakes),
+      RecommendationKind.noExam => (l.learnRecOpenExams, () => context.go(RoutePaths.exams)),
+      RecommendationKind.weakSubject => (l.learnStartPractice, () => context.push(RoutePaths.quizById(rec.refId ?? ''))),
+      RecommendationKind.weakExamSection => (l.learnStartPractice, () => context.push(RoutePaths.quizById(rec.refId ?? ''))),
+      RecommendationKind.weakTopic => (l.learnOpenMistakes, openMistakes),
+      RecommendationKind.moreData => (l.learnQuickPracticeTitle, () => context.push(RoutePaths.quickTest)),
+    };
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainer,
+        borderRadius: AppRadii.mdAll,
+        border: Border.all(color: context.tokens.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(title, style: theme.textTheme.titleSmall),
+          const SizedBox(height: AppSpacing.xs),
+          Text(body, style: theme.textTheme.bodyMedium),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(onPressed: onTap, child: Text(label)),
+          ),
+        ],
       ),
     );
   }

@@ -1,11 +1,11 @@
 {
-    "name": "knowledge_flow",
-    "short_name": "knowledge_flow",
+    "name": "ORT Master KG",
+    "short_name": "ORT Master",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Подготовка к ОРТ: пробные экзамены, практика и разбор ошибок. Учебный результат, не официальный балл.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

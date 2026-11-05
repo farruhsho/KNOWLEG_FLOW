@@ -1,0 +1,2566 @@
+{
+  "schema_version": 1,
+  "batch": {
+    "id": "main_ru_v2_grammar",
+    "kind": "generated",
+    "created_at": "2026-11-05T17:51:33.381Z",
+    "note": "Партия v2, раздел «Практическая грамматика» ort_main_2026 (ru): 30 ОРИГИНАЛЬНЫХ заданий single_choice (A–D): орфография 6, пунктуация 6, словообразование 4, дополнение 5, лексико-грамматическое значение 5, нормы употребления 4. Написаны с нуля (claude-v2-author), не по материалам ЦООМО/testing.kg, Secom или других издателей и без повторения пилотных заданий; нормы — по справочникам уровня Розенталя. Сложность 9/15/6 по матрице content/matrix/ort_main_2026.json. Статус draft: нужна независимая проверка и одобрение методиста."
+  },
+  "passages": [],
+  "items": [
+    {
+      "id": "q_bb9f33a39f800ae1c692",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.unstressed_vowels",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_bb9f33a39f800ae1",
+        "type": "single_choice",
+        "stem": "В каком слове на месте пропуска пишется буква Е?",
+        "options": [
+          {
+            "id": "A",
+            "text": "м..ряк"
+          },
+          {
+            "id": "B",
+            "text": "с..довод"
+          },
+          {
+            "id": "C",
+            "text": "л..сник"
+          },
+          {
+            "id": "D",
+            "text": "к..рмить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: безударные гласные в корне, проверяемые ударением",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:bb9f33a39f800ae1c6920f4937900070894b77f3ffc98aafa8600e85d3eade5d",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Безударную гласную в корне проверяем словом, где она стоит под ударением: лесник — лес (Е). Остальные: моряк — море (О), садовод — сад (А), кормить — корм (О).",
+        "wrong_option_notes": {
+          "A": "Проверочное слово «море» — пишется О.",
+          "B": "Проверочное слово «сад» — пишется А.",
+          "D": "Проверочное слово «корм» — пишется О."
+        },
+        "solution_steps": [
+          "Подбираем к каждому слову однокоренное, где корень под ударением.",
+          "моряк — море, садовод — сад, лесник — лес, кормить — корм.",
+          "Буква Е только в слове «лесник». Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_369d5cb1b3b612770a48",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.n_nn",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_369d5cb1b3b61277",
+        "type": "single_choice",
+        "stem": "В каком ряду в обоих словах на месте пропуска пишется одна буква Н?",
+        "options": [
+          {
+            "id": "A",
+            "text": "жаре..ая в масле рыба, мочё..ые яблоки"
+          },
+          {
+            "id": "B",
+            "text": "вяза..ый шарф, гружё..ая машина"
+          },
+          {
+            "id": "C",
+            "text": "рисова..ый портрет, плетё..ая корзина"
+          },
+          {
+            "id": "D",
+            "text": "решё..ая задача, стриже..ый газон"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: Н и НН в причастиях и отглагольных прилагательных",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:369d5cb1b3b612770a480c6ebbe29673cb252500ee08c2d6ed86432f4d116705",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "В отглагольных прилагательных, образованных от глаголов несовершенного вида без приставки, если нет зависимых слов, пишется одна Н: вязаный (вязать), гружёная (грузить). НН пишется, если есть зависимое слово (жаренная в масле), если слово образовано от глагола совершенного вида (решённая — решить) или если в нём есть суффикс -ова-/-ева- (рисованный).",
+        "wrong_option_notes": {
+          "A": "«Мочёные» — одна Н, но «жаренная в масле» — НН: у причастия есть зависимое слово.",
+          "C": "«Плетёная» — одна Н, но «рисованный» — НН: суффикс -ова-.",
+          "D": "«Стриженый» — одна Н, но «решённая» — НН: глагол «решить» совершенного вида."
+        },
+        "solution_steps": [
+          "Для каждого слова проверяем: есть ли приставка или зависимое слово, какого вида глагол, есть ли суффикс -ова-/-ева-.",
+          "вязаный, гружёная, мочёные, плетёная, стриженый — от глаголов несовершенного вида, без приставок и зависимых слов → Н.",
+          "жаренная в масле (зависимое слово), рисованный (-ова-), решённая (совершенный вид) → НН.",
+          "Одна Н в обоих словах только в ряду B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1971910fcd34369f41b7",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.ne_with_words",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_1971910fcd34369f",
+        "type": "single_choice",
+        "stem": "В каком предложении НЕ со словом в скобках пишется раздельно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Перед нами лежала (не)тронутая снежная равнина."
+          },
+          {
+            "id": "B",
+            "text": "Соседи (не)годовали из-за шума за окном."
+          },
+          {
+            "id": "C",
+            "text": "Нас ждал (не)приятный сюрприз: поезд задержался на два часа."
+          },
+          {
+            "id": "D",
+            "text": "Река в этом месте была (не)широкой, а узкой и быстрой."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6–7 кл., русский язык: НЕ с прилагательными, глаголами и причастиями",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1971910fcd34369f41b7fc440e727f31fcb5df46c252d1b13f4bfaf442494019",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "С прилагательными НЕ пишется раздельно, если есть противопоставление с союзом А: «не широкой, а узкой». В остальных предложениях НЕ пишется слитно.",
+        "wrong_option_notes": {
+          "A": "«Нетронутая» — причастие без зависимых слов, пишется слитно.",
+          "B": "«Негодовать» без НЕ не употребляется, поэтому пишется слитно, хотя это глагол.",
+          "C": "«Неприятный» — прилагательное без противопоставления, пишется слитно (можно заменить синонимом без НЕ: «досадный»)."
+        },
+        "solution_steps": [
+          "Проверяем, есть ли противопоставление с союзом А или слова «вовсе не», «далеко не», «ничуть не».",
+          "В предложении D есть противопоставление «не широкой, а узкой» → раздельно.",
+          "В остальных: нетронутая (причастие без зависимых слов), негодовали (без НЕ не употребляется), неприятный (нет противопоставления) → слитно. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_488471812a6afd3b1169",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.prefixes",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_488471812a6afd3b",
+        "type": "single_choice",
+        "stem": "В каком ряду во всех словах на месте пропуска пишется буква Ы?",
+        "options": [
+          {
+            "id": "A",
+            "text": "пред..стория, раз..грать, без..мянный"
+          },
+          {
+            "id": "B",
+            "text": "сверх..нтересный, об..скать, раз..скать"
+          },
+          {
+            "id": "C",
+            "text": "меж..нститутский, без..нициативный, под..грать"
+          },
+          {
+            "id": "D",
+            "text": "контр..гра, под..тожить, вз..мать"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: буквы Ы и И после приставок",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:488471812a6afd3b1169dacabb80bd675e136834293ac8162ae698f7dca328bf",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "После русских приставок на согласный вместо И пишется Ы: предыстория, разыграть, безымянный. Исключения: после приставок МЕЖ- и СВЕРХ- и после иноязычных приставок (КОНТР-, ПОСТ-, СУПЕР- и др.) пишется И; И пишется и в слове «взимать».",
+        "wrong_option_notes": {
+          "B": "«Обыскать», «разыскать» — Ы, но «сверхинтересный» — И (после приставки СВЕРХ- И сохраняется).",
+          "C": "«Безынициативный», «подыграть» — Ы, но «межинститутский» — И (после приставки МЕЖ- И сохраняется).",
+          "D": "«Подытожить» — Ы, но «контригра» (иноязычная приставка КОНТР-) и «взимать» (исключение) — И."
+        },
+        "solution_steps": [
+          "Определяем приставку в каждом слове: русская она или иноязычная, нет ли среди них МЕЖ- и СВЕРХ-.",
+          "После русских приставок на согласный пишем Ы: предыстория, разыграть, безымянный, обыскать, разыскать, безынициативный, подыграть, подытожить.",
+          "И: сверхинтересный, межинститутский, контригра, взимать.",
+          "Ы во всех словах только в ряду A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e034b902bb1988d1a165",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.joined_separate",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_e034b902bb1988d1",
+        "type": "single_choice",
+        "stem": "В каком предложении оба выделенных слова пишутся раздельно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "(НА)ВСТРЕЧУ нам по тропе шёл пастух, и мы (С)РАЗУ спросили у него дорогу."
+          },
+          {
+            "id": "B",
+            "text": "(В)ВИДУ густого тумана самолёт посадили (НА)ДРУГОМ аэродроме."
+          },
+          {
+            "id": "C",
+            "text": "(В)ПРОДОЛЖЕНИЕ всей недели ребята приглашали знакомых (НА)ВСТРЕЧУ с писателем."
+          },
+          {
+            "id": "D",
+            "text": "(В)СЛЕДСТВИЕ ремонта дороги автобус пошёл в объезд, (ПО)ЭТОМУ мы опоздали."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: производные предлоги; слитное и раздельное написание наречий и омонимичных сочетаний",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e034b902bb1988d1a165d3d1baeca3249db8a86ffe01d502afd0e3d00e40a5ac",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "«В продолжение» (недели) — производный предлог, который пишется раздельно (с Е на конце). «На встречу» (с писателем) — существительное с предлогом: приглашали на что? на встречу; поэтому тоже раздельно.",
+        "wrong_option_notes": {
+          "A": "«Навстречу» (нам) — предлог, пишется слитно; «сразу» — наречие, тоже слитно.",
+          "B": "«На другом» — прилагательное с предлогом, раздельно, но «ввиду» (= из-за) — производный предлог, пишется слитно.",
+          "D": "«Вследствие» (= из-за) — производный предлог, слитно; «поэтому» — наречие, слитно."
+        },
+        "solution_steps": [
+          "Определяем часть речи каждого выделенного слова.",
+          "Производные предлоги «ввиду», «вследствие» пишутся слитно, «в продолжение» — раздельно.",
+          "«Навстречу нам» — слитно, а «на встречу с писателем» (существительное с предлогом) — раздельно; «сразу», «поэтому» — наречия, слитно.",
+          "Оба слова пишутся раздельно только в предложении C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a0e77a6bc7bdcea9b50d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.spelling",
+        "subtopic_id": "grammar_ru.spelling.unstressed_vowels",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_a0e77a6bc7bdcea9",
+        "type": "single_choice",
+        "stem": "В каком ряду во всех словах на месте пропуска пишется буква И?",
+        "options": [
+          {
+            "id": "A",
+            "text": "зап..рать, расст..лать, отп..реть"
+          },
+          {
+            "id": "B",
+            "text": "выж..гать, зам..реть, соч..тать"
+          },
+          {
+            "id": "C",
+            "text": "бл..стеть, уб..рать, выт..рать"
+          },
+          {
+            "id": "D",
+            "text": "соб..рать, зам..рать, бл..стать"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., русский язык: чередующиеся гласные Е//И в корне",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a0e77a6bc7bdcea9b50d9aa2464ef1afa4e53e032309563f0a00b0c6fce15dd3",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "В корнях с чередованием Е//И (-бер-/-бир-, -мер-/-мир-, -блест-/-блист-, -пер-/-пир-, -стел-/-стил-, -тер-/-тир-, -жег-/-жиг-, -чет-/-чит-) пишется И, если после корня стоит суффикс -А-: собирать, замирать, блистать. Без суффикса -А- пишется Е. Исключения: сочетать, сочетание (Е).",
+        "wrong_option_notes": {
+          "A": "Запирать, расстилать — И, но «отпереть» — Е (после корня нет суффикса -А-).",
+          "B": "«Выжигать» — И, но «замереть» — Е (нет суффикса -А-), «сочетать» — Е (исключение).",
+          "C": "Убирать, вытирать — И, но «блестеть» — Е (после корня нет суффикса -А-)."
+        },
+        "solution_steps": [
+          "Находим корни с чередованием Е//И.",
+          "Проверяем, есть ли после корня суффикс -А-: если есть — пишем И, если нет — Е; помним исключение «сочетать».",
+          "В ряду D во всех трёх словах после корня есть суффикс -А-: собирать, замирать, блистать → И. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_52b65eae9c379736befd",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.homogeneous",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_52b65eae9c379736",
+        "type": "single_choice",
+        "stem": "В каком предложении нужно поставить одну запятую? (Знаки препинания не расставлены.)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Брат любит читать и рисовать."
+          },
+          {
+            "id": "B",
+            "text": "В лагере рано проснулись и туристы и проводники."
+          },
+          {
+            "id": "C",
+            "text": "Мы видели и горы и реки и озёра."
+          },
+          {
+            "id": "D",
+            "text": "Рыбаки сидели на берегу и смотрели на воду."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 и 8 кл., русский язык: знаки препинания при однородных членах предложения",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:52b65eae9c379736befdd0e3d7d7e9e34eb04b1d308ba2ec7363f4c5322f728f",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Однородные члены, соединённые повторяющимся союзом И, разделяются запятыми: «и туристы, и проводники» — однородных членов два, значит, запятая одна.",
+        "wrong_option_notes": {
+          "A": "Однородные члены «читать и рисовать» соединены одиночным союзом И — запятая не нужна.",
+          "C": "Союз И повторяется трижды, поэтому нужны две запятые: «и горы, и реки, и озёра».",
+          "D": "Однородные сказуемые «сидели и смотрели» соединены одиночным союзом И — запятая не нужна."
+        },
+        "solution_steps": [
+          "В каждом предложении находим однородные члены и союзы между ними.",
+          "При одиночном И запятая не ставится (A, D); при повторяющемся И запятая ставится перед каждым И, кроме первого.",
+          "«и туристы, и проводники» — одна запятая; «и горы, и реки, и озёра» — две. Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_5a44a69ca39f22e9824d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.parenthetical",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_5a44a69ca39f22e9",
+        "type": "single_choice",
+        "stem": "В каком предложении знаки препинания при вводном сочетании расставлены правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "К счастью, дождь скоро закончился."
+          },
+          {
+            "id": "B",
+            "text": "К счастью дождь скоро закончился."
+          },
+          {
+            "id": "C",
+            "text": "К счастью дождь, скоро закончился."
+          },
+          {
+            "id": "D",
+            "text": "К счастью, дождь, скоро закончился."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., русский язык: вводные слова и сочетания, знаки препинания при них",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:5a44a69ca39f22e9824d83fa7dc098ff16b325f9276efa35b104d41bd0cafac9",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "«К счастью» — вводное сочетание: оно выражает отношение говорящего к сообщению и не является членом предложения. В начале предложения его отделяют запятой.",
+        "wrong_option_notes": {
+          "B": "Вводное сочетание не отделено запятой.",
+          "C": "Запятая стоит не после вводного сочетания, а между подлежащим и сказуемым.",
+          "D": "Запятая после вводного сочетания верна, но вторая запятая лишняя: она отделяет подлежащее от сказуемого."
+        },
+        "solution_steps": [
+          "Определяем вводное сочетание: «к счастью» (выражает отношение говорящего).",
+          "Вводное сочетание в начале предложения отделяется одной запятой после него.",
+          "Между подлежащим «дождь» и сказуемым «закончился» запятая не ставится. Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_f181f26d7da8d4583cad",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.participial_phrases",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_f181f26d7da8d458",
+        "type": "single_choice",
+        "stem": "В каком предложении знаки препинания расставлены правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Мастер закончив работу, сложил в ящик инструменты, лежавшие на верстаке."
+          },
+          {
+            "id": "B",
+            "text": "Мастер, закончив работу, сложил в ящик инструменты лежавшие на верстаке."
+          },
+          {
+            "id": "C",
+            "text": "Мастер, закончив работу, сложил в ящик инструменты, лежавшие на верстаке."
+          },
+          {
+            "id": "D",
+            "text": "Мастер, закончив работу сложил в ящик, инструменты, лежавшие на верстаке."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., русский язык: обособление причастных и деепричастных оборотов",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:f181f26d7da8d4583cad80ef2e4e604d5ee689683e1ae4764193f29899c5fdb9",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Деепричастный оборот «закончив работу» стоит в середине предложения и выделяется запятыми с обеих сторон. Причастный оборот «лежавшие на верстаке» стоит после определяемого слова «инструменты» и отделяется запятой.",
+        "wrong_option_notes": {
+          "A": "Деепричастный оборот выделен только с одной стороны: нет запятой после слова «Мастер».",
+          "B": "Причастный оборот после определяемого слова не отделён запятой.",
+          "D": "Нет запятой после оборота «закончив работу», а запятая после «в ящик» лишняя: она отделяет сказуемое от дополнения."
+        },
+        "solution_steps": [
+          "Находим обороты: деепричастный «закончив работу» и причастный «лежавшие на верстаке».",
+          "Деепричастный оборот выделяется всегда; в середине предложения — с двух сторон.",
+          "Причастный оборот после определяемого слова «инструменты» обособляется. Все три запятые стоят только в C. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_29280e3b6d8f349a6d4d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.complex_sentences",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_29280e3b6d8f349a",
+        "type": "single_choice",
+        "stem": "Укажите сложноподчинённое предложение, в котором знаки препинания расставлены правильно.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Туман, который всё утро лежал в долине, начал рассеиваться, когда солнце поднялось над горами."
+          },
+          {
+            "id": "B",
+            "text": "Туман, который всё утро лежал в долине начал рассеиваться, когда солнце поднялось над горами."
+          },
+          {
+            "id": "C",
+            "text": "Туман который всё утро лежал в долине, начал рассеиваться когда солнце поднялось над горами."
+          },
+          {
+            "id": "D",
+            "text": "Туман, который всё утро лежал в долине, начал рассеиваться когда, солнце поднялось над горами."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., русский язык: знаки препинания в сложноподчинённом предложении",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:29280e3b6d8f349a6d4d1173a176a1bcc7cab9fb0464b5e9aa5d69a388e7b46a",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Придаточное определительное «который всё утро лежал в долине» стоит внутри главного предложения и выделяется запятыми с двух сторон. Придаточное времени «когда солнце поднялось над горами» отделяется запятой перед союзом «когда».",
+        "wrong_option_notes": {
+          "B": "Придаточное «который… в долине» не закрыто запятой перед сказуемым главного предложения «начал».",
+          "C": "Нет запятой перед словом «который» и перед союзом «когда».",
+          "D": "Запятая стоит после союза «когда», а должна стоять перед ним."
+        },
+        "solution_steps": [
+          "Находим главное предложение «Туман начал рассеиваться» и два придаточных.",
+          "Придаточное в середине главного выделяем с двух сторон: «Туман, который…, начал».",
+          "Придаточное в конце отделяем запятой перед союзом: «…, когда солнце поднялось». Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_ad9d865237a0429c9f81",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.parenthetical",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_ad9d865237a0429c",
+        "type": "single_choice",
+        "stem": "В каком предложении есть вводное слово, которое нужно выделить запятыми? (Знаки препинания не расставлены.)",
+        "options": [
+          {
+            "id": "A",
+            "text": "Ты ведь знаешь эту дорогу."
+          },
+          {
+            "id": "B",
+            "text": "Вдруг налетел сильный ветер."
+          },
+          {
+            "id": "C",
+            "text": "Именно здесь построят новую школу."
+          },
+          {
+            "id": "D",
+            "text": "Мы вероятно приедем к вечеру."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., русский язык: вводные слова; слова, которые не являются вводными",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:ad9d865237a0429c9f819e0f294fd16816a92ec06a5d176d13b7794671a4cc76",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "«Вероятно» — вводное слово: выражает степень уверенности говорящего и не является членом предложения. Оно выделяется запятыми: «Мы, вероятно, приедем к вечеру».",
+        "wrong_option_notes": {
+          "A": "«Ведь» — частица, а не вводное слово; запятыми не выделяется.",
+          "B": "«Вдруг» — наречие, обстоятельство (налетел как?), а не вводное слово.",
+          "C": "«Именно» — частица, которая выделяет слово «здесь»; запятыми не выделяется."
+        },
+        "solution_steps": [
+          "Проверяем каждое выделяемое по смыслу слово: выражает ли оно отношение говорящего и можно ли его убрать без потери связи в предложении.",
+          "«Ведь» и «именно» — частицы, «вдруг» — наречие-обстоятельство; вводными они не бывают.",
+          "«Вероятно» выражает предположение говорящего — вводное слово. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a4824cdb74662d8f7df7",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.punctuation",
+        "subtopic_id": "grammar_ru.punctuation.complex_sentences",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_a4824cdb74662d8f",
+        "type": "single_choice",
+        "stem": "Сколько запятых нужно поставить в предложении?\n\nМы долго шли по тропе которая петляла между скалами и только к вечеру увидели озеро о котором так много слышали.",
+        "options": [
+          {
+            "id": "A",
+            "text": "1"
+          },
+          {
+            "id": "B",
+            "text": "2"
+          },
+          {
+            "id": "C",
+            "text": "3"
+          },
+          {
+            "id": "D",
+            "text": "4"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., русский язык: сложноподчинённое предложение с несколькими придаточными; однородные сказуемые",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a4824cdb74662d8f7df70a12a2348e0f991a3b4267fcb3dddddb0834d64ec4ad",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Правильно: «Мы долго шли по тропе, которая петляла между скалами, и только к вечеру увидели озеро, о котором так много слышали». Придаточное «которая петляла между скалами» стоит внутри главного и выделяется с двух сторон (2 запятые); придаточное «о котором так много слышали» отделяется одной запятой. Союз И соединяет однородные сказуемые «шли» и «увидели», поэтому своей запятой не требует: запятая перед И закрывает придаточное. Всего 3 запятые.",
+        "wrong_option_notes": {
+          "A": "Одна запятая получается, если заметить только последнее придаточное и пропустить придаточное «которая петляла между скалами».",
+          "B": "Две запятые получаются, если не закрыть придаточное «которая петляла между скалами» перед союзом И.",
+          "D": "Четыре запятые получаются, если ещё отделить «только к вечеру» после союза И; это обстоятельство не обособляется."
+        },
+        "solution_steps": [
+          "Находим грамматические основы: «мы шли … и … увидели» (главное предложение с однородными сказуемыми), «которая петляла» и «о котором … слышали» (придаточные).",
+          "Придаточное «которая петляла между скалами» стоит в середине главного — две запятые: перед «которая» и после «скалами».",
+          "Придаточное «о котором так много слышали» стоит в конце — одна запятая перед «о котором».",
+          "Союз И соединяет однородные сказуемые — отдельной запятой не нужно. Итого 3. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a51d9c3cea328c9abb23",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.morphemes",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_a51d9c3cea328c9a",
+        "type": "single_choice",
+        "stem": "Какое слово состоит только из корня и окончания?",
+        "options": [
+          {
+            "id": "A",
+            "text": "окно"
+          },
+          {
+            "id": "B",
+            "text": "рыбка"
+          },
+          {
+            "id": "C",
+            "text": "лесной"
+          },
+          {
+            "id": "D",
+            "text": "прыжок"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., русский язык: морфемный состав слова",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a51d9c3cea328c9abb23681b39cc3b4306c2b8bac6473e11a760e7ce08b1abdc",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Окно: корень -окн-, окончание -о (ср.: окн-а, окн-у). Других морфем в слове нет.",
+        "wrong_option_notes": {
+          "B": "Рыбка: корень -рыб-, суффикс -к-, окончание -а — есть суффикс.",
+          "C": "Лесной: корень -лес-, суффикс -н-, окончание -ой — есть суффикс.",
+          "D": "Прыжок: корень -прыж- (ср.: прыгать), суффикс -ок-, нулевое окончание — есть суффикс."
+        },
+        "solution_steps": [
+          "Изменяем слова, чтобы выделить окончание: окн-а, рыбк-и, лесн-ого, прыжк-а.",
+          "Подбираем однокоренные, чтобы найти корень: окошко → окн-; рыба → рыб-; лес → лес-; прыгать → прыж-.",
+          "Только в слове «окно» нет ни приставки, ни суффикса. Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b809ed53f9fec2c3ba40",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.methods",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_b809ed53f9fec2c3",
+        "type": "single_choice",
+        "stem": "Каким способом образовано слово ЗАДАЧНИК?",
+        "options": [
+          {
+            "id": "A",
+            "text": "приставочным"
+          },
+          {
+            "id": "B",
+            "text": "суффиксальным"
+          },
+          {
+            "id": "C",
+            "text": "бессуффиксным"
+          },
+          {
+            "id": "D",
+            "text": "сложением"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: основные способы образования слов",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b809ed53f9fec2c3ba40e664d60460e25af1d770c6df69b4a8f94248bb69121f",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Задачник («сборник задач») образован от слова «задача» с помощью суффикса -ник-: задач(а) → задач-ник. Это суффиксальный способ. ЗА- здесь не приставка: оно входит в основу производящего слова «задача».",
+        "wrong_option_notes": {
+          "A": "Приставка ЗА- не присоединялась к готовому слову: «задачник» — сборник задач, а не «дачник» с приставкой.",
+          "C": "При бессуффиксном способе часть слова отсекается и ничего не добавляется (выходить → выход); здесь же добавлен суффикс -ник-.",
+          "D": "Сложение — соединение двух основ (пар + ход → пароход); в слове «задачник» один корень."
+        },
+        "solution_steps": [
+          "Подбираем производящее слово по смыслу: задачник — сборник задач → «задача».",
+          "Сравниваем: задач(а) + -ник = задачник; добавлен только суффикс.",
+          "Способ — суффиксальный. Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_ca0e34c58398e139ba69",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.methods",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_ca0e34c58398e139",
+        "type": "single_choice",
+        "stem": "Какое слово образовано бессуффиксным способом?",
+        "options": [
+          {
+            "id": "A",
+            "text": "синева"
+          },
+          {
+            "id": "B",
+            "text": "посинеть"
+          },
+          {
+            "id": "C",
+            "text": "синеватый"
+          },
+          {
+            "id": "D",
+            "text": "синь"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: бессуффиксный, суффиксальный и приставочный способы образования слов",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:ca0e34c58398e139ba6934055caa159568f055cc0bcde64b33618606b7a00e48",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "«Синь» образовано от прилагательного «синий» без суффикса: от основы отсекается окончание прилагательного, и получается существительное с нулевым окончанием (син-ий → синь). Это бессуффиксный способ.",
+        "wrong_option_notes": {
+          "A": "Синева: син- + суффикс -ев- + окончание -а — суффиксальный способ.",
+          "B": "Посинеть: приставка ПО- + глагол «синеть» — приставочный способ.",
+          "C": "Синеватый: синий → син-еват-ый — суффиксальный способ (суффикс -еват- со значением неполноты признака)."
+        },
+        "solution_steps": [
+          "Для каждого слова находим производящее: синева, синеватый, синь ← синий; посинеть ← синеть.",
+          "Смотрим, что изменилось: в «синеве» и «синеватом» добавлен суффикс, в «посинеть» — приставка.",
+          "В слове «синь» ничего не добавлено, только отсечено окончание прилагательного. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_9b1c2ec14b55c519ca7f",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.word_formation",
+        "subtopic_id": "grammar_ru.word_formation.morphemes",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_9b1c2ec14b55c519",
+        "type": "single_choice",
+        "stem": "В каком слове есть нулевое окончание?",
+        "options": [
+          {
+            "id": "A",
+            "text": "пальто"
+          },
+          {
+            "id": "B",
+            "text": "сидя"
+          },
+          {
+            "id": "C",
+            "text": "ночь"
+          },
+          {
+            "id": "D",
+            "text": "вчера"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., русский язык: окончание, нулевое окончание; неизменяемые слова",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:9b1c2ec14b55c519ca7f7eba2ecf74602012f9b0af3b63b52e0acf8713f78cc4",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Нулевое окончание бывает у изменяемых слов, когда в данной форме окончание не выражено звуками: ночь∅ — ночь-и, ночь-ю. Неизменяемые слова окончания не имеют совсем.",
+        "wrong_option_notes": {
+          "A": "«Пальто» — несклоняемое существительное: оно не изменяется, поэтому окончания у него нет.",
+          "B": "«Сидя» — деепричастие, неизменяемая форма; окончания нет, -я — суффикс.",
+          "D": "«Вчера» — наречие, неизменяемое слово; окончания нет."
+        },
+        "solution_steps": [
+          "Проверяем, изменяется ли слово: у неизменяемых слов окончания нет вообще.",
+          "Пальто, сидя, вчера не изменяются — окончания нет.",
+          "Ночь изменяется (ночи, ночью); в начальной форме окончание не выражено — нулевое. Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_392507ad23817574787f",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_form",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_392507ad23817574",
+        "type": "single_choice",
+        "stem": "Вставьте пропущенное слово.\n\nВ нашем классе учатся двадцать два ____.",
+        "options": [
+          {
+            "id": "A",
+            "text": "ученики"
+          },
+          {
+            "id": "B",
+            "text": "учеников"
+          },
+          {
+            "id": "C",
+            "text": "ученика"
+          },
+          {
+            "id": "D",
+            "text": "ученику"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: сочетание числительных с существительными",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:392507ad23817574787f39b36986848bc029d679875768fc0661e7c89d370f48",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "После числительных два, три, четыре (и составных, которые на них оканчиваются: двадцать два) существительное ставится в родительном падеже единственного числа: двадцать два ученика.",
+        "wrong_option_notes": {
+          "A": "Именительный падеж множественного числа после «два» не употребляется: «двадцать два ученики» — ошибка.",
+          "B": "Родительный падеж множественного числа нужен после пяти и больше (двадцать пять учеников), а здесь числительное оканчивается на «два».",
+          "D": "Дательный падеж не подходит: сочетание «двадцать два ученика» — подлежащее и стоит в именительном падеже."
+        },
+        "solution_steps": [
+          "Смотрим на последнее слово составного числительного: «два».",
+          "После «два, три, четыре» существительное стоит в родительном падеже единственного числа.",
+          "Получаем «двадцать два ученика». Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a290d994b682f189062f",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_choice",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_a290d994b682f189",
+        "type": "single_choice",
+        "stem": "Вставьте подходящее по смыслу слово.\n\nСтарый мастер охотно ____ свой опыт молодым ученикам.",
+        "options": [
+          {
+            "id": "A",
+            "text": "предавал"
+          },
+          {
+            "id": "B",
+            "text": "преподавал"
+          },
+          {
+            "id": "C",
+            "text": "выдавал"
+          },
+          {
+            "id": "D",
+            "text": "передавал"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7–9 кл., русский язык: лексическое значение глагола, паронимы, лексическая сочетаемость",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a290d994b682f189062f1ed0060132147330baf0875807d2305f56f19d1fbe74",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "«Передавать опыт (знания, умения) кому-либо» — делиться ими, учить других. Только этот глагол подходит и по смыслу, и по сочетаемости к словам «свой опыт молодым ученикам».",
+        "wrong_option_notes": {
+          "A": "«Предавать» — изменять, совершать предательство; похоже по звучанию на «передавать» (паронимы).",
+          "B": "«Преподавать» сочетается с названием предмета (преподавать историю), а не со словом «опыт».",
+          "C": "«Выдавать» — давать по счёту или по документам (выдавать книги, справки); «выдавать опыт» — нарушение сочетаемости."
+        },
+        "solution_steps": [
+          "Определяем смысл: мастер делится опытом с учениками.",
+          "Проверяем сочетаемость каждого глагола со словом «опыт»: нормативно только «передавать опыт».",
+          "Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_f9c30db306b858c6993e",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_form",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_f9c30db306b858c6",
+        "type": "single_choice",
+        "stem": "Вставьте пропущенное слово.\n\n____, пожалуйста, эту книгу на верхнюю полку.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Ложи"
+          },
+          {
+            "id": "B",
+            "text": "Положи"
+          },
+          {
+            "id": "C",
+            "text": "Поклади"
+          },
+          {
+            "id": "D",
+            "text": "Ляжь"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: повелительное наклонение глагола; нормы образования форм",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:f9c30db306b858c6993e225de6e7bee7da54907aeb0f972c585a4be4f3f2fbe5",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Литературная форма повелительного наклонения в значении «помести» — «положи» (от глагола «положить»). Глагол «ложить» в литературном языке не употребляется, «покласть» — просторечие.",
+        "wrong_option_notes": {
+          "A": "«Ложи» — просторечная форма; литературные формы — «клади» (от «класть») или «положи» (от «положить»).",
+          "C": "«Поклади» — просторечие (от ненормативного «покласть»).",
+          "D": "«Ляжь» — неправильная форма от «лечь» (правильно «ляг»); к тому же «лечь» значит «принять лежачее положение», а не «поместить книгу»."
+        },
+        "solution_steps": [
+          "Нужен глагол со значением «поместить что-либо куда-либо» в повелительном наклонении.",
+          "Литературные пары: класть — положить; формы «ложить», «покласть» ненормативны.",
+          "Правильно: «Положи». Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_042c3c477d5bfb43b540",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_choice",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_042c3c477d5bfb43",
+        "type": "single_choice",
+        "stem": "Вставьте подходящее по смыслу слово.\n\nПосле долгого спора участники собрания наконец ____ к общему мнению.",
+        "options": [
+          {
+            "id": "A",
+            "text": "пришли"
+          },
+          {
+            "id": "B",
+            "text": "достигли"
+          },
+          {
+            "id": "C",
+            "text": "вышли"
+          },
+          {
+            "id": "D",
+            "text": "нашли"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7–9 кл., русский язык: лексическая сочетаемость и управление",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:042c3c477d5bfb43b540f4d702c0ed34f8e97bebb9f4ac9d0eb8aa6d4ba8144b",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Устойчивое сочетание — «прийти к общему мнению» (к согласию, к выводу). Глагол «прийти» в этом значении требует предлога «к» с дательным падежом, который уже есть в предложении.",
+        "wrong_option_notes": {
+          "B": "«Достигнуть» управляет родительным падежом без предлога: «достигли согласия»; «достигли к мнению» — ошибка управления.",
+          "C": "«Выйти к чему-либо» говорят о месте (вышли к реке); со словом «мнение» не сочетается.",
+          "D": "«Найти» требует винительного падежа без предлога (нашли решение); «нашли к мнению» — ошибка."
+        },
+        "solution_steps": [
+          "Смотрим на продолжение: «… к общему мнению» — предлог «к» и дательный падеж.",
+          "С этим управлением и смыслом «договориться» сочетается только глагол «прийти».",
+          "Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_f457f28d87d0c579a777",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.completion",
+        "subtopic_id": "grammar_ru.completion.word_form",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_f457f28d87d0c579",
+        "type": "single_choice",
+        "stem": "Вставьте пропущенное слово.\n\nПо ____ сторонам дороги росли высокие тополя.",
+        "options": [
+          {
+            "id": "A",
+            "text": "обоим"
+          },
+          {
+            "id": "B",
+            "text": "обеих"
+          },
+          {
+            "id": "C",
+            "text": "обоих"
+          },
+          {
+            "id": "D",
+            "text": "обеим"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: склонение собирательного числительного «оба/обе»",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:f457f28d87d0c579a7778fac13b3729becf5b6639e8254af7de62eaf924009b7",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Слово «сторона» женского рода, поэтому нужна форма от «обе», а не от «оба». Предлог «по» здесь требует дательного падежа (по чему? по сторонам): обе → обеим. Правильно: «по обеим сторонам».",
+        "wrong_option_notes": {
+          "A": "«Обоим» — дательный падеж мужского и среднего рода (обоим братьям); слово «сторона» женского рода.",
+          "B": "«Обеих» — родительный (или винительный) падеж: «у обеих сторон»; с предлогом «по» в этом предложении нужен дательный.",
+          "C": "«Обоих» — неверны и род (мужской или средний), и падеж (родительный)."
+        },
+        "solution_steps": [
+          "Определяем род существительного: «сторона» — женский род → «обе».",
+          "Определяем падеж: «по (чему?) сторонам» — дательный.",
+          "Дательный падеж от «обе» — «обеим». Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_32c86b9cb6da71f6d3ea",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.word_meaning",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_32c86b9cb6da71f6",
+        "type": "single_choice",
+        "stem": "Какое значение имеет слово ГОСТЕПРИИМНЫЙ?",
+        "options": [
+          {
+            "id": "A",
+            "text": "любящий путешествовать"
+          },
+          {
+            "id": "B",
+            "text": "радушно принимающий гостей"
+          },
+          {
+            "id": "C",
+            "text": "часто бывающий в гостях"
+          },
+          {
+            "id": "D",
+            "text": "работающий в гостинице"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., русский язык: лексическое значение слова, сложные слова",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:32c86b9cb6da71f6d3eaa013abf2b9e9dbdff7b8aef69a2c3ca5691654bc70a2",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Слово сложное: «гость» + «приимный» (от «принимать»). Гостеприимный — тот, кто охотно и радушно принимает гостей.",
+        "wrong_option_notes": {
+          "A": "Это значение не связано с приёмом гостей; любящего путешествовать человека так не называют.",
+          "C": "Тот, кто часто бывает в гостях, сам гость; гостеприимный — хозяин, который принимает гостей.",
+          "D": "Связь с гостиницей ложная: работника гостиницы так не называют."
+        },
+        "solution_steps": [
+          "Разбираем слово по смыслу частей: гост(ь) + приим(ать) — «принимать гостей».",
+          "Ищем толкование, в котором речь идёт о хозяине, радушно принимающем гостей.",
+          "Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_eedf473cf0f3138d91d6",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.parts_of_speech",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_eedf473cf0f3138d",
+        "type": "single_choice",
+        "stem": "Укажите слово, которое является именем прилагательным.",
+        "options": [
+          {
+            "id": "A",
+            "text": "читатель"
+          },
+          {
+            "id": "B",
+            "text": "прочитать"
+          },
+          {
+            "id": "C",
+            "text": "читальный"
+          },
+          {
+            "id": "D",
+            "text": "чтение"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., русский язык: самостоятельные части речи, имя прилагательное",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:eedf473cf0f3138d91d63fe5fea0decc1cbdc0a4567122cf3a070275db0f2334",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "«Читальный» отвечает на вопрос «какой?» (читальный зал), обозначает признак предмета и изменяется по родам, числам и падежам — это имя прилагательное.",
+        "wrong_option_notes": {
+          "A": "«Читатель» отвечает на вопрос «кто?» — имя существительное.",
+          "B": "«Прочитать» отвечает на вопрос «что сделать?» — глагол.",
+          "D": "«Чтение» отвечает на вопрос «что?» — имя существительное (название действия)."
+        },
+        "solution_steps": [
+          "Задаём к каждому слову вопрос: читатель — кто?, прочитать — что сделать?, читальный — какой?, чтение — что?",
+          "На вопрос «какой?» отвечает имя прилагательное.",
+          "Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1dbc7443a45861c58b0a",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.paronyms",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_21f999cde34c5029",
+        "type": "single_choice",
+        "stem": "В каком предложении выделенное слово употреблено правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Школу построили по ТИПОВОМУ проекту."
+          },
+          {
+            "id": "B",
+            "text": "Мой дед был ИСКУССТВЕННЫМ резчиком по дереву."
+          },
+          {
+            "id": "C",
+            "text": "В отделе ХОЗЯЙСКИХ товаров мама купила ведро и швабру."
+          },
+          {
+            "id": "D",
+            "text": "Наша команда стала ДИПЛОМНИКОМ городской олимпиады."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: паронимы",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | Исправлено автором 2026-11-06 по замечанию независимого слепого верификатора (раунд 1): вариант C заменён: «Наш сосед — человек ХОЗЯЙСКИЙ» не был бесспорной ошибкой — словари (Ушаков, Ефремова) дают у «хозяйский» значение «свойственный рачительному хозяину» (хозяйский глаз, хозяйский подход), и сильный ученик мог колебаться между A и C. Новый вариант C — «В отделе ХОЗЯЙСКИХ товаров…» (нужно «хозяйственных»), где ошибка однозначна. Разбор C и шаг 2 переписаны; ключ A, пояснение и варианты A, B, D не менялись. Прежний id q_21f999cde34c50297124. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1dbc7443a45861c58b0a419010f6e58b5411251d8b033c0f5af4bceb2c4492be",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T18:07:52.820Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "«Типовой» — соответствующий образцу, стандартный: «типовой проект», «типовой договор». В предложении A слово употреблено верно.",
+        "wrong_option_notes": {
+          "B": "Нужно «искусным» (умелым). «Искусственный» — сделанный человеком, ненастоящий (искусственный мех).",
+          "C": "Нужно «хозяйственных» (товары для домашнего хозяйства). «Хозяйский» — принадлежащий хозяину (хозяйский дом).",
+          "D": "Нужно «дипломантом» (награждённый дипломом конкурса, олимпиады). «Дипломник» — студент, который пишет дипломную работу."
+        },
+        "solution_steps": [
+          "Для каждого выделенного слова вспоминаем его пароним и значения обоих слов.",
+          "типовой проект — верно; искусственный → искусный, хозяйские товары → хозяйственные, дипломник → дипломант.",
+          "Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1fbeed6f981e2f589096",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.parts_of_speech",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_1fbeed6f981e2f58",
+        "type": "single_choice",
+        "stem": "В каком предложении слово ЧТО является союзом?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Что ты читаешь сейчас?"
+          },
+          {
+            "id": "B",
+            "text": "Книга, что лежит на столе, очень интересная."
+          },
+          {
+            "id": "C",
+            "text": "Он не расслышал, что ему сказали."
+          },
+          {
+            "id": "D",
+            "text": "Я знаю, что завтра будет дождь."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 и 9 кл., русский язык: союз и союзное слово; местоимение",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1fbeed6f981e2f5890963937a64efea1efb653b15c76a0a57917baa3e635b1af",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Союз ЧТО только связывает части сложного предложения и не является членом предложения: на него нельзя поставить логическое ударение, его можно заменить двоеточием («Я знаю: завтра будет дождь»). В предложении D «что» — союз.",
+        "wrong_option_notes": {
+          "A": "Вопросительное местоимение: оно является дополнением (читаешь что?).",
+          "B": "Относительное местоимение (союзное слово) в значении «которая»: «книга, которая лежит» — в придаточном оно подлежащее.",
+          "C": "Союзное слово: «сказали что?» — оно является дополнением в придаточном, на него падает ударение."
+        },
+        "solution_steps": [
+          "Проверяем, является ли «что» членом предложения: можно ли задать к нему вопрос или заменить его словом «который».",
+          "В A, B, C «что» — член предложения (местоимение или союзное слово).",
+          "В D «что» только связывает части и легко заменяется двоеточием — это союз. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b41c6b21adffd87b8b24",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.lexical_grammatical_meaning",
+        "subtopic_id": "grammar_ru.lexical_grammatical_meaning.paronyms",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_b41c6b21adffd87b",
+        "type": "single_choice",
+        "stem": "В каком предложении выделенное слово употреблено НЕВЕРНО?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Комиссия провела ВЫБОРОЧНУЮ проверку тетрадей."
+          },
+          {
+            "id": "B",
+            "text": "Для посева фермер купил ОТБОРНОЕ зерно."
+          },
+          {
+            "id": "C",
+            "text": "Водителя оштрафовали как ЗЛОСТНОГО нарушителя правил."
+          },
+          {
+            "id": "D",
+            "text": "В вопросах астрономии он оказался полным НЕВЕЖЕЙ."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: паронимы и лексическая сочетаемость",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b41c6b21adffd87b8b24fb7fb6dff0395de84fca7eac6afee154af018ac9f1f2",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Нужно «невеждой». Невежда — малообразованный человек, не знающий чего-либо; невежа — грубый, невоспитанный человек. О незнании астрономии говорят «невежда».",
+        "wrong_option_notes": {
+          "A": "Употреблено верно: «выборочный» — проводимый не для всех, а для части (выборочная проверка). Не путать с «выборный» (выборная должность).",
+          "B": "Употреблено верно: «отборный» — лучший, отобранный из многих (отборное зерно). Не путать с «отборочный» (отборочный тур).",
+          "C": "Употреблено верно: «злостный» — упорный, намеренный (злостный нарушитель). Не путать со «злобный» (полный злобы)."
+        },
+        "solution_steps": [
+          "Для каждого выделенного слова вспоминаем его пароним и значения обоих слов.",
+          "выборочная проверка, отборное зерно, злостный нарушитель — верно.",
+          "О незнании говорят «невежда»; «невежа» — грубиян. Ошибка в D. Ответ — D."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_82204f304d20c9079174",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.word_forms",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_82204f304d20c907",
+        "type": "single_choice",
+        "stem": "В каком варианте форма слова образована правильно?",
+        "options": [
+          {
+            "id": "A",
+            "text": "они бегут"
+          },
+          {
+            "id": "B",
+            "text": "они хочут"
+          },
+          {
+            "id": "C",
+            "text": "ехай домой"
+          },
+          {
+            "id": "D",
+            "text": "ихний дом"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., русский язык: нормы образования форм глаголов и местоимений",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:82204f304d20c9079174b88cc13a9600e1105cb0c180314d44bc94bc9e7083b9",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "У глагола «бежать» форма 3-го лица множественного числа — «бегут». Это литературная норма.",
+        "wrong_option_notes": {
+          "B": "Правильно «они хотят»: глагол «хотеть» разноспрягаемый, во множественном числе — хотим, хотите, хотят.",
+          "C": "«Ехай» — просторечие; литературная форма повелительного наклонения — «поезжай».",
+          "D": "«Ихний» — просторечие; правильно — местоимение «их»: «их дом»."
+        },
+        "solution_steps": [
+          "Проверяем каждую форму по литературной норме.",
+          "хочут → хотят, ехай → поезжай, ихний → их; «бегут» — норма.",
+          "Ответ — A."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_58780626f0e0540f1f66",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.agreement_government",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_58780626f0e0540f",
+        "type": "single_choice",
+        "stem": "В каком предложении допущена ошибка в управлении?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Мама всегда беспокоилась о младшем сыне."
+          },
+          {
+            "id": "B",
+            "text": "Друзья удивлялись на его терпение."
+          },
+          {
+            "id": "C",
+            "text": "Мы были уверены в своей правоте."
+          },
+          {
+            "id": "D",
+            "text": "Учёные указали на ошибки в расчётах."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: нормы управления в словосочетаниях",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:58780626f0e0540f1f665d0c625690970e93e986c44d33dc056de8c02f91f443",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Глагол «удивляться» управляет дательным падежом без предлога: удивляться (чему?) его терпению. «Удивлялись на его терпение» — ошибка управления.",
+        "wrong_option_notes": {
+          "A": "Ошибки нет: «беспокоиться (о ком?) о сыне».",
+          "C": "Ошибки нет: «уверен (в чём?) в правоте».",
+          "D": "Ошибки нет: «указать (на что?) на ошибки»."
+        },
+        "solution_steps": [
+          "Для каждого главного слова вспоминаем нормативное управление.",
+          "беспокоиться о ком, уверен в чём, указать на что — верно; удивляться чему — без предлога.",
+          "Ошибка в B. Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_940cfab2cd411ff41e99",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.collocation",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_940cfab2cd411ff4",
+        "type": "single_choice",
+        "stem": "В каком предложении есть лексическая ошибка — лишнее слово (плеоназм)?",
+        "options": [
+          {
+            "id": "A",
+            "text": "В конце концов брат согласился с нами."
+          },
+          {
+            "id": "B",
+            "text": "Мы поднялись на вершину холма к рассвету."
+          },
+          {
+            "id": "C",
+            "text": "Ученики вернулись обратно в класс после перемены."
+          },
+          {
+            "id": "D",
+            "text": "Каждый участник получил на память фотографию."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: лексические нормы, плеоназм",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:940cfab2cd411ff41e99469fd16b19597cc0a672c8bdc3c54b5f134e7e4a2cbb",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T17:51:33.381Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "«Вернуться» уже означает «прийти обратно», поэтому слово «обратно» лишнее: правильно «вернулись в класс». Это плеоназм — повтор одного значения в соседних словах.",
+        "wrong_option_notes": {
+          "A": "«В конце концов» — устойчивое сочетание со значением «наконец»; повтор слова здесь не ошибка.",
+          "B": "Ошибки нет: «подняться на вершину» — нормальное сочетание (плеоназм был бы в «подняться вверх»).",
+          "D": "Ошибки нет: «получить на память фотографию» — обычное сочетание, лишних слов нет."
+        },
+        "solution_steps": [
+          "Ищем соседние слова, значение одного из которых уже содержится в другом.",
+          "«Вернулись» = «пришли обратно», значит, «обратно» повторяет смысл глагола.",
+          "Ответ — C."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_6a5241bbe36bc2f7208d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "grammar",
+        "part_id": "grammar"
+      },
+      "question": {
+        "subject_id": "grammar",
+        "section_id": "grammar",
+        "topic_id": "grammar_ru.usage_norms",
+        "subtopic_id": "grammar_ru.usage_norms.agreement_government",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_e44f02c4dd93d607",
+        "type": "single_choice",
+        "stem": "В каком предложении нет грамматической ошибки?",
+        "options": [
+          {
+            "id": "A",
+            "text": "Экскурсовод долго беседовал с туристами, приехавших из Нарына."
+          },
+          {
+            "id": "B",
+            "text": "Те, кто пришёл на концерт, остались довольны."
+          },
+          {
+            "id": "C",
+            "text": "Ребята любят и гордятся своей школой."
+          },
+          {
+            "id": "D",
+            "text": "Мы хотим поблагодарить вам за тёплый приём."
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": null,
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., русский язык: грамматические нормы (согласование причастия с определяемым словом, согласование подлежащего и сказуемого, управление при однородных сказуемых и при глаголе)",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Оригинальное задание (партия main_ru_v2_grammar, автор claude-v2-author); ключ решён автором дважды, разбор неверных вариантов и шаги решения проверены. | Исправлено автором 2026-11-06 по замечанию независимого слепого верификатора (раунд 1): варианты A и C заменены: прежние «Ни один из участников соревнования не опоздали на старт» и «Подходя к перевалу, нас застал густой туман» повторяли типы ошибок пилотного q_c30067b6bb5fcb9f9910 («Каждый из выпускников получили», «Прочитав статью, у меня возникло»). Новые ошибки, которых нет в пилоте: несогласованное причастие («с туристами, приехавших») и однородные сказуемые с разным управлением («любят и гордятся своей школой»). Предложенный верификатором вариант «Благодаря упорного труда» не взят: ошибка в падеже после производного предлога уже есть в пилоте (q_c30067b6bb5fcb9f9910 «По окончанию концерта», q_218e90579ed4fd069947 «По приезде»). Варианты B и D, ключ B и пояснение сохранены; разбор A и C, шаги и basis переписаны. Прежний id q_e44f02c4dd93d6076b3b. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6a5241bbe36bc2f7208d7447c5fc44d8e6c7b7f693bb6dc1883104fa2095d6c5",
+        "created_at": "2026-11-05T17:51:33.381Z",
+        "updated_at": "2026-11-05T18:07:52.820Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "В предложении B ошибки нет: в придаточном местоимение «кто» требует сказуемого в единственном числе (кто пришёл), а в главном подлежащее «те» стоит во множественном числе (остались довольны).",
+        "wrong_option_notes": {
+          "A": "Причастие согласуется с определяемым словом в падеже: с туристами (кем?) — приехавшими. Форма «приехавших» с ним не согласована.",
+          "C": "Однородные сказуемые требуют разных падежей: любить (что?) школу, гордиться (чем?) школой, поэтому общее дополнение к ним поставить нельзя. Правильно: «Ребята любят свою школу и гордятся ею».",
+          "D": "«Поблагодарить» управляет винительным падежом: поблагодарить (кого?) вас."
+        },
+        "solution_steps": [
+          "Проверяем в каждом предложении согласование и управление: причастие и определяемое слово, однородные сказуемые с общим дополнением, местоимения «кто» и «те», падеж после глагола.",
+          "A: «с туристами, приехавшими»; C: «любят свою школу и гордятся ею»; D: «поблагодарить вас».",
+          "В B «кто пришёл» и «те … остались довольны» согласованы верно. Ответ — B."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_grammar",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 2,
+          "batch_round2_failures": 0
+        }
+      }
+    }
+  ]
+}

@@ -1,14 +1,21 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/routes/app_router.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../core/design/tokens.dart';
+import '../../../../core/navigation/nav_helpers.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/auth_provider.dart';
-import '../../../../shared/services/admin_service.dart';
+import '../../../../providers/locale_provider.dart';
+import '../../../settings/domain/app_info.dart';
+import '../../domain/auth_validation.dart';
+import '../widgets/auth_widgets.dart';
 
-enum UserRole { client, admin }
-
+/// E-mail registration. Public sign-ups are always students; admin roles
+/// are provisioned server-side only (SEC-004).
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 
@@ -22,12 +29,13 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _adminService = AdminService();
-  
-  bool _isPasswordVisible = false;
-  bool _isConfirmPasswordVisible = false;
+  late final TapGestureRecognizer _termsTap = TapGestureRecognizer()
+    ..onTap = () => _open(LegalLinks.termsOfService);
+  late final TapGestureRecognizer _privacyTap = TapGestureRecognizer()
+    ..onTap = () => _open(LegalLinks.privacyPolicy);
+
   bool _isLoading = false;
-  UserRole _selectedRole = UserRole.client;
+  String? _error;
 
   @override
   void dispose() {
@@ -35,305 +43,212 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _termsTap.dispose();
+    _privacyTap.dispose();
     super.dispose();
   }
 
-  Future<void> _handleSignup() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-
+  Future<void> _open(String url) async {
     try {
-      if (_selectedRole == UserRole.admin) {
-        // Admin Registration
-        final success = await _adminService.registerAdmin(
-          _emailController.text.trim(),
-          _passwordController.text,
-        );
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (_) {}
+  }
 
-        if (mounted) {
-          if (success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Администратор успешно зарегистрирован!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            context.go(AppRouter.adminDashboard);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Администратор с таким email уже существует'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      } else {
-        // Client Registration
-        final authService = ref.read(authServiceProvider);
-        await authService.signUpWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-          name: _nameController.text.trim(),
-        );
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Регистрация успешна!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          context.go(AppRouter.dashboard);
-        }
+  Future<void> _run(Future<void> Function() action, {String? successMessage}) async {
+    final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      await action();
+      if (successMessage != null) {
+        messenger.showSnackBar(SnackBar(content: Text(successMessage)));
       }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        String errorMessage;
-        switch (e.code) {
-          case 'email-already-in-use':
-            errorMessage = 'Этот email уже используется';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Неверный формат email';
-            break;
-          case 'weak-password':
-            errorMessage = 'Слишком слабый пароль';
-            break;
-          case 'operation-not-allowed':
-            errorMessage = 'Регистрация временно недоступна';
-            break;
-          default:
-            errorMessage = 'Ошибка регистрации: ${e.message}';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+      context.go(RoutePaths.home);
     } catch (e) {
+      final failure = classifyAuthError(e);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка регистрации: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        setState(() => _error =
+            failure == null ? null : l.shellAuthFailureText(failure));
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _handleSignup() async {
+    if (_isLoading) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    FocusScope.of(context).unfocus();
+    final l = AppLocalizations.of(context)!;
+    final language = ref.read(contentLanguageProvider);
+    await _run(
+      () => ref.read(authServiceProvider).signUpWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            name: _nameController.text.trim(),
+            preferredLanguage: language,
+          ),
+      successMessage: l.shellSignupSuccess,
+    );
+  }
+
+  Future<void> _handleGoogle() async {
+    if (_isLoading) return;
+    await _run(() => ref.read(authServiceProvider).signInWithGoogle());
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final gutter = AppSpacing.gutter(context);
+    final linkStyle = TextStyle(
+      color: scheme.primary,
+      decoration: TextDecoration.underline,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        leading: const SafeBackButton(fallback: RoutePaths.login),
+        actions: const [LanguageActionButton()],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Title
-                Text(
-                  'Регистрация',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+        top: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(gutter, AppSpacing.sm, gutter, AppSpacing.xxl),
+              child: AutofillGroup(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AuthHeader(
+                        title: l.shellSignupTitle,
+                        subtitle: l.shellSignupSubtitle,
                       ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  'Создайте новый аккаунт',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
+                      const SizedBox(height: AppSpacing.xxl),
+                      TextFormField(
+                        controller: _nameController,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.name],
+                        maxLength: 60,
+                        decoration: InputDecoration(
+                          labelText: l.shellAuthNameLabel,
+                          prefixIcon: const Icon(Icons.person_outline_rounded),
+                          counterText: '',
+                        ),
+                        validator: (v) => l.shellValidate(AuthValidators.name(v)),
                       ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 32),
-
-                // Role Selection
-                SegmentedButton<UserRole>(
-                  segments: const [
-                    ButtonSegment<UserRole>(
-                      value: UserRole.client,
-                      label: Text('Ученик'),
-                      icon: Icon(Icons.person),
-                    ),
-                    ButtonSegment<UserRole>(
-                      value: UserRole.admin,
-                      label: Text('Админ'),
-                      icon: Icon(Icons.admin_panel_settings),
-                    ),
-                  ],
-                  selected: {_selectedRole},
-                  onSelectionChanged: (Set<UserRole> newSelection) {
-                    setState(() {
-                      _selectedRole = newSelection.first;
-                    });
-                  },
-                  style: ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Name field (Only for Client)
-                if (_selectedRole == UserRole.client) ...[
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Имя',
-                      hintText: 'Иван Иванов',
-                      prefixIcon: Icon(Icons.person_outlined),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Введите имя';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // Email field
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'example@mail.com',
-                    prefixIcon: Icon(Icons.email_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите email';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Введите корректный email';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Password field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: !_isPasswordVisible,
-                  decoration: InputDecoration(
-                    labelText: 'Пароль',
-                    hintText: '••••••••',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                      const SizedBox(height: AppSpacing.lg),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        autocorrect: false,
+                        autofillHints: const [AutofillHints.email],
+                        decoration: InputDecoration(
+                          labelText: l.shellAuthEmailLabel,
+                          hintText: 'name@example.com',
+                          prefixIcon: const Icon(Icons.alternate_email_rounded),
+                        ),
+                        validator: (v) => l.shellValidate(AuthValidators.email(v)),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Введите пароль';
-                    }
-                    if (value.length < 6) {
-                      return 'Пароль должен содержать минимум 6 символов';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Confirm password field
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: !_isConfirmPasswordVisible,
-                  decoration: InputDecoration(
-                    labelText: 'Подтвердите пароль',
-                    hintText: '••••••••',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isConfirmPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                      const SizedBox(height: AppSpacing.lg),
+                      PasswordField(
+                        controller: _passwordController,
+                        label: l.shellAuthPasswordLabel,
+                        helperText: l.shellAuthPasswordHint(
+                          AuthValidators.minPasswordLength,
+                        ),
+                        autofillHints: const [AutofillHints.newPassword],
+                        validator: (v) =>
+                            l.shellValidate(AuthValidators.newPassword(v)),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isConfirmPasswordVisible =
-                              !_isConfirmPasswordVisible;
-                        });
-                      },
-                    ),
+                      const SizedBox(height: AppSpacing.lg),
+                      PasswordField(
+                        controller: _confirmPasswordController,
+                        label: l.shellAuthConfirmPasswordLabel,
+                        autofillHints: const [AutofillHints.newPassword],
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _handleSignup(),
+                        validator: (v) => l.shellValidate(
+                          AuthValidators.confirmPassword(v, _passwordController.text),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text.rich(
+                        TextSpan(
+                          style: text.bodySmall
+                              ?.copyWith(color: context.tokens.textSecondary),
+                          children: [
+                            TextSpan(text: l.shellSignupLegalPrefix),
+                            TextSpan(
+                              text: l.shellSettingsTerms,
+                              style: linkStyle,
+                              recognizer: _termsTap,
+                            ),
+                            TextSpan(text: l.shellSignupLegalAnd),
+                            TextSpan(
+                              text: l.shellSettingsPrivacy,
+                              style: linkStyle,
+                              recognizer: _privacyTap,
+                            ),
+                            const TextSpan(text: '.'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      if (_error != null) ...[
+                        AuthErrorBox(message: _error!),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                      FilledButton(
+                        onPressed: _isLoading ? null : _handleSignup,
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text(l.shellSignupButton),
+                      ),
+                      if (GoogleSignInSupport.isAvailable) ...[
+                        const SizedBox(height: AppSpacing.xl),
+                        const OrDivider(),
+                        const SizedBox(height: AppSpacing.xl),
+                        OutlinedButton.icon(
+                          onPressed: _isLoading ? null : _handleGoogle,
+                          icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
+                          label: Text(l.shellAuthContinueWithGoogle),
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.xxl),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(l.shellSignupHaveAccount),
+                          TextButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => safePop(context, fallback: RoutePaths.login),
+                            child: Text(l.shellLoginButton),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Подтвердите пароль';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Пароли не совпадают';
-                    }
-                    return null;
-                  },
                 ),
-
-                const SizedBox(height: 32),
-
-                // Signup button
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSignup,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(_selectedRole == UserRole.admin 
-                          ? 'Зарегистрировать админа' 
-                          : 'Зарегистрироваться'),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Login link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Уже есть аккаунт?'),
-                    TextButton(
-                      onPressed: () => context.pop(),
-                      child: const Text('Войти'),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ),

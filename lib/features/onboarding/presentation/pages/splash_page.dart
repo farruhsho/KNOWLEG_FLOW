@@ -1,11 +1,20 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/routes/app_router.dart';
-import '../../../../core/theme/app_colors.dart';
+
+import '../../../../core/design/tokens.dart';
+import '../../../../core/navigation/boot_screens.dart';
+import '../../../../core/navigation/route_guards.dart';
+import '../../../../core/network/firebase_service.dart';
+import '../../../../core/routes/route_paths.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/onboarding_provider.dart';
 
+/// Decides where a cold start goes. No artificial delay (BOOT-01): it waits
+/// only for Firebase Auth to restore the session (with a timeout).
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
@@ -13,111 +22,67 @@ class SplashPage extends ConsumerStatefulWidget {
   ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends ConsumerState<SplashPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-
+class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
-
-    _controller.forward();
-
-    // Navigate after animation
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        _navigateNext();
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _route());
   }
 
-  Future<void> _navigateNext() async {
-    // Check if user is logged in
-    final authService = ref.read(authServiceProvider);
-    final currentUser = authService.currentUser;
-
-    if (currentUser != null) {
-      // User is logged in, go to dashboard
-      if (mounted) {
-        context.go(AppRouter.dashboard);
-      }
-    } else {
-      // Check if onboarding is completed
-      final onboardingService = ref.read(onboardingServiceProvider);
-      final isOnboardingCompleted = await onboardingService.isOnboardingCompleted();
-
-      if (mounted) {
-        if (isOnboardingCompleted) {
-          // Onboarding completed, go to login
-          context.go(AppRouter.login);
-        } else {
-          // First launch, show onboarding
-          context.go(AppRouter.onboarding);
-        }
-      }
+  Future<User?> _restoredUser() async {
+    final auth = FirebaseService.auth;
+    final current = auth.currentUser;
+    if (current != null) return current;
+    try {
+      return await auth
+          .authStateChanges()
+          .first
+          .timeout(const Duration(seconds: 4));
+    } on TimeoutException {
+      return auth.currentUser;
     }
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  Future<void> _route() async {
+    // A deep link carried through the cold start (RouteGuards.coldStartLocation).
+    final from = GoRouterState.of(context).uri.queryParameters[RouteGuards.fromParam];
+    final returnTo = RouteGuards.isSafeReturnLocation(from) ? from : null;
+    User? user;
+    try {
+      user = await _restoredUser();
+    } catch (e, s) {
+      FirebaseService.recordNonFatal(e, s, reason: 'splash_auth_restore');
+    }
+    if (!mounted) return;
+
+    if (user != null) {
+      // Existing session: make sure the profile exists, then save pending
+      // onboarding answers — in the background, in that order.
+      unawaited(ref.read(authServiceProvider).bootstrapSession(user));
+      context.go(returnTo ?? RoutePaths.home);
+      return;
+    }
+
+    final onboardingDone = ref.read(onboardingServiceProvider).isCompleted;
+    if (returnTo != null && onboardingDone) {
+      // Signed out: log in, then continue to the deep link.
+      context.go(Uri(path: RoutePaths.login, queryParameters: {RouteGuards.fromParam: returnTo}).toString());
+      return;
+    }
+    context.go(onboardingDone ? RoutePaths.login : RoutePaths.onboarding);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
+    return const Scaffold(
+      body: SafeArea(
+        child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Logo placeholder
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Icon(
-                  Icons.school,
-                  size: 64,
-                  color: AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'ORT Master KG',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Подготовка к ОРТ',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.white,
-                ),
-              ),
-              const SizedBox(height: 48),
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
-              ),
+              BrandMark(),
+              SizedBox(height: AppSpacing.huge),
+              SizedBox(width: 24, height: 24),
             ],
           ),
         ),

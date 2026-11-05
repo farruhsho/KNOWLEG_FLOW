@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "blueprint_id": "ort_subject_kyrgyz_lit_2026",
+  "blueprint_version": 1,
+  "languages": [
+    {
+      "language": "ky",
+      "sections": [
+        {
+          "section_id": "kyrgyz_lit",
+          "order": 1,
+          "subject_id": "kyrgyz_lit",
+          "duration_minutes": 60,
+          "question_count": 40,
+          "parts": [
+            {
+              "slot": "ort_subject_kyrgyz_lit_2026/kyrgyz_lit/kyrgyz_language",
+              "section_id": "kyrgyz_lit",
+              "part_id": "kyrgyz_language",
+              "item_type": "single_choice",
+              "question_count": 20,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 6,
+                "2": 10,
+                "3": 4
+              },
+              "passage_plan": {
+                "standalone_texts": 1,
+                "paired_texts": 0,
+                "questions_per_text": 5,
+                "passage_topics": [
+                  "kyrgyz.text_work"
+                ],
+                "words": [
+                  200,
+                  400
+                ]
+              },
+              "topics": [
+                {
+                  "topic_id": "kyrgyz.phonetics",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Фонетика",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 2,
+                  "target": 2,
+                  "min": 1,
+                  "max": 3,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz.lexicology",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Лексика",
+                  "grades": [
+                    5,
+                    6
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz.morphology",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Морфология",
+                  "grades": [
+                    6,
+                    7
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz.syntax",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Синтаксис",
+                  "grades": [
+                    8,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz.orthography_punctuation",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Орфография и пунктуация",
+                  "grades": [
+                    5,
+                    9
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 1,
+                    "2": 1,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz.text_work",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Работа с текстом",
+                  "grades": [
+                    8,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            },
+            {
+              "slot": "ort_subject_kyrgyz_lit_2026/kyrgyz_lit/kyrgyz_literature",
+              "section_id": "kyrgyz_lit",
+              "part_id": "kyrgyz_literature",
+              "item_type": "single_choice",
+              "question_count": 20,
+              "options_per_question": 4,
+              "fixed_options": false,
+              "verified": true,
+              "difficulty_counts": {
+                "1": 6,
+                "2": 10,
+                "3": 4
+              },
+              "passage_plan": null,
+              "topics": [
+                {
+                  "topic_id": "kyrgyz_lit.oral_folklore_manas",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Устное народное творчество и эпос «Манас»",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz_lit.akyns_zamanachy",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Акыны-импровизаторы и заманачы",
+                  "grades": [
+                    7,
+                    9
+                  ],
+                  "weight": 4,
+                  "target": 4,
+                  "min": 3,
+                  "max": 5,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 0
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz_lit.soviet_period",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Литература советского периода",
+                  "grades": [
+                    9,
+                    11
+                  ],
+                  "weight": 5,
+                  "target": 5,
+                  "min": 3,
+                  "max": 7,
+                  "difficulty_targets": {
+                    "1": 2,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz_lit.contemporary",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Современная литература",
+                  "grades": [
+                    10,
+                    11
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                },
+                {
+                  "topic_id": "kyrgyz_lit.theory",
+                  "subject_id": "kyrgyz_lit",
+                  "title_ru": "Теория литературы",
+                  "grades": [
+                    5,
+                    11
+                  ],
+                  "weight": 3,
+                  "target": 3,
+                  "min": 2,
+                  "max": 4,
+                  "difficulty_targets": {
+                    "1": 0,
+                    "2": 2,
+                    "3": 1
+                  },
+                  "subtopics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "warnings": []
+}

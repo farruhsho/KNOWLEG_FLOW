@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/theme/app_colors.dart';
+
+import '../../../../core/design/tokens.dart';
+import '../../../../core/routes/route_paths.dart';
+import '../../../../core/utils/content_locale.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/subject_model.dart';
+import '../../../../shared/services/firebase_data_service.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/loading_view.dart';
+import '../../../../shared/widgets/subject_icon.dart';
 import '../../../../shared/widgets/subject_search_delegate.dart';
+import '../../../gamification/gamification_routes.dart';
 
+/// Learn tab root: real subjects from Firestore plus practice shortcuts.
 class SubjectsListPage extends StatefulWidget {
   const SubjectsListPage({super.key});
 
@@ -16,207 +22,166 @@ class SubjectsListPage extends StatefulWidget {
 }
 
 class _SubjectsListPageState extends State<SubjectsListPage> {
-  final _firestore = FirebaseFirestore.instance;
+  late Future<List<SubjectModel>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = FirebaseDataService().getSubjects();
+  }
+
+  Future<void> _reload() async {
+    final f = FirebaseDataService().getSubjects();
+    setState(() => _future = f);
+    await f.catchError((Object _) => <SubjectModel>[]);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('subjects').orderBy('order').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: EmptyView(
-                message: 'Ошибка загрузки',
-                subtitle: snapshot.error.toString(),
-                icon: Icons.error_outline,
-              ),
-            );
+      appBar: AppBar(
+        title: Text(l.learnSubjectsTitle),
+        actions: [
+          FutureBuilder<List<SubjectModel>>(
+            future: _future,
+            builder: (context, snap) => IconButton(
+              icon: const Icon(Icons.search),
+              tooltip: l.learnSearchSubjects,
+              onPressed: snap.hasData
+                  ? () async {
+                      final picked = await showSearch(
+                        context: context,
+                        delegate: SubjectSearchDelegate(subjects: snap.data!),
+                      );
+                      if (picked != null && context.mounted) {
+                        context.push(RoutePaths.subject(picked.id));
+                      }
+                    }
+                  : null,
+            ),
+          ),
+        ],
+      ),
+      body: FutureBuilder<List<SubjectModel>>(
+        future: _future,
+        builder: (context, snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            return LoadingView(message: l.learnLoadingSubjects);
           }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingView(message: 'Загрузка предметов...');
-          }
-
-          final subjects = snapshot.data?.docs
-                  .map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    data['id'] = doc.id;
-                    return SubjectModel.fromFirestore(data);
-                  })
-                  .toList() ??
-              [];
-
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 120.0,
-                floating: true,
-                pinned: true,
-                backgroundColor: AppColors.background,
-                surfaceTintColor: AppColors.background,
-                elevation: 0,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-                  title: Text(
-                    'Предметы',
-                    style: GoogleFonts.outfit(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  background: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.05),
-                          AppColors.background,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                actions: [
-                  Container(
-                    margin: const EdgeInsets.only(right: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.grey200,
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.search, color: AppColors.textPrimary),
-                      onPressed: () {
-                        showSearch(
-                          context: context,
-                          delegate: SubjectSearchDelegate(_firestore),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              if (subjects.isEmpty)
-                const SliverFillRemaining(
-                  child: EmptyView(
-                    message: 'Предметы не найдены',
-                    subtitle: 'Скоро здесь появятся учебные предметы',
-                    icon: Icons.school_outlined,
-                  ),
-                )
-              else
+          if (snap.hasError) return ErrorView.forError(context, snap.error, onRetry: _reload);
+          final subjects = snap.data ?? const <SubjectModel>[];
+          final gutter = AppSpacing.gutter(context);
+          return RefreshIndicator(
+            onRefresh: _reload,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
                 SliverPadding(
-                  padding: const EdgeInsets.all(20),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.85,
+                  padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.sm),
+                  sliver: const SliverToBoxAdapter(child: _PracticeShortcuts()),
+                ),
+                if (subjects.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: EmptyView(
+                      icon: Icons.school_outlined,
+                      message: l.learnNoSubjectsTitle,
+                      subtitle: l.learnNoSubjectsBody,
                     ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final subject = subjects[index];
-                        return _buildSubjectCard(context, subject, index);
-                      },
-                      childCount: subjects.length,
+                  )
+                else
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.xxxl),
+                    sliver: SliverList.separated(
+                      itemCount: subjects.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+                      itemBuilder: (context, i) => _SubjectTile(subject: subjects[i]),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           );
         },
       ),
     );
   }
+}
 
-  Widget _buildSubjectCard(BuildContext context, SubjectModel subject, int index) {
-    // Use AppColors.getSubjectColor if available, otherwise fallback to hex string parse
-    Color color;
-    try {
-      if (subject.color.startsWith('#')) {
-        color = Color(int.parse(subject.color.replaceFirst('#', '0xFF')));
-      } else {
-        color = AppColors.getSubjectColor(subject.id);
-      }
-    } catch (_) {
-      color = AppColors.primary;
-    }
+class _PracticeShortcuts extends StatelessWidget {
+  const _PracticeShortcuts();
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 400 + (index * 100)),
-      curve: Curves.easeOutBack,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: child,
-        );
-      },
-      child: GestureDetector(
-        onTap: () => context.go('/subjects/${subject.id}'),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.grey200.withValues(alpha: 0.5),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final items = [
+      (Icons.bolt_outlined, l.learnQuickPracticeTitle, RoutePaths.quickTest),
+      (Icons.replay_outlined, l.learnMistakesTitle, kMistakesPath),
+      (Icons.today_outlined, l.learnDailyLessonTitle, RoutePaths.dailyLesson),
+      (Icons.leaderboard_outlined, l.learnLeaderboardTitle, RoutePaths.leaderboard),
+    ];
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
+      children: [
+        for (final (icon, label, path) in items)
+          ActionChip(
+            avatar: Icon(icon, size: 18),
+            label: Text(label),
+            onPressed: () => context.push(path),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      ],
+    );
+  }
+}
+
+class _SubjectTile extends StatelessWidget {
+  final SubjectModel subject;
+  const _SubjectTile({required this.subject});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final lang = contentLanguageOf(context);
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final color = SubjectColors.of(subject.id);
+    final description = subject.getDescription(lang);
+    return Material(
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.mdAll, side: BorderSide(color: t.border)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push(RoutePaths.subject(subject.id)),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  subject.icon,
-                  style: const TextStyle(fontSize: 40),
+                width: 48,
+                height: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: AppRadii.smAll),
+                child: SubjectIcon(icon: subject.icon, subjectId: subject.id, size: 26, color: color),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(subject.getTitle(lang), style: theme.textTheme.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    if (description.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(description, style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    ],
+                    if (subject.totalLessons > 0) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(l.learnLessonsCount(subject.totalLessons), style: theme.textTheme.labelSmall),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  subject.getTitle('ru'),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.grey50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.grey100),
-                ),
-                child: Text(
-                  '${subject.totalLessons} уроков',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                ),
-              ),
+              Icon(Icons.chevron_right, color: t.textTertiary),
             ],
           ),
         ),
@@ -224,4 +189,3 @@ class _SubjectsListPageState extends State<SubjectsListPage> {
     );
   }
 }
-

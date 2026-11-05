@@ -1,152 +1,653 @@
 rules_version = '2';
+
+// ORT Master KG — Firestore security rules.
+// Contract: docs/modernization/ARCHITECTURE.md §1 (collection table), §2 (roles), §3 (notes),
+// §9 (phase 3: referrals, promo codes, friends, groups, broadcasts, achievements config),
+// §10 (phase 4: generated exam variants, config/exam_pool, web payment orders).
+//
+// Principles
+// - The server (Cloud Functions, Admin SDK — bypasses these rules) is the
+//   source of truth for exam results, answer keys, entitlements, purchases,
+//   XP / levels / streaks, leaderboards, AI quotas and admin roles. Clients
+//   can only READ those collections (owner-scoped).
+// - Admin role = Firebase Auth custom claim `role` (set by adminSetRole).
+//   Backward compatibility: legacy users/{uid}.role == 'admin' counts as
+//   super_admin when the token carries no valid role claim.
+// - Everything not matched below is denied.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
-    function isAuthenticated() {
+    // ------------------------------------------------------------------
+    // Identity and roles
+
+    function signedIn() {
       return request.auth != null;
     }
 
-    function isOwner(userId) {
-      return request.auth.uid == userId;
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
     }
 
-    function isAdmin() {
-      return isAuthenticated() &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    function validRoles() {
+      return ['super_admin', 'content_manager', 'methodologist', 'moderator', 'support'];
     }
 
-    // Rate limiting helper (max 100 reads per minute)
-    function isRateLimited() {
-      return request.time < resource.data.lastRead + duration.value(0, 600); // 600ms = ~100 req/min
+    function tokenRole() {
+      return request.auth.token.get('role', '');
     }
 
-    // Users collection
+    function legacyAdmin() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'admin';
+    }
+
+    // True when the caller's effective role is one of `roles`.
+    // A valid claim wins; otherwise legacy users.role == 'admin' => super_admin.
+    function hasAnyRole(roles) {
+      return signedIn() && (
+        (tokenRole() in validRoles() && tokenRole() in roles)
+        || (!(tokenRole() in validRoles()) && 'super_admin' in roles && legacyAdmin())
+      );
+    }
+
+    // Permission helpers (ARCHITECTURE §2 matrix).
+    function isSuperAdmin() { return hasAnyRole(['super_admin']); }
+    function isContentRole() { return hasAnyRole(['super_admin', 'content_manager', 'methodologist']); } // edit_content / edit_questions
+    function canReviewQuestions() { return hasAnyRole(['super_admin', 'methodologist']); }
+    function canPublishVariants() { return hasAnyRole(['super_admin', 'content_manager']); }
+    function canManageAchievements() { return hasAnyRole(['super_admin', 'content_manager']); }
+    function canViewUsers() { return hasAnyRole(['super_admin', 'moderator', 'support']); }
+    function canModerateUsers() { return hasAnyRole(['super_admin', 'moderator']); }
+    function canViewPayments() { return hasAnyRole(['super_admin', 'support']); }
+    function canGrantCredits() { return hasAnyRole(['super_admin']); }
+    function isAnyAdmin() { return hasAnyRole(validRoles()); }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // Moderation ban on the caller's own profile (users/{uid}.is_banned).
+    function callerBanned() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('is_banned', false) == true;
+    }
+
+    // ------------------------------------------------------------------
+    // users/{uid}
+
+    // Fields only the server / admins may set (SEC-002, SEC-USR-01, FB-08).
+    // Phase 3 (§9): referral_code, referred_by and group_ids are server-written.
+    function privilegedUserFields() {
+      return ['role', 'roles', 'admin_role', 'isAdmin', 'is_admin', 'premium', 'is_premium',
+              'subscription', 'is_banned', 'banned', 'ban_reason', 'banned_at', 'banned_by',
+              'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by',
+              'referral_code', 'referred_by', 'group_ids'];
+    }
+
+    // Staff profiles (legacy admin or an admin_role mirrored by adminSetRole):
+    // only super_admin may ban them.
+    function isStaffProfile(d) {
+      return d.get('role', '') == 'admin' || d.get('admin_role', null) in validRoles();
+    }
+
+    // Moderator ban / unban (decision D5): only the ban fields, attributed to
+    // the caller. Subscription / premium changes stay super_admin only.
+    function validModeratorBan() {
+      let d = request.resource.data;
+      return changedKeys().hasOnly(['is_banned', 'ban_reason', 'banned_at', 'banned_by', 'updated_at'])
+        && d.get('is_banned', false) is bool
+        && (d.get('banned_by', null) == null || d.banned_by == request.auth.uid)
+        && (d.get('ban_reason', null) == null || (d.ban_reason is string && d.ban_reason.size() <= 500))
+        && (d.get('banned_at', null) == null || d.banned_at is timestamp)
+        && !isStaffProfile(resource.data);
+    }
+
+    // New profiles may not claim any privilege. The client's default
+    // `subscription: {tier: 'free', expires_at: null}` and role 'student' are allowed.
+    function validNewUserProfile() {
+      let d = request.resource.data;
+      return !d.keys().hasAny(['roles', 'admin_role', 'isAdmin', 'is_admin', 'premium', 'is_premium',
+                               'is_banned', 'banned', 'ban_reason', 'banned_at', 'banned_by',
+                               'isActive', 'credits', 'entitlements', 'role_updated_at', 'role_updated_by',
+                               'referral_code', 'referred_by', 'group_ids'])
+        && d.get('role', 'student') == 'student'
+        && (!('subscription' in d) || (
+              d.subscription is map
+              && d.subscription.keys().hasOnly(['tier', 'expires_at'])
+              && d.subscription.get('tier', 'free') == 'free'
+              && d.subscription.get('expires_at', null) == null));
+    }
+
     match /users/{userId} {
-      // Users can read and write their own data
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isOwner(userId) || isAdmin();
+      allow read: if isOwner(userId) || canViewUsers();
+      allow create: if isOwner(userId) && validNewUserProfile();
+      allow update: if (isOwner(userId) && !changedKeys().hasAny(privilegedUserFields()))
+                    || isSuperAdmin()
+                    || (canModerateUsers() && validModeratorBan());
+      // Self-deletion goes through the accountDelete function (no delete+recreate bypass).
+      allow delete: if isSuperAdmin();
     }
 
-    // Subjects collection (public read)
+    // ------------------------------------------------------------------
+    // Learning content (legacy collections, still used by the client)
+
     match /subjects/{subjectId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isContentRole();
     }
 
-    // Lessons collection
     match /lessons/{lessonId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if signedIn();
+      allow write: if isContentRole();
     }
 
-    // Questions collection
+    match /daily_lessons/{lessonId} {
+      allow read: if signedIn();
+      allow write: if isContentRole();
+    }
+
+    // Practice question bank. Readable (practice mode grades locally); the
+    // paid mock-exam content lives in exam_questions / exam_question_keys.
     match /questions/{questionId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if signedIn();
+      allow write: if isContentRole();
     }
 
-    // Mock tests collection
     match /mock_tests/{testId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if signedIn();
+      allow write: if isContentRole();
     }
 
-    // ORT tests collection
     match /ort_tests/{testId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if signedIn();
+      allow write: if isContentRole();
     }
 
-    // ORT attempts
-    match /ort_attempts/{attemptId} {
-      allow read: if isAuthenticated() &&
-                   resource.data.user_id == request.auth.uid;
-      allow create: if isAuthenticated() &&
-                     request.resource.data.user_id == request.auth.uid;
-      allow update: if isAuthenticated() &&
-                     (resource.data.user_id == request.auth.uid || isAdmin());
-      allow delete: if isOwner(resource.data.user_id) || isAdmin();
-    }
-
-    // User attempts
-    match /user_attempts/{attemptId} {
-      allow read: if isAuthenticated() &&
-                   resource.data.uid == request.auth.uid;
-      allow create: if isAuthenticated() &&
-                     request.resource.data.uid == request.auth.uid;
-      allow update: if isAuthenticated() &&
-                     (resource.data.uid == request.auth.uid || isAdmin());
-      allow delete: if isOwner(resource.data.uid);
-    }
-
-    // User progress
-    match /user_progress/{userId} {
-      allow read: if isOwner(userId);
-      allow write: if isOwner(userId) || isAdmin();
-    }
-
-    // Payments
-    match /payments/{paymentId} {
-      allow read: if isAuthenticated() &&
-                   resource.data.uid == request.auth.uid;
-      allow create: if isAuthenticated() &&
-                     request.resource.data.uid == request.auth.uid;
-      allow update: if false; // Only Cloud Functions can update payment status
-      allow delete: if false;
-    }
-
-    // Flashcards
     match /flashcards/{flashcardId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if signedIn();
+      allow write: if isContentRole();
     }
 
-    // User flashcard progress
-    match /flashcard_progress/{progressId} {
-      allow read: if isAuthenticated() &&
-                   resource.data.uid == request.auth.uid;
-      allow write: if isAuthenticated() &&
-                    request.resource.data.uid == request.auth.uid;
-    }
-
-    // Daily missions
     match /daily_missions/{missionId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow read: if signedIn();
+      allow write: if canManageAchievements();
     }
 
-    // User mission progress
-    match /user_mission_progress/{progressId} {
-      allow read: if isAuthenticated() &&
-                   resource.data.user_id == request.auth.uid;
-      allow write: if isAuthenticated() &&
-                    request.resource.data.user_id == request.auth.uid;
+    // ------------------------------------------------------------------
+    // Legacy per-user data written by the current client.
+    // Not trusted for rankings, levels or entitlements (server uses user_stats).
+
+    match /user_progress/{userId} {
+      allow read: if isOwner(userId) || canViewUsers();
+      allow write: if isOwner(userId) || isSuperAdmin();
     }
 
-    // Rankings (read-only for users, write by Cloud Functions)
-    match /rankings/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin(); // Only admin or Cloud Functions
-    }
-
-    // Analytics (user-specific)
     match /analytics/{userId} {
       allow read: if isOwner(userId);
-      allow write: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isSuperAdmin();
     }
 
-    // Forum posts (future feature)
+    // Cosmetic gamification (ARCHITECTURE §3 notes): owner read/write.
+    match /user_gamification/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /user_achievements/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Doc id is `${uid}_${date}`.
+    match /daily_quests/{questId} {
+      allow read, write: if signedIn() && questId.matches('^' + request.auth.uid + '_.+$');
+    }
+
+    // Legacy doc written at sign-up by older clients; cosmetic only.
+    match /gamification/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /ort_attempts/{attemptId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update: if signedIn() && resource.data.user_id == request.auth.uid
+                    && request.resource.data.user_id == request.auth.uid;
+      allow delete: if (signedIn() && resource.data.user_id == request.auth.uid) || isSuperAdmin();
+    }
+
+    match /user_attempts/{attemptId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    match /flashcard_progress/{progressId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    match /user_mission_progress/{progressId} {
+      allow read: if signedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update: if signedIn() && resource.data.user_id == request.auth.uid
+                    && request.resource.data.user_id == request.auth.uid;
+      allow delete: if signedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // Legacy rankings: read-only for clients (FB-09).
+    match /rankings/{userId} {
+      allow read: if signedIn();
+      allow write: if isSuperAdmin();
+    }
+
+    // Legacy payments: never client-writable (FB-10). Billing uses purchases/.
+    match /payments/{paymentId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || canViewPayments());
+      allow create, update, delete: if false;
+    }
+
+    // Forum (feature unused): posts are bound to their author (FB-30);
+    // banned users cannot post or edit (D5).
     match /forum_posts/{postId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated() &&
-                     resource.data.author_uid == request.auth.uid;
-      allow delete: if (isAuthenticated() &&
-                       resource.data.author_uid == request.auth.uid) ||
-                      isAdmin();
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.author_uid == request.auth.uid && !callerBanned();
+      allow update: if signedIn() && resource.data.author_uid == request.auth.uid
+                    && request.resource.data.author_uid == request.auth.uid && !callerBanned();
+      allow delete: if (signedIn() && resource.data.author_uid == request.auth.uid) || canModerateUsers();
+    }
+
+    // ------------------------------------------------------------------
+    // Exam content (ARCHITECTURE §1.1–1.3)
+
+    match /exam_blueprints/{blueprintId} {
+      allow read: if signedIn();
+      allow write: if canPublishVariants();
+    }
+
+    // Students see published variants only (queries must filter on status).
+    // Publishing goes through adminPublishVariant (validation), so direct
+    // writes may not set or modify 'published'.
+    // Phase 4 (§10.1): 'generated' variants are assembled by examStart for one
+    // attempt (exam_variants/fresh_{attemptId}). Students never read them (not
+    // even the owner of the attempt: the payload carries the current section);
+    // content roles read them like every variant (CMS lists, support), and
+    // nobody may create, edit or delete them from a client.
+    match /exam_variants/{variantId} {
+      allow read: if signedIn() && (resource.data.status == 'published' || isContentRole());
+      allow create: if canPublishVariants()
+                    && request.resource.data.status in ['draft', 'in_review'];
+      allow update: if canPublishVariants()
+                    && !(resource.data.status in ['published', 'generated'])
+                    && request.resource.data.status in ['draft', 'in_review', 'archived'];
+      allow delete: if isSuperAdmin() && !(resource.data.status in ['published', 'generated']);
+    }
+
+    function reviewStatus(data) {
+      return data.get('review', {}).get('status', 'draft');
+    }
+
+    // Student-visible question content: changing any of these on an approved
+    // or rejected question requires review (the CMS resets it to draft).
+    function reviewedQuestionFields() {
+      return ['review', 'stem', 'options', 'passage_id', 'image_path', 'language', 'table', 'type',
+              'column_a', 'column_b'];
+    }
+
+    // Questions, keys and passages: never readable by students.
+    // Only reviewers (super_admin, methodologist) may approve or reject.
+    // Other content roles may create/update drafts, and may edit metadata
+    // (topic, difficulty, part, translation links, edited_in_cms_at, ...) of
+    // approved/rejected questions as long as no reviewed field changes
+    // (AUTH-ADM-04).
+    match /exam_questions/{questionId} {
+      allow read: if isContentRole();
+      allow create: if isContentRole()
+                    && (canReviewQuestions() || reviewStatus(request.resource.data) in ['draft', 'ai_verified']);
+      allow update: if isContentRole()
+                    && (canReviewQuestions()
+                        || reviewStatus(request.resource.data) in ['draft', 'ai_verified']
+                        || !changedKeys().hasAny(reviewedQuestionFields()));
+      allow delete: if canPublishVariants();
+    }
+
+    function questionPath(questionId) {
+      return /databases/$(database)/documents/exam_questions/$(questionId);
+    }
+
+    // Answer keys (AUTH-ADM-07): reviewers write freely. Other content roles
+    // may change `correct` only while the question is (or, in the same batch,
+    // becomes) draft / ai_verified; explanation-only edits keep `correct`.
+    match /exam_question_keys/{questionId} {
+      allow read: if isContentRole();
+      allow create, update: if canReviewQuestions()
+        || (isContentRole() && (
+              (existsAfter(questionPath(questionId))
+                && reviewStatus(getAfter(questionPath(questionId)).data) in ['draft', 'ai_verified'])
+              || (resource != null
+                && request.resource.data.get('correct', '') == resource.data.get('correct', ''))));
+      allow delete: if canPublishVariants();
+    }
+
+    match /exam_passages/{passageId} {
+      allow read, write: if isContentRole();
+    }
+
+    // ------------------------------------------------------------------
+    // Exam attempts (server-written)
+
+    function attemptData(attemptId) {
+      return get(/databases/$(database)/documents/exam_attempts/$(attemptId)).data;
+    }
+
+    // Draft autosave: owner, current section only, until deadline + 2 min.
+    // Decision D1: the client writes exactly {answers, flags,
+    // client_updated_at: serverTimestamp()} (the section is the doc id);
+    // a serverTimestamp resolves to request.time, which `is timestamp`.
+    function canWriteDraft(attemptId, sectionId) {
+      let a = attemptData(attemptId);
+      let d = request.resource.data;
+      return signedIn()
+        && a.uid == request.auth.uid
+        && a.status == 'in_progress'
+        && a.current_section_id == sectionId
+        && request.time < a.current_deadline_at + duration.value(2, 'm')
+        && d.keys().hasOnly(['answers', 'flags', 'client_updated_at'])
+        && d.answers is map
+        && d.answers.size() <= 100
+        && (!('flags' in d) || (d.flags is list && d.flags.size() <= 100))
+        // Timestamp (or serverTimestamp()) or epoch milliseconds.
+        && (!('client_updated_at' in d) || d.client_updated_at is timestamp || d.client_updated_at is int);
+    }
+
+    match /exam_attempts/{attemptId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+
+      match /answers/{sectionId} {
+        allow read: if signedIn() && attemptData(attemptId).uid == request.auth.uid;
+        allow write: if false;
+      }
+
+      match /drafts/{sectionId} {
+        allow read: if signedIn() && attemptData(attemptId).uid == request.auth.uid;
+        allow create, update: if canWriteDraft(attemptId, sectionId);
+        allow delete: if false;
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // Billing, stats, XP, leaderboards, AI usage (server-written)
+
+    // Owner, plus staff with view_users (super_admin, moderator, support):
+    // the CMS user page shows credits, ledger and stats (decision D6).
+    match /entitlements/{uid} {
+      allow read: if isOwner(uid) || canViewUsers();
+      allow write: if false;
+
+      match /ledger/{entryId} {
+        allow read: if isOwner(uid) || canViewUsers();
+        allow write: if false;
+      }
+    }
+
+    match /purchases/{purchaseId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || canViewPayments());
+      allow write: if false;
+
+      // Raw purchase token for consume retries: server only.
+      match /private/{docId} {
+        allow read, write: if false;
+      }
+    }
+
+    // Web payments (ARCHITECTURE §10.3): orders are created and moved only by
+    // the payment functions; the owner reads their own (queries must filter
+    // on uid), super_admin and support read all (view_payments).
+    match /payment_orders/{orderId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || canViewPayments());
+      allow write: if false;
+    }
+
+    // Provider notifications (idempotency, no uid) and the daily order
+    // counters: server only.
+    match /payment_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /payment_attempts/{attemptId} {
+      allow read, write: if false;
+    }
+
+    match /user_stats/{uid} {
+      allow read: if isOwner(uid) || canViewUsers();
+      allow write: if false;
+    }
+
+    match /xp_events/{uid}/events/{eventId} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    match /leaderboards/{boardId} {
+      allow read: if signedIn();
+      allow write: if false;
+
+      match /entries/{entryUid} {
+        allow read: if signedIn();
+        allow create, update: if false;
+        allow delete: if canModerateUsers();
+      }
+    }
+
+    match /ai_usage/{uid}/days/{day} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    match /config/pricing {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Fresh-variant pool settings (§10.1): readable by signed-in users,
+    // written only by adminUpdateExamPool.
+    match /config/exam_pool {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Achievement texts (§9.4): written directly by manage_achievements roles;
+    // thresholds and award logic stay in the server code.
+    function validAchievementsConfig() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['titles', 'descriptions', 'disabled'])
+        && (!('titles' in d) || d.titles is map)
+        && (!('descriptions' in d) || d.descriptions is map)
+        && (!('disabled' in d) || (d.disabled is list && d.disabled.size() <= 100));
+    }
+
+    match /config/achievements {
+      allow read: if signedIn();
+      allow create, update: if canManageAchievements() && validAchievementsConfig();
+      allow delete: if false;
+    }
+    // config/ai_tutor and any other config doc: server only (default deny).
+
+    match /admin_logs/{logId} {
+      allow read: if hasAnyRole(['super_admin', 'support']);
+      allow write: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Phase 3: growth and social (ARCHITECTURE §9). Every write below goes
+    // through a callable unless noted (assignments, submissions, friend
+    // deletion, config/achievements).
+
+    // Code reservations and counters: server only.
+    match /referral_codes/{code} {
+      allow read, write: if false;
+    }
+
+    match /group_join_codes/{code} {
+      allow read, write: if false;
+    }
+
+    match /promo_attempts/{attemptId} {
+      allow read, write: if false;
+    }
+
+    // groupJoin + friendAdd attempt counter (§9.7): server only.
+    match /code_attempts/{attemptId} {
+      allow read, write: if false;
+    }
+
+    match /notification_quota/{day} {
+      allow read, write: if false;
+    }
+
+    // Promo codes: no client access; grant_credits (super_admin) reads them.
+    match /promo_codes/{code} {
+      allow read: if canGrantCredits();
+      allow write: if false;
+
+      match /redemptions/{redeemerUid} {
+        allow read: if canGrantCredits();
+        allow write: if false;
+      }
+    }
+
+    // Referrals: the referrer reads their counters and the people they invited;
+    // view_users roles read them too (D6, CMS user card, §9.7).
+    match /referrals/{referrerUid} {
+      allow get: if isOwner(referrerUid) || canViewUsers();
+      allow list: if isOwner(referrerUid);
+      allow write: if false;
+
+      match /items/{itemUid} {
+        allow read: if isOwner(referrerUid) || canViewUsers();
+        allow write: if false;
+      }
+    }
+
+    // Friends: created only by friendAdd; the owner reads and removes.
+    match /friends/{ownerUid}/list/{friendUid} {
+      allow read: if isOwner(ownerUid);
+      allow delete: if isOwner(ownerUid);
+      allow create, update: if false;
+    }
+
+    function groupPath(gid) {
+      return /databases/$(database)/documents/groups/$(gid);
+    }
+
+    function isGroupMember(gid) {
+      return signedIn() && exists(/databases/$(database)/documents/groups/$(gid)/members/$(request.auth.uid));
+    }
+
+    function isGroupOwner(gid) {
+      return signedIn() && exists(groupPath(gid)) && get(groupPath(gid)).data.owner_uid == request.auth.uid;
+    }
+
+    // groups/{gid}/assignments/{aid} = {title, kind, ref_id, due_at, created_by, created_at}
+    // (+ optional description, updated_at). ref_id '' only for kind 'practice'
+    // ("quick practice", §9.7); other kinds need a non-empty ref_id.
+    function validAssignment() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['title', 'kind', 'ref_id', 'due_at', 'created_by', 'created_at', 'description', 'updated_at'])
+        && d.keys().hasAll(['title', 'kind', 'ref_id', 'created_by', 'created_at'])
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 120
+        && d.kind in ['lesson', 'practice', 'exam_variant']
+        && d.ref_id is string && d.ref_id.size() <= 150
+        && (d.ref_id.size() >= 1 || d.kind == 'practice')
+        && (d.get('due_at', null) == null || d.due_at is timestamp)
+        && d.created_at is timestamp
+        && (d.get('description', null) == null || (d.description is string && d.description.size() <= 1000))
+        && (d.get('updated_at', null) == null || d.updated_at is timestamp);
+    }
+
+    // .../submissions/{uid} = {done_at, score_percent?}
+    function validSubmission() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['done_at', 'score_percent'])
+        && d.done_at is timestamp
+        && (d.get('score_percent', null) == null
+            || ((d.score_percent is int || d.score_percent is float) && d.score_percent >= 0 && d.score_percent <= 100));
+    }
+
+    // Groups: membership (members/{uid}), member_count and users.group_ids
+    // change only through groupCreate / groupJoin / groupLeave /
+    // groupRemoveMember. Members read the group and its member list;
+    // view_users roles read the group document only (CMS user card, §9.7).
+    match /groups/{gid} {
+      // Staff may open one group (CMS user card, D6) but never list them all:
+      // a listing would hand out every join_code (ARCHITECTURE §9.7).
+      allow get: if isGroupMember(gid) || canViewUsers();
+      allow list: if isGroupMember(gid);
+      allow write: if false;
+
+      match /members/{memberUid} {
+        allow read: if isGroupMember(gid);
+        allow write: if false;
+      }
+
+      // Users the owner removed (groupRemoveMember, §9.7): server only.
+      match /removed/{removedUid} {
+        allow read, write: if false;
+      }
+
+      // Homework (FR-LRN-6): the group owner creates, edits and deletes;
+      // members read.
+      match /assignments/{aid} {
+        allow read: if isGroupMember(gid);
+        allow create: if isGroupOwner(gid) && !callerBanned() && validAssignment()
+                      && request.resource.data.created_by == request.auth.uid;
+        allow update: if isGroupOwner(gid) && !callerBanned() && validAssignment()
+                      && request.resource.data.created_by == resource.data.created_by
+                      && request.resource.data.created_at == resource.data.created_at;
+        allow delete: if isGroupOwner(gid);
+
+        // A member writes only their own submission; the owner reads all.
+        match /submissions/{subUid} {
+          allow read: if isGroupOwner(gid) || (isOwner(subUid) && isGroupMember(gid));
+          allow create, update: if isOwner(subUid) && isGroupMember(gid)
+                                && exists(/databases/$(database)/documents/groups/$(gid)/assignments/$(aid))
+                                && validSubmission();
+          allow delete: if isOwner(subUid) && isGroupMember(gid);
+        }
+      }
+    }
+
+    // Broadcast history (adminSendNotification): admin roles read.
+    match /notifications/{notificationId} {
+      allow read: if isAnyAdmin();
+      allow write: if false;
+    }
+
+    // ------------------------------------------------------------------
+    // Mistakes & review queue (ARCHITECTURE §1)
+
+    function practiceMistakeShape(questionId) {
+      let d = request.resource.data;
+      return d.source == 'practice'
+        && d.get('question_id', questionId) == questionId
+        && d.keys().size() <= 20;
+    }
+
+    match /user_mistakes/{uid}/items/{questionId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && practiceMistakeShape(questionId);
+      // Practice items: owner edits freely. Exam items (written by
+      // examSubmitSection): the owner may only advance their review schedule.
+      allow update: if isOwner(uid) && (
+        (resource.data.source == 'practice' && practiceMistakeShape(questionId))
+        || (resource.data.source == 'exam'
+            && changedKeys().hasOnly(['resolved', 'next_review_at', 'interval_days', 'last_reviewed_at', 'review_count', 'updated_at']))
+      );
+      allow delete: if isOwner(uid) && resource.data.source == 'practice';
     }
   }
 }

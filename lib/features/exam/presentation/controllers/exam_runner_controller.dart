@@ -1,0 +1,569 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../data/exam_draft_sink.dart';
+import '../../data/exam_local_store.dart';
+import '../../data/exam_remote_datasource.dart';
+import '../../domain/exam_failure.dart';
+import '../../domain/exam_session.dart';
+import '../../domain/exam_start.dart';
+import '../../domain/question_timing.dart';
+
+/// One-shot messages for the runner UI (snackbars).
+enum ExamRunnerNotice {
+  fiveMinutesLeft,
+  oneMinuteLeft,
+  autoSubmitted,
+
+  /// Strict style: a third choice for an already corrected answer was refused.
+  answerLocked,
+}
+
+/// Sink for non-fatal errors the runner cannot show to the user (draft
+/// autosave failures). Wired to crash reporting in the app.
+typedef ExamErrorReporter = void Function(
+    Object error, StackTrace? stack, String reason);
+
+void _debugReport(Object error, StackTrace? stack, String reason) =>
+    debugPrint('exam: $reason failed ($error)');
+
+@immutable
+class ExamRunnerState {
+  final bool loading;
+
+  /// Fatal: nothing to show (no local copy and the server call failed).
+  final ExamFailure? loadFailure;
+  final ExamSession? session;
+
+  /// The last server sync failed; running from the local copy.
+  final bool offline;
+
+  /// Why the last section submission failed (while in submitPending).
+  final ExamFailure? submitFailure;
+  final ExamRunnerNotice? notice;
+  final int noticeSeq;
+
+  const ExamRunnerState({
+    this.loading = true,
+    this.loadFailure,
+    this.session,
+    this.offline = false,
+    this.submitFailure,
+    this.notice,
+    this.noticeSeq = 0,
+  });
+
+  ExamRunnerState copyWith({
+    bool? loading,
+    ExamFailure? loadFailure,
+    bool clearLoadFailure = false,
+    ExamSession? session,
+    bool? offline,
+    ExamFailure? submitFailure,
+    bool clearSubmitFailure = false,
+    ExamRunnerNotice? notice,
+    int? noticeSeq,
+  }) =>
+      ExamRunnerState(
+        loading: loading ?? this.loading,
+        loadFailure: clearLoadFailure ? null : (loadFailure ?? this.loadFailure),
+        session: session ?? this.session,
+        offline: offline ?? this.offline,
+        submitFailure:
+            clearSubmitFailure ? null : (submitFailure ?? this.submitFailure),
+        notice: notice ?? this.notice,
+        noticeSeq: noticeSeq ?? this.noticeSeq,
+      );
+
+  ExamPhase? get phase => session?.phase;
+}
+
+/// Drives one attempt: restores it (local first, then the server), applies
+/// edits to the pure [ExamSession], persists every change to Hive at once,
+/// syncs drafts every [draftInterval] and when the app goes to background,
+/// fires timer warnings and auto-submits at the deadline.
+class ExamRunnerController extends StateNotifier<ExamRunnerState> {
+  final String attemptId;
+  final ExamRemoteDataSource _remote;
+  final ExamLocalStore _store;
+  final ExamDraftSink _drafts;
+  final ExamClock _clock;
+  final String? _uid;
+  final ExamErrorReporter _reportError;
+  final Duration tickInterval;
+  final Duration draftInterval;
+  final Duration retryInterval;
+
+  /// Strict style: wait this long before sending a section again after the
+  /// server answered SECTION_NOT_OVER (the device clock ran a little ahead).
+  final Duration sectionNotOverRetry;
+
+  /// Earliest moment of the next automatic retry after SECTION_NOT_OVER.
+  DateTime? _retryNotBefore;
+
+  Timer? _ticker;
+  Timer? _draftTimer;
+  bool _draftDirty = false;
+  int _draftFailureCount = 0;
+
+  /// Sections whose draft failure was already reported (one report per
+  /// section, so a persistent denial does not flood crash reporting).
+  final Set<String> _draftFailureReported = {};
+  bool _submitting = false;
+  DateTime? _lastAutoRetry;
+  Future<void> _saveChain = Future.value();
+
+  /// Time per question of the open section (ARCHITECTURE §9.5). Not part of
+  /// [state]: it changes every instant and must never rebuild widgets.
+  QuestionTimer? _timer;
+
+  /// Timings restored from the device for a section not yet re-opened.
+  QuestionTimer? _restoredTimer;
+  bool _backgrounded = false;
+
+  ExamRunnerController({
+    required this.attemptId,
+    required ExamRemoteDataSource remote,
+    required ExamLocalStore store,
+    required ExamDraftSink drafts,
+    required ExamClock clock,
+    String? uid,
+    ExamErrorReporter reportError = _debugReport,
+    this.tickInterval = const Duration(seconds: 1),
+    this.draftInterval = const Duration(seconds: 20),
+    this.retryInterval = const Duration(seconds: 15),
+    this.sectionNotOverRetry = const Duration(seconds: 3),
+    bool autoLoad = true,
+  })  : _remote = remote,
+        _store = store,
+        _drafts = drafts,
+        _clock = clock,
+        _uid = uid,
+        _reportError = reportError,
+        super(const ExamRunnerState()) {
+    if (autoLoad) load();
+  }
+
+  // ------------------------------------------------------------- loading
+
+  Future<void> load() async {
+    state = state.copyWith(loading: true, clearLoadFailure: true);
+    ExamSession? local;
+    try {
+      local = await _store.load(attemptId);
+    } catch (e) {
+      debugPrint('exam: local load failed ($e)');
+    }
+    try {
+      _restoredTimer = await _store.loadTimings(attemptId);
+    } catch (e) {
+      debugPrint('exam: local timings unreadable ($e)');
+    }
+    if (!mounted) return;
+    if (local != null && (local.uid == null || _uid == null || local.uid == _uid)) {
+      state = state.copyWith(loading: false, session: local);
+      _syncTimer(local);
+      _startTimers();
+    }
+    await _syncWithServer(initial: true);
+  }
+
+  Future<void> _syncWithServer({bool initial = false}) async {
+    try {
+      final payload = await _remote.getState(attemptId);
+      if (!mounted) return;
+      final now = _clock();
+      final current = state.session;
+      final next = current == null
+          ? ExamSession.fromPayload(payload, clientNow: now, uid: _uid)
+          : current.reconcile(payload, clientNow: now);
+      _commit(next, content: true);
+      state = state.copyWith(loading: false, offline: false);
+      _startTimers();
+      if (next.phase == ExamPhase.submitPending) {
+        unawaited(submitSection());
+      } else if (next.phase == ExamPhase.submitting && !_submitting) {
+        _commit(next.submitFailed());
+      }
+    } on ExamFailure catch (f) {
+      if (!mounted) return;
+      final current = state.session;
+      if (f.kind == ExamFailureKind.attemptNotInProgress && current != null) {
+        _commit(current.complete(null));
+        state = state.copyWith(loading: false);
+        return;
+      }
+      if (current == null) {
+        state = state.copyWith(loading: false, loadFailure: f);
+      } else {
+        state = state.copyWith(loading: false, offline: true);
+        if (current.phase == ExamPhase.submitting && !_submitting) {
+          _commit(current.submitFailed());
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final f = ExamFailure(ExamFailureKind.unknown, e.toString());
+      if (state.session == null) {
+        state = state.copyWith(loading: false, loadFailure: f);
+      } else {
+        state = state.copyWith(loading: false, offline: true);
+      }
+    }
+  }
+
+  // --------------------------------------------------------------- edits
+
+  void selectAnswer(String questionId, String optionId) {
+    final s = state.session;
+    if (s != null &&
+        s.isAnswerLocked(questionId) &&
+        s.answerOf(questionId) != optionId &&
+        s.canEdit(_clock())) {
+      // Strict: the one correction is used up — explain instead of a
+      // silent no-op.
+      _notify(ExamRunnerNotice.answerLocked);
+      return;
+    }
+    _edit((s, now) => s.answer(questionId, optionId, now: now), dirty: true);
+  }
+
+  void clearAnswer(String questionId) =>
+      _edit((s, now) => s.clearAnswer(questionId, now: now), dirty: true);
+
+  void toggleFlag(String questionId) =>
+      _edit((s, now) => s.toggleFlag(questionId, now: now), dirty: true);
+
+  void goTo(int index) => _edit((s, _) => s.goTo(index));
+  void next() => _edit((s, _) => s.next());
+  void previous() => _edit((s, _) => s.previous());
+
+  /// Leaves the section interstitial.
+  void startSection() => _edit((s, _) => s.startSection());
+
+  void _edit(ExamSession Function(ExamSession s, DateTime now) f,
+      {bool dirty = false}) {
+    final s = state.session;
+    if (s == null) return;
+    final next = f(s, _clock());
+    if (identical(next, s)) return;
+    if (dirty) _draftDirty = true;
+    _commit(next);
+  }
+
+  void _commit(ExamSession session, {bool content = false}) {
+    if (!mounted) return;
+    state = state.copyWith(session: session);
+    _syncTimer(session);
+    // Serialise writes so an older snapshot can never land after a newer one.
+    _saveChain = _saveChain.then((_) async {
+      try {
+        await _store.save(session,
+            includeContent: content,
+            savedAtMs: _clock().millisecondsSinceEpoch);
+        // A finished attempt no longer needs its question content on the
+        // device; the small state record (result, flags) is kept.
+        if (session.phase == ExamPhase.completed) {
+          await _store.pruneContent(session.attemptId);
+        }
+      } catch (e) {
+        debugPrint('exam: local save failed ($e)');
+      }
+    });
+  }
+
+  /// Completes when every local write issued so far has finished.
+  Future<void> get pendingWrites => _saveChain;
+
+  // -------------------------------------------------------------- timings
+
+  static int _sectionCapSec(ExamSession s) => s.section.durationSec > 0
+      ? s.section.durationSec
+      : s.sectionSpec.durationMinutes * 60;
+
+  /// Points the question clock at whatever is on screen for [s]: the
+  /// current question while answering, nothing on the interstitial, the
+  /// submit screens or after the deadline.
+  void _syncTimer(ExamSession s) {
+    final now = _clock();
+    if (s.phase == ExamPhase.completed || !s.hasQuestions) {
+      _timer?.focus(null, now);
+      return;
+    }
+    final sectionId = s.section.sectionId;
+    var timer = _timer;
+    if (timer == null || timer.sectionId != sectionId) {
+      final restored = _restoredTimer;
+      _restoredTimer = null;
+      timer = restored != null && restored.sectionId == sectionId
+          ? restored
+          : QuestionTimer(sectionId: sectionId, capSeconds: _sectionCapSec(s));
+      if (_backgrounded) timer.pause(now);
+      _timer = timer;
+    }
+    final visible =
+        s.phase == ExamPhase.inSection && !s.isExpired(now) ? s.currentQuestion?.id : null;
+    final before = timer.activeQuestionId;
+    timer.focus(visible, now);
+    if (before != visible) _persistTimer();
+  }
+
+  void _persistTimer() {
+    final timer = _timer;
+    if (timer == null) return;
+    final now = _clock();
+    _saveChain = _saveChain.then((_) async {
+      try {
+        await _store.saveTimings(attemptId, timer, now);
+      } catch (e) {
+        debugPrint('exam: timings save failed ($e)');
+      }
+    });
+  }
+
+  /// Seconds per question of the open section measured so far (for tests
+  /// and diagnostics).
+  Map<String, int> questionTimings() {
+    final s = state.session;
+    final timer = _timer;
+    if (s == null || timer == null || timer.sectionId != s.section.sectionId) return const {};
+    return timer.secondsAt(_clock(), questionIds: [for (final q in s.questions) q.id]);
+  }
+
+  /// The app went to the background: stop the question clock, keep the
+  /// timings and send the draft.
+  void onAppBackground() {
+    _backgrounded = true;
+    _timer?.pause(_clock());
+    _persistTimer();
+    flushDraft();
+  }
+
+  /// The app is visible again: the question on screen counts again.
+  void onAppForeground() {
+    _backgrounded = false;
+    _timer?.resume(_clock());
+  }
+
+  // ------------------------------------------------------------ submission
+
+  /// Closes the open section (after the user confirmed, or automatically at
+  /// the deadline) and sends it. On failure the section stays locked in
+  /// [ExamPhase.submitPending] until a retry succeeds.
+  ///
+  /// Strict style never closes a section before its deadline: an early call
+  /// is ignored (there is no "finish section" button in that style anyway).
+  Future<void> submitSection({bool automatic = false}) async {
+    final s = state.session;
+    if (s == null || _submitting) return;
+    if (!s.canSubmit(_clock())) return;
+    _submitting = true;
+    _retryNotBefore = null;
+    try {
+      final locked = s.beginSubmit(
+        now: _clock(),
+        automatic: automatic,
+        timings: questionTimings(),
+      );
+      _commit(locked);
+      state = state.copyWith(clearSubmitFailure: true);
+      final submission = locked.pendingSubmission!;
+      _syncDraftNow(locked, force: true);
+      final response = await _remote.submitSection(submission);
+      if (!mounted) return;
+      final current = state.session!;
+      final now = _clock();
+      final ExamSession next;
+      if (response.completed || response.next == null) {
+        next = current.complete(response.result);
+      } else {
+        next = current.acceptNextSection(response.next!, clientNow: now);
+      }
+      _draftDirty = false;
+      _commit(next, content: true);
+      state = state.copyWith(offline: false);
+      if (submission.automatic) _notify(ExamRunnerNotice.autoSubmitted);
+    } on ExamFailure catch (f) {
+      if (!mounted) return;
+      if (f.kind == ExamFailureKind.wrongSection ||
+          f.kind == ExamFailureKind.attemptNotInProgress) {
+        // The server already moved past this section: adopt its state.
+        _submitting = false;
+        await _syncWithServer();
+        return;
+      }
+      if (f.kind == ExamFailureKind.sectionNotOver) {
+        // Strict: the server's clock says the section still runs. Usually a
+        // few seconds: the answers stay locked in and are sent again
+        // shortly. If the device clock was far ahead, the section reopens.
+        // Only strict attempts get this answer, so the attempt is strict
+        // whatever this device assumed (e.g. a copy without the style): it
+        // switches, which also makes the reopen possible.
+        _retryNotBefore = _clock().add(sectionNotOverRetry);
+        _commit(state.session!.withStyle(ExamStyle.strict).submitFailed());
+        state = state.copyWith(submitFailure: f, offline: false);
+        await _reopenIfStillRunning();
+        return;
+      }
+      _commit(state.session!.submitFailed());
+      state = state.copyWith(
+          submitFailure: f, offline: f.kind == ExamFailureKind.network);
+    } on StateError catch (_) {
+      _submitting = false;
+      await _syncWithServer();
+      return;
+    } finally {
+      _submitting = false;
+    }
+  }
+
+  /// After SECTION_NOT_OVER: asks the server for its clock. When the open
+  /// section has real time left (the device clock ran ahead), it reopens
+  /// with the corrected deadline instead of waiting on a locked screen.
+  Future<void> _reopenIfStillRunning() async {
+    try {
+      final payload = await _remote.getState(attemptId);
+      if (!mounted) return;
+      final current = state.session;
+      if (current == null) return;
+      final reopened = current.reopenNotOver(payload, clientNow: _clock());
+      if (identical(reopened, current)) return;
+      _retryNotBefore = null;
+      _commit(reopened);
+      state = state.copyWith(clearSubmitFailure: true);
+    } catch (e) {
+      debugPrint('exam: state check after SECTION_NOT_OVER failed ($e)');
+    }
+  }
+
+  /// Manual "Повторить" on the offline screen.
+  Future<void> retrySubmit() => submitSection();
+
+  /// Manual retry when the first load failed.
+  Future<void> retryLoad() => load();
+
+  // ------------------------------------------------------------- drafts
+
+  /// Sends the draft now (e.g. on AppLifecycleState.paused).
+  void flushDraft() {
+    final s = state.session;
+    if (s != null) _syncDraftNow(s);
+  }
+
+  void _syncDraftNow(ExamSession s, {bool force = false}) {
+    if (!force && !_draftDirty) return;
+    if (s.phase != ExamPhase.inSection && !force) return;
+    _draftDirty = false;
+    final answers = <String, String>{
+      for (final q in s.questions)
+        if (s.answers[q.id] != null) q.id: s.answers[q.id]!,
+    };
+    final flags = [
+      for (final q in s.questions)
+        if (s.flags.contains(q.id)) q.id,
+    ];
+    final sectionId = s.section.sectionId;
+    // Firestore queues the write offline; never block the UI on it. The Hive
+    // copy is authoritative, so a failure changes nothing locally: the draft
+    // is marked dirty again (retried on the next interval) and reported.
+    unawaited(_writeDraft(s.attemptId, sectionId, answers, flags));
+  }
+
+  Future<void> _writeDraft(String attemptId, String sectionId,
+      Map<String, String> answers, List<String> flags) async {
+    try {
+      await _drafts.writeDraft(
+        attemptId: attemptId,
+        sectionId: sectionId,
+        answers: answers,
+        flags: flags,
+      );
+      _draftFailureReported.remove(sectionId);
+    } catch (e, st) {
+      _onDraftWriteFailed(sectionId, e, st);
+    }
+  }
+
+  /// Number of draft writes that failed (diagnostics / tests).
+  int get draftFailures => _draftFailureCount;
+
+  void _onDraftWriteFailed(String sectionId, Object error, StackTrace stack) {
+    _draftFailureCount++;
+    if (_draftFailureReported.add(sectionId)) {
+      _reportError(error, stack, 'exam_draft_write');
+    } else {
+      debugPrint('exam: draft write failed again ($error)');
+    }
+    if (!mounted) return;
+    final s = state.session;
+    // Retry on the next draft tick while the same section is still open.
+    if (s != null &&
+        s.phase == ExamPhase.inSection &&
+        s.section.sectionId == sectionId) {
+      _draftDirty = true;
+    }
+  }
+
+  // -------------------------------------------------------------- timers
+
+  void _startTimers() {
+    _ticker ??= Timer.periodic(tickInterval, (_) => tick());
+    _draftTimer ??= Timer.periodic(draftInterval, (_) {
+      final s = state.session;
+      if (s != null) _syncDraftNow(s);
+      if (s?.phase == ExamPhase.inSection && !_backgrounded) _persistTimer();
+    });
+  }
+
+  /// One clock step: warnings, auto-submit, periodic retry. Public for tests.
+  void tick() {
+    final s = state.session;
+    if (s == null || !mounted) return;
+    final now = _clock();
+    final warning = s.dueWarning(now);
+    if (warning != null) {
+      _commit(s.markWarned(warning));
+      _notify(warning == TimerWarning.oneMinute
+          ? ExamRunnerNotice.oneMinuteLeft
+          : ExamRunnerNotice.fiveMinutesLeft);
+    }
+    final current = state.session!;
+    if (current.shouldAutoSubmit(now)) {
+      unawaited(submitSection(automatic: true));
+    } else if (current.phase == ExamPhase.submitPending && !_submitting) {
+      final notBefore = _retryNotBefore;
+      if (notBefore != null) {
+        if (!now.isBefore(notBefore)) {
+          _lastAutoRetry = now;
+          unawaited(submitSection());
+        }
+        return;
+      }
+      final last = _lastAutoRetry;
+      if (last == null || now.difference(last) >= retryInterval) {
+        _lastAutoRetry = now;
+        unawaited(submitSection());
+      }
+    }
+  }
+
+  void _notify(ExamRunnerNotice n) {
+    if (!mounted) return;
+    state = state.copyWith(notice: n, noticeSeq: state.noticeSeq + 1);
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    _draftTimer?.cancel();
+    final s = state.session;
+    if (s != null && s.phase == ExamPhase.inSection) {
+      _syncDraftNow(s);
+      _timer?.focus(null, _clock());
+      _persistTimer();
+    }
+    super.dispose();
+  }
+}

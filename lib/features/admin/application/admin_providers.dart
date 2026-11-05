@@ -1,0 +1,220 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/network/firebase_service.dart';
+import '../../../providers/admin_access_provider.dart';
+import '../data/admin_firebase.dart';
+import '../data/admin_functions.dart';
+import '../data/models/admin_records.dart';
+import '../data/models/subject_doc.dart';
+import '../data/repositories/content_repositories.dart';
+import '../data/repositories/exam_repositories.dart';
+import '../data/repositories/growth_repositories.dart';
+import '../data/repositories/people_repositories.dart';
+import '../data/repositories/phase4_repositories.dart';
+import '../domain/achievements_config.dart';
+import '../domain/blueprint_spec.dart';
+import '../domain/callable_errors.dart' show kAdminAppCheckEnforced;
+import '../domain/exam_pool.dart';
+import '../domain/exam_question.dart';
+import '../domain/lesson_doc.dart';
+import '../domain/notification_draft.dart';
+import '../domain/payment_order.dart';
+import '../domain/practice_question_codec.dart';
+import '../domain/pricing_config.dart';
+import '../domain/promo_code.dart';
+import 'paged_list.dart';
+
+// --- Repositories -----------------------------------------------------------
+
+final subjectsRepoProvider =
+    Provider((ref) => SubjectsRepository(ref.watch(adminFirestoreProvider)));
+final lessonsRepoProvider =
+    Provider((ref) => LessonsRepository(ref.watch(adminFirestoreProvider)));
+final practiceRepoProvider =
+    Provider((ref) => PracticeQuestionsRepository(ref.watch(adminFirestoreProvider)));
+final mediaRepoProvider = Provider((ref) => MediaRepository(ref.watch(adminStorageProvider)));
+final examBankRepoProvider =
+    Provider((ref) => ExamBankRepository(ref.watch(adminFirestoreProvider)));
+final variantsRepoProvider =
+    Provider((ref) => VariantsRepository(ref.watch(adminFirestoreProvider)));
+final blueprintsRepoProvider =
+    Provider((ref) => BlueprintsRepository(ref.watch(adminFirestoreProvider)));
+final usersRepoProvider = Provider((ref) => UsersRepository(ref.watch(adminFirestoreProvider)));
+final paymentsRepoProvider =
+    Provider((ref) => PaymentsRepository(ref.watch(adminFirestoreProvider)));
+final adminLogsRepoProvider =
+    Provider((ref) => AdminLogsRepository(ref.watch(adminFirestoreProvider)));
+final statsRepoProvider = Provider((ref) => StatsRepository(ref.watch(adminFirestoreProvider)));
+final notificationsRepoProvider =
+    Provider((ref) => NotificationsRepository(ref.watch(adminFirestoreProvider)));
+final promoCodesRepoProvider =
+    Provider((ref) => PromoCodesRepository(ref.watch(adminFirestoreProvider)));
+final achievementsConfigRepoProvider =
+    Provider((ref) => AchievementsConfigRepository(ref.watch(adminFirestoreProvider)));
+
+/// Whether this build activates App Check (Android/Apple, or web built with
+/// `APP_CHECK_WEB_SITE_KEY`).
+final adminAppCheckAvailableProvider = Provider<bool>((ref) => FirebaseService.supportsAppCheck);
+
+/// Whether the backend enforces App Check on the admin* callables
+/// (`APP_CHECK_ENFORCE_ADMIN`, off by default — see [kAdminAppCheckEnforced]).
+final adminAppCheckEnforcedProvider = Provider<bool>((ref) => kAdminAppCheckEnforced);
+
+/// Whether the shell warns that admin callables will be rejected: only when
+/// the backend enforces App Check for them and this platform cannot provide
+/// a token (SEC-APPCHECK-01). With the default backend config (admin App
+/// Check off) there is nothing to warn about.
+final adminAppCheckNoticeProvider = Provider<bool>((ref) =>
+    ref.watch(adminAppCheckEnforcedProvider) && !ref.watch(adminAppCheckAvailableProvider));
+
+/// uid of the signed-in admin, written into `*_by` audit fields.
+final adminActorProvider =
+    Provider<String>((ref) => ref.watch(adminSessionProvider)?.uid ?? 'unknown');
+
+// --- Reference data ---------------------------------------------------------
+
+final adminSubjectsProvider = FutureProvider.autoDispose<List<SubjectDoc>>(
+    (ref) => ref.watch(subjectsRepoProvider).list());
+
+final adminBlueprintsProvider =
+    FutureProvider<List<BlueprintSpec>>((ref) => ref.watch(blueprintsRepoProvider).list());
+
+final adminStatProvider = FutureProvider.autoDispose.family<int, AdminStat>(
+    (ref, stat) => ref.watch(statsRepoProvider).count(stat));
+
+final lessonsBySubjectProvider = FutureProvider.autoDispose.family<List<LessonDoc>, String>(
+    (ref, subjectId) => ref.watch(lessonsRepoProvider).bySubject(subjectId));
+
+final pricingProvider =
+    FutureProvider.autoDispose<PricingConfig>((ref) => ref.watch(paymentsRepoProvider).pricing());
+
+final passagesProvider = FutureProvider.autoDispose
+    .family<List<ExamPassageDoc>, ({String? sectionId, String? language})>(
+        (ref, f) => ref.watch(examBankRepoProvider).passages(
+              sectionId: f.sectionId,
+              language: f.language,
+            ));
+
+final translationsProvider = FutureProvider.autoDispose.family<List<ExamQuestionDoc>, String>(
+    (ref, groupId) => ref.watch(examBankRepoProvider).translations(groupId));
+
+// --- User detail ------------------------------------------------------------
+
+final adminUserProvider = FutureProvider.autoDispose.family<AdminUserRecord?, String>(
+    (ref, uid) => ref.watch(usersRepoProvider).get(uid));
+final adminEntitlementProvider = FutureProvider.autoDispose.family<EntitlementInfo, String>(
+    (ref, uid) => ref.watch(usersRepoProvider).entitlement(uid));
+final adminLedgerProvider = FutureProvider.autoDispose.family<List<LedgerEntry>, String>(
+    (ref, uid) => ref.watch(usersRepoProvider).ledger(uid));
+final adminUserStatsProvider = FutureProvider.autoDispose.family<Map<String, dynamic>?, String>(
+    (ref, uid) => ref.watch(usersRepoProvider).stats(uid));
+
+/// `count()` of `referrals/{uid}/items` (§9.1).
+final adminReferralsCountProvider = FutureProvider.autoDispose.family<int, String>(
+    (ref, uid) => ref.watch(usersRepoProvider).referralsCount(uid));
+
+/// `groups/{gid}.name` (§9.3); `null` = the group does not exist.
+final adminGroupNameProvider = FutureProvider.autoDispose.family<String?, String>(
+    (ref, groupId) => ref.watch(usersRepoProvider).groupName(groupId));
+
+// --- Phase 3: growth (ARCHITECTURE §9) -------------------------------------
+
+/// `config/achievements` (§9.4).
+final achievementsConfigProvider = FutureProvider.autoDispose<AchievementsConfig>(
+    (ref) => ref.watch(achievementsConfigRepoProvider).load());
+
+// --- Phase 4: fresh-variant pool, web payments (ARCHITECTURE §10) ----------
+
+final paymentOrdersRepoProvider =
+    Provider((ref) => PaymentOrdersRepository(ref.watch(adminFirestoreProvider)));
+final examPoolRepoProvider =
+    Provider((ref) => ExamPoolRepository(ref.watch(adminFirestoreProvider)));
+
+/// `config/exam_pool` (§10.1).
+final examPoolConfigProvider = FutureProvider.autoDispose<ExamPoolConfig>(
+    (ref) => ref.watch(examPoolRepoProvider).config());
+
+/// `adminExamPoolHealth` for one blueprint × language (§10.1).
+final examPoolHealthProvider = FutureProvider.autoDispose
+    .family<PoolHealth, ({String blueprintId, String language})>(
+  (ref, k) => ref.watch(adminFunctionsServiceProvider).examPoolHealth(k.blueprintId, k.language),
+);
+
+/// Paid web orders per Bishkek day for the last 30 days (§10.3).
+final revenueProvider = FutureProvider.autoDispose<RevenueSummary>(
+    (ref) => ref.watch(paymentOrdersRepoProvider).revenue(now: DateTime.now()));
+
+/// Web orders, newest first, optionally filtered by status (§10.3).
+final paymentOrdersPageProvider = StateNotifierProvider.autoDispose
+    .family<PagedListNotifier<PaymentOrder>, PagedState<PaymentOrder>, String?>(
+  (ref, status) {
+    final repo = ref.watch(paymentOrdersRepoProvider);
+    return PagedListNotifier((after) => repo.page(status, after: after));
+  },
+);
+
+// --- Paginated lists (FB-17) -------------------------------------------------
+
+final practicePageProvider = StateNotifierProvider.autoDispose.family<
+    PagedListNotifier<PracticeQuestionDraft>, PagedState<PracticeQuestionDraft>, PracticeFilter>(
+  (ref, f) {
+    final repo = ref.watch(practiceRepoProvider);
+    return PagedListNotifier((after) => repo.page(f, after: after));
+  },
+);
+
+final examBankPageProvider = StateNotifierProvider.autoDispose
+    .family<PagedListNotifier<ExamQuestionDoc>, PagedState<ExamQuestionDoc>, ExamBankFilter>(
+  (ref, f) {
+    final repo = ref.watch(examBankRepoProvider);
+    return PagedListNotifier((after) => repo.page(f, after: after));
+  },
+);
+
+final variantsPageProvider = StateNotifierProvider.autoDispose
+    .family<PagedListNotifier<VariantDoc>, PagedState<VariantDoc>, VariantFilter>(
+  (ref, f) {
+    final repo = ref.watch(variantsRepoProvider);
+    return PagedListNotifier((after) => repo.page(f, after: after));
+  },
+);
+
+final usersPageProvider = StateNotifierProvider.autoDispose
+    .family<PagedListNotifier<AdminUserRecord>, PagedState<AdminUserRecord>, String>(
+  (ref, prefix) {
+    final repo = ref.watch(usersRepoProvider);
+    return PagedListNotifier((after) => repo.page(prefix, after: after));
+  },
+);
+
+final purchasesPageProvider = StateNotifierProvider.autoDispose
+    .family<PagedListNotifier<PurchaseRecord>, PagedState<PurchaseRecord>, String?>(
+  (ref, state) {
+    final repo = ref.watch(paymentsRepoProvider);
+    return PagedListNotifier((after) => repo.page(state, after: after));
+  },
+);
+
+final adminLogsPageProvider = StateNotifierProvider.autoDispose<
+    PagedListNotifier<AdminLogRecord>, PagedState<AdminLogRecord>>(
+  (ref) {
+    final repo = ref.watch(adminLogsRepoProvider);
+    return PagedListNotifier((after) => repo.page(after: after));
+  },
+);
+
+final notificationsPageProvider = StateNotifierProvider.autoDispose<
+    PagedListNotifier<NotificationRecord>, PagedState<NotificationRecord>>(
+  (ref) {
+    final repo = ref.watch(notificationsRepoProvider);
+    return PagedListNotifier((after) => repo.page(after: after));
+  },
+);
+
+final promoCodesPageProvider = StateNotifierProvider.autoDispose<
+    PagedListNotifier<PromoCodeRecord>, PagedState<PromoCodeRecord>>(
+  (ref) {
+    final repo = ref.watch(promoCodesRepoProvider);
+    return PagedListNotifier((after) => repo.page(after: after));
+  },
+);

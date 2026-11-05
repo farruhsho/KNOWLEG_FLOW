@@ -1,84 +1,89 @@
 import 'package:flutter/material.dart';
+import '../design/tokens.dart';
 
+/// LEGACY colour façade.
+///
+/// ~45 older pages reference these static constants directly. They are now
+/// mapped onto the new [AppPalette] so the whole app picks up the new visual
+/// language without touching every file. These constants are light-mode
+/// only — new and migrated code must use `Theme.of(context).colorScheme` and
+/// `context.tokens` instead so dark mode works.
 class AppColors {
-  // Primary Brand Colors (Vibrant Orange/Red for energy)
-  static const Color primary = Color(0xFFFF6B35); // Energetic Orange
-  static const Color primaryDark = Color(0xFFE85D2A);
-  static const Color primaryLight = Color(0xFFFF8F66);
-  static const Color primaryContainer = Color(0xFFFFE5D9);
+  // Brand
+  static const Color primary = AppPalette.blue600;
+  static const Color primaryDark = AppPalette.blue700;
+  static const Color primaryLight = AppPalette.blue400;
+  static const Color primaryContainer = AppPalette.blue50;
 
-  // Secondary Brand Colors (Deep Blue for trust/knowledge)
-  static const Color secondary = Color(0xFF2B2D42); // Dark Blue/Grey
-  static const Color secondaryDark = Color(0xFF1A1C29);
-  static const Color secondaryLight = Color(0xFF4A4E69);
-  static const Color secondaryContainer = Color(0xFFE0E2E8);
+  static const Color secondary = AppPalette.n800;
+  static const Color secondaryDark = AppPalette.n900;
+  static const Color secondaryLight = AppPalette.n600;
+  static const Color secondaryContainer = AppPalette.n100;
 
-  // Accent Colors
-  static const Color accent = Color(0xFF8D99AE); // Cool Grey
-  static const Color accentDark = Color(0xFF6C757D);
-  static const Color accentLight = Color(0xFFAFB8C6);
+  static const Color accent = AppPalette.saffron500;
+  static const Color accentDark = AppPalette.saffron700;
+  static const Color accentLight = AppPalette.saffron300;
 
-  // Status Colors
-  static const Color success = Color(0xFF06D6A0); // Mint Green
-  static const Color warning = Color(0xFFFFD166); // Warm Yellow
-  static const Color error = Color(0xFFEF476F); // Soft Red
-  static const Color info = Color(0xFF118AB2); // Blue
+  // Status
+  static const Color success = AppPalette.green600;
+  static const Color warning = AppPalette.amber600;
+  static const Color error = AppPalette.red600;
+  static const Color info = AppPalette.blue500;
 
-  // Subject Colors (Modern Pastel/Vibrant mix)
-  static const Color mathColor = Color(0xFF4CC9F0); // Cyan
-  static const Color physicsColor = Color(0xFF4361EE); // Royal Blue
-  static const Color chemistryColor = Color(0xFF7209B7); // Purple
-  static const Color biologyColor = Color(0xFF06D6A0); // Mint
-  static const Color historyColor = Color(0xFFF72585); // Pink
-  static const Color geographyColor = Color(0xFFFF9F1C); // Orange
-  static const Color languageColor = Color(0xFF2EC4B6); // Teal
+  // Subjects
+  static const Color mathColor = AppPalette.blue600;
+  static const Color physicsColor = Color(0xFF0E7490);
+  static const Color chemistryColor = Color(0xFF7C3AED);
+  static const Color biologyColor = AppPalette.green700;
+  static const Color historyColor = Color(0xFFB45309);
+  static const Color geographyColor = Color(0xFF0F766E);
+  static const Color languageColor = Color(0xFF4338CA);
 
-  // Neutral Colors
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color black = Color(0xFF000000);
-  static const Color grey50 = Color(0xFFF8F9FA);
-  static const Color grey100 = Color(0xFFF1F3F5);
-  static const Color grey200 = Color(0xFFE9ECEF);
-  static const Color grey300 = Color(0xFFDEE2E6);
-  static const Color grey400 = Color(0xFFCED4DA);
-  static const Color grey500 = Color(0xFFADB5BD);
-  static const Color grey600 = Color(0xFF868E96);
-  static const Color grey700 = Color(0xFF495057);
-  static const Color grey800 = Color(0xFF343A40);
-  static const Color grey900 = Color(0xFF212529);
-  
-  // Shorthand
+  // Neutrals
+  static const Color white = AppPalette.n0;
+  static const Color black = AppPalette.n950;
+  static const Color grey50 = AppPalette.n50;
+  static const Color grey100 = AppPalette.n100;
+  static const Color grey200 = AppPalette.n200;
+  static const Color grey300 = AppPalette.n300;
+  static const Color grey400 = AppPalette.n400;
+  static const Color grey500 = AppPalette.n500;
+  static const Color grey600 = AppPalette.n600;
+  static const Color grey700 = AppPalette.n700;
+  static const Color grey800 = AppPalette.n800;
+  static const Color grey900 = AppPalette.n900;
   static const Color grey = grey500;
 
-  // Background Colors
-  static const Color background = Color(0xFFF8F9FA);
-  static const Color backgroundDark = Color(0xFF121212);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceDark = Color(0xFF1E1E1E);
+  // Backgrounds
+  static const Color background = AppPalette.n50;
+  static const Color backgroundDark = AppPalette.n950;
+  static const Color surface = AppPalette.n0;
+  static const Color surfaceDark = AppPalette.n900;
 
-  // Text Colors
-  static const Color textPrimary = Color(0xFF212529);
-  static const Color textSecondary = Color(0xFF868E96);
-  static const Color textTertiary = Color(0xFFADB5BD);
-  static const Color textPrimaryDark = Color(0xFFF8F9FA);
-  static const Color textSecondaryDark = Color(0xFFADB5BD);
-  static const Color textTertiaryDark = Color(0xFF495057);
+  // Text
+  static const Color textPrimary = AppPalette.n900;
+  static const Color textSecondary = AppPalette.n600;
+  static const Color textTertiary = AppPalette.n500;
+  static const Color textPrimaryDark = AppPalette.darkText;
+  static const Color textSecondaryDark = AppPalette.darkTextSecondary;
+  static const Color textTertiaryDark = AppPalette.darkTextTertiary;
 
-  // Gradients
+  // Gradients — kept for API compatibility but deliberately subtle (two
+  // adjacent shades) so legacy hero cards read as flat brand surfaces.
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFFFF6B35), Color(0xFFFF9F1C)],
+    colors: [AppPalette.blue600, AppPalette.blue700],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient purpleGradient = LinearGradient(
-    colors: [Color(0xFF7209B7), Color(0xFFF72585)],
+    colors: [Color(0xFF6D28D9), Color(0xFF5B21B6)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient blueGradient = LinearGradient(
-    colors: [Color(0xFF4361EE), Color(0xFF4CC9F0)],
+    colors: [AppPalette.blue500, AppPalette.blue600],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -89,7 +94,6 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
-  // Score Colors
   static Color getScoreColor(int score) {
     if (score >= 180) return success;
     if (score >= 160) return info;
@@ -97,23 +101,5 @@ class AppColors {
     return error;
   }
 
-  // Subject Colors Map
-  static Color getSubjectColor(String subjectId) {
-    switch (subjectId) {
-      case 'math':
-        return mathColor;
-      case 'physics':
-        return physicsColor;
-      case 'chemistry':
-        return chemistryColor;
-      case 'biology':
-        return biologyColor;
-      case 'history':
-        return historyColor;
-      case 'geography':
-        return geographyColor;
-      default:
-        return languageColor;
-    }
-  }
+  static Color getSubjectColor(String subjectId) => SubjectColors.of(subjectId);
 }

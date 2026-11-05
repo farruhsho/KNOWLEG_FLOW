@@ -13,6 +13,9 @@
 .swiftpm/
 migrate_working_dir/
 
+# Analyzer / audit output dumps (build artifacts, not source)
+analysis_report*.txt
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -136,7 +139,6 @@ firebase-debug.*.log
 *.freezed.dart
 *.config.dart
 **/generated/
-lib/generated_plugin_registrant.dart
 .flutter-plugins-dependencies
 
 # Localization
@@ -151,3 +153,10 @@ lib/generated_plugin_registrant.dart
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
+
+# Kotlin Gradle plugin 2.x session data
+**/android/.kotlin/
+
+# Node tooling and Firebase emulator logs
+node_modules/
+*-debug.log

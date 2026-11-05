@@ -1,0 +1,1127 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-02",
+  "blueprints": [
+    {
+      "id": "ort_main_2026",
+      "kind": "main",
+      "subject_id": null,
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Основной тест ОРТ",
+        "ky": "ЖРТнын негизги тести",
+        "en": "ORT Main test"
+      },
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "math",
+          "order": 1,
+          "title": {
+            "ru": "Математика",
+            "ky": "Математика",
+            "en": "Mathematics"
+          },
+          "question_count": 60,
+          "duration_minutes": 90,
+          "points_per_question": 1,
+          "subject_area": "math",
+          "allow_scratchpad": true,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "math_comparison",
+              "title": {
+                "ru": "Часть I. Сравнение величин",
+                "ky": "I бөлүк. Чоңдуктарды салыштыруу",
+                "en": "Part I. Quantitative comparison"
+              },
+              "question_count": 30,
+              "options_per_question": 4,
+              "item_type": "quantitative_comparison",
+              "verified": true,
+              "fixed_options": [
+                {
+                  "id": "A",
+                  "text": {
+                    "ru": "Величина в колонке А больше",
+                    "ky": "А мамычасындагы чоңдук чоң",
+                    "en": "Column A is greater"
+                  }
+                },
+                {
+                  "id": "B",
+                  "text": {
+                    "ru": "Величина в колонке Б больше",
+                    "ky": "Б мамычасындагы чоңдук чоң",
+                    "en": "Column B is greater"
+                  }
+                },
+                {
+                  "id": "C",
+                  "text": {
+                    "ru": "Величины равны",
+                    "ky": "Чоңдуктар барабар",
+                    "en": "The quantities are equal"
+                  }
+                },
+                {
+                  "id": "D",
+                  "text": {
+                    "ru": "Информации недостаточно, чтобы определить",
+                    "ky": "Аныктоо үчүн маалымат жетишсиз",
+                    "en": "Cannot be determined"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "math_problems",
+              "title": {
+                "ru": "Часть II. Задачи",
+                "ky": "II бөлүк. Маселелер",
+                "en": "Part II. Problems"
+              },
+              "question_count": 30,
+              "options_per_question": 5,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        },
+        {
+          "id": "verbal",
+          "order": 2,
+          "title": {
+            "ru": "Аналогии и дополнение предложений",
+            "ky": "Аналогиялар жана сүйлөмдөрдү толуктоо",
+            "en": "Analogies and sentence completion"
+          },
+          "question_count": 30,
+          "duration_minutes": 30,
+          "points_per_question": 1,
+          "subject_area": "verbal",
+          "allow_scratchpad": false,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "analogies",
+              "title": {
+                "ru": "Аналогии",
+                "ky": "Аналогиялар",
+                "en": "Analogies"
+              },
+              "question_count": 15,
+              "options_per_question": 4,
+              "item_type": "analogy",
+              "verified": false,
+              "note": "Деление 30 заданий между частями в брошюре не указано; 15/15 — рабочее допущение."
+            },
+            {
+              "id": "completion",
+              "title": {
+                "ru": "Дополнение предложений",
+                "ky": "Сүйлөмдөрдү толуктоо",
+                "en": "Sentence completion"
+              },
+              "question_count": 15,
+              "options_per_question": 4,
+              "item_type": "completion",
+              "verified": false
+            }
+          ]
+        },
+        {
+          "id": "reading",
+          "order": 3,
+          "title": {
+            "ru": "Чтение и понимание",
+            "ky": "Окуу жана түшүнүү",
+            "en": "Reading comprehension"
+          },
+          "question_count": 30,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "reading",
+          "allow_scratchpad": false,
+          "uses_passages": true,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "passage_layout": {
+            "standalone_texts": 2,
+            "paired_texts": 1,
+            "words_min": 400,
+            "words_max": 850,
+            "line_numbering_every": 5
+          },
+          "parts": [
+            {
+              "id": "reading",
+              "title": {
+                "ru": "Чтение и понимание",
+                "ky": "Окуу жана түшүнүү",
+                "en": "Reading"
+              },
+              "question_count": 30,
+              "options_per_question": 4,
+              "item_type": "text_based",
+              "verified": true
+            }
+          ]
+        },
+        {
+          "id": "grammar",
+          "order": 4,
+          "title": {
+            "ru": "Практическая грамматика",
+            "ky": "Практикалык грамматика",
+            "en": "Practical grammar"
+          },
+          "question_count": 30,
+          "duration_minutes": 35,
+          "points_per_question": 1,
+          "subject_area": "grammar",
+          "allow_scratchpad": false,
+          "uses_passages": false,
+          "language_specific": true,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "task_types": [
+            "spelling",
+            "punctuation",
+            "word_formation",
+            "completion",
+            "lexical_grammatical_meaning",
+            "usage_norms"
+          ],
+          "parts": [
+            {
+              "id": "grammar",
+              "title": {
+                "ru": "Практическая грамматика",
+                "ky": "Практикалык грамматика",
+                "en": "Grammar"
+              },
+              "question_count": 30,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [
+          "math"
+        ],
+        "one_attempt_per_year": true,
+        "no_wrong_answer_penalty_assumed": true
+      },
+      "reference": {
+        "official_max_score": 245,
+        "thresholds_2026_27": {
+          "university": {
+            "general": 110,
+            "pedagogical_grant": 130,
+            "pedagogical_contract": 115,
+            "healthcare_grant": 120,
+            "healthcare_contract": 110,
+            "agriculture": 100,
+            "military_grant": 90,
+            "special_categories": 90,
+            "subject_tests": 60
+          },
+          "college": {
+            "general": 90,
+            "pedagogical_healthcare_grant": 95,
+            "pedagogical_healthcare_contract": 90,
+            "agriculture": 80,
+            "special_categories": 70,
+            "subject_tests": 40
+          }
+        },
+        "source": "https://testing.kg/news/porogovyie-ballyi-dlya-priema-v-obrazovatelnyie-organizatsii-vyisshego-professionalnogo-obrazovaniya732"
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_chemistry_2026",
+      "kind": "subject",
+      "subject_id": "chemistry",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Химия",
+        "ky": "Химия",
+        "en": "Chemistry"
+      },
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "chemistry",
+          "order": 1,
+          "title": {
+            "ru": "Химия",
+            "ky": "Химия",
+            "en": "Chemistry"
+          },
+          "question_count": 40,
+          "duration_minutes": 80,
+          "points_per_question": 1,
+          "subject_area": "chemistry",
+          "allow_scratchpad": true,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "chemistry",
+              "title": {
+                "ru": "Химия",
+                "ky": "Химия",
+                "en": "Chemistry"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [
+          "chemistry"
+        ]
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_biology_2026",
+      "kind": "subject",
+      "subject_id": "biology",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Биология",
+        "ky": "Биология",
+        "en": "Biology"
+      },
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "biology",
+          "order": 1,
+          "title": {
+            "ru": "Биология",
+            "ky": "Биология",
+            "en": "Biology"
+          },
+          "question_count": 40,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "biology",
+          "allow_scratchpad": true,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "biology",
+              "title": {
+                "ru": "Биология",
+                "ky": "Биология",
+                "en": "Biology"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [
+          "biology"
+        ]
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_physics_2026",
+      "kind": "subject",
+      "subject_id": "physics",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Физика",
+        "ky": "Физика",
+        "en": "Physics"
+      },
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "physics",
+          "order": 1,
+          "title": {
+            "ru": "Физика",
+            "ky": "Физика",
+            "en": "Physics"
+          },
+          "question_count": 40,
+          "duration_minutes": 80,
+          "points_per_question": 1,
+          "subject_area": "physics",
+          "allow_scratchpad": true,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "physics",
+              "title": {
+                "ru": "Физика",
+                "ky": "Физика",
+                "en": "Physics"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [
+          "physics"
+        ]
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_math_2026",
+      "kind": "subject",
+      "subject_id": "math",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Математика (предметный тест)",
+        "ky": "Математика (предметтик тест)",
+        "en": "Mathematics (subject test)"
+      },
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "math",
+          "order": 1,
+          "title": {
+            "ru": "Математика (предметный тест)",
+            "ky": "Математика (предметтик тест)",
+            "en": "Mathematics (subject test)"
+          },
+          "question_count": 40,
+          "duration_minutes": 80,
+          "points_per_question": 1,
+          "subject_area": "math",
+          "allow_scratchpad": true,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "math",
+              "title": {
+                "ru": "Математика",
+                "ky": "Математика",
+                "en": "Mathematics"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [
+          "math"
+        ]
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_history_2026",
+      "kind": "subject",
+      "subject_id": "history",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "История",
+        "ky": "Тарых",
+        "en": "History"
+      },
+      "languages": [
+        "ru",
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "history",
+          "order": 1,
+          "title": {
+            "ru": "История",
+            "ky": "Тарых",
+            "en": "History"
+          },
+          "question_count": 40,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "history",
+          "allow_scratchpad": true,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "history",
+              "title": {
+                "ru": "История",
+                "ky": "Тарых",
+                "en": "History"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [
+          "history"
+        ]
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_english_2026",
+      "kind": "subject",
+      "subject_id": "english",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Английский язык",
+        "ky": "Англис тили",
+        "en": "English"
+      },
+      "languages": [
+        "en"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "english",
+          "order": 1,
+          "title": {
+            "ru": "Английский язык",
+            "ky": "Англис тили",
+            "en": "English"
+          },
+          "question_count": 50,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "english",
+          "allow_scratchpad": false,
+          "uses_passages": true,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "english_lexgram",
+              "title": {
+                "ru": "Лексика и грамматика",
+                "ky": "Лексика жана грамматика",
+                "en": "Vocabulary and grammar"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": false,
+              "note": "Брошюра: 40 + 2 текста × 5; онлайн-образец ЦООМО: 45 + 5. Сверить перед выпуском."
+            },
+            {
+              "id": "english_reading",
+              "title": {
+                "ru": "Чтение",
+                "ky": "Окуу",
+                "en": "Reading"
+              },
+              "question_count": 10,
+              "options_per_question": 4,
+              "item_type": "text_based",
+              "verified": false
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": []
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_kyrgyz_lit_2026",
+      "kind": "subject",
+      "subject_id": "kyrgyz_lit",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Кыргызский язык и литература",
+        "ky": "Кыргыз тили жана адабияты",
+        "en": "Kyrgyz language and literature"
+      },
+      "languages": [
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "kyrgyz_lit",
+          "order": 1,
+          "title": {
+            "ru": "Кыргызский язык и литература",
+            "ky": "Кыргыз тили жана адабияты",
+            "en": "Kyrgyz language and literature"
+          },
+          "question_count": 40,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "kyrgyz_lit",
+          "allow_scratchpad": false,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "kyrgyz_language",
+              "title": {
+                "ru": "Язык",
+                "ky": "Тил",
+                "en": "Language"
+              },
+              "question_count": 20,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true,
+              "note": "15 отдельных + 5 к тексту"
+            },
+            {
+              "id": "kyrgyz_literature",
+              "title": {
+                "ru": "Литература",
+                "ky": "Адабият",
+                "en": "Literature"
+              },
+              "question_count": 20,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": []
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_subject_russian_lit_2026",
+      "kind": "subject",
+      "subject_id": "russian_lit",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Русский язык и литература",
+        "ky": "Орус тили жана адабияты",
+        "en": "Russian language and literature"
+      },
+      "languages": [
+        "ru"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "russian_lit",
+          "order": 1,
+          "title": {
+            "ru": "Русский язык и литература",
+            "ky": "Орус тили жана адабияты",
+            "en": "Russian language and literature"
+          },
+          "question_count": 40,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "russian_lit",
+          "allow_scratchpad": false,
+          "uses_passages": false,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "russian_language",
+              "title": {
+                "ru": "Язык",
+                "ky": "Тил",
+                "en": "Language"
+              },
+              "question_count": 20,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true,
+              "note": "15 отдельных + 5 к тексту"
+            },
+            {
+              "id": "russian_literature",
+              "title": {
+                "ru": "Литература",
+                "ky": "Адабият",
+                "en": "Literature"
+              },
+              "question_count": 20,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "raw",
+        "official_scale_known": false,
+        "disclaimer": {
+          "ru": "Учебный результат приложения. Не является официальным баллом ОРТ: официальная формула пересчёта ЦООМО не опубликована.",
+          "ky": "Тиркеменин окуу жыйынтыгы. ЖРТнын расмий баллы эмес: БББЖБнын расмий эсептөө формуласы жарыяланган эмес.",
+          "en": "Practice result. Not an official ORT score: the official conversion formula is not published."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": []
+      },
+      "reference": {
+        "official_max_score": 150,
+        "threshold_university": 60,
+        "threshold_college": 40
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    },
+    {
+      "id": "ort_state_language_2026",
+      "kind": "state_language",
+      "subject_id": "state_language",
+      "exam_year": 2026,
+      "version": 1,
+      "status": "active",
+      "title": {
+        "ru": "Тест по государственному языку",
+        "ky": "Мамлекеттик тил боюнча тест",
+        "en": "State language (Kyrgyz) test"
+      },
+      "languages": [
+        "ky"
+      ],
+      "options_per_question": 4,
+      "navigation": {
+        "within_section": "free",
+        "across_sections": "forward_only"
+      },
+      "sections": [
+        {
+          "id": "state_language",
+          "order": 1,
+          "title": {
+            "ru": "Государственный язык",
+            "ky": "Мамлекеттик тил",
+            "en": "State language"
+          },
+          "question_count": 50,
+          "duration_minutes": 60,
+          "points_per_question": 1,
+          "subject_area": "state_language",
+          "allow_scratchpad": false,
+          "uses_passages": true,
+          "difficulty_mix": {
+            "1": 0.3,
+            "2": 0.5,
+            "3": 0.2
+          },
+          "parts": [
+            {
+              "id": "state_lexgram",
+              "title": {
+                "ru": "Лексика и грамматика",
+                "ky": "Лексика жана грамматика",
+                "en": "Vocabulary and grammar"
+              },
+              "question_count": 40,
+              "options_per_question": 4,
+              "item_type": "single_choice",
+              "verified": false,
+              "note": "Деление 40/10 — допущение: в брошюре часть 1 лексико-грамматическая, часть 2 — 2 текста × 5 вопросов."
+            },
+            {
+              "id": "state_reading",
+              "title": {
+                "ru": "Чтение (2 текста)",
+                "ky": "Окуу (2 текст)",
+                "en": "Reading (2 texts)"
+              },
+              "question_count": 10,
+              "options_per_question": 4,
+              "item_type": "text_based",
+              "verified": true
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "method": "level",
+        "official_scale_known": false,
+        "level_cutoffs_known": false,
+        "levels": [
+          {
+            "level": 1,
+            "title": {
+              "ru": "Ниже среднего",
+              "ky": "Орточодон төмөн",
+              "en": "Below average"
+            }
+          },
+          {
+            "level": 2,
+            "title": {
+              "ru": "Средний",
+              "ky": "Орточо",
+              "en": "Average"
+            }
+          },
+          {
+            "level": 3,
+            "title": {
+              "ru": "Выше среднего",
+              "ky": "Орточодон жогору",
+              "en": "Above average"
+            }
+          },
+          {
+            "level": 4,
+            "title": {
+              "ru": "Высокий",
+              "ky": "Жогорку",
+              "en": "High"
+            }
+          }
+        ],
+        "disclaimer": {
+          "ru": "Официальный результат выдаётся уровнем 1–4; границы уровней не опубликованы. Приложение показывает учебный процент. Тест обязателен для получения сертификата, но не влияет на конкурс.",
+          "ky": "Расмий жыйынтык 1–4-деңгээл менен берилет; деңгээлдердин чектери жарыяланган эмес. Тиркеме окуу пайызын көрсөтөт. Тест сертификат алуу үчүн милдеттүү, бирок конкурска таасир этпейт.",
+          "en": "Officially reported as level 1–4 with unpublished cut-offs; the app shows a practice percentage."
+        }
+      },
+      "rules": {
+        "calculators": false,
+        "scratchpad_sections": [],
+        "mandatory_for_certificate": true,
+        "affects_competition": false
+      },
+      "source": {
+        "url": "https://testing.kg/media/uploads/2026/06/01/brosh_rus_2026.pdf",
+        "verified_at": "2026-11-02",
+        "note": "Брошюра ЦООМО «Готовимся к ОРТ», Бишкек 2026. Структура совпадает с изданием 2025."
+      },
+      "effective_from": "2026-01-01",
+      "effective_to": null
+    }
+  ]
+}
