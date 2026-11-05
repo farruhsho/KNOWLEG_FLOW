@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/backend/backend_contract.dart';
+import '../domain/callable_errors.dart';
 import '../domain/notification_draft.dart';
 import '../domain/promo_code.dart';
 import 'admin_firebase.dart';
@@ -94,6 +95,11 @@ class AdminFunctions {
     ];
   }
 
+  /// Client timeout of `adminSendNotification`, for the dry run and the send
+  /// alike (§9.7): the reach check scans the same users as a send, and the
+  /// function itself may run up to 540 s.
+  static const Duration sendNotificationTimeout = Duration(seconds: 540);
+
   /// `adminSendNotification` (§9.4). With [dryRun] the server only counts
   /// the recipients ("Проверить охват"); otherwise it sends in batches of
   /// ≤ 500 and records the broadcast in `notifications`.
@@ -102,16 +108,32 @@ class AdminFunctions {
     final r = await _call(
       BackendFunctions.adminSendNotification,
       draft.toCallable(dryRun: dryRun),
-      timeout: Duration(seconds: dryRun ? 60 : 300),
+      timeout: sendNotificationTimeout,
     );
     return NotificationSendResult.fromMap(r);
   }
 
   /// `adminUpsertPromoCode` (§9.2, super_admin). Creates, edits or
   /// deactivates a code; the server logs the change in `admin_logs`.
-  Future<void> upsertPromoCode(PromoCodeDraft draft) =>
-      _call(BackendFunctions.adminUpsertPromoCode, draft.toCallable());
+  ///
+  /// With [createOnly] (a new code, §9.7) the server refuses an existing
+  /// code with `VALIDATION_FAILED`, `details.why = 'exists'`
+  /// ([isPromoCodeExistsError]) and changes nothing. Returns the response's
+  /// `created` flag, or `null` when the server did not send one.
+  Future<bool?> upsertPromoCode(PromoCodeDraft draft, {bool createOnly = false}) async {
+    final r = await _call(
+        BackendFunctions.adminUpsertPromoCode, draft.toCallable(createOnly: createOnly));
+    final created = r['created'];
+    return created is bool ? created : null;
+  }
 }
+
+/// Whether [error] is the `adminUpsertPromoCode` refusal of a `createOnly`
+/// call for a code that already exists (§9.7).
+bool isPromoCodeExistsError(Object error) =>
+    error is FirebaseFunctionsException &&
+    BackendReasons.of(error) == BackendReasons.validationFailed &&
+    callableDetailsWhy(error.details) == kPromoExistsWhy;
 
 final adminFunctionsServiceProvider =
     Provider<AdminFunctions>((ref) => AdminFunctions(ref.watch(adminFunctionsProvider)));

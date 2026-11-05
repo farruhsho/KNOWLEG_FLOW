@@ -2632,6 +2632,12 @@ abstract class AppLocalizations {
   /// **'From {min} to {max} credits'**
   String adminPromoErrCredits(int min, int max);
 
+  /// No description provided for @adminPromoErrExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Code {code} already exists. To change it, open it in the list.'**
+  String adminPromoErrExists(String code);
+
   /// No description provided for @adminPromoErrExpiry.
   ///
   /// In en, this message translates to:
@@ -2697,6 +2703,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Who the code is for: campaign, partner, school.'**
   String get adminPromoNoteHelp;
+
+  /// No description provided for @adminPromoOverwritten.
+  ///
+  /// In en, this message translates to:
+  /// **'Code {code} already existed: its settings were overwritten. Check it in the list.'**
+  String adminPromoOverwritten(String code);
 
   /// No description provided for @adminPromoPickDate.
   ///
@@ -3309,6 +3321,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Referrals and groups'**
   String get adminUserGrowth;
+
+  /// No description provided for @adminUserGrowthNoAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Part of this data is hidden: the Firestore rules on the server do not let your role read it yet. The updated rules need to be deployed.'**
+  String get adminUserGrowthNoAccess;
 
   /// No description provided for @adminUserLanguage.
   ///

@@ -117,6 +117,12 @@ void main() {
       final m = _draft().toCallable();
       expect(m.keys.toSet(), {'code', 'credits', 'active', 'note'});
     });
+
+    test('createOnly (§9.7) is sent only for a new code', () {
+      expect(_draft().toCallable(createOnly: true)['createOnly'], isTrue);
+      expect(_draft().toCallable(createOnly: false).containsKey('createOnly'), isFalse);
+      expect(kPromoExistsWhy, 'exists');
+    });
   });
 
   group('promo_codes documents', () {

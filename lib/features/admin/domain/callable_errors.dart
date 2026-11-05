@@ -75,3 +75,12 @@ AdminCallableIssue? classifyAdminCallableError({
   }
   return null;
 }
+
+/// `details.why` of a callable error (ARCHITECTURE §9.7): the specific cause
+/// behind a generic `details.reason` such as `VALIDATION_FAILED`. [details]
+/// is `FirebaseFunctionsException.details`; `null` when absent.
+String? callableDetailsWhy(Object? details) {
+  if (details is! Map) return null;
+  final why = details['why'];
+  return why is String && why.isNotEmpty ? why : null;
+}

@@ -913,6 +913,14 @@
       }
     }
   },
+  "adminPromoErrExists": "Code {code} already exists. To change it, open it in the list.",
+  "@adminPromoErrExists": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "adminPromoErrExpiry": "The date has passed: pick a future date or deactivate the code",
   "adminPromoErrMax": "From 1 to {limit}",
   "@adminPromoErrMax": {
@@ -938,6 +946,14 @@
   "adminPromoNoExpiry": "no expiry",
   "adminPromoNote": "Note (internal)",
   "adminPromoNoteHelp": "Who the code is for: campaign, partner, school.",
+  "adminPromoOverwritten": "Code {code} already existed: its settings were overwritten. Check it in the list.",
+  "@adminPromoOverwritten": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "adminPromoPickDate": "Pick a date",
   "adminPromoSaved": "Promo code {code} saved",
   "@adminPromoSaved": {
@@ -1133,6 +1149,7 @@
     }
   },
   "adminUserGrowth": "Referrals and groups",
+  "adminUserGrowthNoAccess": "Part of this data is hidden: the Firestore rules on the server do not let your role read it yet. The updated rules need to be deployed.",
   "adminUserLanguage": "Language",
   "adminUserLastActive": "Last active",
   "adminUserLedger": "Credit history",

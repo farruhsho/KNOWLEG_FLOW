@@ -121,6 +121,11 @@ String adminErrorMessage(
   return l.adminErrUnknown;
 }
 
+/// Whether [error] is a Firebase `permission-denied`: for an optional read,
+/// e.g. one that older deployed rules do not allow for this role yet.
+bool isAdminPermissionDenied(Object error) =>
+    error is FirebaseException && error.code == 'permission-denied';
+
 void showAdminSnack(BuildContext context, String message, {bool error = false}) {
   final scheme = Theme.of(context).colorScheme;
   ScaffoldMessenger.of(context)
