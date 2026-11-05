@@ -3,33 +3,46 @@
  * examSubmitSection, examGetReview, and the examExpireStale scheduler.
  */
 import '../config';
-import type { DocumentSnapshot, Transaction } from 'firebase-admin/firestore';
+import { randomBytes } from 'node:crypto';
+import type { DocumentReference, DocumentSnapshot, Query, Transaction } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { assembleFreshVariant } from '../domain/assembly';
 import { applyStartDecision, decideExamStart, parseEntitlement, parseFreeExamsPerUser } from '../domain/entitlements';
+import {
+  assemblySections,
+  assertFreshBlueprint,
+  FRESH_VARIANT_TITLE,
+  freshVariantId,
+  isFreshVariantId,
+  parseExamStartInput,
+  type ExamStyle,
+} from '../domain/exam_pool';
 import {
   applyExpiry,
   applySectionSubmit,
   assertOwner,
+  assertSectionOver,
   buildInitialAttempt,
+  flagsForStyle,
   isStale,
   sanitizeAnswers,
   sanitizeFlags,
   STALE_AFTER_MS,
+  type AttemptFreshness,
   type AttemptState,
 } from '../domain/exam_session';
 import { buildSessionPayload, classifySubmit, clientOptions, type ExamSessionPayload } from '../domain/payload';
 import { DomainError, Reasons } from '../domain/reasons';
 import type { ExamResult } from '../domain/scoring';
 import { sanitizeTimings, storedTimings } from '../domain/timings';
-import { isRecord, num, partForIndex, type Blueprint } from '../domain/types';
+import { isRecord, num, partForIndex, type Blueprint, type Variant } from '../domain/types';
 import {
   callableOptions,
   db,
   FieldValue,
   mapLimit,
-  optString,
   payload,
   reqId,
   requireActiveUser,
@@ -37,6 +50,7 @@ import {
   Timestamp,
   wrap,
 } from './common';
+import { loadEligiblePool, loadLastSeen, readExamPoolConfig, requireMatrix } from './fresh';
 import { bumpVariantStats, loadScoringContent, readCompletionInputs, writeCompletion, type CompletionContext } from './completion';
 import {
   attemptFromDoc,
@@ -99,75 +113,229 @@ function timingsFromSnap(snap: DocumentSnapshot | undefined): Record<string, num
 }
 
 // ---------------------------------------------------------------------------
-// examStart {variantId, clientAppVersion} -> ExamSessionPayload
+// examStart {variantId?, blueprintId?, language?, mode?, examStyle?, clientAppVersion}
+//   -> ExamSessionPayload (+ examStyle, source, freshness)
+//
+// library (default with a variantId): a published variant, resume per variant.
+// fresh (§10.1): a new variant assembled from the verified bank for this
+// attempt; resume = the user's in-progress fresh attempt of the same
+// blueprint + language. The variant document, the attempt and the
+// entitlement charge are written in ONE transaction; POOL_TOO_SMALL is
+// thrown before it, so nothing is charged.
+
+interface StartPlan {
+  uid: string;
+  blueprint: Blueprint;
+  /** In-progress attempt that makes this call a resume. */
+  inProgressQuery: Query;
+  variant: Variant;
+  examStyle: ExamStyle;
+  clientAppVersion: string;
+  /** Fresh mode: id of the attempt the assembled variant belongs to. */
+  attemptRef?: DocumentReference;
+  freshVariantDoc?: Record<string, unknown>;
+  freshness?: AttemptFreshness;
+}
+
+type StartOutcome = { attemptId: string; state: AttemptState; source: string };
+
+/** The start transaction shared by both modes: resume, or charge and create. */
+async function runStart(plan: StartPlan): Promise<StartOutcome> {
+  const { uid, blueprint, variant } = plan;
+  const freeExamsPerUser = await readPricingFreeExams();
+  const entRef = db().doc(`entitlements/${uid}`);
+  return db().runTransaction(async (tx) => {
+    const nowMs = Date.now();
+    const [inProgress, entSnap] = await Promise.all([tx.get(plan.inProgressQuery), tx.get(entRef)]);
+    const existing = inProgress.docs[0];
+    const entitlement = parseEntitlement(entSnap.data());
+    const decision = decideExamStart({ entitlement, inProgressAttemptId: existing?.id ?? null, freeExamsPerUser });
+
+    if (decision.kind === 'resume') {
+      const state = attemptFromDoc(existing!.data());
+      if (!state) throw new DomainError(Reasons.ATTEMPT_NOT_FOUND, 'corrupt attempt');
+      return { attemptId: decision.attemptId, state, source: 'resume' };
+    }
+    if (decision.kind === 'none') {
+      throw new DomainError(Reasons.NO_ENTITLEMENT, 'no free exam or credits left', { credits: entitlement.credits });
+    }
+
+    const ref = plan.attemptRef ?? db().collection('exam_attempts').doc();
+    const fresh = plan.freshVariantDoc !== undefined;
+    const state = buildInitialAttempt({
+      uid,
+      variant,
+      blueprint,
+      nowMs,
+      entitlementSource: decision.kind,
+      clientAppVersion: plan.clientAppVersion,
+      examStyle: plan.examStyle,
+      source: fresh ? 'fresh' : 'library',
+      freshness: plan.freshness ?? null,
+    });
+    const applied = applyStartDecision(entitlement, decision, ref.id, nowMs);
+    if (fresh) {
+      tx.set(db().doc(`exam_variants/${variant.id}`), { ...plan.freshVariantDoc, created_at: FieldValue.serverTimestamp() });
+    }
+    tx.set(ref, { ...attemptToDoc(state), result: null, created_at: FieldValue.serverTimestamp() });
+    tx.set(
+      entRef,
+      {
+        free_exam_used: applied.entitlement.free_exam_used,
+        free_exam_used_at: applied.entitlement.free_exam_used_at ? Timestamp.fromMillis(applied.entitlement.free_exam_used_at) : null,
+        free_exam_attempt_id: applied.entitlement.free_exam_attempt_id,
+        free_exams_used_count: applied.entitlement.free_exams_used_count,
+        credits: applied.entitlement.credits,
+        lifetime_credits_purchased: applied.entitlement.lifetime_credits_purchased,
+        updated_at: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    tx.set(entRef.collection('ledger').doc(), {
+      ...applied.ledger,
+      ref: ref.id,
+      actor_uid: uid,
+      at: FieldValue.serverTimestamp(),
+    });
+    return { attemptId: ref.id, state, source: applied.entitlementSource as string };
+  });
+}
+
+function freshInProgressQuery(uid: string, blueprintId: string, language: string): Query {
+  return db()
+    .collection('exam_attempts')
+    .where('uid', '==', uid)
+    .where('blueprint_id', '==', blueprintId)
+    .where('language', '==', language)
+    .where('source', '==', 'fresh')
+    .where('status', '==', 'in_progress')
+    .limit(1);
+}
 
 export const examStart = onCall(
-  callableOptions(),
+  callableOptions({ timeoutSeconds: 120, memory: '512MiB' }),
   wrap('examStart', async (req) => {
     // Deleted accounts (token still valid) and banned users cannot start or claim the free exam.
     const { uid } = await requireActiveUser(req);
-    const data = payload(req);
-    const variantId = reqId(data['variantId'], 'variantId');
-    const clientAppVersion = optString(data['clientAppVersion'], 'clientAppVersion', 40) ?? '';
+    const input = parseExamStartInput(payload(req));
 
-    const variant = await loadVariant(variantId);
-    if (!variant || variant.status !== 'published') {
-      throw new DomainError(Reasons.VARIANT_NOT_AVAILABLE, 'variant is not available');
-    }
-    const blueprint = await requireBlueprint(variant.blueprint_id);
-    const freeExamsPerUser = await readPricingFreeExams();
-    const entRef = db().doc(`entitlements/${uid}`);
-
-    const started = await db().runTransaction(async (tx) => {
-      const nowMs = Date.now();
-      const inProgressQuery = db()
-        .collection('exam_attempts')
-        .where('uid', '==', uid)
-        .where('variant_id', '==', variantId)
-        .where('status', '==', 'in_progress')
-        .limit(1);
-      const [inProgress, entSnap] = await Promise.all([tx.get(inProgressQuery), tx.get(entRef)]);
-      const existing = inProgress.docs[0];
-      const entitlement = parseEntitlement(entSnap.data());
-      const decision = decideExamStart({ entitlement, inProgressAttemptId: existing?.id ?? null, freeExamsPerUser });
-
-      if (decision.kind === 'resume') {
-        const state = attemptFromDoc(existing!.data());
-        if (!state) throw new DomainError(Reasons.ATTEMPT_NOT_FOUND, 'corrupt attempt');
-        return { attemptId: decision.attemptId, state, source: 'resume' };
+    if (input.mode === 'library') {
+      const variant = await loadVariant(input.variantId);
+      if (!variant || variant.status !== 'published') {
+        throw new DomainError(Reasons.VARIANT_NOT_AVAILABLE, 'variant is not available');
       }
-      if (decision.kind === 'none') {
-        throw new DomainError(Reasons.NO_ENTITLEMENT, 'no free exam or credits left', { credits: entitlement.credits });
-      }
-
-      const ref = db().collection('exam_attempts').doc();
-      const state = buildInitialAttempt({ uid, variant, blueprint, nowMs, entitlementSource: decision.kind, clientAppVersion });
-      const applied = applyStartDecision(entitlement, decision, ref.id, nowMs);
-      tx.set(ref, { ...attemptToDoc(state), result: null, created_at: FieldValue.serverTimestamp() });
-      tx.set(
-        entRef,
-        {
-          free_exam_used: applied.entitlement.free_exam_used,
-          free_exam_used_at: applied.entitlement.free_exam_used_at ? Timestamp.fromMillis(applied.entitlement.free_exam_used_at) : null,
-          free_exam_attempt_id: applied.entitlement.free_exam_attempt_id,
-          free_exams_used_count: applied.entitlement.free_exams_used_count,
-          credits: applied.entitlement.credits,
-          lifetime_credits_purchased: applied.entitlement.lifetime_credits_purchased,
-          updated_at: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
-      tx.set(entRef.collection('ledger').doc(), {
-        ...applied.ledger,
-        ref: ref.id,
-        actor_uid: uid,
-        at: FieldValue.serverTimestamp(),
+      const blueprint = await requireBlueprint(variant.blueprint_id);
+      const started = await runStart({
+        uid,
+        blueprint,
+        variant,
+        examStyle: input.examStyle,
+        clientAppVersion: input.clientAppVersion,
+        inProgressQuery: db()
+          .collection('exam_attempts')
+          .where('uid', '==', uid)
+          .where('variant_id', '==', input.variantId)
+          .where('status', '==', 'in_progress')
+          .limit(1),
       });
-      return { attemptId: ref.id, state, source: applied.entitlementSource as string };
-    });
+      logger.info('examStart', { uid, mode: 'library', variantId: input.variantId, attemptId: started.attemptId, source: started.source });
+      return sessionPayload(started.attemptId, started.state, blueprint, started.source);
+    }
 
-    logger.info('examStart', { uid, variantId, attemptId: started.attemptId, source: started.source });
-    return sessionPayload(started.attemptId, started.state, blueprint, started.source);
+    // mode === 'fresh'
+    const blueprint = await requireBlueprint(input.blueprintId);
+    assertFreshBlueprint(blueprint, input.language);
+    const inProgressQuery = freshInProgressQuery(uid, blueprint.id, input.language);
+    // Resume charges and writes nothing, so it needs no transaction (and no assembly).
+    const open = (await inProgressQuery.get()).docs[0];
+    const openState = open ? attemptFromDoc(open.data()) : null;
+    if (open && openState) {
+      const resumeBlueprint = await requireBlueprint(openState.blueprint_id);
+      return sessionPayload(open.id, openState, resumeBlueprint, 'resume');
+    }
+
+    const config = await readExamPoolConfig();
+    if (!config.fresh_enabled) throw new DomainError(Reasons.VARIANT_NOT_AVAILABLE, 'fresh variants are switched off', { why: 'fresh_disabled' });
+    const matrix = requireMatrix(blueprint, input.language);
+    const [pool, lastSeen] = await Promise.all([
+      loadEligiblePool(blueprint, input.language, config.min_review_status),
+      loadLastSeen(uid, blueprint.id, input.language),
+    ]);
+    const seed = randomBytes(12).toString('hex');
+    const assembled = assembleFreshVariant({
+      sections: assemblySections(blueprint),
+      matrix,
+      pool: pool.items,
+      passages: pool.passages,
+      lastSeen,
+      seed,
+    });
+    if (!assembled.ok) {
+      logger.warn('fresh variant: pool too small', { uid, blueprintId: blueprint.id, language: input.language, section: assembled.section_id, part: assembled.part_id, problems: assembled.problems.slice(0, 3) });
+      throw new DomainError(Reasons.POOL_TOO_SMALL, 'not enough verified questions for a new variant', {
+        section_id: assembled.section_id,
+        part_id: assembled.part_id,
+      });
+    }
+
+    const attemptDocRef = db().collection('exam_attempts').doc();
+    const variantId = freshVariantId(attemptDocRef.id);
+    const variant: Variant = {
+      id: variantId,
+      blueprint_id: blueprint.id,
+      blueprint_version: blueprint.version,
+      number: 0,
+      title: { ...FRESH_VARIANT_TITLE },
+      language: input.language,
+      status: 'generated',
+      sections: assembled.sections,
+    };
+    const freshVariantDoc: Record<string, unknown> = {
+      blueprint_id: blueprint.id,
+      blueprint_version: blueprint.version,
+      number: 0,
+      title: { ...FRESH_VARIANT_TITLE },
+      language: input.language,
+      status: 'generated',
+      source: 'fresh',
+      generated_for: uid,
+      attempt_id: attemptDocRef.id,
+      seed,
+      sections: assembled.sections,
+      content_version: 1,
+      difficulty_label: 'standard',
+      created_by: 'examStart',
+      freshness: assembled.freshness,
+      assembly: {
+        matrix_fit: assembled.fit,
+        repeated_parts: assembled.repeated_parts,
+        min_review_status: config.min_review_status,
+        pool_size: pool.items.length,
+        seen_questions: lastSeen.size,
+      },
+    };
+    const started = await runStart({
+      uid,
+      blueprint,
+      variant,
+      examStyle: input.examStyle,
+      clientAppVersion: input.clientAppVersion,
+      inProgressQuery,
+      attemptRef: attemptDocRef,
+      freshVariantDoc,
+      freshness: assembled.freshness,
+    });
+    logger.info('examStart', {
+      uid,
+      mode: 'fresh',
+      blueprintId: blueprint.id,
+      language: input.language,
+      attemptId: started.attemptId,
+      source: started.source,
+      freshness: assembled.freshness,
+    });
+    const startedBlueprint = started.state.blueprint_id === blueprint.id ? blueprint : await requireBlueprint(started.state.blueprint_id);
+    return sessionPayload(started.attemptId, started.state, startedBlueprint, started.source);
   }),
 );
 
@@ -230,9 +398,12 @@ export const examSubmitSection = onCall(
         throw new DomainError(Reasons.WRONG_SECTION, 'not the current section', { currentSectionId: attempt.current_section_id });
       }
 
+      // Strict ORT style (§10.2): the next section opens only when this one's time is over.
+      assertSectionOver(attempt, nowMs);
       const sec = attempt.sections[attempt.current_section_index]!;
       const answers = sanitizeAnswers(data['answers'], sec.question_ids);
-      const flags = sanitizeFlags(data['flags'], sec.question_ids);
+      // No flags in strict style (marks in the booklet are not allowed).
+      const flags = flagsForStyle(attempt.exam_style, sanitizeFlags(data['flags'], sec.question_ids));
       const bs = blueprint.sections.find((s) => s.id === sectionId);
       const timings = sanitizeTimings(data['timings'], sec.question_ids, (bs?.duration_minutes ?? 0) * 60);
       const transition = applySectionSubmit(attempt, blueprint, sectionId, nowMs);
@@ -272,7 +443,8 @@ export const examSubmitSection = onCall(
     });
 
     if (outcome.kind === 'completed') {
-      await bumpVariantStats(outcome.attempt.variant_id, outcome.result.percent);
+      // A fresh variant belongs to one attempt: no shared stats to keep.
+      if (!isFreshVariantId(outcome.attempt.variant_id)) await bumpVariantStats(outcome.attempt.variant_id, outcome.result.percent);
       logger.info('exam completed', { uid, attemptId, percent: outcome.result.percent, eligible: outcome.result.leaderboard_eligible });
       return { completed: true, result: outcome.result };
     }
@@ -395,7 +567,7 @@ async function expireOne(attemptId: string): Promise<'expired' | 'skipped'> {
       tx.set(answersRef(attemptId, c.section_id), {
         section_id: c.section_id,
         answers: answersBySection[c.section_id] ?? {},
-        flags: sanitizeFlags(flags, transition.attempt.sections.find((s) => s.section_id === c.section_id)?.question_ids ?? []),
+        flags: flagsForStyle(attempt.exam_style, sanitizeFlags(flags, transition.attempt.sections.find((s) => s.section_id === c.section_id)?.question_ids ?? [])),
         submitted_at: Timestamp.fromMillis(nowMs),
         late: true,
         client_elapsed_sec: null,

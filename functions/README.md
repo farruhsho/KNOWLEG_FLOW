@@ -1,7 +1,8 @@
 # ORT Master KG — Cloud Functions (2nd gen)
 
 Server side of the contract in [`docs/modernization/ARCHITECTURE.md`](../docs/modernization/ARCHITECTURE.md) §3
-(phase 3 — referrals, promo codes, friends, groups, broadcasts, analytics — §9).
+(phase 3 — referrals, promo codes, friends, groups, broadcasts, analytics — §9; phase 4 — a fresh
+variant per attempt, strict ORT style, web payments — §10).
 TypeScript (strict), Node.js 22, `firebase-functions` 7.4, `firebase-admin` 14 (modular imports),
 `@anthropic-ai/sdk` 1.3, `@googleapis/androidpublisher`. Region: `europe-west1`, `maxInstances: 20`
 (`src/config.ts`).
@@ -26,6 +27,30 @@ TypeScript (strict), Node.js 22, `firebase-functions` 7.4, `firebase-admin` 14 (
 | `billingSweepVoided` | schedule, daily 04:00 (Asia/Bishkek) | — |
 | `sendStudyReminders` | schedule, daily 18:00 (Asia/Bishkek) | — |
 | `onUserBanChanged` | Firestore `users/{uid}` updated | — |
+| `adminUpdateExamPool` | callable | `super_admin` |
+| `adminExamPoolHealth` | callable | `super_admin`, `content_manager`, `methodologist` |
+| `paymentCreateOrder`, `paymentGetOrder` | callable | signed-in (owner) |
+| `adminRefundOrder` | callable | `super_admin` (`refund`) |
+| `paymentWebhook` | HTTPS `POST` (provider notifications, raw-body signature) | provider |
+| `paymentSandboxCheckout` | HTTPS — test checkout page, **404 unless the Functions emulator runs a `demo-*` project** | — |
+| `paymentExpireOrders` | schedule, hourly (Asia/Bishkek) | — |
+
+Phase 4 notes (ARCHITECTURE §10):
+
+- `examStart {mode: 'fresh', blueprintId, language, examStyle?}` assembles a new variant from the
+  bank (`src/domain/assembly.ts`, a port of the pipeline's `assemble.ts`, with the topic matrices
+  `content/matrix/*.json` copied to `lib/data/matrix/` by `copy-assets`) and writes
+  `exam_variants/fresh_{attemptId}` (`status: 'generated'`) with the attempt and the charge in one
+  transaction; `POOL_TOO_SMALL` charges nothing. The pool reads `exam_questions` by
+  `(language, section_id, part_id, review.status)`; it also honours `blueprint_id`,
+  `passage_order` and `exam_passages.layout` when the documents carry them (the pipeline importer
+  should write them; without a layout a text may fill either kind of reading slot).
+- `examStyle: 'strict'`: `examSubmitSection` before `deadline_at − 5 s` → `SECTION_NOT_OVER`; flags
+  are not stored.
+- Payments: `src/payments/` holds the provider adapter interface, `none` (default: no sales,
+  `PAYMENTS_DISABLED`) and the emulator-only `sandbox`. A paid webhook grants with the same code as
+  Google Play (`src/handlers/credit_grants.ts`: debt settlement, ledger `purchase` with
+  `ref: 'web_' + orderId`, referral reward); refunds use the same clawback.
 
 Errors are `HttpsError` with `details.reason` from `src/domain/reasons.ts`
 (same codes as `BackendReasons` in `lib/core/backend/backend_contract.dart`).
@@ -58,6 +83,11 @@ src/
     notifications.ts   broadcast input, audience filter, language, FCM batches of 500, 3/day
     regions.ts         kg_regions.json index, users.region -> region id (leagues, audiences)
     timings.ts         exam timings sanitizing, topic_time_avg / slow_topics, activity seconds
+    assembly.ts        fresh variant assembly (matrix tiers, passages, unseen-first), pool health
+    flow.ts            bounded-flow solver used by the assembly (port of the pipeline's flow.ts)
+    exam_matrix.ts     topic matrix parsing and blueprint fit check
+    exam_pool.ts       examStart input (mode/style), config/exam_pool, pool documents, seen questions
+  payments/            web payment adapter interface, `none` / `sandbox` adapters, order rules
     time.ts, types.ts, hash.ts, reasons.ts
   handlers/            thin Firebase adapters (Firestore transactions, Auth, Play, Anthropic)
 test/                  node:test unit tests for every domain module
@@ -103,6 +133,15 @@ firebase functions:secrets:set ANTHROPIC_API_KEY
 
 Only `aiTutor` and `adminAiDraftQuestions` mount it. The key never reaches the app.
 
+### 3b. Secret: payment provider
+
+```bash
+firebase functions:secrets:set PAYMENT_PROVIDER_SECRET   # any placeholder while PAYMENT_PROVIDER=none
+```
+
+`paymentCreateOrder`, `paymentWebhook` and `adminRefundOrder` mount it for the provider adapter, so
+the deploy needs the secret to exist. The `none` and `sandbox` adapters never read it.
+
 ### 4. Params
 
 Values are asked interactively on the first deploy, or put them in `functions/.env.knowleg-33f36`
@@ -115,6 +154,8 @@ Values are asked interactively on the first deploy, or put them in `functions/.e
 | `PLAY_PACKAGE_NAME` | `com.example.knowledge_flow` | Play `applicationId`. Change together with the Android app id before the first Play upload. |
 | `ALLOW_TEST_PURCHASES` | `false` | Grant credits for license-tester purchases. Keep `false` in production. |
 | `AI_TUTOR_MODEL` | `claude-opus-5-5` | Model for the tutor and the question drafter (owner can switch without an app release). |
+| `PAYMENT_PROVIDER` | `none` | Web payment adapter: `none` (no sales) \| `sandbox` (**Functions emulator + `demo-*` project only**; anywhere else it acts as `none`) \| a provider adapter name. |
+| `PAYMENT_RETURN_ORIGINS` | `https://knowleg-33f36.web.app,https://knowleg-33f36.firebaseapp.com` | Origins `paymentCreateOrder` accepts in `returnUrl` (the web app's `/pay/return`). |
 
 ```dotenv
 # functions/.env.knowleg-33f36  (example values)
@@ -123,6 +164,8 @@ APP_CHECK_ENFORCE_ADMIN=false
 PLAY_PACKAGE_NAME=kg.example.ortmaster
 ALLOW_TEST_PURCHASES=false
 AI_TUTOR_MODEL=claude-opus-5-5
+PAYMENT_PROVIDER=none
+PAYMENT_RETURN_ORIGINS=https://knowleg-33f36.web.app,https://knowleg-33f36.firebaseapp.com
 ```
 
 ### 5. Firestore config documents (optional, defaults shown)
@@ -134,6 +177,13 @@ AI_TUTOR_MODEL=claude-opus-5-5
   (`FREE_EXAMS_PER_USER_*` in `src/domain/entitlements.ts`). The admin CMS and the student client use the same range.
 - `config/ai_tutor` — `{enabled: true, daily_limit: 15, max_tokens: 1200}` (Admin SDK / console only;
   clients cannot read it).
+- `config/pricing.web_products` — `{exam_single: {credits: 1, amount_som: 100, enabled: true},
+  exam_pack_5: {credits: 5, amount_som: 450, enabled: false}, exam_pack_10: {credits: 10, amount_som: 800,
+  enabled: false}}` (these defaults apply when the field is missing). `adminUpdatePricing {webProducts}`
+  replaces the map (credits 1..50, amount_som 1..100000, enabled bool); `exam_single` must stay
+  1 credit = 100 som unless `confirmBasePriceChange: true` (owner decision).
+- `config/exam_pool` — `{fresh_enabled: true, min_review_status: 'methodologist_approved'}`; written by
+  `adminUpdateExamPool` (`ai_verified` is an explicit owner decision for a pilot).
 - `exam_blueprints/{id}` — import from `assets/data/exam_blueprints.json`; the functions fall back
   to the bundled copy when a document is missing.
 
@@ -198,6 +248,20 @@ upload CMS media.
 Phase 3 needs one more index override (in `firestore.indexes.json`): `members.uid` with
 collection-group scope (accountDelete finds the user's group memberships). Broadcast audiences page
 through `users` ordered by document id and filter in code, so they need no composite index.
+
+Phase 4 indexes: `exam_questions (language, section_id, part_id, review.status)` (fresh pool),
+`exam_attempts (uid, blueprint_id, language, started_at desc)` (seen questions) and
+`(uid, blueprint_id, language, source, status)` (fresh resume), `payment_orders (uid, created_at
+desc)`, `(status, created_at)` (expiry, CMS).
+
+### 10. Web app (Firebase Hosting, BILLING_MODE=web)
+
+`firebase.json` serves `build/web` with an SPA rewrite to `/index.html`, `no-cache` for
+`index.html`, `flutter_service_worker.js`, `flutter_bootstrap.js`, `main.dart.js` and every route,
+and long caching only for content-hashed files. Deploy it with the **Deploy backend** workflow
+(`deploy_hosting: true`; repository variable `APP_CHECK_WEB_SITE_KEY` = reCAPTCHA Enterprise site
+key), which runs `flutter build web --release --dart-define=BILLING_MODE=web`. Set
+`PAYMENT_RETURN_ORIGINS` to the site's origins (custom domain included) before selling.
 
 `onUserBanChanged` is a Firestore trigger (Eventarc): it must be deployed in the Firestore
 database's region (see step 1). `sendStudyReminders` needs the Firebase Cloud Messaging API

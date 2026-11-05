@@ -3,7 +3,7 @@
 // complete exam variants. Where the hand-written sample bank
 // (content/bank/sample/items.json) has an original item for a part, it is used;
 // the rest of each variant is clearly-labelled synthetic filler.
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -89,12 +89,91 @@ export async function seedVariant(db, bp, variantId, lang, number = 1) {
   return sections;
 }
 
+/**
+ * Web products (ARCHITECTURE §10.3): the base product 1 credit = 100 som is on
+ * sale, the packs stay off until the owner approves their prices.
+ */
+export const WEB_PRODUCTS = {
+  exam_single: { credits: 1, amount_som: 100, enabled: true },
+  exam_pack_5: { credits: 5, amount_som: 450, enabled: false },
+  exam_pack_10: { credits: 10, amount_som: 800, enabled: false },
+};
+
 export async function seedExamBase(db) {
   for (const bp of blueprints) await db.doc(`exam_blueprints/${bp.id}`).set(bp);
   await db.doc('config/pricing').set({
     free_exams_per_user: 1,
     products: { exam_single: { credits: 1 }, exam_pack_5: { credits: 5 }, exam_pack_10: { credits: 10 } },
+    web_products: WEB_PRODUCTS,
   });
+  // EMULATOR-ONLY pilot setting (§10.1): the pilot bank is `ai_verified`
+  // (checked by an independent AI solver, not yet by a methodologist), so the
+  // local fresh variants accept it. Production keeps the default
+  // `methodologist_approved` until the owner decides otherwise
+  // (adminUpdateExamPool, super_admin).
+  await db.doc('config/exam_pool').set({
+    fresh_enabled: true,
+    min_review_status: 'ai_verified',
+    note: 'emulator-only pilot setting (seed_dev.mjs): ai_verified items are not methodologist-approved',
+    updated_by: 'seed',
+  });
+}
+
+const tsOrNull = (iso) => (typeof iso === 'string' && iso ? new Date(iso) : null);
+
+/**
+ * Imports the pilot bank (content/bank/pilot_main_ru_v1_*: 150 original
+ * `ai_verified` items for ort_main_2026 ru + 3 reading passages) into
+ * exam_questions / exam_question_keys / exam_passages in the §1.3 shape the
+ * pipeline importer writes (incl. part_id), plus the additive fields the
+ * fresh-variant assembly reads when present: `blueprint_id`, `passage_order`
+ * (question order in its text) and the passage `layout` (standalone | paired).
+ * With config/exam_pool.min_review_status = ai_verified this is exactly one
+ * fresh ort_main_2026 ru variant (more attempts honestly report repeats).
+ */
+export async function seedPilotBank(db) {
+  const bankDir = path.join(root, 'content/bank');
+  const dirs = readdirSync(bankDir).filter((d) => d.startsWith('pilot_main_ru_v1_') && existsSync(path.join(bankDir, d, 'items.json')));
+  const ops = [];
+  let items = 0;
+  let passages = 0;
+  for (const dir of dirs.sort()) {
+    const file = JSON.parse(readFileSync(path.join(bankDir, dir, 'items.json'), 'utf8'));
+    for (const p of file.passages ?? []) {
+      const x = p.passage;
+      ops.push([`exam_passages/${p.id}`, {
+        language: x.language, subject_id: x.subject_id, section_id: x.section_id, title: x.title, text: x.text,
+        source: { ...x.source }, content_hash: p.content_hash, layout: p.layout,
+      }]);
+      passages++;
+    }
+    for (const it of file.items ?? []) {
+      const q = it.question;
+      if (q.review?.status === 'rejected') continue;
+      ops.push([`exam_questions/${it.id}`, {
+        subject_id: q.subject_id, section_id: q.section_id, part_id: it.target.part_id, blueprint_id: it.target.blueprint_id,
+        topic_id: q.topic_id, subtopic_id: q.subtopic_id ?? null, difficulty: q.difficulty, language: q.language,
+        translation_group_id: q.translation_group_id ?? null, type: q.type, stem: q.stem,
+        options: (q.options ?? []).map((o) => ({ id: o.id, text: o.text })),
+        passage_id: q.passage_id ?? null, passage_order: it.passage_order ?? null, image_path: q.image_path ?? null,
+        table: storedTable(q.table), source: { ...q.source },
+        review: { status: q.review.status, reviewed_by: q.review.reviewed_by ?? null, reviewed_at: tsOrNull(q.review.reviewed_at), notes: q.review.notes ?? '' },
+        content_version: q.content_version ?? 1, content_hash: q.content_hash, pipeline_hash: q.content_hash,
+        created_at: tsOrNull(q.created_at), updated_at: tsOrNull(q.updated_at),
+      }]);
+      ops.push([`exam_question_keys/${it.id}`, {
+        correct: it.key.correct, explanation: it.key.explanation ?? '', wrong_option_notes: it.key.wrong_option_notes ?? {},
+        solution_steps: it.key.solution_steps ?? [],
+      }]);
+      items++;
+    }
+  }
+  for (let i = 0; i < ops.length; i += 400) {
+    const batch = db.batch();
+    for (const [p, data] of ops.slice(i, i + 400)) batch.set(db.doc(p), data);
+    await batch.commit();
+  }
+  return { items, passages };
 }
 
 /**

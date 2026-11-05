@@ -1,18 +1,26 @@
 name: Deploy backend (manual)
 
 # Deploys Firestore rules + indexes, Storage rules and Cloud Functions to the
-# production project. Manual only: run it after the owner has chosen the
-# Firestore/Functions region and set secrets (see functions/README.md).
+# production project, and optionally the web app (Firebase Hosting, the site
+# where web payments are taken — ARCHITECTURE §10.3). Manual only: run it after
+# the owner has chosen the Firestore/Functions region and set secrets (see
+# functions/README.md).
 on:
   workflow_dispatch:
     inputs:
       only:
-        description: "firebase deploy --only targets"
+        description: "firebase deploy --only targets for the backend ('none' = skip the backend)"
         required: true
         default: "firestore:rules,firestore:indexes,storage,functions"
+      deploy_hosting:
+        description: "Also build the Flutter web app (BILLING_MODE=web) and deploy Firebase Hosting"
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   deploy:
+    if: ${{ github.event.inputs.only != 'none' }}
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -29,3 +37,46 @@ jobs:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       - name: Deploy
         run: firebase deploy --project knowleg-33f36 --only "${{ github.event.inputs.only }}" --non-interactive
+
+  hosting:
+    # Runs after the backend (when it is deployed in the same run) so the web
+    # app never calls callables that do not exist yet.
+    needs: deploy
+    if: ${{ always() && github.event.inputs.deploy_hosting == 'true' && (needs.deploy.result == 'success' || needs.deploy.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.7
+          channel: stable
+          cache: true
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install -g firebase-tools@15
+      - name: App Check site key is required
+        # Student callables enforce App Check (APP_CHECK_ENFORCE=true): a web build
+        # without the reCAPTCHA Enterprise site key could not call any of them.
+        env:
+          SITE_KEY: ${{ vars.APP_CHECK_WEB_SITE_KEY }}
+        run: |
+          if [ -z "$SITE_KEY" ]; then
+            echo "::error::Set the repository variable APP_CHECK_WEB_SITE_KEY (reCAPTCHA Enterprise site key of the web app)."
+            exit 1
+          fi
+      - name: Build web (BILLING_MODE=web)
+        env:
+          SITE_KEY: ${{ vars.APP_CHECK_WEB_SITE_KEY }}
+        run: |
+          flutter pub get
+          flutter gen-l10n
+          flutter build web --release \
+            --dart-define=BILLING_MODE=web \
+            --dart-define=APP_CHECK_WEB_SITE_KEY="$SITE_KEY"
+      - name: Authenticate
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Deploy hosting
+        run: firebase deploy --project knowleg-33f36 --only hosting --non-interactive

@@ -136,6 +136,9 @@ export function attemptToDoc(a: AttemptState): Record<string, unknown> {
     language: a.language,
     status: a.status,
     entitlement_source: a.entitlement_source,
+    exam_style: a.exam_style,
+    source: a.source,
+    freshness: a.freshness ? { total: a.freshness.total, repeated: a.freshness.repeated } : null,
     current_section_index: a.current_section_index,
     current_section_id: a.current_section_id,
     current_deadline_at: msToTs(a.current_deadline_at),
@@ -167,6 +170,7 @@ export function attemptFromDoc(data: unknown): AttemptState | null {
     }));
   const integrity = isRecord(data['integrity']) ? data['integrity'] : {};
   const status = str(data['status'], 'in_progress');
+  const fr = isRecord(data['freshness']) ? data['freshness'] : null;
   return {
     uid: str(data['uid']),
     variant_id: str(data['variant_id']),
@@ -175,6 +179,10 @@ export function attemptFromDoc(data: unknown): AttemptState | null {
     language: str(data['language'], 'ru'),
     status: status === 'completed' || status === 'expired' ? status : 'in_progress',
     entitlement_source: (str(data['entitlement_source'], 'credit') as AttemptState['entitlement_source']),
+    // Attempts created before phase 4 have neither field: standard library attempts.
+    exam_style: data['exam_style'] === 'strict' ? 'strict' : 'standard',
+    source: data['source'] === 'fresh' ? 'fresh' : 'library',
+    freshness: fr ? { total: int(fr['total']), repeated: int(fr['repeated']) } : null,
     current_section_index: int(data['current_section_index']),
     current_section_id: typeof data['current_section_id'] === 'string' ? data['current_section_id'] : null,
     current_deadline_at: tsToMs(data['current_deadline_at']),

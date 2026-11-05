@@ -59,6 +59,12 @@ What is covered:
   readable by every admin role; `config/achievements` read by signed-in users, written by
   `super_admin` / `content_manager` with keys `titles`, `descriptions`, `disabled` only; region and
   group league boards read-only.
+- Phase 4 (ARCHITECTURE §10): `exam_variants` with `status: 'generated'` (fresh variant per
+  attempt) are never readable by students — not even the one assembled for them — while the
+  published-only library query keeps working; content roles read them (CMS lists) but nobody
+  creates, edits or deletes them from a client; `config/exam_pool` signed-in read, no client
+  writes; `payment_orders` read by the owner (uid-filtered queries) and by `super_admin` /
+  `support`, never client-written; `payment_events` and `payment_attempts` have no client access.
 
 CI: add a job with `actions/setup-java` (21) + `actions/setup-node` (22) running `npm ci && npm test`
 in this directory (the existing `.github/workflows/flutter-ci.yml` has a commented-out

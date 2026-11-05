@@ -12,8 +12,10 @@
  * user exists), so wiping entitlements cannot be abused to re-claim the free
  * exam. A retry after a partial failure (Auth user already gone) skips the
  * recent-login check and only finishes the data cleanup of the caller's uid.
- * Purchases and legacy payments are kept for finance/fraud review but
- * anonymized: uid -> 'deleted:' + sha256(uid).
+ * Purchases, web payment orders and legacy payments are kept for
+ * finance/fraud review but anonymized: uid -> 'deleted:' + sha256(uid).
+ * Fresh variants generated for the user (exam_variants.generated_for) are
+ * deleted with the attempts.
  */
 import '../config';
 import { getAuth } from 'firebase-admin/auth';
@@ -141,7 +143,7 @@ export async function deleteUserData(uid: string): Promise<Record<string, number
     await db().doc(`referrals/${referredBy}/items/${uid}`).delete();
   }
   const attemptRange = dailyQuestIdRange(uid); // same `${uid}_${day}` id scheme
-  for (const counter of ['promo_attempts', 'code_attempts']) {
+  for (const counter of ['promo_attempts', 'code_attempts', 'payment_attempts']) {
     counts[counter] = await deleteQueryTrees(
       db()
         .collection(counter)
@@ -157,10 +159,17 @@ export async function deleteUserData(uid: string): Promise<Record<string, number
   // (their submissions there were already deleted at removal time).
   counts['removed_markers'] = await deleteQueryTrees(db().collectionGroup('removed').where('uid', '==', uid));
 
+  // Phase 4 (§10.1): the fresh variants assembled for this user's attempts.
+  counts['fresh_variants'] = await deleteQueryTrees(db().collection('exam_variants').where('generated_for', '==', uid));
+
   counts['purchases_anonymized'] = await anonymize('purchases', 'uid', uid);
   // Other users' purchases that paid this user a referral bonus keep no raw uid.
   counts['purchases_referrer_anonymized'] = await anonymize('purchases', 'referral_referrer_uid', uid);
   counts['payments_anonymized'] = await anonymize('payments', 'uid', uid);
+  // Web payment orders (§10.3) are financial records too: kept, anonymized
+  // like purchases (payment_events never carry a uid).
+  counts['payment_orders_anonymized'] = await anonymize('payment_orders', 'uid', uid);
+  counts['payment_orders_referrer_anonymized'] = await anonymize('payment_orders', 'referral_referrer_uid', uid);
 
   try {
     const bucket = getStorage().bucket();

@@ -12,6 +12,7 @@ import { isValidProductId } from '../domain/purchase';
 import { DomainError, Reasons } from '../domain/reasons';
 import { isRole, legacyUserRoleFor, ROLES, type Role } from '../domain/roles';
 import { isRecord, num } from '../domain/types';
+import { BASE_PRICE_SOM, BASE_PRODUCT_ID, parseWebProductsUpdate } from '../payments/orders';
 import { adminCallableOptions, db, FieldValue, payload, reqId, reqInt, reqString, requirePermission, wrap, writeAdminLog } from './common';
 import { loadBlueprint, loadKeys, loadPassages, loadQuestions, loadVariant } from './content';
 
@@ -117,6 +118,10 @@ export const adminPublishVariant = onCall(
     const publish = data['publish'];
     const variant = await loadVariant(variantId);
     if (!variant) throw new DomainError(Reasons.VALIDATION_FAILED, 'variant not found', { field: 'variantId' });
+    // A fresh variant (§10.1) belongs to one attempt and never enters the library.
+    if (variant.status === 'generated') {
+      throw new DomainError(Reasons.VALIDATION_FAILED, 'a generated variant cannot be published', { field: 'variantId', why: 'generated_variant' });
+    }
     const ref = db().doc(`exam_variants/${variantId}`);
 
     if (!publish) {
@@ -150,28 +155,72 @@ export const adminPublishVariant = onCall(
 );
 
 // ---------------------------------------------------------------------------
-// adminUpdatePricing {products, freeExamsPerUser} -> {ok}
+// adminUpdatePricing {products, freeExamsPerUser, webProducts?, confirmBasePriceChange?} -> {ok}
+//
+// webProducts (ARCHITECTURE §10.3) = {id: {credits 1..50, amount_som 1..100000, enabled}}
+// replaces config/pricing.web_products as a whole; exam_single must stay
+// {credits: 1, amount_som: 100} unless confirmBasePriceChange is true (owner
+// decision). With webProducts, products / freeExamsPerUser may be omitted
+// (the web pricing page sends only its own map).
+
+function parseProductsInput(rawProducts: unknown): Record<string, number> {
+  const products: Record<string, number> = {};
+  const entries: Array<[unknown, unknown]> = Array.isArray(rawProducts)
+    ? rawProducts.filter(isRecord).map((p) => [p['productId'] ?? p['product_id'] ?? p['id'], p['credits']])
+    : isRecord(rawProducts)
+      ? Object.entries(rawProducts).map(([k, v]) => [k, isRecord(v) ? v['credits'] : v])
+      : [];
+  for (const [id, credits] of entries) {
+    const c = num(credits, NaN);
+    if (!isValidProductId(id) || !Number.isInteger(c) || c < 1 || c > 1000) {
+      throw new DomainError(Reasons.VALIDATION_FAILED, `invalid product entry ${String(id)}`, { field: 'products' });
+    }
+    products[id] = c;
+  }
+  if (Object.keys(products).length === 0) throw new DomainError(Reasons.VALIDATION_FAILED, 'products must not be empty', { field: 'products' });
+  return products;
+}
 
 export const adminUpdatePricing = onCall(
   adminCallableOptions(),
   wrap('adminUpdatePricing', async (req) => {
     const actor = await requirePermission(req, 'manage_pricing');
     const data = payload(req);
-    const rawProducts = data['products'];
-    const products: Record<string, number> = {};
-    const entries: Array<[unknown, unknown]> = Array.isArray(rawProducts)
-      ? rawProducts.filter(isRecord).map((p) => [p['productId'] ?? p['product_id'] ?? p['id'], p['credits']])
-      : isRecord(rawProducts)
-        ? Object.entries(rawProducts).map(([k, v]) => [k, isRecord(v) ? v['credits'] : v])
-        : [];
-    for (const [id, credits] of entries) {
-      const c = num(credits, NaN);
-      if (!isValidProductId(id) || !Number.isInteger(c) || c < 1 || c > 1000) {
-        throw new DomainError(Reasons.VALIDATION_FAILED, `invalid product entry ${String(id)}`, { field: 'products' });
-      }
-      products[id] = c;
+    if (data['webProducts'] !== undefined && data['webProducts'] !== null) {
+      const webProducts = parseWebProductsUpdate(data['webProducts'], data['confirmBasePriceChange']);
+      const products = data['products'] !== undefined && data['products'] !== null ? parseProductsInput(data['products']) : null;
+      const freeExamsPerUser =
+        data['freeExamsPerUser'] !== undefined && data['freeExamsPerUser'] !== null
+          ? reqInt(data['freeExamsPerUser'], 'freeExamsPerUser', FREE_EXAMS_PER_USER_MIN, FREE_EXAMS_PER_USER_MAX)
+          : null;
+      const ref = db().doc('config/pricing');
+      const before = (await ref.get()).data() ?? null;
+      const previousWeb = isRecord(before?.['web_products']) ? (before!['web_products'] as Record<string, unknown>) : {};
+      // Whole-map replacement under merge: products removed from the map are deleted.
+      const webField: Record<string, unknown> = { ...webProducts };
+      for (const id of Object.keys(previousWeb)) if (!(id in webProducts)) webField[id] = FieldValue.delete();
+      await ref.set(
+        {
+          web_products: webField,
+          ...(products ? { products } : {}),
+          ...(freeExamsPerUser !== null ? { free_exams_per_user: freeExamsPerUser } : {}),
+          updated_at: FieldValue.serverTimestamp(),
+          updated_by: actor.uid,
+        },
+        { merge: true },
+      );
+      const basePriceChanged = webProducts[BASE_PRODUCT_ID]!.amount_som !== BASE_PRICE_SOM || webProducts[BASE_PRODUCT_ID]!.credits !== 1;
+      await writeAdminLog(actor, 'update_pricing', { doc: 'config/pricing' }, {
+        before: before
+          ? { products: before['products'] ?? null, free_exams_per_user: before['free_exams_per_user'] ?? null, web_products: before['web_products'] ?? null }
+          : null,
+        after: { products: products ?? undefined, free_exams_per_user: freeExamsPerUser ?? undefined, web_products: webProducts },
+        base_price_changed: basePriceChanged,
+      });
+      return { ok: true };
     }
-    if (Object.keys(products).length === 0) throw new DomainError(Reasons.VALIDATION_FAILED, 'products must not be empty', { field: 'products' });
+
+    const products = parseProductsInput(data['products']);
     const freeExamsPerUser = reqInt(data['freeExamsPerUser'], 'freeExamsPerUser', FREE_EXAMS_PER_USER_MIN, FREE_EXAMS_PER_USER_MAX);
 
     const ref = db().doc('config/pricing');

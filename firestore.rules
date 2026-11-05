@@ -2,7 +2,8 @@ rules_version = '2';
 
 // ORT Master KG — Firestore security rules.
 // Contract: docs/modernization/ARCHITECTURE.md §1 (collection table), §2 (roles), §3 (notes),
-// §9 (phase 3: referrals, promo codes, friends, groups, broadcasts, achievements config).
+// §9 (phase 3: referrals, promo codes, friends, groups, broadcasts, achievements config),
+// §10 (phase 4: generated exam variants, config/exam_pool, web payment orders).
 //
 // Principles
 // - The server (Cloud Functions, Admin SDK — bypasses these rules) is the
@@ -270,14 +271,19 @@ service cloud.firestore {
     // Students see published variants only (queries must filter on status).
     // Publishing goes through adminPublishVariant (validation), so direct
     // writes may not set or modify 'published'.
+    // Phase 4 (§10.1): 'generated' variants are assembled by examStart for one
+    // attempt (exam_variants/fresh_{attemptId}). Students never read them (not
+    // even the owner of the attempt: the payload carries the current section);
+    // content roles read them like every variant (CMS lists, support), and
+    // nobody may create, edit or delete them from a client.
     match /exam_variants/{variantId} {
       allow read: if signedIn() && (resource.data.status == 'published' || isContentRole());
       allow create: if canPublishVariants()
                     && request.resource.data.status in ['draft', 'in_review'];
       allow update: if canPublishVariants()
-                    && resource.data.status != 'published'
+                    && !(resource.data.status in ['published', 'generated'])
                     && request.resource.data.status in ['draft', 'in_review', 'archived'];
-      allow delete: if isSuperAdmin() && resource.data.status != 'published';
+      allow delete: if isSuperAdmin() && !(resource.data.status in ['published', 'generated']);
     }
 
     function reviewStatus(data) {
@@ -398,6 +404,24 @@ service cloud.firestore {
       }
     }
 
+    // Web payments (ARCHITECTURE §10.3): orders are created and moved only by
+    // the payment functions; the owner reads their own (queries must filter
+    // on uid), super_admin and support read all (view_payments).
+    match /payment_orders/{orderId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || canViewPayments());
+      allow write: if false;
+    }
+
+    // Provider notifications (idempotency, no uid) and the daily order
+    // counters: server only.
+    match /payment_events/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /payment_attempts/{attemptId} {
+      allow read, write: if false;
+    }
+
     match /user_stats/{uid} {
       allow read: if isOwner(uid) || canViewUsers();
       allow write: if false;
@@ -425,6 +449,13 @@ service cloud.firestore {
     }
 
     match /config/pricing {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Fresh-variant pool settings (§10.1): readable by signed-in users,
+    // written only by adminUpdateExamPool.
+    match /config/exam_pool {
       allow read: if signedIn();
       allow write: if false;
     }

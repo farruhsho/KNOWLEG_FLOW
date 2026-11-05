@@ -45,6 +45,12 @@ export interface ExamSessionPayload {
   entitlementSource: string;
   language: string;
   sectionsTotal: number;
+  /** standard | strict (ARCHITECTURE §10.2). */
+  examStyle: string;
+  /** library | fresh (ARCHITECTURE §10.1). */
+  source: string;
+  /** Fresh attempts: {total, repeated} — "N questions you have already seen"; null for library variants. */
+  freshness: { total: number; repeated: number } | null;
   result?: ExamResult | null;
 }
 
@@ -102,6 +108,9 @@ export function buildSessionPayload(input: BuildPayloadInput): ExamSessionPayloa
     entitlementSource: input.entitlementSource ?? attempt.entitlement_source,
     language: attempt.language,
     sectionsTotal: attempt.sections.length,
+    examStyle: attempt.exam_style,
+    source: attempt.source,
+    freshness: attempt.freshness ? { ...attempt.freshness } : null,
   };
   if (attempt.status !== 'in_progress') {
     base.result = input.result ?? null;
