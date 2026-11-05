@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "as_of": "2026-11-04T17:16:15.278Z",
+  "as_of": "2026-11-05T18:18:40.722Z",
   "target_per_direction": 100,
   "rows": [
     {
@@ -9,18 +9,18 @@
       "target_variants": 100,
       "items_per_variant": 150,
       "variants": {
-        "drafted": 1,
-        "ai_verified": 1,
+        "drafted": 2,
+        "ai_verified": 2,
         "approved": 0,
         "published": 0,
         "archived": 0
       },
       "items": {
         "draft": 12,
-        "ai_verified": 150,
+        "ai_verified": 300,
         "methodologist_approved": 0,
         "rejected": 0,
-        "total": 162
+        "total": 312
       }
     },
     {
@@ -424,11 +424,11 @@
   ],
   "totals": {
     "target_variants": 1600,
-    "drafted": 1,
-    "ai_verified": 1,
+    "drafted": 2,
+    "ai_verified": 2,
     "approved": 0,
     "published": 0,
-    "items": 166,
+    "items": 316,
     "approved_items": 0,
     "target_numbers": 1000,
     "approved_numbers": 0,

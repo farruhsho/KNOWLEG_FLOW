@@ -1,0 +1,2897 @@
+{
+  "schema_version": 1,
+  "batch": {
+    "id": "main_ru_v2_math_comparison",
+    "kind": "generated",
+    "created_at": "2026-11-05T17:43:33.547Z",
+    "note": "v2 batch: 30 ORIGINAL quantitative-comparison items (ort_main_2026 / math / math_comparison, ru), hand-authored from scratch by claude-v2-author from the KR school programme (grades 5–11). Not taken, paraphrased or reconstructed from ЦООМО/testing.kg mocks or booklets, Secom, any other collection or website, and no pilot item, context, number or text is reused. Topic × difficulty = PILOT_main_ru_v1 §1 / content/matrix/ort_main_2026.json (9/15/6); keys A/B/C/D = 9/8/7/6. Every key solved by hand and re-derived by an independent numeric/sampling check in the builder. Status draft until independent verification and methodologist review."
+  },
+  "passages": [],
+  "items": [
+    {
+      "id": "q_6ac87c3f47b820ccdde5",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.order_of_operations",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_6ac87c3f47b820cc",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$5 + 4^2 : 2$",
+              "$(5 + 4) \\cdot 2 - 5$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., математика: порядок действий в выражениях со степенью и скобками",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6ac87c3f47b820ccdde5ea7ae9692faa5035bbb39a8cbfc60b6015b4093de90a",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "В колонке А сначала возводят в степень, затем делят и только потом складывают: $4^2 = 16$, $16 : 2 = 8$, $5 + 8 = 13$. В колонке Б сначала выполняют действие в скобках: $5 + 4 = 9$, затем $9 \\cdot 2 = 18$ и $18 - 5 = 13$. Значения равны.",
+        "wrong_option_notes": {
+          "A": "Получается, если в колонке А сначала сложить, а затем возвести в квадрат: $(5 + 4)^2 : 2 = 81 : 2 = 40{,}5 > 13$. Но в степень возводится только 4, а сложение не стоит в скобках.",
+          "B": "Получается, если в колонке А выполнять действия слева направо: $(5 + 16) : 2 = 10{,}5 < 13$, или считать $4^2 = 4 \\cdot 2 = 8$: $5 + 8 : 2 = 9 < 13$. Деление выполняется раньше сложения, а $4^2 = 16$.",
+          "D": "Обе величины — числовые выражения, их значения вычисляются точно."
+        },
+        "solution_steps": [
+          "Колонка А: $4^2 = 16$; $16 : 2 = 8$; $5 + 8 = 13$.",
+          "Колонка Б: $5 + 4 = 9$; $9 \\cdot 2 = 18$; $18 - 5 = 13$.",
+          "$13 = 13$ — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_33d164648bdebcb6a742",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.divisibility",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_33d164648bdebcb6",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Наименьшее трёхзначное число, кратное 7",
+              "$104$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., математика: делители и кратные, деление с остатком",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:33d164648bdebcb6a74245862fff2f8b7ad43a8f50a95ad8c180a7adf331295e",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Разделим 100 на 7 с остатком: $100 = 7 \\cdot 14 + 2$. Число $7 \\cdot 14 = 98$ двузначное, поэтому наименьшее трёхзначное число, кратное 7, равно $7 \\cdot 15 = 105$. Так как $105 > 104$, больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается, если взять $7 \\cdot 14 = 98$. Но 98 — наибольшее двузначное число, кратное 7, а не трёхзначное.",
+          "C": "Получается, если считать, что 104 делится на 7. Но $104 = 7 \\cdot 14 + 6$, остаток равен 6.",
+          "D": "Наименьшее трёхзначное число, кратное 7, — конкретное число 105, его можно найти точно."
+        },
+        "solution_steps": [
+          "$100 = 7 \\cdot 14 + 2$, значит, $7 \\cdot 14 = 98 < 100$.",
+          "Следующее кратное 7: $7 \\cdot 15 = 105$ — наименьшее трёхзначное число, кратное 7.",
+          "$105 > 104$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b308371058bc712b1762",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.powers_roots",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_b308371058bc712b",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$9^7$",
+              "$27^5$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: степень с натуральным показателем и её свойства",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b308371058bc712b17629506e802052de98c0c21c33ec54fba27844f1a04f624",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Приведём степени к основанию 3: $9^7 = (3^2)^7 = 3^{14}$, $27^5 = (3^3)^5 = 3^{15}$ (при возведении степени в степень показатели перемножают). Так как $3^{15} = 3 \\cdot 3^{14}$, величина в колонке Б в 3 раза больше величины в колонке А.",
+        "wrong_option_notes": {
+          "A": "Получается, если сравнить только показатели ($7 > 5$), не приведя степени к одному основанию, или если при возведении степени в степень сложить показатели: $3^{2 + 7} = 3^9$ и $3^{3 + 5} = 3^8$. Показатели нужно перемножать: $3^{14}$ и $3^{15}$.",
+          "C": "Получается, если решить, что меньшее основание с большим показателем «уравновешивает» большее основание. После приведения к основанию 3 показатели разные: 14 и 15.",
+          "D": "Обе величины — конкретные числа; приведение к общему основанию позволяет сравнить их точно."
+        },
+        "solution_steps": [
+          "$9^7 = (3^2)^7 = 3^{14}$.",
+          "$27^5 = (3^3)^5 = 3^{15}$.",
+          "$3^{14} < 3^{15}$, больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_968da3c4bbdc6ae83a57",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.arithmetic",
+        "subtopic_id": "math.arithmetic.estimation",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_968da3c4bbdc6ae8",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$\\sqrt{15} + \\sqrt{35}$",
+              "$10$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: арифметический квадратный корень, оценка значений корней",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:968da3c4bbdc6ae83a57dc55f04737b7d4e120c8bad659211a82cffd9f784e6f",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Оценим каждый корень: $15 < 16$, поэтому $\\sqrt{15} < 4$; $35 < 36$, поэтому $\\sqrt{35} < 6$. Значит, $\\sqrt{15} + \\sqrt{35} < 4 + 6 = 10$. Проверка другим способом: $(\\sqrt{15} + \\sqrt{35})^2 = 50 + 2\\sqrt{525}$, а $\\sqrt{525} < 23$ (так как $23^2 = 529$), поэтому квадрат суммы меньше $50 + 46 = 96 < 100 = 10^2$. Больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается, если заменить сумму корней корнем из произведения: $\\sqrt{15 \\cdot 35} = \\sqrt{525} > 22$. Но $\\sqrt{a} + \\sqrt{b} \\ne \\sqrt{ab}$.",
+          "C": "Получается, если заменить корни ближайшими целыми: $\\sqrt{15} \\approx 4$, $\\sqrt{35} \\approx 6$, $4 + 6 = 10$. Но обе замены сделаны с избытком: $\\sqrt{15} < 4$ и $\\sqrt{35} < 6$, поэтому сумма строго меньше 10.",
+          "D": "Корни можно оценить точно: каждый меньше ближайшего целого числа сверху, поэтому сравнение однозначно."
+        },
+        "solution_steps": [
+          "$15 < 16$, поэтому $\\sqrt{15} < 4$.",
+          "$35 < 36$, поэтому $\\sqrt{35} < 6$.",
+          "$\\sqrt{15} + \\sqrt{35} < 10$, больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_fd4c2ce169e90f939a9f",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.common_fractions",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_fd4c2ce169e90f93",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$\\frac{2}{3} + \\frac{1}{6}$",
+              "$\\frac{3}{4} + \\frac{1}{12}$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5–6 кл., математика: сложение обыкновенных дробей с разными знаменателями",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:fd4c2ce169e90f939a9f45631e20cbe59969976c7966c9aca5faaf4980a5e9b4",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Колонка А: $\\frac{2}{3} + \\frac{1}{6} = \\frac{4}{6} + \\frac{1}{6} = \\frac{5}{6}$. Колонка Б: $\\frac{3}{4} + \\frac{1}{12} = \\frac{9}{12} + \\frac{1}{12} = \\frac{10}{12} = \\frac{5}{6}$. Величины равны.",
+        "wrong_option_notes": {
+          "A": "Получается, если складывать отдельно числители и знаменатели: $\\frac{2 + 1}{3 + 6} = \\frac{1}{3}$ и $\\frac{3 + 1}{4 + 12} = \\frac{1}{4}$, а $\\frac{1}{3} > \\frac{1}{4}$. Так дроби не складывают: сначала их приводят к общему знаменателю.",
+          "B": "Получается, если не сократить дробь $\\frac{10}{12}$ и сравнить её с $\\frac{5}{6}$ по числителям ($10 > 5$). Но $\\frac{10}{12} = \\frac{5}{6}$.",
+          "D": "Обе величины — числовые выражения, их значения вычисляются точно."
+        },
+        "solution_steps": [
+          "$\\frac{2}{3} + \\frac{1}{6} = \\frac{4}{6} + \\frac{1}{6} = \\frac{5}{6}$.",
+          "$\\frac{3}{4} + \\frac{1}{12} = \\frac{9}{12} + \\frac{1}{12} = \\frac{10}{12} = \\frac{5}{6}$.",
+          "$\\frac{5}{6} = \\frac{5}{6}$ — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_25fd726d31cf9e6a9a2e",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.decimals",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_25fd726d31cf9e6a",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$1{,}8 : 0{,}06$",
+              "$3$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 5 кл., математика: деление десятичных дробей",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:25fd726d31cf9e6a9a2e00616ece59f7fb732c11b512d472e6264cf7d535cdeb",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Чтобы разделить на десятичную дробь, переносят запятую в делимом и делителе вправо на столько знаков, сколько их после запятой в делителе (здесь на два): $1{,}8 : 0{,}06 = 180 : 6 = 30$. Проверка: $0{,}06 \\cdot 30 = 1{,}8$. Так как $30 > 3$, больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается, если разделить $1{,}8$ на 6, забыв, что делитель равен $0{,}06$: выйдет $0{,}3 < 3$.",
+          "C": "Получается, если перенести запятую в делимом только на один знак, а в делителе — на два: $18 : 6 = 3$. Запятую в обоих числах переносят на одинаковое число знаков: $180 : 6 = 30$.",
+          "D": "Обе величины — числа, частное вычисляется точно."
+        },
+        "solution_steps": [
+          "Переносим запятую на два знака вправо: $1{,}8 : 0{,}06 = 180 : 6$.",
+          "$180 : 6 = 30$; проверка: $0{,}06 \\cdot 30 = 1{,}8$.",
+          "$30 > 3$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_2328b8eb7cef76abac0c",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.percent_change",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_2328b8eb7cef76ab",
+        "type": "quantitative_comparison",
+        "stem": "Число участников кружка робототехники за год выросло с 40 до 50 человек.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "На сколько процентов выросло число участников",
+              "$20\\,\\%$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: проценты, процентное изменение величины",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:2328b8eb7cef76abac0cf677d7baf753f68ac1b165eac7e5ebfb5cee096eb71f",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Число участников увеличилось на $50 - 40 = 10$ человек. Процент изменения считают от исходного значения: $\\frac{10}{40} \\cdot 100\\,\\% = 25\\,\\%$. Так как $25\\,\\% > 20\\,\\%$, больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается, если принять прирост в 10 человек за 10 %. Но 10 человек — это четверть от 40, то есть 25 %.",
+          "C": "Получается, если разделить прирост на новое число участников: $\\frac{10}{50} \\cdot 100\\,\\% = 20\\,\\%$. Так находят, на сколько процентов 40 меньше 50, а рост считают от первоначального значения 40.",
+          "D": "Начальное и конечное число участников известны, поэтому процент прироста находится точно."
+        },
+        "solution_steps": [
+          "Прирост: $50 - 40 = 10$ человек.",
+          "В процентах от исходного числа: $\\frac{10}{40} \\cdot 100\\,\\% = 25\\,\\%$.",
+          "$25\\,\\% > 20\\,\\%$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_fc7fb204ffa5b2ad40db",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.fractions_percents",
+        "subtopic_id": "math.fractions_percents.percent_of_number",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_fc7fb204ffa5b2ad",
+        "type": "quantitative_comparison",
+        "stem": "Айгуль потратила 30 % своих карманных денег, а Бекзат — 20 % своих карманных денег.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Сумма, которую потратила Айгуль",
+              "Сумма, которую потратил Бекзат"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: нахождение процента от числа",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. Исправление после слепой проверки (2026-11-05): переписан разбор неверного варианта B — прежний пример (по 1000 сомов у обоих) показывал перевес величины А и выглядел как довод за B; теперь приведён случай, где действительно больше Б (500 и 1000 сомов: 150 < 200), и контрпример, где больше А. Ключ, условие и объяснение не менялись. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:fc7fb204ffa5b2ad40db7e7461fb309ae7311a675113c9041641d2d4870360e7",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:50:23.045Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Проценты взяты от разных величин, а сколько денег было у каждого, неизвестно. Если у обоих было по 1000 сомов, Айгуль потратила 300 сомов, а Бекзат — 200 сомов (больше величина А). Если у Айгуль было 500 сомов, а у Бекзата 1000 сомов, она потратила 150 сомов, а он — 200 сомов (больше величина Б). Если у Айгуль было 200 сомов, а у Бекзата 300 сомов, оба потратили по 60 сомов (величины равны). Соотношение зависит от исходных сумм, поэтому определить его нельзя.",
+        "wrong_option_notes": {
+          "A": "Получается, если сравнить только проценты ($30\\,\\% > 20\\,\\%$). Но 30 % от меньшей суммы может оказаться меньше, чем 20 % от большей: 30 % от 500 сомов — 150 сомов, а 20 % от 1000 сомов — 200 сомов.",
+          "B": "Верно лишь при некоторых суммах: например, если у Айгуль было 500 сомов, а у Бекзата 1000 сомов, она потратила 150 сомов, а он — 200 сомов. Но если у обоих было по 1000 сомов, Айгуль потратила 300 сомов, а Бекзат — 200 сомов, и больше величина А.",
+          "C": "Верно лишь в частном случае, например при 200 сомах у Айгуль и 300 сомах у Бекзата (оба потратили по 60 сомов)."
+        },
+        "solution_steps": [
+          "Суммы, от которых взяты проценты, неизвестны.",
+          "По 1000 сомов у каждого: 300 и 200 сомов — больше А.",
+          "500 сомов у Айгуль и 1000 сомов у Бекзата: 150 и 200 сомов — больше Б.",
+          "Ответ зависит от неизвестных сумм — информации недостаточно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_60679f3389151e8f7338",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.ratios_proportions",
+        "subtopic_id": "math.ratios_proportions.scale",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_60679f3389151e8f",
+        "type": "quantitative_comparison",
+        "stem": "План пришкольного участка начерчен в масштабе $1 : 500$. Длина теплицы на плане равна 4 см.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Длина теплицы на местности",
+              "$20$ м"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: масштаб",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:60679f3389151e8f73387733d441e251fab9459a1136116161317e33ac5df347",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Масштаб $1 : 500$ означает, что 1 см на плане соответствует 500 см на местности. Значит, длина теплицы равна $4 \\cdot 500 = 2000$ см. В 1 м 100 см, поэтому $2000$ см $= 20$ м. Величины равны.",
+        "wrong_option_notes": {
+          "A": "Получается при ошибке в переводе единиц: $2000$ см приняли за 200 м. Но $2000 : 100 = 20$, то есть 20 м.",
+          "B": "Получается, если переводить сантиметры в метры делением на 1000: $2000$ см $\\to 2$ м. В метре 100 см, а не 1000 (1000 — число миллиметров в метре).",
+          "D": "Масштаб и длина на плане известны, поэтому длину на местности можно найти точно."
+        },
+        "solution_steps": [
+          "1 см на плане — 500 см на местности.",
+          "$4 \\cdot 500 = 2000$ см.",
+          "$2000$ см $= 20$ м — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_0c0e97d79f4e09a84501",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.ratios_proportions",
+        "subtopic_id": "math.ratios_proportions.direct_inverse",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_0c0e97d79f4e09a8",
+        "type": "quantitative_comparison",
+        "stem": "При сушке из 12 кг свежих абрикосов получается 3 кг кураги.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Масса кураги (в кг), которая получится из 30 кг таких же абрикосов",
+              "$7{,}5$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 6 кл., математика: прямая пропорциональность, пропорции",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:0c0e97d79f4e09a84501c7d6d509e74a35f46365dbad89029b3b3b5f3c450c34",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Масса кураги прямо пропорциональна массе свежих абрикосов: из 12 кг получается 3 кг, то есть из 4 кг — 1 кг. Тогда из 30 кг получится $30 : 4 = 7{,}5$ кг. Другой способ: $30 : 12 = 2{,}5$, и кураги будет в $2{,}5$ раза больше: $3 \\cdot 2{,}5 = 7{,}5$ кг. Величины равны.",
+        "wrong_option_notes": {
+          "A": "Получается, если считать, что при сушке всегда теряется одна и та же масса ($12 - 3 = 9$ кг): $30 - 9 = 21 > 7{,}5$. Но постоянна не теряемая масса, а доля: курага составляет $\\frac{1}{4}$ массы абрикосов.",
+          "B": "Получается, если составить обратную пропорцию: $\\frac{12 \\cdot 3}{30} = 1{,}2 < 7{,}5$. Чем больше абрикосов, тем больше кураги, — зависимость прямая.",
+          "D": "Отношение массы кураги к массе абрикосов известно ($3 : 12 = 1 : 4$), поэтому массу кураги можно найти точно."
+        },
+        "solution_steps": [
+          "$3 : 12 = 1 : 4$ — курага составляет четверть массы абрикосов.",
+          "$30 : 4 = 7{,}5$ кг (или $3 \\cdot \\frac{30}{12} = 7{,}5$ кг).",
+          "$7{,}5 = 7{,}5$ — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_ea95428ced4e847815a3",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.short_multiplication",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_ea95428ced4e8478",
+        "type": "quantitative_comparison",
+        "stem": "Сравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$53 \\cdot 47$",
+              "$50^2$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: формулы сокращённого умножения (разность квадратов)",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:ea95428ced4e847815a3771cd2f59f54569284df9af496e89f855441f747b734",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "По формуле разности квадратов $(a + b)(a - b) = a^2 - b^2$: $53 \\cdot 47 = (50 + 3)(50 - 3) = 50^2 - 3^2 = 2500 - 9 = 2491$. Проверка прямым умножением: $53 \\cdot 47 = 53 \\cdot 50 - 53 \\cdot 3 = 2650 - 159 = 2491$. Так как $2491 < 2500$, больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается при ошибке в знаке: $(50 + 3)(50 - 3) = 2500 + 9$. По формуле $(a + b)(a - b) = a^2 - b^2$ квадрат второго числа вычитается.",
+          "C": "Получается, если считать, что отклонения $+3$ и $-3$ от 50 компенсируют друг друга. Для суммы это так ($53 + 47 = 50 + 50$), а произведение меньше $50^2$ на $3^2 = 9$.",
+          "D": "Обе величины — числа, их значения вычисляются точно."
+        },
+        "solution_steps": [
+          "$53 \\cdot 47 = (50 + 3)(50 - 3)$.",
+          "$(50 + 3)(50 - 3) = 50^2 - 3^2 = 2500 - 9 = 2491$.",
+          "$2491 < 2500$, больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_26615edbd11dd90d4644",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.expressions_with_variables",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_26615edbd11dd90d",
+        "type": "quantitative_comparison",
+        "stem": "Пусть $x = -3$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x^2 - 2x$",
+              "$x^2 + 2x$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: значение выражения с переменной",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:26615edbd11dd90d4644363209d6b83a9efe0ef4e061d652c01a5ff44412253c",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Подставим $x = -3$: $x^2 = (-3)^2 = 9$, $2x = -6$. Колонка А: $9 - (-6) = 15$. Колонка Б: $9 + (-6) = 3$. Так как $15 > 3$, больше величина в колонке А. Проверка: разность $(x^2 - 2x) - (x^2 + 2x) = -4x = 12 > 0$.",
+        "wrong_option_notes": {
+          "B": "Получается при ошибке в знаке: если считать $-2x = -6$ и $2x = 6$, не учитывая, что $x$ отрицательно, выйдет А $= 3$, Б $= 15$. Но при $x = -3$: $-2x = 6$, $2x = -6$.",
+          "C": "Получается, если считать, что слагаемые $-2x$ и $2x$ одинаково влияют на значение, раз отличаются только знаком. Разность величин равна $-4x = 12$, а не 0.",
+          "D": "Значение $x$ задано, поэтому обе величины вычисляются точно."
+        },
+        "solution_steps": [
+          "При $x = -3$: $x^2 = 9$, $2x = -6$.",
+          "А: $9 - (-6) = 15$; Б: $9 + (-6) = 3$.",
+          "$15 > 3$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1c5096d6b009670c4335",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.polynomials",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_1c5096d6b009670c",
+        "type": "quantitative_comparison",
+        "stem": "Число $x$ может быть любым.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x^2 - 6x + 10$",
+              "$0$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7–8 кл., алгебра: многочлены, выделение полного квадрата",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1c5096d6b009670c4335b1690add4cbdb1b6b2a8d744b79a52c2ffbf2054e2b1",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Выделим полный квадрат: $x^2 - 6x + 10 = (x^2 - 6x + 9) + 1 = (x - 3)^2 + 1$. Квадрат любого числа неотрицателен, поэтому при любом $x$ выражение не меньше 1 и, значит, больше 0. Другой способ: дискриминант трёхчлена $36 - 40 = -4 < 0$, а старший коэффициент положителен, поэтому трёхчлен положителен при всех $x$. Больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается, если решить, что из-за слагаемого $-6x$ выражение при некоторых $x$ становится отрицательным. Но $(x - 3)^2 + 1 \\ge 1$: даже наименьшее значение (при $x = 3$) равно 1.",
+          "C": "Равенство невозможно: уравнение $x^2 - 6x + 10 = 0$ равносильно $(x - 3)^2 = -1$, а квадрат числа не бывает отрицательным.",
+          "D": "Типичная ловушка: раз $x$ неизвестно, кажется, что сравнить нельзя. Но при любом $x$ выражение не меньше 1, поэтому соотношение всегда одно и то же."
+        },
+        "solution_steps": [
+          "$x^2 - 6x + 10 = (x - 3)^2 + 1$.",
+          "$(x - 3)^2 \\ge 0$, поэтому $(x - 3)^2 + 1 \\ge 1 > 0$ при любом $x$.",
+          "Больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_02cc18ec8eff3a03e03e",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.algebraic_expressions",
+        "subtopic_id": "math.algebraic_expressions.algebraic_fractions",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_02cc18ec8eff3a03",
+        "type": "quantitative_comparison",
+        "stem": "Известно, что $x > 0$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$\\frac{x}{x + 1}$",
+              "$\\frac{x + 1}{x + 2}$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: рациональные дроби, сравнение выражений с помощью разности",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:02cc18ec8eff3a03e03edc539e6fa100cf314117f86c9170911808112b86d903",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Найдём разность: $\\frac{x}{x + 1} - \\frac{x + 1}{x + 2} = \\frac{x(x + 2) - (x + 1)^2}{(x + 1)(x + 2)} = \\frac{x^2 + 2x - x^2 - 2x - 1}{(x + 1)(x + 2)} = -\\frac{1}{(x + 1)(x + 2)}$. При $x > 0$ знаменатель положителен, поэтому разность отрицательна при любом таком $x$. Другой способ: $\\frac{x}{x + 1} = 1 - \\frac{1}{x + 1}$ и $\\frac{x + 1}{x + 2} = 1 - \\frac{1}{x + 2}$, а $\\frac{1}{x + 1} > \\frac{1}{x + 2}$. Больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается, если сравнивать дроби только по знаменателям: у дроби в колонке Б знаменатель больше, и её ошибочно считают меньшей. Но у неё больше и числитель; разность величин А и Б равна $-\\frac{1}{(x + 1)(x + 2)} < 0$.",
+          "C": "Получается, если считать, что прибавление 1 к числителю и знаменателю не меняет дробь. Это неверно: например, при $x = 1$ получаем $\\frac{1}{2}$ и $\\frac{2}{3}$.",
+          "D": "Значение $x$ неизвестно, но при любом $x > 0$ разность $-\\frac{1}{(x + 1)(x + 2)}$ отрицательна, поэтому соотношение всегда одно и то же."
+        },
+        "solution_steps": [
+          "$\\frac{x}{x + 1} - \\frac{x + 1}{x + 2} = \\frac{x(x + 2) - (x + 1)^2}{(x + 1)(x + 2)}$.",
+          "Числитель: $x^2 + 2x - (x^2 + 2x + 1) = -1$.",
+          "При $x > 0$ разность $-\\frac{1}{(x + 1)(x + 2)} < 0$, больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_3a45d0e7bdfbdb8fb904",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.linear",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_3a45d0e7bdfbdb8f",
+        "type": "quantitative_comparison",
+        "stem": "$x$ — решение уравнения $3(x - 4) = x + 6$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x$",
+              "$5$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: линейные уравнения с одной переменной",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:3a45d0e7bdfbdb8fb9046b83939f5f0841b0cb7ffb4e4a37cc2adebb94002859",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Раскроем скобки: $3x - 12 = x + 6$. Перенесём слагаемые: $3x - x = 6 + 12$, $2x = 18$, $x = 9$. Проверка: $3 \\cdot (9 - 4) = 15$ и $9 + 6 = 15$. Так как $9 > 5$, больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается при ошибке в переносе слагаемых: если $-12$ перенести без смены знака ($2x = 6 - 12$, $x = -3$) или $x$ перенести со знаком «+» ($4x = 18$, $x = 4{,}5$), выходит число меньше 5.",
+          "C": "Получается, если раскрыть скобки неверно: $3x - 4 = x + 6$, откуда $x = 5$. Множитель 3 умножают на оба слагаемых в скобках: $3(x - 4) = 3x - 12$.",
+          "D": "Линейное уравнение имеет единственный корень $x = 9$, поэтому сравнение однозначно."
+        },
+        "solution_steps": [
+          "$3(x - 4) = x + 6$, то есть $3x - 12 = x + 6$.",
+          "$2x = 18$, $x = 9$.",
+          "$9 > 5$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_812800bf1a027909d83c",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.quadratic_vieta",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_812800bf1a027909",
+        "type": "quantitative_comparison",
+        "stem": "Известно, что $x^2 - 9x + 14 = 0$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x$",
+              "$5$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: квадратные уравнения, теорема Виета",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:812800bf1a027909d83c8a05bbb3ca1092caddf25c1e45b325f7a3027ac7f26a",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "По теореме Виета сумма корней равна 9, а произведение равно 14; этим условиям удовлетворяют числа 2 и 7. Проверка через дискриминант: $D = 81 - 56 = 25$, $x = \\frac{9 \\pm 5}{2}$, то есть $x = 7$ или $x = 2$. Если $x = 7$, больше величина в колонке А; если $x = 2$, больше величина в колонке Б. Какой из корней имеется в виду, неизвестно, поэтому определить соотношение нельзя.",
+        "wrong_option_notes": {
+          "A": "Верно только для корня $x = 7$. Второй корень $x = 2$ меньше 5.",
+          "B": "Верно только для корня $x = 2$. Второй корень $x = 7$ больше 5.",
+          "C": "Число 5 не является корнем уравнения: $25 - 45 + 14 = -6 \\ne 0$."
+        },
+        "solution_steps": [
+          "Корни уравнения $x^2 - 9x + 14 = 0$: $x = 2$ и $x = 7$ ($2 + 7 = 9$, $2 \\cdot 7 = 14$).",
+          "При $x = 7$: $7 > 5$ — больше А.",
+          "При $x = 2$: $2 < 5$ — больше Б.",
+          "Соотношение зависит от выбора корня — информации недостаточно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e1298bbacfb9ab046bab",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.equations_systems",
+        "subtopic_id": "math.equations_systems.systems",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_e1298bbacfb9ab04",
+        "type": "quantitative_comparison",
+        "stem": "Числа $x$ и $y$ таковы, что $x + 3y = 10$ и $2x - y = 6$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x$",
+              "$2y$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., алгебра: системы двух линейных уравнений с двумя переменными",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e1298bbacfb9ab046bab5e97323b6bc24e22ac8334266100fe52d722b35e7c4d",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Из второго уравнения $y = 2x - 6$. Подставим в первое: $x + 3(2x - 6) = 10$, $7x - 18 = 10$, $x = 4$; тогда $y = 2 \\cdot 4 - 6 = 2$. Другой способ: умножим второе уравнение на 3 и сложим с первым: $7x = 28$, $x = 4$, $y = 2$. Проверка: $4 + 3 \\cdot 2 = 10$, $2 \\cdot 4 - 2 = 6$. Колонка А: $x = 4$, колонка Б: $2y = 4$. Величины равны.",
+        "wrong_option_notes": {
+          "A": "Получается, если сравнить $x$ с $y$, а не с $2y$: $4 > 2$.",
+          "B": "Получается при ошибке в знаке: если из второго уравнения выразить $y = 6 - 2x$, то $x + 3(6 - 2x) = 10$, $x = 1{,}6$, $y = 2{,}8$ и $2y = 5{,}6 > 1{,}6$. Верно: $y = 2x - 6$.",
+          "D": "Система имеет единственное решение $x = 4$, $y = 2$, поэтому обе величины известны."
+        },
+        "solution_steps": [
+          "Из второго уравнения: $y = 2x - 6$.",
+          "$x + 3(2x - 6) = 10$, $7x = 28$, $x = 4$, $y = 2$.",
+          "$x = 4$, $2y = 4$ — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_c0ac37d45157fe8f1ec1",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.inequalities",
+        "subtopic_id": "math.inequalities.linear",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_c0ac37d45157fe8f",
+        "type": "quantitative_comparison",
+        "stem": "Для числа $a$ выполнено неравенство $2a + 9 \\le 3$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$a$",
+              "$-3$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: линейные неравенства с одной переменной",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:c0ac37d45157fe8f1ec112d8c7d64738cbc4c7fe129faa21a8e1db04981edfe9",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Решим неравенство: $2a \\le 3 - 9$, $2a \\le -6$, $a \\le -3$. Неравенство нестрогое, поэтому возможны два случая: при $a = -3$ (проверка: $-6 + 9 = 3 \\le 3$) величины равны, а при $a = -4$ (проверка: $-8 + 9 = 1 \\le 3$) больше величина в колонке Б. Соотношение зависит от $a$, поэтому определить его нельзя.",
+        "wrong_option_notes": {
+          "A": "Невозможно: из условия следует $a \\le -3$, то есть $a$ не может быть больше $-3$ (знак неравенства при делении на положительное число 2 не меняется).",
+          "B": "Типичная ошибка — не заметить, что неравенство нестрогое. При $a = -4$ больше величина Б, но при $a = -3$ величины равны.",
+          "C": "Верно только при $a = -3$; например, при $a = -4$ больше величина в колонке Б."
+        },
+        "solution_steps": [
+          "$2a + 9 \\le 3$, $2a \\le -6$, $a \\le -3$.",
+          "При $a = -3$ величины равны.",
+          "При $a = -4$: $-4 < -3$ — больше Б.",
+          "Соотношение зависит от $a$ — информации недостаточно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_fc8a6cb6421862d7228f",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.inequalities",
+        "subtopic_id": "math.inequalities.quadratic",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_fc8a6cb6421862d7",
+        "type": "quantitative_comparison",
+        "stem": "Число $x$ — решение неравенства $x^2 - 5x + 6 < 0$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x$",
+              "$2{,}5$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: квадратные неравенства",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:fc8a6cb6421862d7228f18ba4bbe363922ced970a4b0ebbfb0078c0c2aca8961",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Корни трёхчлена $x^2 - 5x + 6$ — числа 2 и 3 ($2 + 3 = 5$, $2 \\cdot 3 = 6$). Ветви параболы направлены вверх, поэтому трёхчлен отрицателен между корнями: $2 < x < 3$. В этот интервал входят числа и больше, и меньше $2{,}5$: при $x = 2{,}8$ больше величина А, при $x = 2{,}2$ — величина Б, а при $x = 2{,}5$ величины равны. Определить соотношение нельзя.",
+        "wrong_option_notes": {
+          "A": "Верно лишь для части решений, например при $x = 2{,}8$ (проверка: $7{,}84 - 14 + 6 = -0{,}16 < 0$); при $x = 2{,}2$ больше величина в колонке Б.",
+          "B": "Верно лишь для части решений, например при $x = 2{,}2$; при $x = 2{,}8$ больше величина в колонке А.",
+          "C": "Верно только при $x = 2{,}5$, а решений неравенства бесконечно много — это все числа интервала $(2; 3)$."
+        },
+        "solution_steps": [
+          "Корни уравнения $x^2 - 5x + 6 = 0$: $x = 2$ и $x = 3$.",
+          "Решения неравенства: $2 < x < 3$.",
+          "При $x = 2{,}8$ больше А, при $x = 2{,}2$ больше Б.",
+          "Соотношение зависит от $x$ — информации недостаточно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_03652d410097fbeee614",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.inequalities",
+        "subtopic_id": "math.inequalities.absolute_value",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_03652d410097fbee",
+        "type": "quantitative_comparison",
+        "stem": "Для числа $x$ верно неравенство $|x + 1| > |x - 3|$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$x$",
+              "$1$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., алгебра: модуль числа, неравенства с модулем",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. Исправление после слепой проверки (2026-11-05): переписан разбор неверного варианта B — прежняя формулировка выдавала верный смысл неравенства за ошибочный и не называла результат ошибки; теперь указано, что ошибка даёт $x < 1$ (кажется, что больше Б), и отдельно объяснён верный смысл с проверкой при $x = 0$ и $x = 2$. Ключ, условие и объяснение не менялись. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:03652d410097fbeee6141aa7697fdb577f9b508c94db2c3abc6ebf585f06a8db",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:50:23.045Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "$|x + 1|$ — расстояние на числовой прямой от $x$ до $-1$, а $|x - 3|$ — расстояние от $x$ до 3. Неравенство означает, что $x$ ближе к 3, чем к $-1$, то есть лежит правее середины отрезка $[-1; 3]$ — точки 1. Алгебраически: обе части неотрицательны, поэтому их можно возвести в квадрат: $x^2 + 2x + 1 > x^2 - 6x + 9$, $8x > 8$, $x > 1$. Значит, больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается, если перепутать смысл неравенства и решить, что $x$ ближе к $-1$, чем к 3, то есть $x < 1$ (тогда больше кажется величина Б). На самом деле $|x + 1| > |x - 3|$ означает, что $x$ дальше от $-1$, чем от 3, то есть ближе к 3: при $x = 0$ получаем $1 > 3$ — неверно, а при $x = 2$: $3 > 1$ — верно.",
+          "C": "Получается, если решить уравнение $|x + 1| = |x - 3|$ (его корень $x = 1$) вместо неравенства. При $x = 1$ обе части равны 2, и строгое неравенство не выполняется.",
+          "D": "Получается, если просто убрать знаки модуля: $x + 1 > x - 3$ верно при любом $x$, и кажется, что $x$ может быть любым. Но так модули не раскрывают: при $x = 0$ получаем $1 > 3$ — неверно."
+        },
+        "solution_steps": [
+          "Обе части неотрицательны, возводим в квадрат: $(x + 1)^2 > (x - 3)^2$.",
+          "$x^2 + 2x + 1 > x^2 - 6x + 9$, $8x > 8$, $x > 1$.",
+          "Все решения больше 1 — больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_2a58758345cbc9770eac",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.functions_graphs",
+        "subtopic_id": "math.functions_graphs.inverse_proportion",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_2a58758345cbc977",
+        "type": "quantitative_comparison",
+        "stem": "Точки $M(x_1; y_1)$ и $N(x_2; y_2)$ лежат на графике функции $y = -\\frac{6}{x}$, причём $x_1 < x_2$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$y_1$",
+              "$y_2$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8 кл., алгебра: функция обратной пропорциональности y = k/x и её свойства",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:2a58758345cbc9770eaca4562ee77b5593151efff545ceb8ad9913ab0073b3a7",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "Функция $y = -\\frac{6}{x}$ возрастает на каждом из промежутков $(-\\infty; 0)$ и $(0; +\\infty)$ по отдельности, но не на всей области определения. Если $x_1 = 1$, $x_2 = 2$, то $y_1 = -6 < y_2 = -3$ — больше величина Б. Если $x_1 = -2$, $x_2 = 3$, то $y_1 = 3 > y_2 = -2$ — больше величина А. Соотношение зависит от того, лежат ли $x_1$ и $x_2$ по одну сторону от нуля, поэтому определить его нельзя.",
+        "wrong_option_notes": {
+          "A": "Верно, только если $x_1 < 0 < x_2$ (например, $x_1 = -2$, $x_2 = 3$: $y_1 = 3$, $y_2 = -2$). Если абсциссы одного знака, больше $y_2$.",
+          "B": "Типичная ошибка: функция возрастает на каждой ветви графика, но не на всей области определения. При $x_1 = -2$, $x_2 = 3$ получаем $y_1 = 3 > y_2 = -2$.",
+          "C": "Невозможно: функция $y = -\\frac{6}{x}$ принимает равные значения только при равных $x$, а $x_1 \\ne x_2$."
+        },
+        "solution_steps": [
+          "$x_1 = 1$, $x_2 = 2$: $y_1 = -6$, $y_2 = -3$ — больше Б.",
+          "$x_1 = -2$, $x_2 = 3$: $y_1 = 3$, $y_2 = -2$ — больше А.",
+          "Соотношение зависит от знаков $x_1$ и $x_2$ — информации недостаточно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_1585542b88fdec721f97",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.functions_graphs",
+        "subtopic_id": "math.functions_graphs.quadratic",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_1585542b88fdec72",
+        "type": "quantitative_comparison",
+        "stem": "Вершина параболы $y = x^2 + px + q$ находится в точке $(3; -4)$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$p + q$",
+              "$-1$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., алгебра: квадратичная функция, вершина параболы",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. Исправление после слепой проверки (2026-11-05): уточнён разбор неверного варианта A — ошибка не в раскрытии скобок ($(x - 3)^2 = x^2 - 6x + 9$ раскрыто верно), а в знаке свободного члена ($9 + 4 = 13$ вместо $9 - 4 = 5$); добавлен расчёт $p + q = -6 + 13 = 7$. Ключ, условие и объяснение не менялись. | AI-проверка (verifier: claude-independent-blind-solve, раунд 2, 2026-11-06): после правки по замечаниям раунда 1 задание заново решено вслепую другим проверяющим; замечаний нет. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:1585542b88fdec721f9707f316f31d5ec73279ddeafc4bfa16e1d219378ea123",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:50:23.045Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "Парабола $y = x^2 + px + q$ с вершиной $(3; -4)$ — это $y = (x - 3)^2 - 4 = x^2 - 6x + 5$, поэтому $p = -6$, $q = 5$ и $p + q = -1$. Проверка другим способом: $p + q = y(1) - 1$, а $y(1) = (1 - 3)^2 - 4 = 0$, значит, $p + q = -1$. Величины равны.",
+        "wrong_option_notes": {
+          "A": "Получается при ошибке в знаке свободного члена: если в $(x - 3)^2 - 4$ сложить $9$ и $4$ вместо вычитания, выйдет $x^2 - 6x + 13$, тогда $q = 13$ и $p + q = -6 + 13 = 7 > -1$. Верно: $9 - 4 = 5$, то есть $q = 5$.",
+          "B": "Получается, если взять абсциссу вершины по формуле $x_0 = \\frac{p}{2}$ вместо $x_0 = -\\frac{p}{2}$: тогда $p = 6$, из $9 + 18 + q = -4$ выходит $q = -31$ и $p + q = -25$. Или если принять за $q$ ординату вершины: $q = -4$, $p + q = -10$.",
+          "D": "Вершина однозначно задаёт параболу вида $y = x^2 + px + q$: это $y = (x - 3)^2 - 4$, поэтому $p$ и $q$ находятся точно."
+        },
+        "solution_steps": [
+          "$y = (x - 3)^2 - 4 = x^2 - 6x + 9 - 4 = x^2 - 6x + 5$.",
+          "$p = -6$, $q = 5$, $p + q = -1$.",
+          "$-1 = -1$ — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 2,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": 1,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_6c7949039e4e5e057c2d",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.sequences",
+        "subtopic_id": "math.sequences.arithmetic",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_6c7949039e4e5e05",
+        "type": "quantitative_comparison",
+        "stem": "Сумма первых одиннадцати членов арифметической прогрессии $(a_n)$ равна 66.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "$a_6$",
+              "$6$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: арифметическая прогрессия, сумма первых n членов",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:6c7949039e4e5e057c2dce109e019bde11d08bccb5bd29803425a1d88861e708",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "C",
+        "explanation": "По формуле суммы $S_{11} = \\frac{a_1 + a_{11}}{2} \\cdot 11$. В арифметической прогрессии $a_1 + a_{11} = 2a_6$ (члены, равноудалённые от шестого), поэтому $S_{11} = 11a_6$. Отсюда $a_6 = 66 : 11 = 6$. Другой способ: $S_{11} = \\frac{2a_1 + 10d}{2} \\cdot 11 = 11(a_1 + 5d) = 11a_6$. Хотя $a_1$ и $d$ неизвестны, $a_6$ определяется однозначно. Величины равны.",
+        "wrong_option_notes": {
+          "A": "Получается, если разделить сумму на номер члена: $66 : 6 = 11$. Делить нужно на число слагаемых: $a_6$ — среднее арифметическое первых одиннадцати членов, $66 : 11 = 6$.",
+          "B": "Получается, если ошибиться в числе членов и разделить сумму на 12: $66 : 12 = 5{,}5$. Членов одиннадцать, средний из них — шестой.",
+          "D": "Типичная ловушка: кажется, что без $a_1$ и $d$ найти $a_6$ нельзя. Но $S_{11} = 11(a_1 + 5d) = 11a_6$, поэтому $a_6 = 6$ в любой такой прогрессии."
+        },
+        "solution_steps": [
+          "$S_{11} = \\frac{a_1 + a_{11}}{2} \\cdot 11$ и $a_1 + a_{11} = 2a_6$.",
+          "$S_{11} = 11a_6 = 66$.",
+          "$a_6 = 6$ — величины равны."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_493ea44a2668b52cadec",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.angles_parallel",
+        "difficulty": 1,
+        "language": "ru",
+        "translation_group_id": "tg_493ea44a2668b52c",
+        "type": "quantitative_comparison",
+        "stem": "Сумма двух вертикальных углов равна $140^\\circ$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Один из этих углов",
+              "Угол, смежный с ним"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., геометрия: смежные и вертикальные углы",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:493ea44a2668b52cadeccb2e3848ad5e14f9fd9f8791f5764008cbaf8dd8b101",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Вертикальные углы равны, поэтому каждый из них равен $140^\\circ : 2 = 70^\\circ$. Смежные углы в сумме дают $180^\\circ$, поэтому угол, смежный с углом $70^\\circ$, равен $180^\\circ - 70^\\circ = 110^\\circ$. Так как $70^\\circ < 110^\\circ$, больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается, если принять за один угол всю сумму $140^\\circ$: тогда смежный с ним угол равен $40^\\circ$. Но $140^\\circ$ — сумма двух равных углов, каждый из них равен $70^\\circ$.",
+          "C": "Получается, если перепутать смежный угол с вертикальным. Вертикальные углы равны, а смежные в сумме дают $180^\\circ$.",
+          "D": "Вертикальные углы равны, поэтому оба угла находятся точно: $70^\\circ$ и $110^\\circ$."
+        },
+        "solution_steps": [
+          "Вертикальные углы равны: $140^\\circ : 2 = 70^\\circ$.",
+          "Смежный угол: $180^\\circ - 70^\\circ = 110^\\circ$.",
+          "$70^\\circ < 110^\\circ$, больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_11f6726f4680b9f60d70",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.quadrilaterals",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_11f6726f4680b9f6",
+        "type": "quantitative_comparison",
+        "stem": "Периметр ромба равен 40, а один из его углов равен $60^\\circ$.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Площадь ромба",
+              "$50$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., геометрия: ромб, площадь параллелограмма и ромба",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:11f6726f4680b9f60d70141bf048c6c03158ff7126b72e6a7020386a4ff76c8d",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Все стороны ромба равны: $40 : 4 = 10$. Площадь ромба равна квадрату стороны, умноженному на синус угла: $S = 10^2 \\cdot \\sin 60^\\circ = 100 \\cdot \\frac{\\sqrt{3}}{2} = 50\\sqrt{3}$. Проверка через диагонали: меньшая диагональ делит ромб на два равносторонних треугольника, поэтому она равна 10, а большая равна $10\\sqrt{3}$; $S = \\frac{10 \\cdot 10\\sqrt{3}}{2} = 50\\sqrt{3}$. Так как $\\sqrt{3} > 1$, то $50\\sqrt{3} > 50$ — больше величина в колонке А.",
+        "wrong_option_notes": {
+          "B": "Получается, если в формуле $S = \\frac{d_1 d_2}{2}$ взять вместо большей диагонали её половину $5\\sqrt{3}$: $\\frac{10 \\cdot 5\\sqrt{3}}{2} = 25\\sqrt{3} < 50$.",
+          "C": "Получается, если вычислить площадь как половину квадрата стороны, $\\frac{10 \\cdot 10}{2} = 50$, или подставить $\\sin 30^\\circ = \\frac{1}{2}$ вместо $\\sin 60^\\circ$. Площадь ромба равна $10^2 \\cdot \\sin 60^\\circ = 50\\sqrt{3}$.",
+          "D": "Сторона и угол задают ромб полностью, поэтому его площадь находится точно."
+        },
+        "solution_steps": [
+          "Сторона ромба: $40 : 4 = 10$.",
+          "$S = 10^2 \\cdot \\sin 60^\\circ = 50\\sqrt{3}$.",
+          "$50\\sqrt{3} > 50$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_e6613d100cc5188e26d0",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.areas",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_e6613d100cc5188e",
+        "type": "quantitative_comparison",
+        "stem": "Кусок проволоки согнули в форме квадрата, а затем распрямили и согнули в форме окружности. Оба раза использовали всю проволоку.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Площадь квадрата",
+              "Площадь круга, ограниченного полученной окружностью"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 8–9 кл., геометрия: площадь квадрата, длина окружности и площадь круга",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:e6613d100cc5188e26d0dea187a0202cff1b3473290e830852f5b21585933995",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Обозначим длину проволоки через $P$. Сторона квадрата равна $\\frac{P}{4}$, его площадь — $\\frac{P^2}{16}$. Радиус окружности равен $\\frac{P}{2\\pi}$, площадь круга — $\\pi \\cdot \\frac{P^2}{4\\pi^2} = \\frac{P^2}{4\\pi}$. Так как $\\pi < 4$, то $4\\pi < 16$ и $\\frac{P^2}{4\\pi} > \\frac{P^2}{16}$ при любом $P$. Например, при $P = 4$ площадь квадрата равна 1, а площадь круга $\\frac{4}{\\pi} \\approx 1{,}27$. Больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается, если считать, что квадрат «занимает больше места» за счёт углов. При одинаковом периметре площадь круга больше: отношение площади круга к площади квадрата равно $\\frac{16}{4\\pi} = \\frac{4}{\\pi} > 1$.",
+          "C": "Получается, если считать, что фигуры с одинаковым периметром имеют одинаковую площадь. Площадь зависит от формы: при длине проволоки 4 площадь квадрата равна 1, а площадь круга $\\frac{4}{\\pi} \\approx 1{,}27$.",
+          "D": "Длина проволоки неизвестна, но отношение площадей от неё не зависит: $\\frac{P^2}{4\\pi} : \\frac{P^2}{16} = \\frac{4}{\\pi} > 1$."
+        },
+        "solution_steps": [
+          "Пусть $P$ — длина проволоки. Площадь квадрата: $\\left(\\frac{P}{4}\\right)^2 = \\frac{P^2}{16}$.",
+          "Радиус окружности $\\frac{P}{2\\pi}$, площадь круга $\\frac{P^2}{4\\pi}$.",
+          "$4\\pi < 16$, поэтому $\\frac{P^2}{4\\pi} > \\frac{P^2}{16}$ — больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_439b69d1942e84e4d6fe",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.plane_geometry",
+        "subtopic_id": "math.plane_geometry.triangles",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_439b69d1942e84e4",
+        "type": "quantitative_comparison",
+        "stem": "Две стороны треугольника равны 4 и 9.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Третья сторона треугольника",
+              "$6$"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7 кл., геометрия: неравенство треугольника",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:439b69d1942e84e4d6feda22185107eb490cffc2749701314485c2e7d37650ea",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "D",
+        "explanation": "По неравенству треугольника третья сторона $c$ больше разности и меньше суммы двух других сторон: $9 - 4 < c < 9 + 4$, то есть $5 < c < 13$. Подходят, например, $c = 10$ (больше величина А), $c = 6$ (величины равны) и $c = 5{,}5$ (больше величина Б) — все такие треугольники существуют. Определить соотношение нельзя.",
+        "wrong_option_notes": {
+          "A": "Получается, если считать треугольник прямоугольным с катетами 4 и 9 (гипотенуза $\\sqrt{97} \\approx 9{,}8$). Но о прямом угле в условии не сказано; третья сторона может быть, например, $5{,}5$.",
+          "B": "Верно лишь для некоторых треугольников: третья сторона может быть любым числом от 5 до 13 (не включая концы), например 10.",
+          "C": "Верно только для одного треугольника — со сторонами 4, 9 и 6."
+        },
+        "solution_steps": [
+          "Неравенство треугольника: $9 - 4 < c < 9 + 4$, то есть $5 < c < 13$.",
+          "$c = 10$: больше А; $c = 6$: равны; $c = 5{,}5$: больше Б.",
+          "Соотношение зависит от треугольника — информации недостаточно."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_a67ebe6bee2f6fdd9315",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.solid_geometry",
+        "subtopic_id": "math.solid_geometry.cuboid",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_a67ebe6bee2f6fdd",
+        "type": "quantitative_comparison",
+        "stem": "Измерения прямоугольного параллелепипеда равны 3, 4 и 12. Диагональ куба равна диагонали этого параллелепипеда.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Объём параллелепипеда",
+              "Объём куба"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 10–11 кл., геометрия: прямоугольный параллелепипед и куб, диагональ и объём",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:a67ebe6bee2f6fdd9315cd12cba1c437ce3925dd1f5e021b11762b1bb99d7752",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "Объём параллелепипеда: $3 \\cdot 4 \\cdot 12 = 144$. Его диагональ: $\\sqrt{3^2 + 4^2 + 12^2} = \\sqrt{169} = 13$. Диагональ куба с ребром $a$ равна $a\\sqrt{3}$, поэтому $3a^2 = 169$, $a^2 = \\frac{169}{3} > 49$ и $a > 7$. Тогда объём куба $a^3 > 7^3 = 343 > 144$ (точнее, $a^3 = \\left(\\frac{13}{\\sqrt{3}}\\right)^3 \\approx 423$). Больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается, если найти ребро куба делением диагонали на 3: $13 : 3 \\approx 4{,}3$, и тогда объём куба около 81. Верно: $a\\sqrt{3} = 13$, $a = \\frac{13}{\\sqrt{3}} > 7$.",
+          "C": "Получается, если считать, что тела с равными диагоналями имеют равные объёмы. Это неверно: из всех прямоугольных параллелепипедов с данной диагональю наибольший объём у куба.",
+          "D": "Диагональ куба известна (она равна 13), поэтому его ребро и объём находятся точно."
+        },
+        "solution_steps": [
+          "Объём параллелепипеда $3 \\cdot 4 \\cdot 12 = 144$, диагональ $\\sqrt{9 + 16 + 144} = 13$.",
+          "У куба $a\\sqrt{3} = 13$, $a^2 = \\frac{169}{3} > 49$, значит, $a > 7$.",
+          "Объём куба $a^3 > 343 > 144$ — больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_b8114be5c9f4af47d348",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.data_probability",
+        "subtopic_id": "math.data_probability.averages",
+        "difficulty": 2,
+        "language": "ru",
+        "translation_group_id": "tg_b8114be5c9f4af47",
+        "type": "quantitative_comparison",
+        "stem": "За пять дней Нурлан прочитал 18, 12, 40, 15 и 15 страниц книги.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Среднее арифметическое этих чисел",
+              "Медиана этих чисел"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 7–9 кл., алгебра: статистические характеристики (среднее арифметическое, медиана)",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:b8114be5c9f4af47d3483fa9a1bbdf0236bd895cf64ee4e83851fd6ea87ea691",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "A",
+        "explanation": "Среднее арифметическое: $(18 + 12 + 40 + 15 + 15) : 5 = 100 : 5 = 20$. Для медианы упорядочим числа: 12, 15, 15, 18, 40; в середине ряда стоит 15. Так как $20 > 15$, больше величина в колонке А. Одно большое значение (40) заметно увеличивает среднее, но не влияет на медиану.",
+        "wrong_option_notes": {
+          "B": "Получается, если взять за медиану среднее по счёту число неупорядоченного ряда (40) или полусумму наибольшего и наименьшего чисел: $\\frac{12 + 40}{2} = 26$. Медиана — середина упорядоченного ряда, здесь 15.",
+          "C": "Получается, если считать, что медиана всегда совпадает со средним арифметическим. Это верно не для всякого набора: здесь среднее равно 20, а медиана — 15.",
+          "D": "Все пять чисел известны, поэтому обе величины находятся точно."
+        },
+        "solution_steps": [
+          "Сумма: $18 + 12 + 40 + 15 + 15 = 100$; среднее: $100 : 5 = 20$.",
+          "Упорядоченный ряд: 12, 15, 15, 18, 40; медиана — 15.",
+          "$20 > 15$, больше величина в колонке А."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    },
+    {
+      "id": "q_95a50f14797915b63e95",
+      "target": {
+        "blueprint_id": "ort_main_2026",
+        "section_id": "math",
+        "part_id": "math_comparison"
+      },
+      "question": {
+        "subject_id": "math",
+        "section_id": "math",
+        "topic_id": "math.data_probability",
+        "subtopic_id": "math.data_probability.probability",
+        "difficulty": 3,
+        "language": "ru",
+        "translation_group_id": "tg_95a50f14797915b6",
+        "type": "quantitative_comparison",
+        "stem": "Одновременно бросают две игральные кости.\n\nСравните величины в колонках А и Б.",
+        "options": [
+          {
+            "id": "A",
+            "text": "Величина в колонке А больше"
+          },
+          {
+            "id": "B",
+            "text": "Величина в колонке Б больше"
+          },
+          {
+            "id": "C",
+            "text": "Величины равны"
+          },
+          {
+            "id": "D",
+            "text": "Информации недостаточно, чтобы определить"
+          }
+        ],
+        "passage_id": null,
+        "image_path": null,
+        "table": {
+          "headers": [
+            "Колонка А",
+            "Колонка Б"
+          ],
+          "rows": [
+            [
+              "Вероятность того, что сумма выпавших очков равна 8",
+              "Вероятность того, что сумма выпавших очков равна 7"
+            ]
+          ]
+        },
+        "source": {
+          "kind": "original",
+          "basis": "Программа 9 кл., алгебра: классическое определение вероятности",
+          "author": "claude-v2-author"
+        },
+        "review": {
+          "status": "ai_verified",
+          "reviewed_by": null,
+          "reviewed_at": null,
+          "notes": "Авторское задание банка v2 (claude-v2-author), написано с нуля; ключ решён двумя способами (вручную и независимым пересчётом/перебором в сборщике), разбор неверных вариантов проверен. | AI-проверка (verifier: claude-independent-blind-solve, раунд 1, 2026-11-06): независимое слепое решение без ключа совпало с ключом; ключ, пояснения, разбор неверных вариантов, язык, тема и сложность проверены. Статус ai_verified — НЕ одобрение методиста; перед публикацией нужна проверка методиста."
+        },
+        "content_version": 1,
+        "content_hash": "sha256:95a50f14797915b63e95dd4ea2884fd0e7a21d477561e1b918bd2729826acfe2",
+        "created_at": "2026-11-05T17:43:33.547Z",
+        "updated_at": "2026-11-05T17:43:33.547Z"
+      },
+      "key": {
+        "correct": "B",
+        "explanation": "При броске двух костей $6 \\cdot 6 = 36$ равновозможных исходов (упорядоченных пар: очки на первой и на второй кости). Сумме 8 благоприятствуют 5 исходов: $(2; 6)$, $(3; 5)$, $(4; 4)$, $(5; 3)$, $(6; 2)$, вероятность равна $\\frac{5}{36}$. Сумме 7 благоприятствуют 6 исходов: $(1; 6)$, $(2; 5)$, $(3; 4)$, $(4; 3)$, $(5; 2)$, $(6; 1)$, вероятность равна $\\frac{6}{36}$. Так как $\\frac{5}{36} < \\frac{6}{36}$, больше величина в колонке Б.",
+        "wrong_option_notes": {
+          "A": "Получается, если решить, что большая сумма выпадает чаще, или ошибиться при подсчёте исходов. Сумме 8 благоприятствуют только 5 исходов из 36, а сумме 7 — 6 исходов.",
+          "C": "Получается, если считать неупорядоченные пары: для суммы 7 — «1 и 6», «2 и 5», «3 и 4», для суммы 8 — «2 и 6», «3 и 5», «4 и 4», по три пары. Но такие пары не равновозможны: «4 и 4» получается одним способом, а «3 и 5» — двумя: $(3; 5)$ и $(5; 3)$.",
+          "D": "Все 36 исходов равновозможны и перечисляются полностью, поэтому обе вероятности находятся точно."
+        },
+        "solution_steps": [
+          "Всего $6 \\cdot 6 = 36$ равновозможных исходов.",
+          "Сумма 8: 5 исходов, вероятность $\\frac{5}{36}$.",
+          "Сумма 7: 6 исходов, вероятность $\\frac{6}{36}$.",
+          "$\\frac{5}{36} < \\frac{6}{36}$, больше величина в колонке Б."
+        ]
+      },
+      "passage_order": null,
+      "pipeline": {
+        "batch_id": "main_ru_v2_math_comparison",
+        "generated_by": "hand:claude-v2-author",
+        "prompt_version": null,
+        "independent_verification": {
+          "verifier": "claude-independent-blind-solve",
+          "date": "2026-11-06",
+          "round": 1,
+          "method": "blind solve without the key + audit of key, explanations, wrong-option notes, language, topic/difficulty, answer leaks across items and option-length cues; local arithmetic check (verify --local-only) for maths",
+          "result": "passed",
+          "fixed_after_round": null,
+          "batch_round1_failures": 3,
+          "batch_round2_failures": 0
+        }
+      }
+    }
+  ]
+}
