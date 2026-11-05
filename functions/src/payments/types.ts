@@ -39,6 +39,11 @@ export interface WebhookEvent {
   test?: boolean;
 }
 
+export interface RefundOptions {
+  /** The provider must refund at most once per key (our order id). */
+  idempotencyKey: string;
+}
+
 export interface RefundResult {
   /** refunded = done now (claw back now); pending = wait for the `refunded` webhook. */
   status: 'refunded' | 'pending';
@@ -73,5 +78,6 @@ export interface PaymentAdapter {
   createCheckout(order: CheckoutOrder, returnUrl: string, ctx: CheckoutContext): Promise<CheckoutResult>;
   /** Verifies the signature over the RAW body; throws WebhookRejected. */
   parseWebhook(rawBody: Buffer, headers: HeaderBag): WebhookEvent;
-  refund(order: CheckoutOrder): Promise<RefundResult>;
+  /** Refunds the whole order; `opts.idempotencyKey` (the order id) makes a retried call safe. */
+  refund(order: CheckoutOrder, opts: RefundOptions): Promise<RefundResult>;
 }

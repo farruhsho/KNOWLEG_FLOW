@@ -103,6 +103,7 @@ void main() {
     bool freshEnabled = true,
     BillingMode mode = BillingMode.play,
     Entitlements ent = Entitlements.initial,
+    List<AttemptSummary> attempts = const [],
   }) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
@@ -128,6 +129,7 @@ void main() {
             (ref) => Stream.value(ExamPoolConfig(freshEnabled: freshEnabled))),
         entitlementsProvider.overrideWith((ref) => Stream.value(ent)),
         billingModeProvider.overrideWithValue(mode),
+        myExamAttemptsProvider.overrideWith((ref) => Stream.value(attempts)),
       ],
       child: MaterialApp.router(
         routerConfig: router,
@@ -222,6 +224,36 @@ void main() {
       // The session the runner opens with: strict, freshness kept.
       expect(store.saved!.isStrict, isTrue);
       expect(store.saved!.freshness!.repeated, 2);
+    });
+
+    testWidgets('an attempt in progress in one language: chips stay, only the style hides',
+        (tester) async {
+      await pump(tester,
+          initial: RoutePaths.examFreshFor('ort_main_2026', language: 'ru'),
+          attempts: const [
+            AttemptSummary(
+              id: 'att_ru',
+              variantId: 'fresh_att_ru',
+              blueprintId: 'ort_main_2026',
+              language: 'ru',
+              status: 'in_progress',
+            ),
+          ]);
+      // Russian has an attempt running: continue it, no style choice.
+      expect(find.byKey(const ValueKey('fresh_lang_ru')), findsOneWidget);
+      expect(find.byKey(const ValueKey('fresh_lang_ky')), findsOneWidget);
+      expect(find.text('Продолжить'), findsOneWidget);
+      expect(find.byKey(const ValueKey('exam_style_strict')), findsNothing);
+
+      // Kyrgyz has none: the student can still start a new one there.
+      await tester.tap(find.byKey(const ValueKey('fresh_lang_ky')));
+      await tester.pump();
+      expect(find.byKey(const ValueKey('exam_start_button')), findsOneWidget);
+      await tapScrolled(tester, find.byKey(const ValueKey('exam_style_strict')));
+      await tester.tap(find.byKey(const ValueKey('exam_start_button')));
+      await tester.pumpAndSettle();
+      expect(remote.startRequests.single.language, 'ky');
+      expect(remote.startRequests.single.style, ExamStyle.strict);
     });
 
     testWidgets('state language test: Kyrgyz only', (tester) async {

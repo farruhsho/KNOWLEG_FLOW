@@ -280,9 +280,15 @@ class VariantDoc {
     this.publishedAt,
   });
 
+  /// Statuses of the library (variants written in the CMS).
   static const statuses = ['draft', 'in_review', 'published', 'archived'];
 
+  /// `exam_variants/fresh_{attemptId}`: assembled by `examStart` for one
+  /// attempt (§10.1). Not part of the library; read-only in the CMS.
+  static const generatedStatus = 'generated';
+
   bool get isPublished => status == 'published';
+  bool get isGenerated => status == generatedStatus;
   int get questionCount => sections.fold(0, (a, s) => a + s.questionIds.length);
 
   factory VariantDoc.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) =>

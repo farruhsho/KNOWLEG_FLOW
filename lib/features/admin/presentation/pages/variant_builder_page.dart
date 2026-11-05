@@ -348,13 +348,15 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
           body = _form(l, blueprints.requireValue, bp, report, canWrite: canWrite);
         }
         final published = _v?.isPublished ?? false;
+        // A per-attempt fresh variant (§10.1) is never edited or published.
+        final generated = _v?.isGenerated ?? false;
         final publishReady = !_isNew && !_dirty && !_loadingInfos && _infoError == null &&
             (report?.canPublish ?? false);
         return Scaffold(
           appBar: AppBar(
             title: Text(_isNew ? l.adminVariantsNew : l.adminVariantsEdit),
             actions: [
-              if (_v != null && canPublish && !_isNew)
+              if (_v != null && canPublish && !_isNew && !generated)
                 published
                     ? TextButton(
                         onPressed: _busy ? null : () => _publish(false),
@@ -364,7 +366,7 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
                         onPressed: _busy || !publishReady ? null : () => _publish(true),
                         child: Text(l.adminVariantPublish),
                       ),
-              if (_v != null && !published && canWrite)
+              if (_v != null && !published && !generated && canWrite)
                 Padding(
                   padding: const EdgeInsets.only(right: AppSpacing.sm),
                   child: FilledButton(onPressed: _busy ? null : _save, child: Text(l.adminSave)),
@@ -381,12 +383,17 @@ class _VariantBuilderPageState extends ConsumerState<VariantBuilderPage> {
       VariantValidationReport? report, {required bool canWrite}) {
     final locale = Localizations.localeOf(context).languageCode;
     final v = _v!;
-    final locked = v.isPublished || !canWrite;
+    final locked = v.isPublished || v.isGenerated || !canWrite;
     final outdated = bp != null && v.blueprintVersion != bp.version;
     return AdminPageBody(
       maxWidth: 1000,
       children: [
-        if (!canWrite)
+        if (v.isGenerated)
+          AdminCard(
+            key: const ValueKey('variant_generated_notice'),
+            child: Text(l.adminVariantGeneratedReadOnly, style: TextStyle(color: context.tokens.textSecondary)),
+          )
+        else if (!canWrite)
           AdminCard(child: Text(l.adminVariantReadOnly, style: TextStyle(color: context.tokens.textSecondary)))
         else if (v.isPublished)
           AdminCard(child: Text(l.adminVariantsErrPublished, style: TextStyle(color: context.tokens.warning))),

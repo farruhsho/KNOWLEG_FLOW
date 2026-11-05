@@ -9,7 +9,7 @@ import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { assembleFreshVariant } from '../domain/assembly';
-import { applyStartDecision, decideExamStart, parseEntitlement, parseFreeExamsPerUser } from '../domain/entitlements';
+import { applyStartDecision, assertCanStartNew, decideExamStart, parseEntitlement, parseFreeExamsPerUser } from '../domain/entitlements';
 import {
   assemblySections,
   assertFreshBlueprint,
@@ -66,7 +66,7 @@ import {
 
 async function requireBlueprint(id: string): Promise<Blueprint> {
   const bp = await loadBlueprint(id);
-  if (!bp) throw new DomainError(Reasons.VARIANT_NOT_AVAILABLE, `blueprint ${id} not available`);
+  if (!bp) throw new DomainError(Reasons.VARIANT_NOT_AVAILABLE, `blueprint ${id} not available`, { why: 'blueprint_not_found' });
   return bp;
 }
 
@@ -121,7 +121,10 @@ function timingsFromSnap(snap: DocumentSnapshot | undefined): Record<string, num
 // attempt; resume = the user's in-progress fresh attempt of the same
 // blueprint + language. The variant document, the attempt and the
 // entitlement charge are written in ONE transaction; POOL_TOO_SMALL is
-// thrown before it, so nothing is charged.
+// thrown before it, so nothing is charged. NO_ENTITLEMENT is checked before
+// the pool is loaded (and again in the transaction). An unknown blueprint is
+// VARIANT_NOT_AVAILABLE {why: 'blueprint_not_found'}, an inactive one
+// {why: 'blueprint_inactive'}; the language may be any of the blueprint's.
 
 interface StartPlan {
   uid: string;
@@ -135,6 +138,8 @@ interface StartPlan {
   attemptRef?: DocumentReference;
   freshVariantDoc?: Record<string, unknown>;
   freshness?: AttemptFreshness;
+  /** config/pricing.free_exams_per_user when already read (fresh pre-check). */
+  freeExamsPerUser?: number;
 }
 
 type StartOutcome = { attemptId: string; state: AttemptState; source: string };
@@ -142,7 +147,7 @@ type StartOutcome = { attemptId: string; state: AttemptState; source: string };
 /** The start transaction shared by both modes: resume, or charge and create. */
 async function runStart(plan: StartPlan): Promise<StartOutcome> {
   const { uid, blueprint, variant } = plan;
-  const freeExamsPerUser = await readPricingFreeExams();
+  const freeExamsPerUser = plan.freeExamsPerUser ?? (await readPricingFreeExams());
   const entRef = db().doc(`entitlements/${uid}`);
   return db().runTransaction(async (tx) => {
     const nowMs = Date.now();
@@ -254,8 +259,15 @@ export const examStart = onCall(
       return sessionPayload(open.id, openState, resumeBlueprint, 'resume');
     }
 
-    const config = await readExamPoolConfig();
+    const [config, entSnap, freeExamsPerUser] = await Promise.all([
+      readExamPoolConfig(),
+      db().doc(`entitlements/${uid}`).get(),
+      readPricingFreeExams(),
+    ]);
     if (!config.fresh_enabled) throw new DomainError(Reasons.VARIANT_NOT_AVAILABLE, 'fresh variants are switched off', { why: 'fresh_disabled' });
+    // NO_ENTITLEMENT before the pool is loaded and assembled; the start
+    // transaction (decideExamStart) re-checks and stays authoritative.
+    assertCanStartNew(parseEntitlement(entSnap.data()), freeExamsPerUser);
     const matrix = requireMatrix(blueprint, input.language);
     const [pool, lastSeen] = await Promise.all([
       loadEligiblePool(blueprint, input.language, config.min_review_status),
@@ -324,6 +336,7 @@ export const examStart = onCall(
       attemptRef: attemptDocRef,
       freshVariantDoc,
       freshness: assembled.freshness,
+      freeExamsPerUser,
     });
     logger.info('examStart', {
       uid,

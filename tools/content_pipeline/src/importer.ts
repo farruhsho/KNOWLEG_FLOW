@@ -12,9 +12,13 @@
  *     (admin panel, console) is not overwritten unless `overwrite` is set; it
  *     is reported as a cms_conflict. A question and its key are one unit;
  *   - a question stamped `edited_in_cms_at` whose content (content hash) is
- *     the bank's again is taken back: only its hash fields are written and the
- *     marker is deleted (cms_caught_up), so later bank-only metadata changes
- *     are not conflicts;
+ *     the bank's again is taken back: only its hash fields (and the
+ *     pipeline-only pool fields, POOL_FIELDS) are written and the marker is
+ *     deleted (cms_caught_up), so later bank-only metadata changes are not
+ *     conflicts;
+ *   - the pool fields (POOL_FIELDS) and the passage `layout` are
+ *     pipeline-owned: a document written before they existed is not an edit
+ *     outside the pipeline;
  *   - a translation_group_id changed outside the pipeline (admin panel
  *     translation links) is kept (translation_links_kept) unless `overwrite`;
  *   - an existing question keeps its review if the remote one is further
@@ -27,6 +31,7 @@
  * `rows: string[][]` in callable responses.
  */
 import { passageContentHash, questionContentHash } from './bank';
+import { isDedupExcluded } from './dedup';
 import { canonicalJson, sha256Hex } from './io';
 import { BankItem, BankPassage, ExamPassage, ExamQuestion, QuestionTable, REVIEW_RANK, ReviewStatus, VariantFile, VariantStatus } from './schema';
 import { hasErrors, Problem, validateVariant, ValidationContext } from './validate';
@@ -110,9 +115,16 @@ export function nestedArrayPaths(v: unknown, path = '$'): string[] {
   return [];
 }
 
+/** Bank item → `exam_questions.assembly_excluded`: the translation check failed (as in stage 6 assemble.ts). */
+export const isAssemblyExcluded = (item: BankItem): boolean => item.pipeline.translate_check?.status === 'failed';
+
 /**
  * exam_questions document: the public fields of ARCHITECTURE §1.3 plus
- * `part_id`, `pipeline_hash` and `pipeline_translation_group_id`.
+ * `part_id`, `pipeline_hash` and `pipeline_translation_group_id`, and the
+ * fields the server's fresh-variant pool reads (functions/src/domain/
+ * exam_pool.ts poolItemFromDoc): `blueprint_id`, `passage_order`,
+ * `dedup_excluded` (a non-canonical duplicate or a match of external content,
+ * dedup.ts isDedupExcluded) and `assembly_excluded` (failed translation check).
  */
 export function questionDoc(item: BankItem): Record<string, unknown> {
   const q = item.question;
@@ -122,6 +134,10 @@ export function questionDoc(item: BankItem): Record<string, unknown> {
     // Blueprint part the item was written for: the admin variant builder and
     // the server's variant validation group questions by it.
     part_id: item.target.part_id,
+    blueprint_id: item.target.blueprint_id,
+    passage_order: item.passage_order ?? null,
+    dedup_excluded: isDedupExcluded(item),
+    assembly_excluded: isAssemblyExcluded(item),
     topic_id: q.topic_id,
     subtopic_id: q.subtopic_id,
     difficulty: q.difficulty,
@@ -163,12 +179,14 @@ export function keyDoc(item: BankItem): Record<string, unknown> {
   return doc;
 }
 
+/** exam_passages document; `layout` (standalone | paired) places the text in the fresh-variant assembly. */
 export function passageDoc(p: BankPassage): Record<string, unknown> {
   const x = p.passage;
   return {
     language: x.language,
     subject_id: x.subject_id,
     section_id: x.section_id,
+    layout: p.layout,
     title: x.title,
     text: x.text,
     source: { ...x.source },
@@ -356,11 +374,18 @@ export function editedOutsideReason(collection: CollectionName, data: Record<str
   }
 }
 
+/**
+ * exam_questions fields only the pipeline writes, for the server's
+ * fresh-variant pool. Documents written before they existed lack them; that
+ * alone is never an edit outside the pipeline.
+ */
+export const POOL_FIELDS = ['blueprint_id', 'passage_order', 'dedup_excluded', 'assembly_excluded'] as const;
+
 /** Fields ignored when deciding whether an edited remote document already matches the bank. */
 const SYNC_IGNORE: Record<CollectionName, readonly string[]> = {
   exam_blueprints: [],
-  exam_passages: ['content_hash', 'pipeline_hash'],
-  exam_questions: ['pipeline_hash', 'pipeline_translation_group_id', 'review', 'created_at', 'updated_at', 'content_version', 'edited_in_cms_at'],
+  exam_passages: ['content_hash', 'pipeline_hash', 'layout'],
+  exam_questions: ['pipeline_hash', 'pipeline_translation_group_id', 'review', 'created_at', 'updated_at', 'content_version', 'edited_in_cms_at', ...POOL_FIELDS],
   exam_question_keys: ['pipeline_hash'],
   exam_variants: ['pipeline_hash', 'status', 'published_at', 'published_by', 'stats', 'created_by', 'edited_in_cms_at'],
 };
@@ -496,8 +521,9 @@ export interface CommitReport {
   overwritten: Array<{ collection: CollectionName; id: string; reason: string }>;
   /**
    * Questions stamped `edited_in_cms_at` whose content is the bank's again
-   * (CP-NEW-1): only `pipeline_hash` (and a stale `content_hash`) was written
-   * and the marker deleted; no content or metadata was changed.
+   * (CP-NEW-1): only `pipeline_hash` (and a stale `content_hash`, and the
+   * pool fields when they differ) was written and the marker deleted; no
+   * content or metadata was changed.
    * `pending_fields` still differ from the bank: the next import writes the
    * bank's values (port them into the bank to keep the Firestore ones).
    */
@@ -520,8 +546,8 @@ export const MERGE: Record<CollectionName, boolean> = {
   exam_variants: true,
 };
 
-/** Bookkeeping fields left out of `cms_caught_up.pending_fields`. */
-const CAUGHT_UP_UNREPORTED: readonly string[] = ['pipeline_hash', 'pipeline_translation_group_id', 'content_hash', 'edited_in_cms_at', 'updated_at'];
+/** Bookkeeping fields left out of `cms_caught_up.pending_fields` (the pool fields are written with the take-back). */
+const CAUGHT_UP_UNREPORTED: readonly string[] = ['pipeline_hash', 'pipeline_translation_group_id', 'content_hash', 'edited_in_cms_at', 'updated_at', ...POOL_FIELDS];
 
 const rankOf = (s: unknown): number => (typeof s === 'string' && s in REVIEW_RANK ? REVIEW_RANK[s as ReviewStatus] : 0);
 const docKey = (collection: CollectionName, id: string): string => `${collection}/${id}`;
@@ -623,10 +649,12 @@ export async function commitPlan(plan: ImportPlan, db: FirestorePort, options: n
           }
         }
         if (caughtUp) {
-          // Take the document back without touching its content or metadata.
+          // Take the document back without touching its content or metadata
+          // (the pipeline-only pool fields are brought up to date).
           const hash = String(op.data.content_hash);
           const takeBack: Record<string, unknown> = { pipeline_hash: hash, edited_in_cms_at: DELETE_FIELD };
           if (remote.content_hash !== hash) takeBack.content_hash = hash;
+          for (const f of POOL_FIELDS) if (f in op.data && (!(f in remote) || !sameValue(op.data[f], remote[f]))) takeBack[f] = op.data[f];
           report.cms_caught_up.push({ id: op.id, pending_fields: changedFields(data, remote).filter((k) => !CAUGHT_UP_UNREPORTED.includes(k)) });
           final.push({ collection, id: op.id, data: takeBack, merge: true });
           continue;

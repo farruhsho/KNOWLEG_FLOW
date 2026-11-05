@@ -16,17 +16,19 @@ String variantStatusLabel(AppLocalizations l, String s) => switch (s) {
       'in_review' => l.adminVariantInReview,
       'published' => l.adminVariantPublished,
       'archived' => l.adminVariantArchived,
+      VariantDoc.generatedStatus => l.adminVariantGenerated,
       _ => s,
     };
 
 AdminTone variantStatusTone(String s) => switch (s) {
       'published' => AdminTone.success,
       'in_review' => AdminTone.info,
-      'archived' => AdminTone.neutral,
+      'archived' || VariantDoc.generatedStatus => AdminTone.neutral,
       _ => AdminTone.warning,
     };
 
-/// Exam variants by blueprint (`exam_variants`).
+/// Library variants by blueprint (`exam_variants`). Per-attempt fresh
+/// variants (`generated`) are not listed (see [variantListStatuses]).
 class VariantsPage extends ConsumerStatefulWidget {
   const VariantsPage({super.key});
 

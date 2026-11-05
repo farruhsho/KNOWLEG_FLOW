@@ -188,6 +188,59 @@ void main() {
     });
   });
 
+  group('the attempt\'s style comes from the server', () {
+    test('reconcile adopts a strict examStyle over a standard local copy', () {
+      // A copy saved without the style (or before phase 4) restores as standard.
+      final local = ExamSession.fromPayload(startPayload(), clientNow: t0, uid: 'u1')
+          .answer('q1', 'A', now: t0)
+          .toggleFlag('q3', now: t0);
+      expect(local.isStrict, isFalse);
+      final s = local.reconcile(startPayload(examStyle: 'strict'), clientNow: t0);
+      expect(s.isStrict, isTrue);
+      expect(s.phase, ExamPhase.inSection, reason: 'the open section stays open');
+      expect(s.answerOf('q1'), 'A');
+      expect(s.flags, isEmpty, reason: 'strict has no flags');
+      expect(s.choicesMade('q1'), 1, reason: 'the given answer is the first choice');
+      final corrected = s.answer('q1', 'B', now: t0);
+      expect(corrected.answerOf('q1'), 'B');
+      expect(corrected.answer('q1', 'C', now: t0).answerOf('q1'), 'B');
+      expect(s.canSubmit(t0), isFalse, reason: 'no early finish any more');
+      expect(s.toStateJson()['exam_style'], 'strict');
+    });
+
+    test('a payload without examStyle keeps the local style', () {
+      final local = strict().startSection().answer('q3', 'A', now: t0);
+      final s = local.reconcile(startPayload(), clientNow: t0);
+      expect(s.isStrict, isTrue);
+      expect(s.choicesMade('q3'), 1);
+    });
+
+    test('a standard examStyle replaces a strict local guess', () {
+      final local = strict().startSection().answer('q3', 'A', now: t0).answer('q3', 'B', now: t0);
+      final s = local.reconcile(startPayload(examStyle: 'standard'), clientNow: t0);
+      expect(s.isStrict, isFalse);
+      expect(s.choiceCounts, isEmpty);
+      expect(s.answer('q3', 'C', now: t0).answerOf('q3'), 'C');
+    });
+
+    test('the next section payload carries the style too', () {
+      final s = ExamSession.fromPayload(startPayload(), clientNow: t0);
+      final next = s
+          .beginSubmit(now: t0)
+          .acceptNextSection(nextPayload(deviceNow: t0, examStyle: 'strict'), clientNow: t0);
+      expect(next.isStrict, isTrue);
+      final kept = s
+          .beginSubmit(now: t0)
+          .acceptNextSection(nextPayload(deviceNow: t0), clientNow: t0);
+      expect(kept.isStrict, isFalse);
+    });
+
+    test('withStyle is a no-op for the same style', () {
+      final s = strict();
+      expect(identical(s.withStyle(ExamStyle.strict), s), isTrue);
+    });
+  });
+
   group('standard style is unchanged', () {
     test('free changes, clearing, flags, early finish', () {
       var s = ExamSession.fromPayload(startPayload(), clientNow: t0);

@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,6 +40,16 @@ String _refundSourceLabel(AppLocalizations l, String source) => switch (source) 
       _ => source,
     };
 
+/// `adminRefundOrder` gave no answer in time ([AdminFunctions.refundOrderTimeout]):
+/// the server may still have refunded, so the outcome is unknown — never
+/// suggest simply trying again.
+bool isRefundOutcomeUnknown(Object error) =>
+    error is FirebaseFunctionsException && error.code == 'deadline-exceeded';
+
+/// Message for a failed `adminRefundOrder` call.
+String refundOrderErrorMessage(AppLocalizations l, Object error) =>
+    isRefundOutcomeUnknown(error) ? l.adminOrderRefundUnknown : adminErrorMessage(l, error);
+
 /// Website orders (`payment_orders`, §10.3): status filter, pagination,
 /// order card and — for super_admin — «Вернуть платёж» via
 /// `adminRefundOrder`. Support reads only.
@@ -51,6 +62,10 @@ class WebOrdersTab extends ConsumerStatefulWidget {
 
 class _WebOrdersTabState extends ConsumerState<WebOrdersTab> {
   String? _status;
+
+  /// Orders whose `adminRefundOrder` call has not answered yet: no second
+  /// refund can be started for them meanwhile.
+  final Set<String> _refunding = {};
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +110,7 @@ class _WebOrdersTabState extends ConsumerState<WebOrdersTab> {
                       AdminPill(orderStatusLabel(l, o.status), tone: orderStatusTone(o.status)),
                       AdminPill(l.adminPaymentsCredits(o.credits)),
                       if (o.refundPending) AdminPill(l.adminOrderRefundPendingPill, tone: AdminTone.warning),
+                      if (_refunding.contains(o.id)) AdminPill(l.adminOrderRefundBusy, tone: AdminTone.info),
                     ],
                     onTap: () => _open(o, role),
                   ),
@@ -110,6 +126,7 @@ class _WebOrdersTabState extends ConsumerState<WebOrdersTab> {
       builder: (_) => OrderDetailsDialog(
         order: order,
         canRefund: (role?.canRefundOrders ?? false) && order.canRefund,
+        refundInFlight: _refunding.contains(order.id),
         canOpenUser: (role?.can(AdminPermission.viewUsers) ?? false) && order.uid.isNotEmpty,
       ),
     );
@@ -124,11 +141,13 @@ class _WebOrdersTabState extends ConsumerState<WebOrdersTab> {
 
   Future<void> _refund(PaymentOrder order) async {
     final l = AppLocalizations.of(context)!;
+    if (_refunding.contains(order.id)) return;
     final reason = await showDialog<String>(
       context: context,
       builder: (_) => RefundOrderDialog(order: order),
     );
-    if (reason == null || !mounted) return;
+    if (reason == null || !mounted || !_refunding.add(order.id)) return;
+    setState(() {});
     try {
       final r = await ref.read(adminFunctionsServiceProvider).refundOrder(order.id, reason);
       if (!mounted) return;
@@ -136,11 +155,22 @@ class _WebOrdersTabState extends ConsumerState<WebOrdersTab> {
         context,
         r.refunded ? l.adminOrderRefundDone(r.creditsClawedBack) : l.adminOrderRefundPending,
       );
-      await ref.read(paymentOrdersPageProvider(_status).notifier).refresh();
-      ref.invalidate(revenueProvider);
+      await _reload();
     } catch (e) {
-      if (mounted) showAdminSnack(context, adminErrorMessage(l, e), error: true);
+      if (!mounted) return;
+      showAdminSnack(context, refundOrderErrorMessage(l, e), error: true);
+      // No answer in time: the refund may have gone through — show what
+      // the order says now instead of inviting a blind retry.
+      if (isRefundOutcomeUnknown(e)) await _reload();
+    } finally {
+      _refunding.remove(order.id);
+      if (mounted) setState(() {});
     }
+  }
+
+  Future<void> _reload() async {
+    await ref.read(paymentOrdersPageProvider(_status).notifier).refresh();
+    ref.invalidate(revenueProvider);
   }
 }
 
@@ -154,11 +184,16 @@ class OrderDetailsDialog extends StatelessWidget {
     required this.order,
     required this.canRefund,
     required this.canOpenUser,
+    this.refundInFlight = false,
   });
 
   final PaymentOrder order;
   final bool canRefund;
   final bool canOpenUser;
+
+  /// A refund of this order was sent and has not answered yet: the refund
+  /// button is shown disabled.
+  final bool refundInFlight;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +229,17 @@ class OrderDetailsDialog extends StatelessWidget {
                 AdminKeyValue(l.adminOrderExpires, formatAdminDate(o.expiresAt)),
               AdminKeyValue(l.adminOrderUpdated, formatAdminDate(o.updatedAt)),
               if (o.failureCode != null) AdminKeyValue(l.adminOrderFailure, o.failureCode!),
+              if (o.paidWithoutCredits) ...[
+                const SizedBox(height: AppSpacing.sm),
+                AdminBanner(
+                  key: const ValueKey('order_no_credits'),
+                  icon: Icons.info_outline,
+                  tone: AdminTone.info,
+                  margin: EdgeInsets.zero,
+                  // The refund hint only next to a refund button this viewer can use.
+                  message: canRefund ? l.adminOrderNoCreditsNote : l.adminOrderNoCreditsFact,
+                ),
+              ],
               if (refund != null) ...[
                 const SizedBox(height: AppSpacing.sm),
                 AdminBanner(
@@ -237,8 +283,8 @@ class OrderDetailsDialog extends StatelessWidget {
           TextButton(
             key: const ValueKey('order_refund'),
             style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-            onPressed: () => Navigator.pop(context, _OrderAction.refund),
-            child: Text(l.adminOrderRefundAction),
+            onPressed: refundInFlight ? null : () => Navigator.pop(context, _OrderAction.refund),
+            child: Text(refundInFlight ? l.adminOrderRefundBusy : l.adminOrderRefundAction),
           ),
         TextButton(onPressed: () => Navigator.pop(context), child: Text(l.adminClose)),
       ],
@@ -286,11 +332,13 @@ class _RefundOrderDialogState extends State<RefundOrderDialog> {
                 icon: Icons.warning_amber_outlined,
                 tone: AdminTone.warning,
                 margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                message: l.adminOrderRefundBody(orderAmountLabel(l, o), o.credits),
+                // Paid for a deleted account: money back only, no clawback.
+                message: o.paidWithoutCredits
+                    ? l.adminOrderRefundBodyNoCredits(orderAmountLabel(l, o))
+                    : l.adminOrderRefundBody(orderAmountLabel(l, o), o.credits),
               ),
               AdminKeyValue(l.adminOrderId, o.id),
               AdminKeyValue(l.adminOrderUser, o.uid),
-              if (o.refundPending) Text(l.adminOrderRefundAgain),
               const SizedBox(height: AppSpacing.sm),
               TextField(
                 key: const ValueKey('refund_reason'),

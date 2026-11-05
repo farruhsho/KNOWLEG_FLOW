@@ -6387,10 +6387,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get adminOrderRefundAgain =>
-      'A refund for this order was already requested and the provider has not confirmed it yet. Requesting again sends it once more.';
-
-  @override
   String adminOrderRefundReasonHelp(int min, int max) {
     return '$min to $max characters — recorded in the action log';
   }
@@ -6520,4 +6516,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get adminWebPricingErrBase =>
       'The server refused a base price change without confirmation.';
+
+  @override
+  String get payReturnUnavailableTitle => 'Payment check isn\'t available here';
+
+  @override
+  String get payReturnUnavailableBody =>
+      'This version of the site can\'t ask the server about the order. If you paid, credits are added automatically as soon as the provider confirms the payment — check your balance later.';
+
+  @override
+  String get adminVariantGenerated => 'Built for an attempt';
+
+  @override
+  String get adminVariantGeneratedReadOnly =>
+      'The server built this variant for one student attempt (“New mock exam”). It is not part of the library and is read-only.';
+
+  @override
+  String get adminOrderRefundBusy => 'Sending the refund…';
+
+  @override
+  String get adminOrderRefundUnknown =>
+      'The server did not answer in time — the result of the refund is unknown. Check the order before trying again.';
+
+  @override
+  String get adminOrderNoCreditsNote =>
+      'Paid, but no credits were given: the account was deleted before the payment arrived. The payment can be refunded — there are no credits to claw back.';
+
+  @override
+  String get adminOrderNoCreditsFact =>
+      'Paid, but no credits were given: the account was deleted before the payment arrived.';
+
+  @override
+  String adminOrderRefundBodyNoCredits(String amount) {
+    return 'The provider returns $amount to the user. No credits were given for this order (the account was deleted), so there is nothing to claw back. A refund cannot be undone; the action is recorded in the log.';
+  }
+
+  @override
+  String get adminOrderErrRefundInProgress =>
+      'A refund for this order was already requested — wait for the provider to confirm it.';
+
+  @override
+  String get adminOrderErrProviderUnavailable =>
+      'The provider this order was paid through is not connected right now — the payment cannot be refunded from the CMS. Refund it directly with that provider (shown on the order card).';
 }

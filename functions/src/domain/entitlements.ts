@@ -5,6 +5,7 @@
  * below zero; a refund of already-spent credits is recorded as debt and is
  * settled from the next purchase.
  */
+import { DomainError, Reasons } from './reasons';
 import { bool, int, isRecord, strOrNull } from './types';
 
 export interface EntitlementState {
@@ -101,6 +102,17 @@ export function decideExamStart(input: StartDecisionInput): StartDecision {
   if (input.entitlement.free_exams_used_count < freeAllowed) return { kind: 'free_first' };
   if (input.entitlement.credits >= 1) return { kind: 'credit' };
   return { kind: 'none' };
+}
+
+/**
+ * Early check before expensive work (the fresh-variant pool, §10.1):
+ * NO_ENTITLEMENT when a NEW attempt could not be paid for now. Advisory
+ * only — decideExamStart inside the start transaction stays authoritative.
+ */
+export function assertCanStartNew(entitlement: EntitlementState, freeExamsPerUser: number): void {
+  if (decideExamStart({ entitlement, inProgressAttemptId: null, freeExamsPerUser }).kind === 'none') {
+    throw new DomainError(Reasons.NO_ENTITLEMENT, 'no free exam or credits left', { credits: entitlement.credits });
+  }
 }
 
 export interface StartApplication {

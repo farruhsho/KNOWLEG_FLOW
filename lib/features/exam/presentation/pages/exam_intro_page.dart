@@ -217,6 +217,22 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
   }
 
   /// In-progress attempt this screen should resume instead of starting.
+  /// Style of the fresh attempt in progress for the selected language, if any.
+  ExamStyle? _inProgressStyle() {
+    if (widget.variant != null) return null;
+    final language = _freshLanguage();
+    final attempts = ref.watch(myExamAttemptsProvider).valueOrNull ?? const [];
+    for (final a in attempts) {
+      if (a.isInProgress &&
+          a.blueprintId == widget.blueprint.id &&
+          a.language == language &&
+          a.variantId.startsWith('fresh_')) {
+        return a.examStyle;
+      }
+    }
+    return null;
+  }
+
   VariantAttemptStatus _status() {
     final v = widget.variant;
     if (v != null) {
@@ -248,7 +264,10 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
     final ent = ref.watch(entitlementsProvider);
     final sellsInApp = ref.watch(billingModeProvider.select((m) => m.sellsInApp));
     final platformSupported = ref.watch(examCallablesSupportedProvider);
-    final strict = _style.isStrict;
+    // An attempt in progress keeps its own style: its rules are shown, not the
+    // page's choice (which is hidden then).
+    final shownStyle = (status.isInProgress ? _inProgressStyle() : null) ?? _style;
+    final strict = shownStyle.isStrict;
     final scratchSections = bp.sections
         .where((s) => s.allowScratchpad)
         .map((s) => s.title.resolve(ui))
@@ -295,7 +314,9 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
                   onLibrary: _backToLibrary,
                 ),
               ],
-              if (v == null && !status.isInProgress) ...[
+              // Always offered for a fresh variant: an attempt in progress in
+              // one language must not hide starting one in the other.
+              if (v == null) ...[
                 const SizedBox(height: AppSpacing.xl),
                 _SectionTitle(l.examFreshLanguageLabel),
                 Wrap(
@@ -369,7 +390,7 @@ class _IntroBodyState extends ConsumerState<_IntroBody> {
               const SizedBox(height: AppSpacing.xl),
               _SectionTitle(l.examIntroRules),
               ExamCard(
-                key: ValueKey('exam_rules_${_style.wire}'),
+                key: ValueKey('exam_rules_${shownStyle.wire}'),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

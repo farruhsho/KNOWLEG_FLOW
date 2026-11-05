@@ -37,6 +37,10 @@ String? validRefundReason(String raw) {
   return t.length >= kRefundReasonMin && t.length <= kRefundReasonMax ? t : null;
 }
 
+/// `payment_orders.failure.code` of an order paid after its account was
+/// deleted: `paid`, `granted: false` (functions/src/handlers/payments.ts).
+const String kAccountDeletedFailure = 'account_deleted';
+
 int _int(Object? v) {
   if (v is int) return v;
   if (v is num) return v.toInt();
@@ -156,10 +160,19 @@ class PaymentOrder {
     );
   }
 
-  /// Whether `adminRefundOrder` accepts this order: only a paid order whose
-  /// credits were granted (server: `status == 'paid' && granted`). A pending
-  /// provider refund ([refundPending]) may be requested again.
-  bool get canRefund => status == 'paid' && granted;
+  /// Whether `adminRefundOrder` accepts this order: a paid order with no
+  /// refund requested yet (the server reserves the refund first and answers
+  /// `refund_in_progress` to a second request), whose credits were granted —
+  /// or that was paid for a deleted account ([paidWithoutCredits]), refunded
+  /// without a clawback.
+  bool get canRefund =>
+      status == 'paid' && refundRequested == null && (granted || paidWithoutCredits);
+
+  /// Paid, but no credits were given: the account was deleted before the
+  /// payment arrived (`failure.code == 'account_deleted'`). A refund returns
+  /// the money only — there is nothing to claw back.
+  bool get paidWithoutCredits =>
+      status == 'paid' && !granted && failureCode == kAccountDeletedFailure;
 
   /// A refund was requested from the provider and is not confirmed yet.
   bool get refundPending => refundRequested != null && status != 'refunded';

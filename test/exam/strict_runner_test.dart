@@ -174,6 +174,52 @@ void main() {
       expect(remote.submissions, hasLength(1));
     });
 
+    test('a standard local copy becomes strict when the server says so', () async {
+      // Saved by an older app version (no exam_style) or with the wrong guess.
+      final local = ExamSession.fromPayload(startPayload(), clientNow: t0, uid: 'u1')
+          .answer('q1', 'A', now: t0);
+      store = MemoryExamStore(initial: local);
+      c = build(local: store);
+      addTearDown(c.dispose);
+      await c.load();
+      await c.pendingWrites;
+      final s = c.state.session!;
+      expect(s.isStrict, isTrue);
+      expect(s.answerOf('q1'), 'A');
+      expect(s.canFinishEarly, isFalse);
+      expect(store.saved!.isStrict, isTrue, reason: 'kept for the next restart');
+    });
+
+    test('SECTION_NOT_OVER makes the attempt strict whatever the device assumed',
+        () async {
+      // The server did not report the style; the device took it for standard.
+      remote.onGetState = () => startPayload();
+      c = build();
+      addTearDown(c.dispose);
+      await c.load();
+      expect(c.state.session!.isStrict, isFalse);
+      c.selectAnswer('q1', 'A');
+      c.toggleFlag('q2');
+      remote.onSubmit = (s) => throw const ExamFailure(ExamFailureKind.sectionNotOver);
+      // The server is at minute 2 of 10: 8 minutes left.
+      remote.onGetState = () =>
+          startPayload(skewMs: 120000, timeLeft: const Duration(minutes: 8));
+      now = t0.add(const Duration(minutes: 2));
+      await c.submitSection(); // "Finish section" in what looked like standard
+      final s = c.state.session!;
+      expect(s.isStrict, isTrue);
+      expect(s.phase, ExamPhase.inSection, reason: 'reopened with the server deadline');
+      expect(s.remaining(now), const Duration(minutes: 8));
+      expect(s.answerOf('q1'), 'A');
+      expect(s.flags, isEmpty);
+      expect(c.state.submitFailure, isNull);
+      expect(remote.submissions, hasLength(1));
+      await c.submitSection();
+      expect(remote.submissions, hasLength(1), reason: 'strict: no early finish now');
+      await c.pendingWrites;
+      expect(store.saved!.isStrict, isTrue);
+    });
+
     group('restart (Hive exam_sessions box)', () {
       late Directory dir;
 

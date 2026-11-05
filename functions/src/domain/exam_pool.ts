@@ -6,10 +6,11 @@
  *   config/exam_pool {fresh_enabled (default true), min_review_status
  *              ('methodologist_approved' default | 'ai_verified'), updated_at, updated_by}
  */
-import type { PassageLayout, PoolItem } from './assembly';
+import type { PassageLayout, PoolItem, PoolPassage } from './assembly';
+import { allowedOptionIds, questionPartProblems } from './blueprint_validation';
 import type { AssemblySection } from './exam_matrix';
 import { DomainError, Reasons } from './reasons';
-import { isRecord, type Blueprint } from './types';
+import { isRecord, parseQuestion, type Blueprint, type BlueprintPart } from './types';
 
 export type StartMode = 'library' | 'fresh';
 export type ExamStyle = 'standard' | 'strict';
@@ -125,11 +126,20 @@ export function lastSeenMap(attempts: ReadonlyArray<{ started_at: number; questi
   return out;
 }
 
-/** Fields of exam_questions the pool query reads (`select`). */
+/**
+ * Fields of exam_questions the pool query reads (`select`). The pipeline
+ * importer (tools/content_pipeline/src/importer.ts questionDoc) writes the
+ * pool flags: `dedup_excluded` (a non-canonical duplicate or a match of
+ * external content), `assembly_excluded` (failed translation check),
+ * `blueprint_id` and `passage_order`; `duplicate_of` is the legacy flag.
+ * type / options / stem / column_a / column_b / image_path feed the
+ * per-question checks of the blueprint part (poolItemFromDoc).
+ */
 export const POOL_FIELDS = [
   'section_id',
   'part_id',
   'topic_id',
+  'subtopic_id',
   'difficulty',
   'language',
   'passage_id',
@@ -137,22 +147,35 @@ export const POOL_FIELDS = [
   'blueprint_id',
   'review.status',
   'dedup_excluded',
+  'assembly_excluded',
   'duplicate_of',
+  'type',
+  'options',
+  'stem',
+  'column_a',
+  'column_b',
+  'image_path',
 ] as const;
 
 /**
  * exam_questions document -> pool item, or null when it can never be used:
- * rejected, excluded by deduplication (`dedup_excluded: true` or a
- * `duplicate_of` id), written for another blueprint (`blueprint_id`, when the
- * document carries it), or without a topic / valid difficulty. The review
- * status floor and the key / passage checks are applied by the caller.
+ * rejected, excluded by deduplication (`dedup_excluded: true` or a legacy
+ * `duplicate_of` id) or from assembly (`assembly_excluded: true`), written for
+ * another blueprint (`blueprint_id`, when the document carries it), or
+ * without a topic / valid difficulty. With the blueprint `part` of its slot it
+ * also gets the per-question checks a library variant gets at publication
+ * (blueprint_validation.ts): type, option count, stem, passage for text_based;
+ * `answer_ids` then lists the option ids the key must name (checked by the
+ * caller with the key). The review status floor and the key / passage
+ * document checks are applied by the caller.
  */
-export function poolItemFromDoc(id: string, raw: unknown, blueprintId: string): PoolItem | null {
+export function poolItemFromDoc(id: string, raw: unknown, blueprintId: string, part?: BlueprintPart): PoolItem | null {
   if (!isRecord(raw)) return null;
   const review = isRecord(raw['review']) ? raw['review'] : {};
   const status = typeof review['status'] === 'string' ? review['status'] : 'draft';
   if (status === 'rejected') return null;
   if (raw['dedup_excluded'] === true || (typeof raw['duplicate_of'] === 'string' && raw['duplicate_of'].length > 0)) return null;
+  if (raw['assembly_excluded'] === true) return null;
   if (typeof raw['blueprint_id'] === 'string' && raw['blueprint_id'] !== '' && raw['blueprint_id'] !== blueprintId) return null;
   const topic = typeof raw['topic_id'] === 'string' ? raw['topic_id'] : '';
   const difficulty = typeof raw['difficulty'] === 'number' ? Math.trunc(raw['difficulty']) : NaN;
@@ -162,7 +185,7 @@ export function poolItemFromDoc(id: string, raw: unknown, blueprintId: string): 
   if (!sectionId || !partId) return null;
   const passageId = typeof raw['passage_id'] === 'string' && raw['passage_id'].length > 0 ? raw['passage_id'] : null;
   const order = raw['passage_order'];
-  return {
+  const item: PoolItem = {
     id,
     section_id: sectionId,
     part_id: partId,
@@ -172,12 +195,48 @@ export function poolItemFromDoc(id: string, raw: unknown, blueprintId: string): 
     passage_order: typeof order === 'number' && Number.isFinite(order) ? order : null,
     review_status: status,
   };
+  if (typeof raw['subtopic_id'] === 'string' && raw['subtopic_id'].length > 0) item.subtopic_id = raw['subtopic_id'];
+  if (part) {
+    if (part.id !== partId) return null;
+    const q = parseQuestion(id, raw);
+    if (questionPartProblems(part, q).length > 0) return null;
+    item.answer_ids = allowedOptionIds(part, q);
+  }
+  return item;
+}
+
+/** Whether a stored answer key fits the pool item (`answer_ids` when the part checks ran). */
+export function keyFitsPoolItem(item: Pick<PoolItem, 'answer_ids'>, correct: unknown): boolean {
+  if (typeof correct !== 'string' || correct.trim().length === 0) return false;
+  return !item.answer_ids || item.answer_ids.includes(correct.trim());
 }
 
 /** exam_passages.layout (`standalone` | `paired`); documents imported without it are `unknown`. */
 export function passageLayoutOf(raw: unknown): PassageLayout {
   const layout = isRecord(raw) ? raw['layout'] : null;
   return layout === 'standalone' || layout === 'paired' ? layout : 'unknown';
+}
+
+/** Topic / subtopic ids that mark the paired-text questions (e.g. `reading.paired_comparison`). */
+const PAIRED_TOPIC_RE = /paired/i;
+
+/**
+ * Passage layouts for assembly, inferred server-side where the passage
+ * document has none (written before the importer stored `layout`): `paired`
+ * when any of its pool questions has a topic or subtopic naming the paired
+ * comparison (`reading.paired_comparison`), else `standalone`. An unknown
+ * layout never fills the paired-text slot blindly.
+ */
+export function inferPassageLayouts(items: readonly PoolItem[], stored: ReadonlyMap<string, PassageLayout>): Map<string, PoolPassage> {
+  const pairedHint = new Set<string>();
+  for (const it of items) {
+    if (it.passage_id && (PAIRED_TOPIC_RE.test(it.topic_id) || PAIRED_TOPIC_RE.test(it.subtopic_id ?? ''))) pairedHint.add(it.passage_id);
+  }
+  const out = new Map<string, PoolPassage>();
+  for (const [id, layout] of stored) {
+    out.set(id, { id, layout: layout !== 'unknown' ? layout : pairedHint.has(id) ? 'paired' : 'standalone' });
+  }
+  return out;
 }
 
 /** Document id of the variant assembled for an attempt. */

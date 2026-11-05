@@ -10833,12 +10833,6 @@ abstract class AppLocalizations {
   /// **'The provider returns {amount} to the user, and {credits} credits are clawed back (if already spent, they become debt). Referral rewards for this payment are clawed back too. A refund cannot be undone; the action is recorded in the log.'**
   String adminOrderRefundBody(String amount, int credits);
 
-  /// No description provided for @adminOrderRefundAgain.
-  ///
-  /// In en, this message translates to:
-  /// **'A refund for this order was already requested and the provider has not confirmed it yet. Requesting again sends it once more.'**
-  String get adminOrderRefundAgain;
-
   /// No description provided for @adminOrderRefundReasonHelp.
   ///
   /// In en, this message translates to:
@@ -11042,6 +11036,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The server refused a base price change without confirmation.'**
   String get adminWebPricingErrBase;
+
+  /// No description provided for @payReturnUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment check isn\'t available here'**
+  String get payReturnUnavailableTitle;
+
+  /// No description provided for @payReturnUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This version of the site can\'t ask the server about the order. If you paid, credits are added automatically as soon as the provider confirms the payment — check your balance later.'**
+  String get payReturnUnavailableBody;
+
+  /// No description provided for @adminVariantGenerated.
+  ///
+  /// In en, this message translates to:
+  /// **'Built for an attempt'**
+  String get adminVariantGenerated;
+
+  /// No description provided for @adminVariantGeneratedReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'The server built this variant for one student attempt (“New mock exam”). It is not part of the library and is read-only.'**
+  String get adminVariantGeneratedReadOnly;
+
+  /// No description provided for @adminOrderRefundBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending the refund…'**
+  String get adminOrderRefundBusy;
+
+  /// No description provided for @adminOrderRefundUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not answer in time — the result of the refund is unknown. Check the order before trying again.'**
+  String get adminOrderRefundUnknown;
+
+  /// No description provided for @adminOrderNoCreditsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid, but no credits were given: the account was deleted before the payment arrived. The payment can be refunded — there are no credits to claw back.'**
+  String get adminOrderNoCreditsNote;
+
+  /// No description provided for @adminOrderNoCreditsFact.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid, but no credits were given: the account was deleted before the payment arrived.'**
+  String get adminOrderNoCreditsFact;
+
+  /// No description provided for @adminOrderRefundBodyNoCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider returns {amount} to the user. No credits were given for this order (the account was deleted), so there is nothing to claw back. A refund cannot be undone; the action is recorded in the log.'**
+  String adminOrderRefundBodyNoCredits(String amount);
+
+  /// No description provided for @adminOrderErrRefundInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'A refund for this order was already requested — wait for the provider to confirm it.'**
+  String get adminOrderErrRefundInProgress;
+
+  /// No description provided for @adminOrderErrProviderUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider this order was paid through is not connected right now — the payment cannot be refunded from the CMS. Refund it directly with that provider (shown on the order card).'**
+  String get adminOrderErrProviderUnavailable;
 }
 
 class _AppLocalizationsDelegate

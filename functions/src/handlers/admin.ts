@@ -12,7 +12,7 @@ import { isValidProductId } from '../domain/purchase';
 import { DomainError, Reasons } from '../domain/reasons';
 import { isRole, legacyUserRoleFor, ROLES, type Role } from '../domain/roles';
 import { isRecord, num } from '../domain/types';
-import { BASE_PRICE_SOM, BASE_PRODUCT_ID, parseWebProductsUpdate } from '../payments/orders';
+import { parseWebProductsUpdate, webPricingLogDetails } from '../payments/orders';
 import { adminCallableOptions, db, FieldValue, payload, reqId, reqInt, reqString, requirePermission, wrap, writeAdminLog } from './common';
 import { loadBlueprint, loadKeys, loadPassages, loadQuestions, loadVariant } from './content';
 
@@ -209,14 +209,8 @@ export const adminUpdatePricing = onCall(
         },
         { merge: true },
       );
-      const basePriceChanged = webProducts[BASE_PRODUCT_ID]!.amount_som !== BASE_PRICE_SOM || webProducts[BASE_PRODUCT_ID]!.credits !== 1;
-      await writeAdminLog(actor, 'update_pricing', { doc: 'config/pricing' }, {
-        before: before
-          ? { products: before['products'] ?? null, free_exams_per_user: before['free_exams_per_user'] ?? null, web_products: before['web_products'] ?? null }
-          : null,
-        after: { products: products ?? undefined, free_exams_per_user: freeExamsPerUser ?? undefined, web_products: webProducts },
-        base_price_changed: basePriceChanged,
-      });
+      // Fields not sent are logged as null (an undefined value would make Firestore drop the log entry).
+      await writeAdminLog(actor, 'update_pricing', { doc: 'config/pricing' }, webPricingLogDetails(before, { products, freeExamsPerUser, webProducts }));
       return { ok: true };
     }
 

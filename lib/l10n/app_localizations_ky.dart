@@ -6372,10 +6372,6 @@ class AppLocalizationsKy extends AppLocalizations {
   }
 
   @override
-  String get adminOrderRefundAgain =>
-      'Бул буюртма боюнча кайтаруу мурда суралган, провайдер али ырастай элек. Кайра суроо аны дагы бир жолу жөнөтөт.';
-
-  @override
   String adminOrderRefundReasonHelp(int min, int max) {
     return '$min белгиден $max белгиге чейин — аракеттер журналына жазылат';
   }
@@ -6506,4 +6502,47 @@ class AppLocalizationsKy extends AppLocalizations {
   @override
   String get adminWebPricingErrBase =>
       'Сервер негизги бааны ырастоосуз өзгөртүүнү кабыл алган жок.';
+
+  @override
+  String get payReturnUnavailableTitle =>
+      'Бул жерде төлөмдү текшерүү мүмкүн эмес';
+
+  @override
+  String get payReturnUnavailableBody =>
+      'Сайттын бул версиясы заказдын абалын серверден сурай албайт. Эгер төлөсөңүз, провайдер төлөмдү ырастаары менен кредиттер автоматтык түрдө кошулат — балансты кийинчерээк текшериңиз.';
+
+  @override
+  String get adminVariantGenerated => 'Аракет үчүн түзүлгөн';
+
+  @override
+  String get adminVariantGeneratedReadOnly =>
+      'Бул вариантты сервер окуучунун бир аракети үчүн түзгөн («Жаңы сынамык экзамен»). Ал китепканага кирбейт, аны көрүү гана мүмкүн.';
+
+  @override
+  String get adminOrderRefundBusy => 'Кайтаруу жөнөтүлүүдө…';
+
+  @override
+  String get adminOrderRefundUnknown =>
+      'Сервер убагында жооп берген жок — кайтаруунун жыйынтыгы белгисиз. Кайталоодон мурун буюртманы текшериңиз.';
+
+  @override
+  String get adminOrderNoCreditsNote =>
+      'Төлөнгөн, бирок кредиттер берилген эмес: төлөм келгенге чейин аккаунт өчүрүлгөн. Төлөмдү кайтарса болот — кредиттерди кайра алуунун кереги жок.';
+
+  @override
+  String get adminOrderNoCreditsFact =>
+      'Төлөнгөн, бирок кредиттер берилген эмес: төлөм келгенге чейин аккаунт өчүрүлгөн.';
+
+  @override
+  String adminOrderRefundBodyNoCredits(String amount) {
+    return 'Провайдер колдонуучуга $amount кайтарат. Бул буюртма боюнча кредиттер берилген эмес (аккаунт өчүрүлгөн), ошондуктан кайра ала турган эч нерсе жок. Кайтарууну жокко чыгарууга болбойт; аракет журналга жазылат.';
+  }
+
+  @override
+  String get adminOrderErrRefundInProgress =>
+      'Бул буюртма боюнча кайтаруу мурда суралган — провайдердин ырастоосун күтүңүз.';
+
+  @override
+  String get adminOrderErrProviderUnavailable =>
+      'Бул буюртма төлөнгөн провайдер азыр туташтырылган эмес — төлөмдү CMSтен кайтарууга болбойт. Аны түздөн-түз ошол провайдерде кайтарыңыз (ал буюртманын карточкасында көрсөтүлгөн).';
 }

@@ -29,6 +29,10 @@ enum PayReturnPhase {
 
   /// The status could not be read (connection).
   error,
+
+  /// This build cannot call `paymentGetOrder` at all (web without the App
+  /// Check site key, decision D7): said at once instead of polling.
+  unavailable,
 }
 
 /// Where the payment provider sends the student back (RoutePaths.payReturn,
@@ -70,9 +74,13 @@ class _PayReturnPageState extends ConsumerState<PayReturnPage> {
   @override
   void initState() {
     super.initState();
-    if (ref.read(billingModeProvider).sellsOnWeb) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _begin());
+    if (!ref.read(billingModeProvider).sellsOnWeb) return;
+    if (!ref.read(webPaymentsAvailableProvider)) {
+      // Every poll would fail the same way for two minutes.
+      _phase = PayReturnPhase.unavailable;
+      return;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _begin());
   }
 
   @override
@@ -284,6 +292,18 @@ class _PayReturnPageState extends ConsumerState<PayReturnPage> {
           icon: Icons.help_outline_rounded,
           tone: _Tone.warning,
           title: l.payReturnNoOrder,
+          secondary: (label: l.payReturnToStore, onPressed: toStore),
+        );
+      case PayReturnPhase.unavailable:
+        return _Status(
+          key: const ValueKey('pay_return_unavailable'),
+          icon: Icons.cloud_off_rounded,
+          tone: _Tone.warning,
+          title: l.payReturnUnavailableTitle,
+          lines: [
+            l.payReturnUnavailableBody,
+            if (balance != null) l.payReturnBalance(l.billingCreditsCount(balance)),
+          ],
           secondary: (label: l.payReturnToStore, onPressed: toStore),
         );
       case PayReturnPhase.error:

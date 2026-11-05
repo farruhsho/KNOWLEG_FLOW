@@ -53,12 +53,19 @@ String adminErrorMessage(
     final details = BackendReasons.detailsOf(error);
     final why = callableDetailsWhy(error.details);
     if (reason == BackendReasons.orderNotFound) return l.adminOrderErrNotFound;
-    if (reason == BackendReasons.paymentsDisabled) return l.adminOrderErrProvider;
+    if (reason == BackendReasons.paymentsDisabled) {
+      // adminRefundOrder: the provider this order was paid through is not
+      // configured now (payments may still run through another one).
+      return why == 'provider_unavailable'
+          ? l.adminOrderErrProviderUnavailable
+          : l.adminOrderErrProvider;
+    }
     if (reason == BackendReasons.variantNotAvailable && why == 'matrix_missing') {
       return l.adminPoolErrMatrix;
     }
     if (reason == BackendReasons.validationFailed) {
       if (why == 'not_refundable') return l.adminOrderErrNotRefundable;
+      if (why == 'refund_in_progress') return l.adminOrderErrRefundInProgress;
       if (why == 'base_price_change_unconfirmed') return l.adminWebPricingErrBase;
       if (details['field'] == 'language') return l.adminPoolErrLanguage;
       return l.adminErrValidation(error.message ?? '');

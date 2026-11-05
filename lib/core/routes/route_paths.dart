@@ -83,4 +83,7 @@ abstract final class RoutePaths {
   static const adminNotifications = '/admin/notifications';
   static const adminPromoCodes = '/admin/promo-codes';
   static const adminAchievements = '/admin/achievements';
+
+  // Phase 4 (ARCHITECTURE §10.1): fresh-variant pool settings and health.
+  static const adminExamPool = '/admin/exam-pool';
 }

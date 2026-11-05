@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'exam_payload.dart';
+import 'exam_start.dart';
 import 'json_utils.dart';
 
 /// Read-only view of an `exam_attempts/{id}` document (written only by Cloud
@@ -21,6 +22,9 @@ class AttemptSummary {
   final int? completedAtMs;
   final ExamResult? result;
 
+  /// `exam_attempts.exam_style` (ARCHITECTURE §10.2); standard when absent.
+  final ExamStyle examStyle;
+
   const AttemptSummary({
     required this.id,
     required this.variantId,
@@ -34,6 +38,7 @@ class AttemptSummary {
     this.startedAtMs,
     this.completedAtMs,
     this.result,
+    this.examStyle = ExamStyle.standard,
   });
 
   bool get isInProgress => status == 'in_progress';
@@ -57,6 +62,7 @@ class AttemptSummary {
       startedAtMs: asEpochMs(m['started_at']),
       completedAtMs: asEpochMs(m['completed_at']),
       result: res is Map ? ExamResult.fromJson(res) : null,
+      examStyle: ExamStyle.parse(m['exam_style']),
     );
   }
 }

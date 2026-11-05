@@ -6,9 +6,13 @@
  *
  * Pool = exam_questions of the language and the blueprint slot
  * (section_id, part_id; a `blueprint_id` on the document must match), review
- * status at least config/exam_pool.min_review_status, with an answer key
- * (exam_question_keys.correct) and, for passage questions, an exam_passages
- * document. One query per slot (language, section_id, part_id,
+ * status at least config/exam_pool.min_review_status, not excluded
+ * (`dedup_excluded`, `assembly_excluded`, legacy `duplicate_of`), passing the
+ * per-question checks of its blueprint part (type, option count, stem,
+ * passage for text_based), with an answer key that is one of its options
+ * (exam_question_keys.correct; the fixed options for quantitative comparison)
+ * and, for passage questions, an exam_passages document (layout inferred when
+ * missing). One query per slot (language, section_id, part_id,
  * review.status in [...]) with a field mask; keys and passages are read with
  * field masks too. The eligible pool is cached per instance for 2 minutes
  * (not in the emulator).
@@ -19,10 +23,12 @@ import path from 'node:path';
 import type { DocumentReference } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
-import { poolHealth, statusesAtLeast, type PoolItem, type PoolPassage } from '../domain/assembly';
+import { poolHealth, statusesAtLeast, type PassageLayout, type PoolItem, type PoolPassage } from '../domain/assembly';
 import { matrixProblems, parseBlueprintMatrix, partMatricesFor, type PartMatrix } from '../domain/exam_matrix';
 import {
   assemblySections,
+  inferPassageLayouts,
+  keyFitsPoolItem,
   lastSeenMap,
   parseExamPoolConfig,
   parseExamPoolUpdate,
@@ -110,11 +116,14 @@ async function existingWithMask(collection: string, ids: readonly string[], fiel
   return out;
 }
 
-/** Questions of every slot of the blueprint in `language` (statuses = null: all). */
+/**
+ * Questions of every slot of the blueprint in `language` (statuses = null:
+ * all) that pass the per-question checks of their blueprint part.
+ */
 export async function loadSlotDocs(bp: Blueprint, language: string, statuses: readonly string[] | null): Promise<SlotDocs[]> {
-  const slots = bp.sections.flatMap((s) => s.parts.map((p) => ({ section_id: s.id, part_id: p.id })));
+  const slots = bp.sections.flatMap((s) => s.parts.map((p) => ({ section_id: s.id, part_id: p.id, part: p })));
   return Promise.all(
-    slots.map(async (slot) => {
+    slots.map(async ({ part, ...slot }) => {
       let q = db()
         .collection('exam_questions')
         .where('language', '==', language)
@@ -123,7 +132,8 @@ export async function loadSlotDocs(bp: Blueprint, language: string, statuses: re
       if (statuses) q = q.where('review.status', 'in', [...statuses]);
       const snap = await q.select(...POOL_FIELDS).limit(SLOT_LIMIT).get();
       if (snap.size >= SLOT_LIMIT) logger.warn('pool slot truncated', { blueprintId: bp.id, ...slot, limit: SLOT_LIMIT });
-      const items = snap.docs.map((d) => poolItemFromDoc(d.id, d.data(), bp.id)).filter((x): x is PoolItem => x !== null);
+      const items = snap.docs.map((d) => poolItemFromDoc(d.id, d.data(), bp.id, part)).filter((x): x is PoolItem => x !== null);
+      if (items.length < snap.size) logger.info('pool slot: documents left out', { blueprintId: bp.id, ...slot, read: snap.size, usable: items.length });
       return { ...slot, items };
     }),
   );
@@ -134,18 +144,20 @@ export interface EligiblePool {
   passages: Map<string, PoolPassage>;
 }
 
-/** Drops items without a key (or, for passage questions, without the passage). */
+/**
+ * Drops items without a valid key (one of the item's `answer_ids`) or, for
+ * passage questions, without the passage; passages without a stored layout
+ * get an inferred one (inferPassageLayouts).
+ */
 export async function eligibleFrom(items: readonly PoolItem[]): Promise<EligiblePool> {
   const keys = await existingWithMask('exam_question_keys', items.map((i) => i.id), ['correct']);
-  const keyed = items.filter((i) => {
-    const c = keys.get(i.id)?.['correct'];
-    return typeof c === 'string' && c.trim().length > 0;
-  });
+  const keyed = items.filter((i) => keyFitsPoolItem(i, keys.get(i.id)?.['correct']));
   const passageIds = keyed.map((i) => i.passage_id).filter((p): p is string => !!p);
   const passageDocs = await existingWithMask('exam_passages', passageIds, ['layout']);
-  const passages = new Map<string, PoolPassage>();
-  for (const [id, data] of passageDocs) passages.set(id, { id, layout: passageLayoutOf(data) });
-  return { items: keyed.filter((i) => !i.passage_id || passages.has(i.passage_id)), passages };
+  const stored = new Map<string, PassageLayout>();
+  for (const [id, data] of passageDocs) stored.set(id, passageLayoutOf(data));
+  const usable = keyed.filter((i) => !i.passage_id || stored.has(i.passage_id));
+  return { items: usable, passages: inferPassageLayouts(usable, stored) };
 }
 
 const poolCache = new Map<string, { at: number; value: EligiblePool }>();

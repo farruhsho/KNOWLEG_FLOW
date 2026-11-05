@@ -66,11 +66,14 @@ Phase 4 seed data (all emulator-only):
   setting for the emulator only**: the pilot bank is checked by an independent AI solver but not
   yet by a methodologist. Production keeps the default `methodologist_approved` until the owner
   changes it with `adminUpdateExamPool` (super_admin).
-- The pilot bank `content/bank/pilot_main_ru_v1_*` (150 original `ai_verified` questions + 3
-  reading passages) in `exam_questions` / `exam_question_keys` / `exam_passages` (§1.3 shape with
-  `part_id`, plus `blueprint_id`, `passage_order` and the passage `layout`), so «Новый вариант» of
-  the main test (ru) can be started in the app. It is exactly one variant: further attempts honestly
-  report «N заданий вы уже встречали».
+- Every committed ort_main_2026 ru bank (`content/bank/*/items.json` except `sample`: the pilot set
+  `pilot_main_ru_v1_*` and set 2 `main_ru_v2_*`, 150 original `ai_verified` questions + 3 reading
+  passages each) in `exam_questions` / `exam_question_keys` / `exam_passages` (§1.3 shape with
+  `part_id`, plus `blueprint_id`, `passage_order`, `dedup_excluded`, `assembly_excluded` and the
+  passage `layout`, as the pipeline importer writes them), so «Новый вариант» of the main test (ru)
+  can be started in the app. The 300 questions make two disjoint variants: further attempts honestly
+  report «N заданий вы уже встречали». The demo filler of the 4 library variants is
+  `assembly_excluded` (never in a fresh variant).
 - `config/pricing.web_products`: `exam_single` 1 credit = 100 som (on sale), packs disabled.
 - `PAYMENT_PROVIDER=sandbox`: the «Оплатить» button opens the emulator's test checkout page
   («Тестовая оплата — только эмулятор»); its buttons send a signed webhook, no money moves. The

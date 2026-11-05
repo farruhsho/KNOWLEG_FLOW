@@ -22,6 +22,8 @@ function sampleFor(partId, lang) {
 function writeQuestion(batch, db, id, q, key) {
   batch.set(db.doc(`exam_questions/${id}`), {
     ...q, table: storedTable(q.table), review: { status: 'methodologist_approved' }, content_version: 1,
+    // Demo filler of the library variants only: never part of the fresh-variant pool (seedPilotBank is).
+    assembly_excluded: true,
   });
   batch.set(db.doc(`exam_question_keys/${id}`), {
     correct: key.correct, explanation: key.explanation ?? '', wrong_option_notes: key.wrong_option_notes ?? {}, solution_steps: key.solution_steps ?? [],
@@ -121,41 +123,53 @@ export async function seedExamBase(db) {
 
 const tsOrNull = (iso) => (typeof iso === 'string' && iso ? new Date(iso) : null);
 
+/** Same rules as the pipeline importer (tools/content_pipeline/src/importer.ts questionDoc). */
+const isDedupExcluded = (it) => !!it.pipeline?.dedup && (it.pipeline.dedup.duplicate_of != null || String(it.pipeline.dedup.cluster_id ?? '').startsWith('ext:'));
+const isAssemblyExcluded = (it) => it.pipeline?.translate_check?.status === 'failed';
+
+/** Blueprint × language of the emulator fresh-variant pool (seedPilotBank). */
+export const POOL_BLUEPRINT = 'ort_main_2026';
+export const POOL_LANGUAGE = 'ru';
+
 /**
- * Imports the pilot bank (content/bank/pilot_main_ru_v1_*: 150 original
- * `ai_verified` items for ort_main_2026 ru + 3 reading passages) into
- * exam_questions / exam_question_keys / exam_passages in the §1.3 shape the
- * pipeline importer writes (incl. part_id), plus the additive fields the
- * fresh-variant assembly reads when present: `blueprint_id`, `passage_order`
- * (question order in its text) and the passage `layout` (standalone | paired).
- * With config/exam_pool.min_review_status = ai_verified this is exactly one
- * fresh ort_main_2026 ru variant (more attempts honestly report repeats).
+ * Imports every committed bank for ort_main_2026 ru (content/bank/<batch>/items.json
+ * except `sample`: the pilot set pilot_main_ru_v1_* and set 2 main_ru_v2_*, 150
+ * original `ai_verified` items + 3 reading passages each) into exam_questions /
+ * exam_question_keys / exam_passages in the shape the pipeline importer writes
+ * (§1.3 incl. part_id, plus the fields the fresh-variant pool reads:
+ * `blueprint_id`, `passage_order` (question order in its text),
+ * `dedup_excluded`, `assembly_excluded`, and the passage `layout`).
+ * With config/exam_pool.min_review_status = ai_verified the 300 items make two
+ * disjoint fresh ort_main_2026 ru variants (later attempts honestly report repeats).
  */
 export async function seedPilotBank(db) {
   const bankDir = path.join(root, 'content/bank');
-  const dirs = readdirSync(bankDir).filter((d) => d.startsWith('pilot_main_ru_v1_') && existsSync(path.join(bankDir, d, 'items.json')));
+  const dirs = readdirSync(bankDir).filter((d) => d !== 'sample' && existsSync(path.join(bankDir, d, 'items.json')));
   const ops = [];
   let items = 0;
   let passages = 0;
   for (const dir of dirs.sort()) {
     const file = JSON.parse(readFileSync(path.join(bankDir, dir, 'items.json'), 'utf8'));
+    const chosen = (file.items ?? []).filter((it) => it.target?.blueprint_id === POOL_BLUEPRINT && it.question?.language === POOL_LANGUAGE && it.question.review?.status !== 'rejected');
+    const usedPassages = new Set(chosen.map((it) => it.question.passage_id).filter(Boolean));
     for (const p of file.passages ?? []) {
+      if (!usedPassages.has(p.id)) continue;
       const x = p.passage;
       ops.push([`exam_passages/${p.id}`, {
-        language: x.language, subject_id: x.subject_id, section_id: x.section_id, title: x.title, text: x.text,
-        source: { ...x.source }, content_hash: p.content_hash, layout: p.layout,
+        language: x.language, subject_id: x.subject_id, section_id: x.section_id, layout: p.layout, title: x.title, text: x.text,
+        source: { ...x.source }, content_hash: p.content_hash, pipeline_hash: p.content_hash,
       }]);
       passages++;
     }
-    for (const it of file.items ?? []) {
+    for (const it of chosen) {
       const q = it.question;
-      if (q.review?.status === 'rejected') continue;
       ops.push([`exam_questions/${it.id}`, {
         subject_id: q.subject_id, section_id: q.section_id, part_id: it.target.part_id, blueprint_id: it.target.blueprint_id,
+        passage_order: it.passage_order ?? null, dedup_excluded: isDedupExcluded(it), assembly_excluded: isAssemblyExcluded(it),
         topic_id: q.topic_id, subtopic_id: q.subtopic_id ?? null, difficulty: q.difficulty, language: q.language,
-        translation_group_id: q.translation_group_id ?? null, type: q.type, stem: q.stem,
+        translation_group_id: q.translation_group_id ?? null, pipeline_translation_group_id: q.translation_group_id ?? null, type: q.type, stem: q.stem,
         options: (q.options ?? []).map((o) => ({ id: o.id, text: o.text })),
-        passage_id: q.passage_id ?? null, passage_order: it.passage_order ?? null, image_path: q.image_path ?? null,
+        passage_id: q.passage_id ?? null, image_path: q.image_path ?? null,
         table: storedTable(q.table), source: { ...q.source },
         review: { status: q.review.status, reviewed_by: q.review.reviewed_by ?? null, reviewed_at: tsOrNull(q.review.reviewed_at), notes: q.review.notes ?? '' },
         content_version: q.content_version ?? 1, content_hash: q.content_hash, pipeline_hash: q.content_hash,

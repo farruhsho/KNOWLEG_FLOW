@@ -302,6 +302,7 @@ class ExamSession {
     bool clearPending = false,
     ExamResult? result,
     Map<String, int>? choiceCounts,
+    ExamStyle? style,
   }) =>
       ExamSession._(
         attemptId: attemptId,
@@ -322,7 +323,7 @@ class ExamSession {
         pendingSubmission:
             clearPending ? null : (pendingSubmission ?? this.pendingSubmission),
         result: result ?? this.result,
-        style: style,
+        style: style ?? this.style,
         choiceCounts: choiceCounts ?? this.choiceCounts,
         freshness: freshness,
       );
@@ -575,6 +576,20 @@ class ExamSession {
     return _copy(phase: ExamPhase.submitting, pendingSubmission: submission);
   }
 
+  /// Switches to the attempt's real style (§10.2) — what the server reports,
+  /// which wins over whatever this device assumed (an older local copy, or a
+  /// copy saved without a style). The open section stays where it is:
+  /// answers already given count as the first choice (one correction left)
+  /// and flags are dropped when switching to strict, which has none.
+  ExamSession withStyle(ExamStyle next) {
+    if (next == style) return this;
+    return _copy(
+      style: next,
+      flags: next.isStrict ? const {} : null,
+      choiceCounts: next.isStrict ? null : const {},
+    );
+  }
+
   /// Sending failed — keep everything and wait for a retry.
   ExamSession submitFailed() {
     if (phase != ExamPhase.submitting) return this;
@@ -605,6 +620,7 @@ class ExamSession {
       throw StateError('Cannot reopen a submitted section');
     }
     return _copy(
+      style: next.examStyle,
       submitted: Map.unmodifiable({
         ...submitted,
         section.sectionId: _recordCurrent(),
@@ -682,9 +698,20 @@ class ExamSession {
   /// session after a restart or reconnect. Local answers of the same open
   /// section win (they are newer than the last draft); a section the server
   /// has already moved past is closed locally and never reopened.
+  ///
+  /// The attempt's style comes from the server whenever it reports one
+  /// (`examStyle`, §10.2): the local copy may predate it or have been saved
+  /// with the style the device asked for.
   ExamSession reconcile(ExamSessionPayload server,
       {required DateTime clientNow}) {
     if (server.isCompleted) return complete(server.result);
+    final serverStyle = server.examStyle;
+    final s = serverStyle == null ? this : withStyle(serverStyle);
+    return s._reconcileSection(server, clientNow: clientNow);
+  }
+
+  ExamSession _reconcileSection(ExamSessionPayload server,
+      {required DateTime clientNow}) {
     final serverSection = server.section;
     final offset = server.serverNowMs - clientNow.millisecondsSinceEpoch;
     if (serverSection == null) return _copy(clockOffsetMs: offset);

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart' show FirebaseException;
 import 'package:flutter/material.dart';
@@ -9,14 +12,17 @@ import 'package:knowledge_flow/features/admin/application/paged_list.dart';
 import 'package:knowledge_flow/features/admin/data/admin_firebase.dart';
 import 'package:knowledge_flow/features/admin/data/admin_functions.dart';
 import 'package:knowledge_flow/features/admin/data/models/admin_records.dart';
+import 'package:knowledge_flow/features/admin/data/repositories/exam_repositories.dart';
 import 'package:knowledge_flow/features/admin/domain/admin_nav.dart';
 import 'package:knowledge_flow/features/admin/domain/admin_role.dart';
 import 'package:knowledge_flow/features/admin/domain/blueprint_spec.dart';
 import 'package:knowledge_flow/features/admin/domain/exam_pool.dart';
 import 'package:knowledge_flow/features/admin/domain/payment_order.dart';
 import 'package:knowledge_flow/features/admin/domain/pricing_config.dart';
+import 'package:knowledge_flow/features/admin/domain/variant_validation.dart' show VariantQuestionInfo;
 import 'package:knowledge_flow/features/admin/presentation/pages/exam_pool_page.dart';
 import 'package:knowledge_flow/features/admin/presentation/pages/ops_pages.dart';
+import 'package:knowledge_flow/features/admin/presentation/pages/variant_builder_page.dart';
 import 'package:knowledge_flow/features/admin/presentation/shell/admin_shell.dart';
 import 'package:knowledge_flow/features/admin/presentation/widgets/admin_widgets.dart' show AdminPageBody;
 import 'package:knowledge_flow/l10n/app_localizations.dart';
@@ -47,18 +53,49 @@ class _FakeAdminFunctions extends AdminFunctions {
   final webPricing = <Map<String, Object>>[];
   RefundOrderResult refundResult = const RefundOrderResult(status: 'refunded', creditsClawedBack: 1);
 
+  /// Thrown by [refundOrder] instead of answering.
+  Object? refundError;
+
+  /// When set, [refundOrder] answers only once this completes (call in flight).
+  Completer<void>? refundGate;
+
   @override
   Future<void> updateExamPool(Map<String, Object> update) async => poolUpdates.add(update);
 
   @override
   Future<RefundOrderResult> refundOrder(String orderId, String reason) async {
     refunds.add((orderId: orderId, reason: reason));
+    final gate = refundGate;
+    if (gate != null) await gate.future;
+    final error = refundError;
+    if (error != null) throw error;
     return refundResult;
   }
 
   @override
   Future<void> updateWebPricing(Map<String, WebProductConfig> products) async =>
       webPricing.add(webPricingPayload(products));
+}
+
+class _NoFirestore implements FirebaseFirestore {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// `exam_variants` holding exactly one document.
+class _OneVariantRepo extends VariantsRepository {
+  _OneVariantRepo(this.doc) : super(_NoFirestore());
+  final VariantDoc doc;
+
+  @override
+  Future<VariantDoc?> get(String id) async => id == doc.id ? doc : null;
+}
+
+class _NoInfosBank extends ExamBankRepository {
+  _NoInfosBank() : super(_NoFirestore());
+
+  @override
+  Future<Map<String, VariantQuestionInfo>> infos(Iterable<String> ids) async => const {};
 }
 
 PagedListNotifier<T> _paged<T>(List<T> items) =>
@@ -400,6 +437,109 @@ void main() {
       expect(find.textContaining('Возврат запрошен у провайдера'), findsOneWidget);
     });
 
+    testWidgets('a refund already requested cannot be sent again', (tester) async {
+      final requested = PaymentOrder(
+        id: 'ord_requested',
+        uid: 'student-4',
+        productId: 'exam_single',
+        credits: 1,
+        amountSom: 100,
+        provider: 'sandbox',
+        status: 'paid',
+        granted: true,
+        paidAt: _now.subtract(const Duration(hours: 3)),
+        refundRequested: OrderRefundRequest(
+            at: _now.subtract(const Duration(hours: 1)), by: 'u1', reason: 'двойная оплата'),
+      );
+      await _pump(tester, _shell(AdminSection.payments, const PaymentsPage()),
+          overrides: _base(AdminRole.superAdmin, orders: () => _paged([requested])));
+      expect(find.text('возврат запрошен'), findsOneWidget);
+      await _tap(tester, find.byKey(const ValueKey('order_ord_requested')));
+      expect(find.textContaining('«двойная оплата»'), findsOneWidget);
+      expect(find.byKey(const ValueKey('order_refund')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('paid for a deleted account: refund without clawback, with a note', (tester) async {
+      final fn = _FakeAdminFunctions()..refundResult = const RefundOrderResult(status: 'refunded');
+      final deleted = PaymentOrder(
+        id: 'ord_deleted',
+        uid: 'gone-uid',
+        productId: 'exam_single',
+        credits: 1,
+        amountSom: 100,
+        provider: 'sandbox',
+        status: 'paid',
+        granted: false,
+        failureCode: 'account_deleted',
+        paidAt: _now.subtract(const Duration(hours: 1)),
+      );
+      await _pump(tester, _shell(AdminSection.payments, const PaymentsPage()),
+          overrides: _base(AdminRole.superAdmin, functions: fn, orders: () => _paged([deleted])));
+      await _tap(tester, find.byKey(const ValueKey('order_ord_deleted')));
+      expect(find.byKey(const ValueKey('order_no_credits')), findsOneWidget);
+      expect(find.textContaining('кредиты не начислены'), findsOneWidget);
+      await _tap(tester, find.byKey(const ValueKey('order_refund')));
+      expect(find.textContaining('Кредиты по этому заказу не начислялись'), findsOneWidget);
+      expect(find.textContaining('будет отозвано'), findsNothing);
+      await tester.enterText(find.byKey(const ValueKey('refund_reason')), 'Аккаунт удалён');
+      await tester.pump();
+      await _tap(tester, find.byKey(const ValueKey('refund_confirm')));
+      expect(fn.refunds, [(orderId: 'ord_deleted', reason: 'Аккаунт удалён')]);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('no second refund while the first call is in flight', (tester) async {
+      final fn = _FakeAdminFunctions()..refundGate = Completer<void>();
+      await _pump(tester, _shell(AdminSection.payments, const PaymentsPage()),
+          overrides: _base(AdminRole.superAdmin, functions: fn));
+      await _tap(tester, find.byKey(const ValueKey('order_ord_paid_1')));
+      await _tap(tester, find.byKey(const ValueKey('order_refund')));
+      await tester.enterText(find.byKey(const ValueKey('refund_reason')), 'Двойная оплата');
+      await tester.pump();
+      await _tap(tester, find.byKey(const ValueKey('refund_confirm')));
+      expect(fn.refunds, hasLength(1));
+      expect(find.text('Возврат отправляется…'), findsOneWidget, reason: 'list pill');
+
+      await _tap(tester, find.byKey(const ValueKey('order_ord_paid_1')));
+      final button = tester.widget<TextButton>(find.byKey(const ValueKey('order_refund')));
+      expect(button.onPressed, isNull);
+      expect(find.text('Возврат отправляется…'), findsNWidgets(2));
+      await tester.tapAt(const Offset(4, 4));
+      await tester.pumpAndSettle();
+
+      fn.refundGate!.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('Платёж возвращён. Отозвано кредитов: 1.'), findsOneWidget);
+      expect(find.text('Возврат отправляется…'), findsNothing);
+      expect(fn.refunds, hasLength(1));
+    });
+
+    testWidgets('a refund that timed out: unknown outcome, the list is reloaded', (tester) async {
+      var loads = 0;
+      final fn = _FakeAdminFunctions()
+        ..refundError = FirebaseFunctionsException(code: 'deadline-exceeded', message: 'timeout');
+      await _pump(tester, _shell(AdminSection.payments, const PaymentsPage()),
+          overrides: _base(AdminRole.superAdmin,
+              functions: fn,
+              orders: () => PagedListNotifier<PaymentOrder>((after) async {
+                    loads++;
+                    return AdminPage<PaymentOrder>(_orders, null, false);
+                  })));
+      expect(loads, 1);
+      await _tap(tester, find.byKey(const ValueKey('order_ord_paid_1')));
+      await _tap(tester, find.byKey(const ValueKey('order_refund')));
+      await tester.enterText(find.byKey(const ValueKey('refund_reason')), 'Двойная оплата');
+      await tester.pump();
+      await _tap(tester, find.byKey(const ValueKey('refund_confirm')));
+      expect(
+          find.text('Сервер не ответил вовремя — результат возврата неизвестен. '
+              'Проверьте заказ, прежде чем повторять.'),
+          findsOneWidget);
+      expect(loads, 2, reason: 'the list shows what the order says now');
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('status filter lists only matching orders', (tester) async {
       await _pump(tester, _shell(AdminSection.payments, const PaymentsPage()), overrides: _base(AdminRole.support));
       await _tap(tester, find.byKey(const ValueKey('orders_status')));
@@ -427,6 +567,37 @@ void main() {
       await _tap(tester, find.text('Выручка'));
       expect(find.text('0 сом'), findsWidgets);
       expect(find.textContaining('оплат на сайте не было'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('variants: per-attempt fresh variants', () {
+    testWidgets('a generated variant opened directly is read-only and labelled', (tester) async {
+      final doc = VariantDoc.fromMap('fresh_att1', {
+        'blueprint_id': 'ort_main_2026',
+        'blueprint_version': 1,
+        'number': 1,
+        'language': 'ru',
+        'status': 'generated',
+        'sections': [
+          {
+            'section_id': 'math',
+            'question_ids': ['q1', 'q2'],
+          },
+        ],
+      });
+      await _pump(tester, const VariantBuilderPage(variantId: 'fresh_att1'),
+          size: const Size(1280, 1400),
+          overrides: [
+            ..._base(AdminRole.superAdmin),
+            variantsRepoProvider.overrideWithValue(_OneVariantRepo(doc)),
+            examBankRepoProvider.overrideWithValue(_NoInfosBank()),
+          ]);
+      expect(find.byKey(const ValueKey('variant_generated_notice')), findsOneWidget);
+      expect(find.text('Собран для попытки'), findsOneWidget);
+      expect(find.text('Сохранить'), findsNothing);
+      expect(find.text('Опубликовать'), findsNothing);
+      expect(find.text('Снять с публикации'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });

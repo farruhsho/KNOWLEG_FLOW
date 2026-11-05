@@ -16,6 +16,7 @@ import {
   keyDoc,
   nestedArrayPaths,
   passageDoc,
+  POOL_FIELDS,
   questionDoc,
   remoteQuestionHash,
   toStoredTable,
@@ -71,9 +72,9 @@ describe('import (dry run plan)', () => {
     for (const secret of ['correct', 'explanation', 'wrong_option_notes', 'solution_steps', 'key', 'target', 'pipeline']) assert.equal(secret in q.data, false, secret);
     assert.deepEqual(Object.keys(k.data).sort(), ['correct', 'explanation', 'pipeline_hash', 'solution_steps', 'wrong_option_notes']);
     assert.deepEqual(Object.keys(q.data).sort(), [
-      'content_hash', 'content_version', 'created_at', 'difficulty', 'image_path', 'language', 'options', 'part_id', 'passage_id', 'pipeline_hash',
-      'pipeline_translation_group_id', 'review', 'section_id', 'source', 'stem', 'subject_id', 'subtopic_id', 'table', 'topic_id', 'translation_group_id', 'type',
-      'updated_at',
+      'assembly_excluded', 'blueprint_id', 'content_hash', 'content_version', 'created_at', 'dedup_excluded', 'difficulty', 'image_path', 'language', 'options',
+      'part_id', 'passage_id', 'passage_order', 'pipeline_hash', 'pipeline_translation_group_id', 'review', 'section_id', 'source', 'stem', 'subject_id',
+      'subtopic_id', 'table', 'topic_id', 'translation_group_id', 'type', 'updated_at',
     ]);
     assert.equal(q.data.pipeline_translation_group_id, q.data.translation_group_id, 'the link the pipeline wrote is recorded (CP-NEW-2)');
     assert.deepEqual(q.data.created_at, { __timestamp: byId.get(q.id)!.question.created_at });
@@ -109,6 +110,38 @@ describe('import (dry run plan)', () => {
     const parts = new Set(qs.map((o) => o.data.part_id));
     for (const p of ['math_comparison', 'math_problems', 'analogies', 'completion', 'reading', 'grammar']) assert.ok(parts.has(p), p);
     assert.ok(qs.filter((o) => o.data.type === 'quantitative_comparison').every((o) => o.data.part_id === 'math_comparison'));
+  });
+
+  it('writes the fields the server pool reads: blueprint_id, passage_order, dedup_excluded, assembly_excluded, passage layout', () => {
+    const plan = buildImportPlan(input(items, passages, files));
+    const qs = plan.ops.filter((o) => o.collection === 'exam_questions');
+    for (const op of qs) {
+      const it = byId.get(op.id)!;
+      assert.equal(op.data.blueprint_id, 'ort_main_2026', op.id);
+      assert.equal(op.data.passage_order, it.passage_order, op.id);
+      assert.equal(op.data.dedup_excluded, false, op.id);
+      assert.equal(op.data.assembly_excluded, false, op.id);
+    }
+    assert.ok(qs.some((o) => typeof o.data.passage_order === 'number'), 'passage questions carry their text order');
+    assert.ok(qs.some((o) => o.data.passage_order === null), 'standalone questions store null');
+    const ps = plan.ops.filter((o) => o.collection === 'exam_passages');
+    const layouts = new Map(passages.map((p) => [p.id, p.layout]));
+    for (const op of ps) assert.equal(op.data.layout, layouts.get(op.id), op.id);
+    assert.deepEqual([...new Set(ps.map((o) => o.data.layout))].sort(), ['paired', 'standalone']);
+
+    // The same rules as stage 6 (assemble.ts): non-canonical duplicates, external matches, failed translation checks.
+    const base = items[0]!;
+    const at = '2026-11-05T00:00:00.000Z';
+    const withDedup = (cluster_id: string, duplicate_of: string | null): BankItem => ({ ...base, pipeline: { ...base.pipeline, dedup: { at, cluster_id, duplicate_of, max_similarity: 0.9 } } });
+    assert.equal(questionDoc(withDedup('c_1', items[1]!.id)).dedup_excluded, true, 'non-canonical cluster member');
+    assert.equal(questionDoc(withDedup('c_1', null)).dedup_excluded, false, 'the canonical member stays');
+    assert.equal(questionDoc(withDedup('ext:ort_2019_v3_q12', null)).dedup_excluded, true, 'matches external content');
+    const translate = (status: 'passed' | 'failed'): BankItem => ({
+      ...base,
+      pipeline: { ...base.pipeline, translate_check: { at, counterpart_ids: [], structural_ok: status === 'passed', structural_problems: [], api: null, status } },
+    });
+    assert.equal(questionDoc(translate('failed')).assembly_excluded, true);
+    assert.equal(questionDoc(translate('passed')).assembly_excluded, false);
   });
 
   it('is idempotent: the same content gives the same ids and data', () => {
@@ -264,7 +297,11 @@ describe('import (commit)', () => {
       delete legacy.part_id;
       delete legacy.pipeline_hash;
       delete legacy.pipeline_translation_group_id;
-      if (op.collection === 'exam_passages') delete legacy.content_hash;
+      for (const f of POOL_FIELDS) delete legacy[f];
+      if (op.collection === 'exam_passages') {
+        delete legacy.content_hash;
+        delete legacy.layout;
+      }
       db.set(op.collection, op.id, legacy);
     }
     const r = await commitPlan(plan, db);
@@ -273,7 +310,42 @@ describe('import (commit)', () => {
     const q = plan.ops.find((o) => o.collection === 'exam_questions')!;
     assert.equal(db.get('exam_questions', q.id)!.part_id, q.data.part_id);
     assert.equal(db.get('exam_questions', q.id)!.pipeline_translation_group_id, q.data.translation_group_id);
+    for (const f of POOL_FIELDS) assert.deepEqual(db.get('exam_questions', q.id)![f], q.data[f], f);
+    const p = plan.ops.find((o) => o.collection === 'exam_passages')!;
+    assert.equal(db.get('exam_passages', p.id)!.layout, p.data.layout);
     assert.deepEqual(r.translation_links_kept, [], 'an unchanged link is not reported');
+  });
+
+  it('documents saved in the admin panel before the pool fields existed: in sync, not conflicts; caught-up questions get the pool fields (D11)', async () => {
+    const db = new FakeFirestore();
+    const plan = buildImportPlan(input(items, passages, files));
+    await commitPlan(plan, db);
+    const qs = plan.ops.filter((o) => o.collection === 'exam_questions' && o.data.passage_id !== null);
+    const [qa, qb] = qs.map((o) => o.id) as [string, string];
+    const at = { __timestamp: '2026-11-03T12:00:00.000Z' };
+    // qa: saved in the admin panel without a content change (marker set), written before the pool fields existed.
+    for (const f of POOL_FIELDS) delete db.get('exam_questions', qa)![f];
+    Object.assign(db.get('exam_questions', qa)!, { edited_in_cms_at: at, updated_by: 'uid_m' });
+    // qb: a stem edited in the admin panel and not ported: still held back as a whole.
+    for (const f of POOL_FIELDS) delete db.get('exam_questions', qb)![f];
+    Object.assign(db.get('exam_questions', qb)!, { stem: 'Правка методиста', edited_in_cms_at: at });
+    // A passage saved in the admin panel (same text) before `layout` existed.
+    const pid = passages[0]!.id;
+    delete db.get('exam_passages', pid)!.layout;
+    db.get('exam_passages', pid)!.updated_by = 'uid_m';
+
+    const r = await commitPlan(plan, db);
+    assert.deepEqual(r.cms_conflicts.map((c) => `${c.collection}/${c.id}`).sort(), [`exam_question_keys/${qb}`, `exam_questions/${qb}`]);
+    assert.deepEqual(r.cms_caught_up, [{ id: qa, pending_fields: [] }]);
+    const a = db.get('exam_questions', qa)!;
+    const planned = qs[0]!.data;
+    for (const f of POOL_FIELDS) assert.deepEqual(a[f], planned[f], `${qa}.${f} written with the take-back`);
+    assert.equal(a.updated_by, 'uid_m', 'nothing else of the admin-panel save is touched');
+    assert.equal('edited_in_cms_at' in a, false);
+    assert.equal(db.get('exam_questions', qb)!.stem, 'Правка методиста');
+    assert.equal('dedup_excluded' in db.get('exam_questions', qb)!, false, 'a held-back question is left exactly as it is');
+    assert.equal(db.get('exam_passages', pid)!.layout, passages[0]!.layout, 'the in-sync passage gets its layout');
+    assert.deepEqual(conflictReason('exam_passages', passageDoc(passages[0]!), { ...passageDoc(passages[0]!), layout: undefined, updated_by: 'uid_m' }), null);
   });
 
   it('does not revert documents edited in the admin panel; reports them; --overwrite replaces them (CP-04)', async () => {
@@ -501,9 +573,10 @@ describe('import (commit)', () => {
     assert.deepEqual(db.get('exam_question_keys', 'k'), { correct: 'A' });
   });
 
-  it('passage documents carry the content hash the pipeline wrote', () => {
+  it('passage documents carry the content hash the pipeline wrote and the layout', () => {
     const doc = passageDoc(passages[0]!);
     assert.equal(doc.content_hash, passages[0]!.content_hash);
     assert.equal(doc.pipeline_hash, passages[0]!.content_hash);
+    assert.equal(doc.layout, passages[0]!.layout);
   });
 });

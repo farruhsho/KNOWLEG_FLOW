@@ -104,6 +104,25 @@ export function parseWebProductsUpdate(raw: unknown, confirmBasePriceChange: unk
   return out;
 }
 
+/**
+ * admin_logs details of an adminUpdatePricing call with `webProducts`.
+ * Fields the call did not send are `null`, never `undefined` (Firestore
+ * rejects undefined values and the log entry would be lost).
+ */
+export function webPricingLogDetails(
+  before: Record<string, unknown> | null,
+  after: { products: Record<string, number> | null; freeExamsPerUser: number | null; webProducts: Record<string, WebProduct> },
+): Record<string, unknown> {
+  const base = after.webProducts[BASE_PRODUCT_ID];
+  return {
+    before: before
+      ? { products: before['products'] ?? null, free_exams_per_user: before['free_exams_per_user'] ?? null, web_products: before['web_products'] ?? null }
+      : null,
+    after: { products: after.products ?? null, free_exams_per_user: after.freeExamsPerUser ?? null, web_products: after.webProducts },
+    base_price_changed: !base || base.amount_som !== BASE_PRICE_SOM || base.credits !== 1,
+  };
+}
+
 /** PAYMENT_RETURN_ORIGINS (comma separated) -> normalized origins. */
 export function parseReturnOrigins(raw: string): string[] {
   return raw
@@ -204,6 +223,54 @@ export function decideWebhook(order: OrderState, event: Pick<WebhookEvent, 'stat
       if (order.granted) return { kind: 'refund', credits: order.credits };
       return { kind: 'refund_ungranted' };
   }
+}
+
+/**
+ * A refund reservation older than this is stale (the function died during the
+ * provider call, or the provider never answered): it may be taken again. The
+ * provider call is idempotent by orderId, so a retry cannot refund twice.
+ */
+export const REFUND_RESERVATION_STALE_MS = 10 * 60 * 1000;
+
+/** The parts of a payment_orders document an admin refund needs. */
+export interface RefundableOrder {
+  status: OrderStatus | string;
+  granted: boolean;
+  /** payment_orders.refund_requested is set (a refund is in flight or was asked of the provider). */
+  refund_requested: boolean;
+  /** refund_requested.at in ms; null when unknown (treated as fresh). */
+  refund_requested_at_ms?: number | null;
+  /** payment_orders.failure.code */
+  failure_code?: string | null;
+}
+
+export type AdminRefundPlan =
+  /** Provider refund, then the credits are clawed back (debt if spent). */
+  | { kind: 'clawback' }
+  /** Paid but never granted (paid after the account was deleted): provider refund only. */
+  | { kind: 'provider_only' };
+
+/**
+ * adminRefundOrder: only a `paid` order without a refund in flight.
+ * A second request while `refund_requested` is set is VALIDATION_FAILED
+ * {why: 'refund_in_progress'}; any other status is VALIDATION_FAILED
+ * {why: 'not_refundable', status}.
+ */
+export function planAdminRefund(order: RefundableOrder, nowMs = Date.now()): AdminRefundPlan {
+  if (order.status !== 'paid') {
+    throw new DomainError(Reasons.VALIDATION_FAILED, `order is ${order.status}`, { why: 'not_refundable', status: order.status }, 'failed-precondition');
+  }
+  if (order.refund_requested) {
+    const at = order.refund_requested_at_ms;
+    const stale = typeof at === 'number' && nowMs - at > REFUND_RESERVATION_STALE_MS;
+    if (!stale) {
+      throw new DomainError(Reasons.VALIDATION_FAILED, 'a refund of this order is already in progress', { why: 'refund_in_progress', status: order.status }, 'failed-precondition');
+    }
+  }
+  if (order.granted) return { kind: 'clawback' };
+  // Only the known case: paid after the account was deleted (no credits were given).
+  if (order.failure_code === 'account_deleted') return { kind: 'provider_only' };
+  throw new DomainError(Reasons.VALIDATION_FAILED, 'paid order without granted credits', { why: 'not_refundable', status: order.status }, 'failed-precondition');
 }
 
 /** payment_events document id: provider prefix + the provider's event id (hashed when not id-safe). */

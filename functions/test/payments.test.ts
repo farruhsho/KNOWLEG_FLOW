@@ -15,9 +15,13 @@ import {
   parseWebProducts,
   parseWebProductsUpdate,
   paymentEventId,
+  planAdminRefund,
+  REFUND_RESERVATION_STALE_MS,
   requireWebProduct,
   returnUrlFor,
+  webPricingLogDetails,
   type OrderState,
+  type RefundableOrder,
 } from '../src/payments/orders';
 import { adapterForOrder, projectIdOf, resolveAdapter, sandboxAllowed } from '../src/payments/registry';
 import { buildSandboxWebhook, parseSandboxWebhook, sandboxAdapter, sandboxSignature, SANDBOX_SIGNATURE_HEADER } from '../src/payments/sandbox';
@@ -101,7 +105,11 @@ describe('sandbox adapter', () => {
     assert.equal(url.searchParams.get('order'), 'ord1');
     assert.equal(url.searchParams.get('return'), 'http://localhost:8088/pay/return?order=ord1');
     assert.equal(c.providerRef, 'sbx_ord1');
-    assert.deepEqual(await sandboxAdapter.refund({ id: 'ord1', product_id: 'exam_single', credits: 1, amount_som: 100, currency: 'KGS', provider_ref: 'sbx_ord1' }), { status: 'refunded' });
+    assert.deepEqual(
+      await sandboxAdapter.refund({ id: 'ord1', product_id: 'exam_single', credits: 1, amount_som: 100, currency: 'KGS', provider_ref: 'sbx_ord1' }, { idempotencyKey: 'ord1' }),
+      { status: 'refunded' },
+    );
+    await assert.rejects(noneAdapter.refund({ id: 'ord1', product_id: 'exam_single', credits: 1, amount_som: 100, currency: 'KGS', provider_ref: null }, { idempotencyKey: 'ord1' }), PaymentsDisabled);
   });
 
   it('verifies the HMAC over the raw body', () => {
@@ -264,5 +272,68 @@ describe('decideWebhook', () => {
     assert.deepEqual(decideWebhook(order({ status: 'paid', granted: true, credits: 5 }), ev('refunded')), { kind: 'refund', credits: 5 });
     assert.deepEqual(decideWebhook(order(), ev('refunded')), { kind: 'refund_ungranted' });
     assert.deepEqual(decideWebhook(order({ status: 'refunded', granted: true }), ev('refunded')), { kind: 'noop', why: 'refunded' });
+  });
+});
+
+describe('planAdminRefund (adminRefundOrder reservation)', () => {
+  const o = (x: Partial<RefundableOrder> = {}): RefundableOrder => ({ status: 'paid', granted: true, refund_requested: false, ...x });
+
+  it('a granted paid order: provider refund + clawback', () => {
+    assert.deepEqual(planAdminRefund(o()), { kind: 'clawback' });
+  });
+
+  it('paid but never granted (paid after the account was deleted): provider refund only', () => {
+    assert.deepEqual(planAdminRefund(o({ granted: false, failure_code: 'account_deleted' })), { kind: 'provider_only' });
+  });
+
+  it('paid, not granted for any other reason (legacy / hand-edited): not refundable here', () => {
+    assert.equal(reasonOf(() => planAdminRefund(o({ granted: false }))), 'VALIDATION_FAILED:not_refundable');
+    assert.equal(reasonOf(() => planAdminRefund(o({ granted: false, failure_code: 'amount_mismatch' }))), 'VALIDATION_FAILED:not_refundable');
+  });
+
+  it('a stale reservation (function died mid-call) may be taken again; a fresh one may not', () => {
+    const now = 1_800_000_000_000;
+    assert.deepEqual(planAdminRefund(o({ refund_requested: true, refund_requested_at_ms: now - REFUND_RESERVATION_STALE_MS - 1 }), now), { kind: 'clawback' });
+    assert.equal(reasonOf(() => planAdminRefund(o({ refund_requested: true, refund_requested_at_ms: now - 60_000 }), now)), 'VALIDATION_FAILED:refund_in_progress');
+    assert.equal(reasonOf(() => planAdminRefund(o({ refund_requested: true, refund_requested_at_ms: null }), now)), 'VALIDATION_FAILED:refund_in_progress');
+  });
+
+  it('a second request while the refund is reserved / in flight: refund_in_progress', () => {
+    assert.equal(reasonOf(() => planAdminRefund(o({ refund_requested: true }))), 'VALIDATION_FAILED:refund_in_progress');
+    assert.equal(reasonOf(() => planAdminRefund(o({ granted: false, failure_code: 'account_deleted', refund_requested: true }))), 'VALIDATION_FAILED:refund_in_progress');
+    try {
+      planAdminRefund(o({ refund_requested: true }));
+    } catch (e) {
+      assert.ok(e instanceof DomainError);
+      assert.equal(e.code, 'failed-precondition');
+    }
+  });
+
+  it('anything but paid is not refundable (refunded, failed, pending, expired)', () => {
+    for (const status of ['refunded', 'failed', 'pending', 'created', 'expired']) {
+      assert.equal(reasonOf(() => planAdminRefund(o({ status }))), 'VALIDATION_FAILED:not_refundable', status);
+    }
+    assert.equal(reasonOf(() => planAdminRefund(o({ status: 'refunded', refund_requested: true }))), 'VALIDATION_FAILED:not_refundable');
+  });
+});
+
+describe('webPricingLogDetails (admin_logs of adminUpdatePricing with webProducts)', () => {
+  const hasUndefined = (v: unknown): boolean =>
+    v === undefined || (typeof v === 'object' && v !== null && Object.values(v as Record<string, unknown>).some(hasUndefined));
+  const web = { exam_single: { credits: 1, amount_som: 100, enabled: true } };
+
+  it('a webProducts-only call logs null (never undefined) for the fields it did not send', () => {
+    const d = webPricingLogDetails(null, { products: null, freeExamsPerUser: null, webProducts: web });
+    assert.equal(hasUndefined(d), false);
+    assert.deepEqual(d, { before: null, after: { products: null, free_exams_per_user: null, web_products: web }, base_price_changed: false });
+    const withBefore = webPricingLogDetails({ web_products: { exam_single: { credits: 1, amount_som: 90, enabled: true } } }, { products: null, freeExamsPerUser: null, webProducts: web });
+    assert.equal(hasUndefined(withBefore), false);
+    assert.deepEqual(withBefore['before'], { products: null, free_exams_per_user: null, web_products: { exam_single: { credits: 1, amount_som: 90, enabled: true } } });
+  });
+
+  it('logs the products / free exams when sent and flags a base price change', () => {
+    const d = webPricingLogDetails(null, { products: { exam_single: 1 }, freeExamsPerUser: 2, webProducts: { exam_single: { credits: 1, amount_som: 120, enabled: true } } });
+    assert.deepEqual(d['after'], { products: { exam_single: 1 }, free_exams_per_user: 2, web_products: { exam_single: { credits: 1, amount_som: 120, enabled: true } } });
+    assert.equal(d['base_price_changed'], true);
   });
 });

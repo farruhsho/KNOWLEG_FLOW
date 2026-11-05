@@ -31,6 +31,7 @@ void main() {
     String location = '${RoutePaths.payReturn}?order=ord_7',
     BillingMode mode = BillingMode.web,
     Uri? pageUri,
+    bool webAvailable = true,
   }) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
@@ -53,6 +54,7 @@ void main() {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         billingModeProvider.overrideWithValue(mode),
+        webPaymentsAvailableProvider.overrideWithValue(webAvailable),
         webPaymentGatewayProvider.overrideWithValue(gateway),
         pendingWebOrderStoreProvider.overrideWithValue(pending),
         webPageUriProvider.overrideWithValue(
@@ -176,6 +178,23 @@ void main() {
     await tester.pump();
     expect(find.byKey(const ValueKey('pay_return_error')), findsOneWidget);
     expect(find.byKey(const ValueKey('pay_return_check_again')), findsOneWidget);
+  });
+
+  testWidgets('no App Check site key (D7): says so at once, never polls', (tester) async {
+    pending.value = 'ord_7';
+    gateway.orderScript = const [WebOrderState(status: 'paid', credits: 1, balance: 1)];
+    await pumpPage(tester, webAvailable: false);
+    expect(find.byKey(const ValueKey('pay_return_unavailable')), findsOneWidget);
+    expect(find.byKey(const ValueKey('pay_return_checking')), findsNothing);
+    expect(find.text('Проверка оплаты здесь недоступна'), findsOneWidget);
+    expect(find.textContaining('кредиты начислятся автоматически'), findsOneWidget);
+    expect(find.text('Баланс: 3 кредита'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 10));
+    expect(gateway.polled, isEmpty);
+    expect(pending.value, 'ord_7', reason: 'the order is kept for a later check');
+    await tester.tap(find.text('К балансу'));
+    await tester.pumpAndSettle();
+    expect(find.text('STORE_PAGE'), findsOneWidget);
   });
 
   testWidgets('not a web build: neutral page, the server is never asked', (tester) async {

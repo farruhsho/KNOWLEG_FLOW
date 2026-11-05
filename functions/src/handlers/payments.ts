@@ -10,7 +10,8 @@
  * payment_orders/{orderId} = {uid, product_id, credits, amount_som, currency: 'KGS',
  *   provider, status: created|pending|paid|failed|expired|refunded, provider_ref,
  *   checkout_url, return_url, created_at, updated_at, expires_at, paid_at, granted,
- *   refund: null|{at, source: provider|admin, credits_clawed_back, ...}, failure?}
+ *   refund: null|{at, source: provider|admin, credits_clawed_back, ...},
+ *   refund_requested?: {id, at, by, reason} (adminRefundOrder reservation), failure?}
  * payment_events/{provider}_{eventId} = {provider, provider_event_id, order_id,
  *   status, amount_som, currency, result, received_at}  (no uid; idempotency)
  * payment_attempts/{uid}_{yyyy-mm-dd} = {uid, day, count}  (≤ 10 orders a day)
@@ -22,6 +23,7 @@
  * A refund uses the same clawback (debt if spent, referral bonuses too).
  */
 import '../config';
+import { randomUUID } from 'node:crypto';
 import type { DocumentReference, DocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { HttpsError, onCall, onRequest, type CallableRequest } from 'firebase-functions/v2/https';
@@ -31,7 +33,7 @@ import { parseEntitlement } from '../domain/entitlements';
 import { sha256Hex } from '../domain/hash';
 import { DomainError, Reasons } from '../domain/reasons';
 import { bishkekDayKey } from '../domain/time';
-import { bool, int, num, str } from '../domain/types';
+import { bool, int, isRecord, num, str } from '../domain/types';
 import {
   checkReturnUrl,
   decideWebhook,
@@ -43,6 +45,7 @@ import {
   parseWebProducts,
   paymentAttemptsId,
   paymentEventId,
+  planAdminRefund,
   requireWebProduct,
   returnUrlFor,
   type OrderState,
@@ -92,11 +95,17 @@ interface StoredOrder extends OrderState {
   provider: string;
   provider_ref: string | null;
   return_url: string | null;
+  /** payment_orders.refund_requested.id when a refund is reserved / asked of the provider. */
+  refund_request_id: string | null;
+  /** payment_orders.refund_requested.at in ms (null when missing). */
+  refund_requested_at_ms: number | null;
+  failure_code: string | null;
 }
 
 function parseOrder(snap: DocumentSnapshot): StoredOrder | null {
   if (!snap.exists) return null;
   const d = snap.data() ?? {};
+  const requested = isRecord(d['refund_requested']) ? d['refund_requested'] : d['refund_requested'] ? {} : null;
   return {
     id: snap.id,
     uid: str(d['uid']),
@@ -109,8 +118,19 @@ function parseOrder(snap: DocumentSnapshot): StoredOrder | null {
     amount_som: num(d['amount_som']),
     currency: str(d['currency'], ORDER_CURRENCY),
     credits: int(d['credits']),
+    refund_request_id: requested ? str(requested['id'], 'legacy') : null,
+    refund_requested_at_ms: requested && requested['at'] instanceof Timestamp ? requested['at'].toMillis() : null,
+    failure_code: isRecord(d['failure']) && typeof d['failure']['code'] === 'string' ? d['failure']['code'] : null,
   };
 }
+
+const refundableOf = (o: StoredOrder) => ({
+  status: o.status,
+  granted: o.granted,
+  refund_requested: o.refund_request_id !== null,
+  refund_requested_at_ms: o.refund_requested_at_ms,
+  failure_code: o.failure_code,
+});
 
 function checkoutOrder(o: StoredOrder): CheckoutOrder {
   return { id: o.id, product_id: o.product_id, credits: o.credits, amount_som: o.amount_som, currency: ORDER_CURRENCY, provider_ref: o.provider_ref };
@@ -415,6 +435,16 @@ export const paymentWebhook = onRequest({ secrets: [PAYMENT_PROVIDER_SECRET], ti
 
 // ---------------------------------------------------------------------------
 // adminRefundOrder {orderId, reason} -> {status, creditsClawedBack}
+//
+// The refund is reserved in a transaction BEFORE the provider is called
+// (payment_orders.refund_requested {id, at, by, reason}), so a second request
+// (double click, retry after a timeout) is VALIDATION_FAILED
+// {why: 'refund_in_progress'} and never refunds twice; the provider gets the
+// order id as idempotency key. A provider error releases the reservation (the
+// retry is safe: same idempotency key). `pending` keeps it: the `refunded`
+// webhook claws back. A paid order that was never granted (paid after the
+// account was deleted, failure.code account_deleted) is refunded at the
+// provider only: no credits to claw back.
 
 export const adminRefundOrder = onCall(
   adminCallableOptions({ secrets: [PAYMENT_PROVIDER_SECRET] }),
@@ -423,30 +453,76 @@ export const adminRefundOrder = onCall(
     const data = payload(req);
     const orderId = reqId(data['orderId'], 'orderId');
     const reason = reqString(data['reason'], 'reason', 3, 200);
-    const order = parseOrder(await orderRef(orderId).get());
+    const ref = orderRef(orderId);
+    const order = parseOrder(await ref.get());
     if (!order) throw orderNotFound();
-    if (order.status !== 'paid' || !order.granted) {
-      throw new DomainError(Reasons.VALIDATION_FAILED, `order is ${order.status}`, { why: 'not_refundable', status: order.status }, 'failed-precondition');
-    }
+    planAdminRefund(refundableOf(order));
     const adapter = adapterForOrder(order.provider, process.env);
     if (!adapter) throw new DomainError(Reasons.PAYMENTS_DISABLED, 'the provider of this order is not configured', { why: 'provider_unavailable' });
-    const r = await adapter.refund(checkoutOrder(order));
+
+    // 1. Reserve (authoritative re-check inside the transaction).
+    const requestId = randomUUID();
+    const reserved = await db().runTransaction(async (tx) => {
+      const current = parseOrder(await tx.get(ref));
+      if (!current) throw orderNotFound();
+      const plan = planAdminRefund(refundableOf(current));
+      // Only {id, at} on the order (its owner can read it); who and why go to admin_logs.
+      tx.set(ref, { refund_requested: { id: requestId, at: FieldValue.serverTimestamp() }, updated_at: FieldValue.serverTimestamp() }, { merge: true });
+      return { order: current, plan };
+    });
+
+    // 2. Provider refund, at most once per order.
+    let r;
+    try {
+      r = await adapter.refund(checkoutOrder(reserved.order), { idempotencyKey: orderId });
+    } catch (e) {
+      await db()
+        .runTransaction(async (tx) => {
+          const snap = await tx.get(ref);
+          const current = parseOrder(snap);
+          if (current && current.status === 'paid' && current.refund_request_id === requestId) {
+            tx.set(ref, { refund_requested: FieldValue.delete(), updated_at: FieldValue.serverTimestamp() }, { merge: true });
+          }
+        })
+        .catch((err: unknown) => logger.error('refund reservation not released', { orderId, error: String(err) }));
+      if (e instanceof PaymentsDisabled) throw disabled({ adapter, enabled: false, why: 'none' });
+      logger.error('provider refund failed', { orderId, provider: order.provider, error: String(e) });
+      throw new HttpsError('unavailable', 'The payment provider did not confirm the refund, please retry.');
+    }
+
+    // 3. Done now: claw back (granted) or just close (never granted); pending: the webhook does it.
     let clawedBack = 0;
     let status: 'refunded' | 'pending' = 'pending';
     if (r.status === 'refunded') {
       const out = await db().runTransaction(async (tx) => {
-        const snap = await tx.get(orderRef(orderId));
+        const snap = await tx.get(ref);
         const current = parseOrder(snap);
-        if (!current || current.status === 'refunded' || !current.granted) return null; // a webhook was faster
-        return refundOrderInTx(tx, snap, current, 'admin', actor.uid);
+        if (!current || current.status === 'refunded') return null; // a webhook was faster
+        if (current.granted) return refundOrderInTx(tx, snap, current, 'admin', actor.uid);
+        tx.set(
+          ref,
+          {
+            status: 'refunded',
+            refund: { at: FieldValue.serverTimestamp(), source: 'admin', credits_clawed_back: 0, debt_added: 0 },
+            updated_at: FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+        return { clawedBack: 0, newDebt: 0 };
       });
       clawedBack = out?.clawedBack ?? 0;
       status = 'refunded';
-    } else {
-      // The provider confirms asynchronously: the `refunded` webhook claws back.
-      await orderRef(orderId).set({ refund_requested: { at: FieldValue.serverTimestamp(), by: actor.uid, reason }, updated_at: FieldValue.serverTimestamp() }, { merge: true });
     }
-    await writeAdminLog(actor, 'refund_order', { orderId }, { reason, provider: order.provider, status, credits_clawed_back: clawedBack, uid: order.uid });
+    await writeAdminLog(actor, 'refund_order', { orderId }, {
+      reason,
+      provider: order.provider,
+      status,
+      kind: reserved.plan.kind,
+      refund_request_id: requestId,
+      failure_code: reserved.order.failure_code,
+      credits_clawed_back: clawedBack,
+      uid: order.uid,
+    });
     return { status, creditsClawedBack: clawedBack };
   }),
 );

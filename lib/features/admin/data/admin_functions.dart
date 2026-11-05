@@ -106,11 +106,21 @@ class AdminFunctions {
     return _call(BackendFunctions.adminUpdateExamPool, update);
   }
 
+  /// Client timeout of `adminRefundOrder`: the function waits for the
+  /// provider's refund call before it answers, so the default 30 s is too
+  /// short. A timeout does not mean the refund failed (see
+  /// `isRefundOutcomeUnknown`).
+  static const Duration refundOrderTimeout = Duration(seconds: 90);
+
   /// `adminRefundOrder({orderId, reason})` (§10.3, super_admin). `refunded`:
   /// the provider refunded at once and the credits were clawed back;
   /// `pending`: the provider confirms later (its webhook claws back).
   Future<RefundOrderResult> refundOrder(String orderId, String reason) async {
-    final r = await _call(BackendFunctions.adminRefundOrder, {'orderId': orderId, 'reason': reason});
+    final r = await _call(
+      BackendFunctions.adminRefundOrder,
+      {'orderId': orderId, 'reason': reason},
+      timeout: refundOrderTimeout,
+    );
     final clawed = r['creditsClawedBack'];
     return RefundOrderResult(
       status: (r['status'] ?? '').toString(),

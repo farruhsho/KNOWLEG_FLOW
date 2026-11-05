@@ -3,13 +3,18 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_flow/core/backend/backend_contract.dart';
+import 'package:knowledge_flow/core/routes/route_paths.dart';
 import 'package:knowledge_flow/features/admin/admin_routes.dart';
 import 'package:knowledge_flow/features/admin/data/admin_functions.dart';
+import 'package:knowledge_flow/features/admin/data/models/admin_records.dart';
+import 'package:knowledge_flow/features/admin/data/repositories/exam_repositories.dart';
 import 'package:knowledge_flow/features/admin/domain/admin_nav.dart';
 import 'package:knowledge_flow/features/admin/domain/admin_role.dart';
 import 'package:knowledge_flow/features/admin/domain/exam_pool.dart';
 import 'package:knowledge_flow/features/admin/domain/payment_order.dart';
 import 'package:knowledge_flow/features/admin/domain/pricing_config.dart';
+import 'package:knowledge_flow/features/admin/presentation/pages/variants_page.dart';
+import 'package:knowledge_flow/features/admin/presentation/pages/web_payments_page.dart';
 import 'package:knowledge_flow/features/admin/presentation/widgets/admin_widgets.dart';
 import 'package:knowledge_flow/l10n/app_localizations_ru.dart';
 
@@ -186,7 +191,9 @@ void main() {
         expect(o(s).canRefund, isFalse, reason: s);
       }
       expect(o('paid', granted: false).canRefund, isFalse);
+      expect(o('paid', granted: false).paidWithoutCredits, isFalse);
       expect(o('paid').canRefund, isTrue);
+      expect(o('paid').paidWithoutCredits, isFalse);
       expect(kPaymentOrderStatuses.toSet(), {
         ...PaymentOrderStatuses.terminal,
         PaymentOrderStatuses.created,
@@ -209,11 +216,37 @@ void main() {
         'refund_requested': {'at': DateTime.utc(2026, 11, 5), 'by': 'admin1', 'reason': 'двойная оплата'},
       });
       expect(requested.refundPending, isTrue);
-      expect(requested.canRefund, isTrue, reason: 'a pending provider refund may be requested again');
+      expect(requested.canRefund, isFalse,
+          reason: 'the server answers refund_in_progress to a second request');
       expect(requested.refundRequested!.reason, 'двойная оплата');
       final failed = PaymentOrder.fromMap('f', {'status': 'failed', 'failure': {'code': 'amount_mismatch'}});
       expect(failed.failureCode, 'amount_mismatch');
       expect(PaymentOrder.fromMap('e', null).status, 'created');
+    });
+
+    test('paid for a deleted account: refundable without a clawback', () {
+      final o = PaymentOrder.fromMap('d', {
+        'status': 'paid',
+        'granted': false,
+        'amount_som': 100,
+        'failure': {'code': 'account_deleted'},
+      });
+      expect(o.paidWithoutCredits, isTrue);
+      expect(o.canRefund, isTrue);
+      final asked = PaymentOrder.fromMap('d2', {
+        'status': 'paid',
+        'granted': false,
+        'failure': {'code': 'account_deleted'},
+        'refund_requested': {'at': DateTime.utc(2026, 11, 5), 'by': 'admin1', 'reason': 'удалён'},
+      });
+      expect(asked.canRefund, isFalse);
+      final refunded = PaymentOrder.fromMap('d3', {
+        'status': 'refunded',
+        'granted': false,
+        'failure': {'code': 'account_deleted'},
+      });
+      expect(refunded.paidWithoutCredits, isFalse);
+      expect(refunded.canRefund, isFalse);
     });
 
     test('the refund reason is trimmed and 3..200 long', () {
@@ -343,7 +376,8 @@ void main() {
 
   group('roles and navigation (§2, §10)', () {
     test('the pool page follows adminExamPoolHealth (edit_questions)', () {
-      expect(AdminSection.examPool.path, '/admin/exam-pool');
+      expect(RoutePaths.adminExamPool, '/admin/exam-pool');
+      expect(AdminSection.examPool.path, RoutePaths.adminExamPool);
       expect(AdminSection.forPath('/admin/exam-pool'), AdminSection.examPool);
       expect(_paths(adminRoutes), contains('/admin/exam-pool'));
       final visible = {for (final r in AdminRole.values) if (AdminSection.examPool.visibleTo(r)) r};
@@ -358,6 +392,29 @@ void main() {
         expect(AdminSection.pricing.visibleTo(r), sa, reason: r.wire);
         expect(AdminSection.payments.visibleTo(r), sa || r == AdminRole.support, reason: r.wire);
       }
+    });
+  });
+
+  group('per-attempt fresh variants in the CMS (§10.1)', () {
+    test('the variants list asks only for library statuses by default', () {
+      expect(variantListStatuses(null), ['draft', 'in_review', 'published', 'archived']);
+      expect(variantListStatuses(null), isNot(contains(VariantDoc.generatedStatus)));
+      expect(variantListStatuses('published'), ['published']);
+      expect(VariantDoc.statuses, isNot(contains('generated')),
+          reason: 'the status filter does not offer it either');
+    });
+
+    test('a generated variant is recognised and labelled', () {
+      final v = VariantDoc.fromMap('fresh_att1', {
+        'blueprint_id': 'ort_main_2026',
+        'status': 'generated',
+        'source': 'fresh',
+        'generated_for': 'u1',
+      });
+      expect(v.isGenerated, isTrue);
+      expect(v.isPublished, isFalse);
+      expect(variantStatusLabel(l, v.status), l.adminVariantGenerated);
+      expect(variantStatusTone(v.status), AdminTone.neutral);
     });
   });
 
@@ -387,6 +444,9 @@ void main() {
       final r = await AdminFunctions(fns).refundOrder('o1', 'двойная оплата');
       expect(fns.calls.single.name, BackendFunctions.adminRefundOrder);
       expect(fns.calls.single.data, {'orderId': 'o1', 'reason': 'двойная оплата'});
+      expect(fns.calls.single.timeout, AdminFunctions.refundOrderTimeout);
+      expect(AdminFunctions.refundOrderTimeout, greaterThanOrEqualTo(const Duration(seconds: 75)),
+          reason: 'the function waits for the provider before it answers');
       expect(r.refunded, isTrue);
       expect(r.creditsClawedBack, 5);
       fns.response = {'status': 'pending', 'creditsClawedBack': 0};
@@ -409,14 +469,23 @@ void main() {
     test('refund, provider, pool and pricing reasons get dedicated texts', () {
       expect(adminErrorMessage(l, err('not-found', {'reason': 'ORDER_NOT_FOUND'}), appCheckAvailable: true),
           l.adminOrderErrNotFound);
+      // This order's provider is not connected (others may be): refund it there.
       expect(
           adminErrorMessage(l, err('failed-precondition', {'reason': 'PAYMENTS_DISABLED', 'why': 'provider_unavailable'}),
               appCheckAvailable: true),
+          l.adminOrderErrProviderUnavailable);
+      expect(l.adminOrderErrProviderUnavailable, contains('напрямую у этого провайдера'));
+      expect(
+          adminErrorMessage(l, err('failed-precondition', {'reason': 'PAYMENTS_DISABLED'}), appCheckAvailable: true),
           l.adminOrderErrProvider);
       expect(
           adminErrorMessage(l, err('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': 'not_refundable', 'status': 'refunded'}),
               appCheckAvailable: true),
           l.adminOrderErrNotRefundable);
+      expect(
+          adminErrorMessage(l, err('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': 'refund_in_progress', 'status': 'paid'}),
+              appCheckAvailable: true),
+          l.adminOrderErrRefundInProgress);
       expect(
           adminErrorMessage(l, err('invalid-argument', {'reason': 'VALIDATION_FAILED', 'why': 'base_price_change_unconfirmed'}),
               appCheckAvailable: true),
@@ -429,6 +498,17 @@ void main() {
           adminErrorMessage(l, err('invalid-argument', {'reason': 'VALIDATION_FAILED', 'field': 'language'}),
               appCheckAvailable: true),
           l.adminPoolErrLanguage);
+    });
+
+    test('a refund that timed out has an unknown outcome', () {
+      final timeout = FirebaseFunctionsException(code: 'deadline-exceeded', message: 'm');
+      expect(isRefundOutcomeUnknown(timeout), isTrue);
+      expect(refundOrderErrorMessage(l, timeout), l.adminOrderRefundUnknown);
+      expect(l.adminOrderRefundUnknown, contains('Проверьте заказ, прежде чем повторять'));
+      final denied = err('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': 'refund_in_progress'});
+      expect(isRefundOutcomeUnknown(denied), isFalse);
+      expect(refundOrderErrorMessage(l, denied), l.adminOrderErrRefundInProgress);
+      expect(isRefundOutcomeUnknown(FirebaseFunctionsException(code: 'unavailable', message: 'm')), isFalse);
     });
 
     test('access denied: rules, role refusals, but never a banned account', () {

@@ -19,10 +19,13 @@
  *    structure, a repeat is not a new variant.
  *  - Order inside a part: standalone items from easy to hard (difficulty
  *    ascending, seeded tie-break), then the passage groups — standalone texts
- *    (easier first) before paired ones — each in text order (passage_order).
+ *    (easier first) before paired ones — each in text order (passage_order;
+ *    questions without one after, by id).
  *  - Items whose topic is not in the part's matrix are never used.
- *  - Passages without a stored `layout` may fill either kind of text slot,
- *    after the passages whose layout is known.
+ *  - Passages with an `unknown` layout may fill either kind of text slot,
+ *    after the passages whose layout is known. The server never passes
+ *    `unknown`: it infers missing layouts first (exam_pool.ts
+ *    inferPassageLayouts).
  *
  * Deterministic: the same pool (as a set), seen map and seed give the same
  * variant.
@@ -70,6 +73,10 @@ export interface PoolItem {
   /** Position of the question in its passage (text order); null = unknown. */
   passage_order: number | null;
   review_status: string;
+  /** exam_questions.subtopic_id (passage layout inference, exam_pool.ts). */
+  subtopic_id?: string | null;
+  /** Option ids the answer key must name (set when the blueprint part checks ran). */
+  answer_ids?: readonly string[];
 }
 
 export type PassageLayout = 'standalone' | 'paired' | 'unknown';
@@ -162,12 +169,14 @@ function difficultyOf(it: PoolItem): number {
   return it.difficulty;
 }
 
-/** Text order inside a passage (passage_order, then difficulty, then the seeded key). */
-function textOrder(run: PartRun) {
+/**
+ * Text order inside a passage: passage_order; questions without one come
+ * after, in a stable order by id (never by seed or difficulty, so the text
+ * order does not change between attempts).
+ */
+function textOrder() {
   return (a: PoolItem, b: PoolItem): number =>
-    (a.passage_order ?? Number.MAX_SAFE_INTEGER) - (b.passage_order ?? Number.MAX_SAFE_INTEGER) ||
-    a.difficulty - b.difficulty ||
-    run.keyOf(a.id).localeCompare(run.keyOf(b.id));
+    (a.passage_order ?? Number.MAX_SAFE_INTEGER) - (b.passage_order ?? Number.MAX_SAFE_INTEGER) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 }
 
 interface PassageCandidate {
@@ -192,7 +201,7 @@ function pickPassageGroups(run: PartRun, pool: PoolItem[]): { groups: PoolItem[]
     if (list) list.push(it);
     else byPassage.set(it.passage_id, [it]);
   }
-  const order = textOrder(run);
+  const order = textOrder();
   const candidates: PassageCandidate[] = [...byPassage.entries()]
     .map(([pid, items]) => ({
       pid,

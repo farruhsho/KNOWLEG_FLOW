@@ -5,8 +5,10 @@
 //  - strict ORT style: SECTION_NOT_OVER before the deadline, flags ignored;
 //  - web payments with the emulator-only `sandbox` provider: order -> checkout
 //    page -> signed webhook -> credits, idempotent replay, wrong amount, cancel,
-//    refunds (admin + provider) with clawback, referral reward via the shared
-//    Google Play logic, ORDER_NOT_FOUND, 10 orders/day, account deletion.
+//    refunds (admin + provider) with clawback, a refund in progress refused,
+//    a paid-but-never-granted order refunded without clawback, referral
+//    reward via the shared Google Play logic, ORDER_NOT_FOUND, 10 orders/day,
+//    account deletion; adminUpdatePricing (webProducts only) logged.
 // PAYMENTS_DISABLED cannot happen here (the emulator runs the sandbox): it is
 // covered by functions/test/payments.test.ts.
 //
@@ -274,6 +276,8 @@ test('fresh: the generated variant completes, scores and reviews like a library 
 
 test('fresh: without free exams or credits a new fresh attempt is NO_ENTITLEMENT', async () => {
   await expectReason(freshStart(), 'NO_ENTITLEMENT');
+  // Checked before the pool is loaded: the 5-question biology pool would be POOL_TOO_SMALL.
+  await expectReason(call('examStart')({ mode: 'fresh', blueprintId: BIO, language: 'ru' }), 'NO_ENTITLEMENT');
 });
 
 // ---------------------------------------------------------------- web payments (sandbox)
@@ -379,6 +383,12 @@ test('POOL_TOO_SMALL charges nothing and names the part', async () => {
   await expectReason(call('examStart')({ mode: 'fresh', blueprintId: CHEM, language: 'de' }), 'VALIDATION_FAILED');
   await expectReason(call('examStart')({ mode: 'fresh', blueprintId: 'ort_state_language_2026', language: 'ru' }), 'VALIDATION_FAILED');
   await expectReason(call('examStart')({ mode: 'fresh', blueprintId: CHEM, language: 'ru', examStyle: 'turbo' }), 'VALIDATION_FAILED');
+  // An unknown blueprint is VARIANT_NOT_AVAILABLE {why}; the English subject test takes `en` (no en pool here).
+  const unknown = await expectReason(call('examStart')({ mode: 'fresh', blueprintId: 'ort_no_such_2026', language: 'ru' }), 'VARIANT_NOT_AVAILABLE');
+  assert.equal(unknown.details.why, 'blueprint_not_found');
+  const en = await expectReason(call('examStart')({ mode: 'fresh', blueprintId: 'ort_subject_english_2026', language: 'en' }), 'POOL_TOO_SMALL');
+  assert.equal(en.details.section_id, 'english');
+  assert.equal((await entitlement(buyerUid)).credits, before.credits, 'still nothing charged');
 });
 
 test('config/exam_pool: super_admin switches fresh variants; pool health for content roles', async () => {
@@ -396,9 +406,28 @@ test('config/exam_pool: super_admin switches fresh variants; pool health for con
   assert.equal(part.available_by_status.methodologist_approved >= part.eligible, true);
   assert.equal(health.disjoint_variants, 1, '1.5 variants worth of questions = 1 disjoint variant');
   assert.ok(health.shortfalls.length > 0 && health.shortfalls.every((s) => s.kind === 'cell'), 'what is missing for variant 2');
-  assert.equal((await call('adminExamPoolHealth')({ blueprintId: BIO, language: 'ru' })).disjoint_variants, 0);
+  const bio = await call('adminExamPoolHealth')({ blueprintId: BIO, language: 'ru' });
+  assert.equal(bio.disjoint_variants, 0);
+  // The biology scraps have 2 options where the part needs 4: they fail the per-question checks.
+  assert.equal(bio.sections[0].parts[0].available_by_status.methodologist_approved, 0);
   const logs = await db.collection('admin_logs').where('action', '==', 'update_exam_pool').get();
   assert.equal(logs.size, 1);
+
+  // adminUpdatePricing with only webProducts (the web pricing page) is logged too (no undefined in the details).
+  const web = {
+    exam_single: { credits: 1, amountSom: 100, enabled: true },
+    exam_pack_5: { credits: 5, amountSom: 450, enabled: false },
+    exam_pack_10: { credits: 10, amountSom: 800, enabled: false },
+  };
+  assert.deepEqual(await call('adminUpdatePricing')({ webProducts: web }), { ok: true });
+  const pricingLogs = (await db.collection('admin_logs').where('action', '==', 'update_pricing').get()).docs.map((d) => d.get('details'));
+  const webOnly = pricingLogs.find((d) => d?.after?.products === null);
+  assert.ok(webOnly, 'an update_pricing admin_logs entry for the webProducts-only call');
+  assert.deepEqual([webOnly.after.free_exams_per_user, webOnly.base_price_changed], [null, false]);
+  assert.deepEqual(webOnly.after.web_products.exam_single, { credits: 1, amount_som: 100, enabled: true });
+  const pricing = (await db.doc('config/pricing').get()).data();
+  assert.equal(pricing.free_exams_per_user, 1, 'fields not sent are untouched');
+  assert.deepEqual(pricing.web_products.exam_single, { credits: 1, amount_som: 100, enabled: true });
 
   await signInAs(BUYER);
   const off = await expectReason(freshStart(), 'VARIANT_NOT_AVAILABLE');
@@ -435,12 +464,35 @@ test('refunds: adminRefundOrder and a provider `refunded` webhook claw back (deb
   await expectReason(call('adminRefundOrder')({ orderId: orders.wrongAmount, reason: 'never paid' }), 'VALIDATION_FAILED');
   await expectReason(call('adminRefundOrder')({ orderId: 'no_such_order', reason: 'missing' }), 'ORDER_NOT_FOUND');
   assert.ok((await db.collection('admin_logs').where('action', '==', 'refund_order').get()).size >= 1);
+
+  // A refund already asked of the provider (reserved, waiting for its webhook): a second request is refused.
+  await db.doc(`payment_orders/${orders.second}`).set({ refund_requested: { id: 'e2e_pending', by: 'e2e', reason: 'pending at the provider' } }, { merge: true });
+  const busy = await expectReason(call('adminRefundOrder')({ orderId: orders.second, reason: 'twice' }), 'VALIDATION_FAILED');
+  assert.equal(busy.details.why, 'refund_in_progress');
+
+  // Paid after the account was deleted (never granted): the provider refund only, nothing to claw back.
+  const ungranted = 'e2e_p4_paid_ungranted';
+  await db.doc(`payment_orders/${ungranted}`).set({
+    uid: 'deleted:e2e', product_id: 'exam_single', credits: 1, amount_som: 100, currency: 'KGS', provider: 'sandbox',
+    status: 'paid', granted: false, provider_ref: `sbx_${ungranted}`, failure: { code: 'account_deleted' }, refund: null,
+    created_at: AdminTimestamp.now(),
+  });
+  assert.deepEqual(await call('adminRefundOrder')({ orderId: ungranted, reason: 'paid after deletion' }), { status: 'refunded', creditsClawedBack: 0 });
+  const closed = (await db.doc(`payment_orders/${ungranted}`).get()).data();
+  assert.deepEqual([closed.status, closed.refund.source, closed.refund.credits_clawed_back], ['refunded', 'admin', 0]);
+  assert.deepEqual(Object.keys(closed.refund_requested).sort(), ['at', 'id'], 'the owner-readable order keeps no admin uid or reason');
+  assert.equal((await expectReason(call('adminRefundOrder')({ orderId: ungranted, reason: 'again' }), 'VALIDATION_FAILED')).details.why, 'not_refundable');
+  const ungrantedLog = (await db.collection('admin_logs').where('action', '==', 'refund_order').get()).docs.find((d) => d.get('target').orderId === ungranted);
+  assert.equal(ungrantedLog?.get('details').kind, 'provider_only');
+  assert.equal(ungrantedLog?.get('details').reason, 'paid after deletion');
+
   await signInAs(BUYER);
   assert.equal(await credits(buyerUid), 0);
   const refunded = (await db.doc(`payment_orders/${orders.first}`).get()).data();
   assert.deepEqual([refunded.status, refunded.refund.source, refunded.refund.credits_clawed_back], ['refunded', 'admin', 1]);
+  assert.equal(typeof refunded.refund_requested?.id, 'string', 'the refund was reserved before the provider was called');
 
-  // The provider refunds the second order: the credit is already spent -> debt.
+  // The provider refunds the second order (the admin request above was pending there): the credit is already spent -> debt.
   const w = await postWebhook({ eventId: 'e2e_p4_evt_refund_2', orderId: orders.second, status: 'refunded', amountSom: 100 });
   assert.equal(w.body?.result, 'refunded');
   const ent = await entitlement(buyerUid);

@@ -48,14 +48,38 @@ export interface ValidationInput {
 }
 
 /** Analogy/completion/text-based items may be stored as plain single_choice. */
-function typeMatches(part: BlueprintPart, questionType: string): boolean {
+export function typeMatches(part: BlueprintPart, questionType: string): boolean {
   if (part.item_type === questionType) return true;
   return questionType === 'single_choice' && part.item_type !== 'quantitative_comparison';
 }
 
-function allowedOptionIds(part: BlueprintPart, q: ExamQuestion): string[] {
+/** Option ids a key may name: the blueprint's fixed options for quantitative comparison, else the question's. */
+export function allowedOptionIds(part: BlueprintPart, q: Pick<ExamQuestion, 'options'>): string[] {
   if (part.item_type === 'quantitative_comparison' && part.fixed_options) return part.fixed_options.map((o) => o.id);
   return q.options.map((o) => o.id);
+}
+
+/** A question needs a stem, unless it is a two-column comparison or an image item. */
+export function hasStem(q: Pick<ExamQuestion, 'stem' | 'column_a' | 'column_b' | 'image_path'>): boolean {
+  return q.stem.trim().length > 0 || !!(q.column_a && q.column_b) || !!q.image_path;
+}
+
+/**
+ * Per-question checks against the blueprint part (no key, review or
+ * section/language checks): type, option count (not for quantitative
+ * comparison, whose options are the blueprint's fixed ones), stem, and a
+ * passage for text_based parts. Used by the fresh pool (exam_pool.ts
+ * poolItemFromDoc). validateVariant runs the same rules through its own
+ * per-problem reporting (it shares typeMatches, allowedOptionIds and
+ * hasStem) — change both together.
+ */
+export function questionPartProblems(part: BlueprintPart, q: ExamQuestion): ProblemCode[] {
+  const out: ProblemCode[] = [];
+  if (!typeMatches(part, q.type)) out.push('question_type_mismatch');
+  if (part.item_type !== 'quantitative_comparison' && q.options.length !== part.options_per_question) out.push('options_count');
+  if (part.item_type === 'text_based' && !q.passage_id) out.push('passage_missing');
+  if (!hasStem(q)) out.push('question_empty_stem');
+  return out;
 }
 
 /**
@@ -167,7 +191,7 @@ export function validateVariant(input: ValidationInput): Problem[] {
       if (q.review_status !== 'methodologist_approved') {
         problems.push({ code: 'question_not_approved', sectionId: bs.id, questionId: qid, actual: q.review_status });
       }
-      if (q.stem.trim().length === 0 && !(q.column_a && q.column_b) && !q.image_path) {
+      if (!hasStem(q)) {
         problems.push({ code: 'question_empty_stem', sectionId: bs.id, questionId: qid });
       }
       if (q.passage_id && input.passageIds && !input.passageIds.has(q.passage_id)) {

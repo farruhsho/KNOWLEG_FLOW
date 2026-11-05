@@ -1,15 +1,22 @@
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, it } from 'node:test';
+import type { PoolItem } from '../src/domain/assembly';
+import { assertCanStartNew, parseEntitlement } from '../src/domain/entitlements';
 import {
   assertFreshBlueprint,
   freshVariantId,
+  inferPassageLayouts,
   isFreshVariantId,
+  keyFitsPoolItem,
   lastSeenMap,
   parseExamPoolConfig,
   parseExamPoolUpdate,
   parseExamStartInput,
   passageLayoutOf,
   poolItemFromDoc,
+  POOL_FIELDS,
   SEEN_ATTEMPTS_WINDOW,
 } from '../src/domain/exam_pool';
 import {
@@ -134,11 +141,151 @@ describe('pool documents', () => {
     assert.equal(poolItemFromDoc('q', { ...doc, review: undefined }, 'b')?.review_status, 'draft');
   });
 
+  it('drops items the importer flags out of assembly (failed translation check)', () => {
+    assert.equal(poolItemFromDoc('q', { ...doc, assembly_excluded: true }, 'b'), null);
+    assert.equal(poolItemFromDoc('q', { ...doc, assembly_excluded: false, dedup_excluded: false }, 'b')?.id, 'q');
+    assert.ok(POOL_FIELDS.includes('dedup_excluded') && POOL_FIELDS.includes('assembly_excluded') && POOL_FIELDS.includes('duplicate_of'));
+  });
+
   it('passage layout: standalone | paired, anything else unknown', () => {
     assert.equal(passageLayoutOf({ layout: 'paired' }), 'paired');
     assert.equal(passageLayoutOf({ layout: 'standalone' }), 'standalone');
     assert.equal(passageLayoutOf({ title: 'x' }), 'unknown');
     assert.equal(passageLayoutOf(undefined), 'unknown');
+  });
+});
+
+describe('pool documents: the per-question checks of the blueprint part (as validateVariant)', () => {
+  const bp = blueprint('ort_main_2026');
+  const partOf = (sectionId: string, partId: string) => bp.sections.find((s) => s.id === sectionId)!.parts.find((p) => p.id === partId)!;
+  const opts = (n: number) => Array.from({ length: n }, (_, k) => ({ id: String.fromCharCode(65 + k), text: `вариант ${k + 1}` }));
+  const grammar = {
+    section_id: 'grammar', part_id: 'grammar', topic_id: 'grammar.morphology', difficulty: 2, language: 'ru',
+    type: 'single_choice', stem: 'Укажите верный вариант.', options: opts(4), passage_id: null, review: { status: 'ai_verified' },
+  };
+  const comparison = {
+    section_id: 'math', part_id: 'math_comparison', topic_id: 'math.numbers', difficulty: 1, language: 'ru',
+    type: 'quantitative_comparison', stem: '', column_a: '$2^3$', column_b: '$3^2$', options: [], passage_id: null, review: { status: 'ai_verified' },
+  };
+  const reading = {
+    section_id: 'reading', part_id: 'reading', topic_id: 'reading.detail', difficulty: 2, language: 'ru',
+    type: 'text_based', stem: 'О чём говорится в первом абзаце?', options: opts(4), passage_id: 'p1', passage_order: 1, review: { status: 'ai_verified' },
+  };
+
+  it('a valid item passes and carries the option ids its key must name', () => {
+    assert.deepEqual(poolItemFromDoc('g1', grammar, bp.id, partOf('grammar', 'grammar'))?.answer_ids, ['A', 'B', 'C', 'D']);
+    // Quantitative comparison: the blueprint's fixed options, no stem needed with both columns.
+    assert.deepEqual(poolItemFromDoc('c1', comparison, bp.id, partOf('math', 'math_comparison'))?.answer_ids, ['A', 'B', 'C', 'D']);
+    assert.equal(poolItemFromDoc('r1', reading, bp.id, partOf('reading', 'reading'))?.passage_id, 'p1');
+    // Analogy / completion / text-based items may be stored as single_choice.
+    assert.equal(poolItemFromDoc('r2', { ...reading, type: 'single_choice' }, bp.id, partOf('reading', 'reading'))?.id, 'r2');
+  });
+
+  it('drops a type that does not match the part', () => {
+    assert.equal(poolItemFromDoc('g', { ...grammar, type: 'quantitative_comparison' }, bp.id, partOf('grammar', 'grammar')), null);
+    assert.equal(poolItemFromDoc('c', { ...comparison, type: 'single_choice' }, bp.id, partOf('math', 'math_comparison')), null);
+  });
+
+  it('drops an option count other than options_per_question (not for quantitative comparison)', () => {
+    assert.equal(poolItemFromDoc('g', { ...grammar, options: opts(5) }, bp.id, partOf('grammar', 'grammar')), null);
+    assert.equal(poolItemFromDoc('g', { ...grammar, options: opts(3) }, bp.id, partOf('grammar', 'grammar')), null);
+    assert.equal(poolItemFromDoc('m', { ...grammar, section_id: 'math', part_id: 'math_problems', options: opts(4) }, bp.id, partOf('math', 'math_problems')), null);
+    assert.equal(poolItemFromDoc('m', { ...grammar, section_id: 'math', part_id: 'math_problems', options: opts(5) }, bp.id, partOf('math', 'math_problems'))?.id, 'm');
+  });
+
+  it('drops an empty stem (unless both comparison columns or an image are there)', () => {
+    assert.equal(poolItemFromDoc('g', { ...grammar, stem: '   ' }, bp.id, partOf('grammar', 'grammar')), null);
+    assert.equal(poolItemFromDoc('g', { ...grammar, stem: '', image_path: 'exam/img.png' }, bp.id, partOf('grammar', 'grammar'))?.id, 'g');
+    assert.equal(poolItemFromDoc('c', { ...comparison, column_b: null }, bp.id, partOf('math', 'math_comparison')), null);
+  });
+
+  it('drops a text_based item without a passage', () => {
+    assert.equal(poolItemFromDoc('r', { ...reading, passage_id: null }, bp.id, partOf('reading', 'reading')), null);
+  });
+
+  it('the key must be one of the item options (the fixed options for comparison)', () => {
+    const g = poolItemFromDoc('g1', grammar, bp.id, partOf('grammar', 'grammar'))!;
+    assert.equal(keyFitsPoolItem(g, 'B'), true);
+    assert.equal(keyFitsPoolItem(g, ' C '), true);
+    assert.equal(keyFitsPoolItem(g, 'E'), false);
+    assert.equal(keyFitsPoolItem(g, ''), false);
+    assert.equal(keyFitsPoolItem(g, null), false);
+    const c = poolItemFromDoc('c1', { ...comparison, options: opts(2) }, bp.id, partOf('math', 'math_comparison'))!;
+    assert.equal(keyFitsPoolItem(c, 'D'), true, 'fixed options, not the stored ones');
+    assert.equal(keyFitsPoolItem(c, 'E'), false);
+    // Without the part checks only a non-empty key is required.
+    assert.equal(keyFitsPoolItem(poolItemFromDoc('x', grammar, bp.id)!, 'Z'), true);
+  });
+
+  it('every item of the committed ort_main_2026 ru banks passes (pilot + set 2)', () => {
+    const dir = path.resolve(__dirname, '..', '..', 'content', 'bank');
+    let n = 0;
+    for (const d of readdirSync(dir).filter((x) => x.startsWith('pilot_main_ru_v1_') || x.startsWith('main_ru_v2_'))) {
+      const f = JSON.parse(readFileSync(path.join(dir, d, 'items.json'), 'utf8')) as { items: Array<{ id: string; target: { blueprint_id: string; part_id: string }; passage_order: number | null; question: Record<string, unknown>; key: { correct: string } }> };
+      for (const it of f.items) {
+        const q = it.question;
+        const section = bp.sections.find((s) => s.id === q['section_id'])!;
+        const part = section.parts.find((p) => p.id === it.target.part_id)!;
+        const item = poolItemFromDoc(it.id, { ...q, part_id: it.target.part_id, blueprint_id: it.target.blueprint_id, passage_order: it.passage_order }, bp.id, part);
+        assert.ok(item, `${d}/${it.id} passes the part checks`);
+        assert.equal(keyFitsPoolItem(item, it.key.correct), true, `${d}/${it.id} key`);
+        n++;
+      }
+    }
+    assert.equal(n, 300);
+  });
+});
+
+describe('inferPassageLayouts', () => {
+  const item = (id: string, passageId: string, topic: string, subtopic: string | null = null) => ({
+    id, section_id: 'reading', part_id: 'reading', topic_id: topic, subtopic_id: subtopic, difficulty: 2, passage_id: passageId, passage_order: null, review_status: 'ai_verified',
+  });
+
+  it('keeps stored layouts; a passage without one is paired only when a question names the paired comparison', () => {
+    const items = [
+      item('a1', 'pa', 'reading.detail'),
+      item('a2', 'pa', 'reading.inference'),
+      item('b1', 'pb', 'reading.detail'),
+      item('b2', 'pb', 'reading.paired_comparison'),
+      item('c1', 'pc', 'reading.detail', 'reading.paired.contrast'),
+      item('d1', 'pd', 'reading.detail'),
+    ];
+    const stored = new Map<string, 'standalone' | 'paired' | 'unknown'>([
+      ['pa', 'unknown'],
+      ['pb', 'unknown'],
+      ['pc', 'unknown'],
+      ['pd', 'paired'],
+      ['pe', 'unknown'],
+    ]);
+    const out = inferPassageLayouts(items, stored);
+    assert.deepEqual(Object.fromEntries([...out].map(([id, p]) => [id, p.layout])), { pa: 'standalone', pb: 'paired', pc: 'paired', pd: 'paired', pe: 'standalone' });
+    assert.ok([...out.values()].every((p) => p.layout !== 'unknown'));
+  });
+
+  it('the pilot bank imported without layouts assembles with the real paired text last', () => {
+    const dir = path.resolve(__dirname, '..', '..', 'content', 'bank');
+    const items: PoolItem[] = [];
+    const truth = new Map<string, string>();
+    for (const d of readdirSync(dir).filter((x) => x.startsWith('pilot_main_ru_v1_reading_'))) {
+      const f = JSON.parse(readFileSync(path.join(dir, d, 'items.json'), 'utf8')) as {
+        passages: Array<{ id: string; layout: string }>;
+        items: Array<{ id: string; question: { topic_id: string; subtopic_id: string | null; difficulty: number; passage_id: string } }>;
+      };
+      for (const p of f.passages) truth.set(p.id, p.layout);
+      for (const it of f.items) items.push({ ...item(it.id, it.question.passage_id, it.question.topic_id, it.question.subtopic_id), difficulty: it.question.difficulty });
+    }
+    const inferred = inferPassageLayouts(items, new Map([...truth.keys()].map((id) => [id, 'unknown' as const])));
+    for (const [id, layout] of truth) assert.equal(inferred.get(id)!.layout, layout, id);
+  });
+});
+
+describe('assertCanStartNew (fresh pre-check before the pool is loaded)', () => {
+  it('NO_ENTITLEMENT without a free exam or a credit; otherwise passes', () => {
+    const ent = (o: Partial<ReturnType<typeof parseEntitlement>> = {}) => ({ ...parseEntitlement(undefined), ...o });
+    assertCanStartNew(ent(), 1);
+    assertCanStartNew(ent({ free_exams_used_count: 1, credits: 1 }), 1);
+    assert.equal(reasonOf(() => assertCanStartNew(ent({ free_exams_used_count: 1 }), 1)), 'NO_ENTITLEMENT');
+    assert.equal(reasonOf(() => assertCanStartNew(ent(), 0)), 'NO_ENTITLEMENT');
   });
 });
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -88,28 +90,91 @@ final examLanguageProvider = StateProvider<String>((ref) {
   return ui == 'ky' ? 'ky' : 'ru';
 });
 
-/// `config/exam_pool` (§10.1): whether «Новый пробный» (mode `fresh`) is
-/// offered. Missing, unreadable or offline means enabled — the server is the
-/// authority and answers POOL_TOO_SMALL when it cannot assemble a variant.
-final examPoolConfigProvider = StreamProvider<ExamPoolConfig>((ref) async* {
-  yield ExamPoolConfig.defaults;
+/// Opens a listener on `config/exam_pool` (document data, null when missing).
+typedef ExamPoolConfigSource = Stream<Map<String, dynamic>?> Function();
+
+/// The Firestore listener behind [examPoolConfigProvider]; null when Firebase
+/// is not initialised (tests, offline dev build). Overridden in tests.
+final examPoolConfigSourceProvider = Provider<ExamPoolConfigSource?>((ref) {
   final FirebaseFirestore db;
   try {
     db = FirebaseFirestore.instance;
   } catch (_) {
-    return; // Firebase not initialised (tests, offline dev build).
+    return null;
   }
-  try {
-    await for (final snap in db
-        .collection(Collections.config)
-        .doc(ConfigDocs.examPool)
-        .snapshots()) {
-      yield ExamPoolConfig.fromMap(snap.data());
-    }
-  } catch (_) {
-    // Permission denied / offline: keep the default already emitted.
-  }
+  return () => db
+      .collection(Collections.config)
+      .doc(ConfigDocs.examPool)
+      .snapshots()
+      .map((s) => s.data());
 });
+
+/// Wait before listening again after `config/exam_pool` failed.
+final examPoolConfigRetryDelayProvider =
+    Provider<Duration>((ref) => const Duration(seconds: 30));
+
+/// `config/exam_pool` (§10.1): whether «Новый пробный» (mode `fresh`) is
+/// offered. Missing, unreadable or offline means enabled — the server is the
+/// authority and answers POOL_TOO_SMALL when it cannot assemble a variant.
+///
+/// Only signed-in users may read the document, so the listener follows the
+/// uid: it starts again after sign-in (and for another account), and after
+/// an error (permission denied before sign-in settled, connection) it tries
+/// again after [examPoolConfigRetryDelayProvider], keeping the last value.
+final examPoolConfigProvider = StreamProvider<ExamPoolConfig>((ref) {
+  final uid = ref.watch(examUidProvider);
+  final source = ref.watch(examPoolConfigSourceProvider);
+  final retryDelay = ref.watch(examPoolConfigRetryDelayProvider);
+  if (uid == null || source == null) return Stream.value(ExamPoolConfig.defaults);
+  return watchExamPoolConfig(source, retryDelay: retryDelay);
+});
+
+/// [ExamPoolConfig.defaults] first, then every document [source] reports.
+/// Errors are never passed on: the listener is opened again after
+/// [retryDelay] until the stream is cancelled.
+Stream<ExamPoolConfig> watchExamPoolConfig(
+  ExamPoolConfigSource source, {
+  required Duration retryDelay,
+}) {
+  late final StreamController<ExamPoolConfig> controller;
+  StreamSubscription<Map<String, dynamic>?>? sub;
+  Timer? retry;
+  var cancelled = false;
+
+  void listen() {
+    if (cancelled) return;
+    void failed() {
+      sub = null;
+      if (!cancelled) retry = Timer(retryDelay, listen);
+    }
+
+    try {
+      sub = source().listen(
+        (data) {
+          if (!cancelled) controller.add(ExamPoolConfig.fromMap(data));
+        },
+        onError: (Object _) => failed(),
+        cancelOnError: true,
+      );
+    } catch (_) {
+      failed();
+    }
+  }
+
+  controller = StreamController<ExamPoolConfig>(
+    onListen: () {
+      controller.add(ExamPoolConfig.defaults);
+      listen();
+    },
+    onCancel: () async {
+      cancelled = true;
+      retry?.cancel();
+      unawaited(controller.close());
+      await sub?.cancel();
+    },
+  );
+  return controller.stream;
+}
 
 /// Whether the catalog offers «Новый пробный» right now.
 final examFreshEnabledProvider = Provider<bool>((ref) =>

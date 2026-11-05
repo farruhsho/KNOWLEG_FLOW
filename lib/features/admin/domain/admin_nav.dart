@@ -13,7 +13,7 @@ enum AdminSection {
   variants('/admin/variants'),
 
   /// Fresh-variant pool health and settings (ARCHITECTURE §10.1).
-  examPool('/admin/exam-pool'),
+  examPool(RoutePaths.adminExamPool),
   aiDrafts('/admin/ai-drafts'),
   users('/admin/users'),
   payments('/admin/payments'),

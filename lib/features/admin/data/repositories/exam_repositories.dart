@@ -307,6 +307,11 @@ class VariantPublishedException implements Exception {
 
 typedef VariantFilter = ({String? blueprintId, String? status});
 
+/// Statuses the variants list asks for: the chosen one, or every library
+/// status — never `generated` (one per fresh attempt, §10.1), which would
+/// bury the library under per-attempt variants.
+List<String> variantListStatuses(String? status) => status == null ? VariantDoc.statuses : [status];
+
 /// `exam_variants/{id}` drafts. Publishing goes only through the
 /// `adminPublishVariant` callable; the client never writes `published`.
 class VariantsRepository {
@@ -325,7 +330,10 @@ class VariantsRepository {
   }) {
     Query<Map<String, dynamic>> q = _col;
     if (f.blueprintId != null) q = q.where('blueprint_id', isEqualTo: f.blueprintId);
-    if (f.status != null) q = q.where('status', isEqualTo: f.status);
+    final statuses = variantListStatuses(f.status);
+    q = statuses.length == 1
+        ? q.where('status', isEqualTo: statuses.single)
+        : q.where('status', whereIn: statuses);
     return fetchPage(q, after: after, pageSize: pageSize, map: VariantDoc.fromSnapshot);
   }
 

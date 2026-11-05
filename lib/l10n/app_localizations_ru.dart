@@ -6460,10 +6460,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get adminOrderRefundAgain =>
-      'Возврат по этому заказу уже запрошен и ещё не подтверждён провайдером. Повторный запрос отправит его снова.';
-
-  @override
   String adminOrderRefundReasonHelp(int min, int max) {
     return 'От $min до $max символов — попадёт в журнал действий';
   }
@@ -6595,4 +6591,46 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get adminWebPricingErrBase =>
       'Сервер не принял изменение базовой цены без подтверждения.';
+
+  @override
+  String get payReturnUnavailableTitle => 'Проверка оплаты здесь недоступна';
+
+  @override
+  String get payReturnUnavailableBody =>
+      'Эта версия сайта не может запросить у сервера статус заказа. Если вы оплатили, кредиты начислятся автоматически, как только провайдер подтвердит оплату, — проверьте баланс позже.';
+
+  @override
+  String get adminVariantGenerated => 'Собран для попытки';
+
+  @override
+  String get adminVariantGeneratedReadOnly =>
+      'Этот вариант сервер собрал для одной попытки ученика («Новый пробный»). Он не входит в библиотеку и доступен только для просмотра.';
+
+  @override
+  String get adminOrderRefundBusy => 'Возврат отправляется…';
+
+  @override
+  String get adminOrderRefundUnknown =>
+      'Сервер не ответил вовремя — результат возврата неизвестен. Проверьте заказ, прежде чем повторять.';
+
+  @override
+  String get adminOrderNoCreditsNote =>
+      'Оплачен, но кредиты не начислены: аккаунт удалили до поступления оплаты. Платёж можно вернуть — отзывать кредиты не придётся.';
+
+  @override
+  String get adminOrderNoCreditsFact =>
+      'Оплачен, но кредиты не начислены: аккаунт удалили до поступления оплаты.';
+
+  @override
+  String adminOrderRefundBodyNoCredits(String amount) {
+    return 'Провайдер вернёт пользователю $amount. Кредиты по этому заказу не начислялись (аккаунт удалён), поэтому отзывать нечего. Отменить возврат нельзя; действие попадёт в журнал.';
+  }
+
+  @override
+  String get adminOrderErrRefundInProgress =>
+      'Возврат по этому заказу уже запрошен — дождитесь подтверждения провайдера.';
+
+  @override
+  String get adminOrderErrProviderUnavailable =>
+      'Провайдер, через который оплачен этот заказ, сейчас не подключён — вернуть платёж из CMS нельзя. Верните его напрямую у этого провайдера (он указан в карточке заказа).';
 }

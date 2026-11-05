@@ -22,7 +22,7 @@ await seedVariant(db, bp('ort_subject_chemistry_2026'), 'dev_chem_ru_1', 'ru', 1
 await seedVariant(db, bp('ort_state_language_2026'), 'dev_state_ky_1', 'ky', 1);
 await seedLearning(db);
 await seedGrowth(db);
-// Phase 4 (§10.1): the pilot bank -> fresh ort_main_2026 ru variants ("Новый вариант").
+// Phase 4 (§10.1): the committed ort_main_2026 ru banks (pilot + set 2) -> fresh variants ("Новый вариант").
 const pilot = await seedPilotBank(db);
 console.log('seeded: blueprints, 4 published variants, pricing (+ web products), config/exam_pool (emulator-only ai_verified pilot),');
-console.log(`        pilot bank ${pilot.items} questions + ${pilot.passages} passages, subjects, a lesson, practice questions, promo code DEMO2026`);
+console.log(`        ort_main_2026 ru bank ${pilot.items} questions + ${pilot.passages} passages, subjects, a lesson, practice questions, promo code DEMO2026`);

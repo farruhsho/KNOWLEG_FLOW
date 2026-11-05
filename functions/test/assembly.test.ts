@@ -373,4 +373,20 @@ describe('the pilot bank (content/bank/pilot_main_ru_v1_*, emulator seed)', () =
   it('still assembles when the import carries no passage layout / order (pipeline importer today)', () => {
     ok(assembleFreshVariant(input('ort_main_2026', 'ru', pilot(false))));
   });
+
+  it('questions without passage_order keep a stable text order (by id), whatever the seed', () => {
+    const bank = pilot(false);
+    const items = byId(bank);
+    const orders = ['s1', 's2', 's3'].map((seed) => {
+      const reading = ok(assembleFreshVariant(input('ort_main_2026', 'ru', bank, { seed }))).sections.find((s) => s.section_id === 'reading')!.question_ids;
+      const groups = new Map<string, string[]>();
+      for (const id of reading) {
+        const pid = items.get(id)!.passage_id!;
+        groups.set(pid, [...(groups.get(pid) ?? []), id]);
+      }
+      for (const ids of groups.values()) assert.deepEqual(ids, [...ids].sort(), 'by id inside each text');
+      return groups;
+    });
+    for (const [pid, ids] of orders[0]!) assert.deepEqual(orders[1]!.get(pid), ids, `${pid}: same order for another seed`);
+  });
 });

@@ -8,6 +8,7 @@ import '../../data/exam_local_store.dart';
 import '../../data/exam_remote_datasource.dart';
 import '../../domain/exam_failure.dart';
 import '../../domain/exam_session.dart';
+import '../../domain/exam_start.dart';
 import '../../domain/question_timing.dart';
 
 /// One-shot messages for the runner UI (snackbars).
@@ -397,8 +398,11 @@ class ExamRunnerController extends StateNotifier<ExamRunnerState> {
         // Strict: the server's clock says the section still runs. Usually a
         // few seconds: the answers stay locked in and are sent again
         // shortly. If the device clock was far ahead, the section reopens.
+        // Only strict attempts get this answer, so the attempt is strict
+        // whatever this device assumed (e.g. a copy without the style): it
+        // switches, which also makes the reopen possible.
         _retryNotBefore = _clock().add(sectionNotOverRetry);
-        _commit(state.session!.submitFailed());
+        _commit(state.session!.withStyle(ExamStyle.strict).submitFailed());
         state = state.copyWith(submitFailure: f, offline: false);
         await _reopenIfStillRunning();
         return;
