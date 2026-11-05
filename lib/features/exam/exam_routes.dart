@@ -20,6 +20,13 @@ List<RouteBase> get examRoutes => [
         builder: (context, state) => const ExamHistoryPage(),
       ),
       GoRoute(
+        path: RoutePaths.examFresh,
+        builder: (context, state) => ExamFreshIntroPage(
+          blueprintId: state.pathParameters['blueprintId'] ?? '',
+          language: state.uri.queryParameters['lang'],
+        ),
+      ),
+      GoRoute(
         path: RoutePaths.examIntro,
         builder: (context, state) =>
             ExamIntroPage(variantId: state.pathParameters['variantId'] ?? ''),

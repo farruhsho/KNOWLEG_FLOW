@@ -244,6 +244,7 @@ class _DirectionCardState extends ConsumerState<_DirectionCard> {
     final preferred = ref.watch(examLanguageProvider);
     final lang = bp.languageFor(preferred);
     final accent = SubjectColors.of(bp.subjectId ?? bp.sections.first.subjectArea);
+    final freshEnabled = ref.watch(examFreshEnabledProvider);
     final summary = [
       l.examQuestionsCount(bp.totalQuestions),
       l.examMinutesCount(bp.totalMinutes),
@@ -300,12 +301,37 @@ class _DirectionCardState extends ConsumerState<_DirectionCard> {
                 ),
               ),
             ),
+            // Primary: a new variant assembled for this attempt (§10.1).
+            if (freshEnabled)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FilledButton.icon(
+                      key: ValueKey('fresh_start_${bp.id}'),
+                      onPressed: () => context.push(
+                          RoutePaths.examFreshFor(bp.id, language: lang)),
+                      icon: const Icon(Icons.auto_awesome_rounded),
+                      label: Text(l.examFreshStart),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(l.examFreshSubtitle, style: theme.textTheme.bodySmall),
+                  ],
+                ),
+              ),
+            // Secondary: ready-made library variants (teachers assign them).
             AnimatedSize(
               duration: AppMotion.of(context, AppMotion.normal),
               curve: AppMotion.standard,
               alignment: Alignment.topCenter,
               child: _expanded
-                  ? _VariantList(blueprintId: bp.id, language: lang)
+                  ? _VariantList(
+                      blueprintId: bp.id,
+                      language: lang,
+                      showTitle: freshEnabled,
+                    )
                   : const SizedBox(width: double.infinity),
             ),
           ],
@@ -319,7 +345,14 @@ class _VariantList extends ConsumerWidget {
   final String blueprintId;
   final String language;
 
-  const _VariantList({required this.blueprintId, required this.language});
+  /// «Готовые варианты» header (when the fresh action sits above the list).
+  final bool showTitle;
+
+  const _VariantList({
+    required this.blueprintId,
+    required this.language,
+    this.showTitle = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -328,7 +361,21 @@ class _VariantList extends ConsumerWidget {
     final state = ref.watch(variantListProvider(query));
     final statuses = ref.watch(variantStatusesProvider);
     final tokens = context.tokens;
-    final children = <Widget>[Divider(height: 1, color: tokens.border)];
+    final children = <Widget>[
+      Divider(height: 1, color: tokens.border),
+      if (showTitle)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.xxs),
+          child: Text(
+            l.examLibraryTitle,
+            style: Theme.of(context)
+                .textTheme
+                .labelLarge
+                ?.copyWith(color: tokens.textSecondary),
+          ),
+        ),
+    ];
     if (state.isInitialLoading) {
       children.add(const Padding(
         padding: EdgeInsets.all(AppSpacing.lg),

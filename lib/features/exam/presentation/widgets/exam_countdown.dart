@@ -15,6 +15,9 @@ class ExamCountdown extends StatefulWidget {
   final bool showIcon;
   final bool compact;
 
+  /// Wraps the `mm:ss` text, e.g. «Раздел закончится через 09:59».
+  final String Function(String time)? labelBuilder;
+
   const ExamCountdown({
     super.key,
     required this.deadline,
@@ -22,6 +25,7 @@ class ExamCountdown extends StatefulWidget {
     this.style,
     this.showIcon = true,
     this.compact = false,
+    this.labelBuilder,
   });
 
   @override
@@ -81,11 +85,13 @@ class _ExamCountdownState extends State<ExamCountdown> {
             ? tokens.warning
             : scheme.onSurface;
     final base = widget.style ?? Theme.of(context).textTheme.titleMedium!;
+    final formatted = formatExamDuration(_left);
+    final label = widget.labelBuilder?.call(formatted);
     final text = Text(
-      formatExamDuration(_left),
-      maxLines: 1,
-      softWrap: false,
-      overflow: TextOverflow.fade,
+      label ?? formatted,
+      maxLines: label == null ? 1 : 2,
+      softWrap: label != null,
+      overflow: label == null ? TextOverflow.fade : TextOverflow.ellipsis,
       style: base.copyWith(
         color: fg,
         fontFeatures: const [FontFeature.tabularFigures()],

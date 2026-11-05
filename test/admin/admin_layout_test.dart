@@ -130,6 +130,11 @@ void main() {
       overrides: _session(AdminRole.superAdmin),
       brightness: Brightness.dark,
     );
+    // Phase 4 (§10.3): the website prices open first; Play credits are the
+    // second tab.
+    expect(find.textContaining('config/pricing.web_products'), findsOneWidget);
+    await tester.tap(find.text('Google Play'));
+    await tester.pumpAndSettle();
     expect(find.textContaining('Google Play Console'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

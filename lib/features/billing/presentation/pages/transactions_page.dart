@@ -22,11 +22,20 @@ class TransactionsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final uid = ref.watch(billingUidProvider);
-    final sellsInApp = ref.watch(canSellProvider);
+    final mode = ref.watch(billingModeProvider);
+    final sellsInApp = mode.sellsInApp;
     if (!sellsInApp) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.billingCreditHistoryTitle)),
         body: _body(context, ref, uid, sellsInApp: false),
+      );
+    }
+    if (!mode.usesPlayBilling) {
+      // Web build: there are no Google Play purchases to list; the ledger
+      // shows every credit (site payments included).
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.billingTransactionsTitle)),
+        body: _body(context, ref, uid, sellsInApp: true, tabs: false),
       );
     }
     return DefaultTabController(
@@ -47,7 +56,7 @@ class TransactionsPage extends ConsumerWidget {
   }
 
   Widget _body(BuildContext context, WidgetRef ref, AsyncValue<String?> uid,
-      {required bool sellsInApp}) {
+      {required bool sellsInApp, bool tabs = true}) {
     final l10n = AppLocalizations.of(context)!;
     return uid.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -73,7 +82,7 @@ class TransactionsPage extends ConsumerWidget {
           emptyText: l10n.billingLedgerEmpty,
           itemBuilder: (context, e) => _LedgerTile(entry: e, neutral: !sellsInApp),
         );
-        if (!sellsInApp) return ledger;
+        if (!sellsInApp || !tabs) return ledger;
         return TabBarView(
           children: [
             _PagedList<PurchaseRecord>(

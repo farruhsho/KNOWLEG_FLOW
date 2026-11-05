@@ -9872,6 +9872,1176 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yearly'**
   String get yearly;
+
+  /// Primary action of a direction: a new variant assembled for this attempt
+  ///
+  /// In en, this message translates to:
+  /// **'New mock exam'**
+  String get examFreshStart;
+
+  /// Fresh mock exam explanation
+  ///
+  /// In en, this message translates to:
+  /// **'A new variant every time, built to the ORT structure from a bank of reviewed questions.'**
+  String get examFreshSubtitle;
+
+  /// Secondary list of published library variants
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made variants'**
+  String get examLibraryTitle;
+
+  /// Fresh exam intro
+  ///
+  /// In en, this message translates to:
+  /// **'A new variant, assembled when you start'**
+  String get examFreshVariantLine;
+
+  /// Fresh exam intro: language choice
+  ///
+  /// In en, this message translates to:
+  /// **'Question language'**
+  String get examFreshLanguageLabel;
+
+  /// Fresh exam intro
+  ///
+  /// In en, this message translates to:
+  /// **'The state language test is in Kyrgyz only.'**
+  String get examFreshKyOnly;
+
+  /// Exam style choice title
+  ///
+  /// In en, this message translates to:
+  /// **'How to take it'**
+  String get examStyleTitle;
+
+  /// Exam style: standard
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get examStyleStandard;
+
+  /// Exam style: standard
+  ///
+  /// In en, this message translates to:
+  /// **'You can flag questions, change answers and finish a section early.'**
+  String get examStyleStandardBody;
+
+  /// Exam style: strict
+  ///
+  /// In en, this message translates to:
+  /// **'Like the ORT'**
+  String get examStyleStrict;
+
+  /// Exam style: strict
+  ///
+  /// In en, this message translates to:
+  /// **'A section ends only when its time is up, you can correct an answer once, there are no flags, and every section starts with instructions.'**
+  String get examStyleStrictBody;
+
+  /// Exam style: strict, honest source note
+  ///
+  /// In en, this message translates to:
+  /// **'The rules follow the official brochure for ORT candidates. This is practice: the result is for study, not an official score.'**
+  String get examStyleStrictSource;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'You can\'t finish a section early: it ends when its time is up and your answers are sent automatically.'**
+  String get examStrictRuleNoEarlyFinish;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'You can correct an answer only once — like on the answer sheet. An answer can\'t be erased.'**
+  String get examStrictRuleOneCorrection;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'There are no “come back later” flags.'**
+  String get examStrictRuleNoFlags;
+
+  /// Strict rule
+  ///
+  /// In en, this message translates to:
+  /// **'Every section starts with instructions. Its time runs from the moment it opens, including while you read them.'**
+  String get examStrictRuleInstruction;
+
+  /// Strict runner: replaces "Finish section"; {time} is mm:ss
+  ///
+  /// In en, this message translates to:
+  /// **'Section ends in {time}'**
+  String examStrictSectionEndsIn(String time);
+
+  /// Strict runner: a third choice was refused
+  ///
+  /// In en, this message translates to:
+  /// **'This answer was already corrected. As on the ORT answer sheet, it can be corrected only once.'**
+  String get examStrictAnswerLocked;
+
+  /// Strict runner
+  ///
+  /// In en, this message translates to:
+  /// **'You can still correct this answer once.'**
+  String get examStrictCorrectionLeft;
+
+  /// Strict runner
+  ///
+  /// In en, this message translates to:
+  /// **'Answer corrected — it can\'t be changed again.'**
+  String get examStrictCorrectionUsed;
+
+  /// Strict runner: SECTION_NOT_OVER, retrying
+  ///
+  /// In en, this message translates to:
+  /// **'The section\'s time is ending — your answers will be sent in a few seconds.'**
+  String get examStrictWaitingDeadline;
+
+  /// Strict pre-section screen
+  ///
+  /// In en, this message translates to:
+  /// **'Section instructions'**
+  String get examSectionInstructionTitle;
+
+  /// Strict pre-section screen, honest timer note
+  ///
+  /// In en, this message translates to:
+  /// **'The section timer is already running: it started when the section opened.'**
+  String get examStrictTimerRunning;
+
+  /// Fresh variant: repeated questions
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You\'ve already seen 1 question in earlier attempts} other{You\'ve already seen {count} questions in earlier attempts}}'**
+  String examFreshnessRepeated(int count);
+
+  /// Fresh variant: repeated questions
+  ///
+  /// In en, this message translates to:
+  /// **'The bank doesn\'t have enough new questions for this direction yet — the rest are new.'**
+  String get examFreshnessWhy;
+
+  /// POOL_TOO_SMALL
+  ///
+  /// In en, this message translates to:
+  /// **'New variants are being prepared'**
+  String get examPoolTooSmallTitle;
+
+  /// POOL_TOO_SMALL
+  ///
+  /// In en, this message translates to:
+  /// **'There aren\'t enough reviewed questions for this direction ({language}) yet. No credit was charged. Meanwhile you can take a ready-made variant.'**
+  String examPoolTooSmallBody(String language);
+
+  /// POOL_TOO_SMALL
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made variants'**
+  String get examPoolTooSmallAction;
+
+  /// SECTION_NOT_OVER
+  ///
+  /// In en, this message translates to:
+  /// **'The section isn\'t over yet — your answers will be sent when time is up.'**
+  String get examErrorSectionNotOver;
+
+  /// Price of a web product from config/pricing.web_products
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} som'**
+  String billingWebPrice(String amount);
+
+  /// Web store button
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get billingPay;
+
+  /// Web store button semantics
+  ///
+  /// In en, this message translates to:
+  /// **'Pay: {title}, {price}'**
+  String billingPaySemantics(String title, String price);
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is made on the payment provider\'s secure page. Credits are added once the payment is confirmed.'**
+  String get billingWebHonestPayment;
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Payment isn\'t available yet. Please check back later.'**
+  String get billingWebProductsEmpty;
+
+  /// PAYMENTS_DISABLED
+  ///
+  /// In en, this message translates to:
+  /// **'Payments aren\'t connected yet. Please try later.'**
+  String get billingWebPaymentsDisabled;
+
+  /// PRODUCT_UNAVAILABLE
+  ///
+  /// In en, this message translates to:
+  /// **'This package isn\'t available right now. Please choose another.'**
+  String get billingWebProductUnavailable;
+
+  /// RATE_LIMITED
+  ///
+  /// In en, this message translates to:
+  /// **'Too many orders today. Please try again tomorrow.'**
+  String get billingWebRateLimited;
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t create the order. Check your connection and try again.'**
+  String get billingWebOrderError;
+
+  /// Web store
+  ///
+  /// In en, this message translates to:
+  /// **'Opening the payment page…'**
+  String get billingWebRedirecting;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Public offer'**
+  String get billingLegalOffer;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Refund policy'**
+  String get billingLegalRefund;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Draft. The final text will be published after legal review.'**
+  String get billingLegalDraftNote;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t open the document.'**
+  String get billingLegalLoadError;
+
+  /// Legal document
+  ///
+  /// In en, this message translates to:
+  /// **'This document is available in Russian only for now.'**
+  String get billingLegalRuOnly;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payReturnTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your payment…'**
+  String get payReturnChecking;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received'**
+  String get payReturnPaidTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'{credits, plural, =1{1 credit added.} other{{credits} credits added.}}'**
+  String payReturnPaidBody(int credits);
+
+  /// Web payment return page; {balance} is e.g. "3 кредита"
+  ///
+  /// In en, this message translates to:
+  /// **'Balance: {balance}'**
+  String payReturnBalance(String balance);
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Start a mock exam'**
+  String get payReturnStartExam;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment didn\'t go through'**
+  String get payReturnFailedTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'No credits were added. If you were charged anyway, contact support and we\'ll check the order.'**
+  String get payReturnFailedBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Order expired'**
+  String get payReturnExpiredTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'The payment didn\'t arrive in time and no credits were added. You can place a new order.'**
+  String get payReturnExpiredBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment refunded'**
+  String get payReturnRefundedTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Credits from this order were withdrawn.'**
+  String get payReturnRefundedBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is still processing'**
+  String get payReturnPendingTitle;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'The provider hasn\'t confirmed the payment yet. Credits are added automatically as soon as it does — check your balance later.'**
+  String get payReturnPendingBody;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get payReturnCheckAgain;
+
+  /// ORDER_NOT_FOUND
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found. If you paid, please contact support.'**
+  String get payReturnNotFound;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t tell which order this is. Check your balance on the exam access page.'**
+  String get payReturnNoOrder;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t check the payment. Check your connection.'**
+  String get payReturnNetworkError;
+
+  /// Web payment return page
+  ///
+  /// In en, this message translates to:
+  /// **'To my balance'**
+  String get payReturnToStore;
+
+  /// No description provided for @adminNavExamPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Question pool'**
+  String get adminNavExamPool;
+
+  /// No description provided for @adminPoolSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A new variant for every attempt'**
+  String get adminPoolSettingsTitle;
+
+  /// No description provided for @adminPoolSettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every full mock exam is assembled anew from the verified bank, following the ORT structure. The price does not change: the first mock exam is free, every next one costs 1 credit.'**
+  String get adminPoolSettingsBody;
+
+  /// No description provided for @adminPoolFreshEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Assemble a new variant'**
+  String get adminPoolFreshEnabled;
+
+  /// No description provided for @adminPoolFreshOnHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'On: students get a «New mock exam» assembled for their attempt. Ready-made library variants stay available too.'**
+  String get adminPoolFreshOnHelp;
+
+  /// No description provided for @adminPoolFreshOffHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: students take only the ready-made library variants.'**
+  String get adminPoolFreshOffHelp;
+
+  /// No description provided for @adminPoolMinStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Which questions may enter a new variant'**
+  String get adminPoolMinStatus;
+
+  /// No description provided for @adminPoolStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Methodologist-approved only'**
+  String get adminPoolStatusApproved;
+
+  /// No description provided for @adminPoolStatusApprovedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'methodologist_approved — every question was reviewed and approved by a methodologist. Recommended.'**
+  String get adminPoolStatusApprovedHelp;
+
+  /// No description provided for @adminPoolStatusAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Also AI-solver-verified'**
+  String get adminPoolStatusAi;
+
+  /// No description provided for @adminPoolStatusAiHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'ai_verified — questions checked by an independent AI solver, not by a methodologist.'**
+  String get adminPoolStatusAiHelp;
+
+  /// No description provided for @adminPoolAiWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'ai_verified means «checked by an independent AI solver, not by a methodologist». Such questions may contain mistakes only a methodologist would catch, and students pay a credit for a mock exam that includes them. This is a deliberate owner decision for the pilot.'**
+  String get adminPoolAiWarning;
+
+  /// No description provided for @adminPoolConfirmAiBody.
+  ///
+  /// In en, this message translates to:
+  /// **'New variants will also include questions with the ai_verified status. Attempts already started are not affected. The change is recorded in the action log.'**
+  String get adminPoolConfirmAiBody;
+
+  /// No description provided for @adminPoolAiAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand: no methodologist checked these questions'**
+  String get adminPoolAiAcknowledge;
+
+  /// No description provided for @adminPoolAiActive.
+  ///
+  /// In en, this message translates to:
+  /// **'New variants currently also include ai_verified questions — checked by an independent AI solver, not by a methodologist.'**
+  String get adminPoolAiActive;
+
+  /// No description provided for @adminPoolReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'View only. Only a super admin can change the pool settings.'**
+  String get adminPoolReadOnly;
+
+  /// No description provided for @adminPoolNotCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'config/exam_pool does not exist yet — the defaults apply: new variants on, methodologist-approved questions only.'**
+  String get adminPoolNotCreated;
+
+  /// No description provided for @adminPoolConfigDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read config/exam_pool: access denied. The Firestore rules for it may not be deployed yet.'**
+  String get adminPoolConfigDenied;
+
+  /// No description provided for @adminPoolUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed: {date} · {uid}'**
+  String adminPoolUpdated(String date, String uid);
+
+  /// No description provided for @adminPoolConfirmFreshOnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn new variants on?'**
+  String get adminPoolConfirmFreshOnTitle;
+
+  /// No description provided for @adminPoolConfirmFreshOnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Students will again be able to start a «New mock exam» assembled from the bank. Credit charging does not change. The change is recorded in the action log.'**
+  String get adminPoolConfirmFreshOnBody;
+
+  /// No description provided for @adminPoolConfirmFreshOffTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn new variants off?'**
+  String get adminPoolConfirmFreshOffTitle;
+
+  /// No description provided for @adminPoolConfirmFreshOffBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Students will be able to take only the ready-made library variants. Attempts already started are not affected. The change is recorded in the action log.'**
+  String get adminPoolConfirmFreshOffBody;
+
+  /// No description provided for @adminPoolConfirmStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change which questions enter a variant?'**
+  String get adminPoolConfirmStatusTitle;
+
+  /// No description provided for @adminPoolConfirmApprovedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'New variants will include only methodologist-approved questions. If there are not enough, students see «not enough questions» (no credit is charged). The change is recorded in the action log.'**
+  String get adminPoolConfirmApprovedBody;
+
+  /// No description provided for @adminPoolSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool settings saved'**
+  String get adminPoolSaved;
+
+  /// No description provided for @adminPoolHealthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pool coverage'**
+  String get adminPoolHealthTitle;
+
+  /// No description provided for @adminPoolHealthBody.
+  ///
+  /// In en, this message translates to:
+  /// **'How many questions each part of the structure has, how many fully distinct variants can be assembled and which topics are short.'**
+  String get adminPoolHealthBody;
+
+  /// No description provided for @adminPoolNoBlueprints.
+  ///
+  /// In en, this message translates to:
+  /// **'No active test structures.'**
+  String get adminPoolNoBlueprints;
+
+  /// No description provided for @adminPoolCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the pool'**
+  String get adminPoolCheck;
+
+  /// No description provided for @adminPoolRecheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate'**
+  String get adminPoolRecheck;
+
+  /// No description provided for @adminPoolChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Counting the pool… This can take up to two minutes.'**
+  String get adminPoolChecking;
+
+  /// No description provided for @adminPoolHealthDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'The pool report is available to super admins, content managers and methodologists.'**
+  String get adminPoolHealthDenied;
+
+  /// No description provided for @adminPoolDisjoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully distinct variants: {n}'**
+  String adminPoolDisjoint(int n);
+
+  /// No description provided for @adminPoolDisjointCapped.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully distinct variants: at least {n}'**
+  String adminPoolDisjointCapped(int n);
+
+  /// No description provided for @adminPoolDisjointHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'This many variants can be assembled now without repeating a single question. After that, students start meeting questions they have already seen.'**
+  String get adminPoolDisjointHelp;
+
+  /// No description provided for @adminPoolDisjointZero.
+  ///
+  /// In en, this message translates to:
+  /// **'The pool does not cover even one variant: students get «not enough questions» (no credit is charged).'**
+  String get adminPoolDisjointZero;
+
+  /// No description provided for @adminPoolFreshOff.
+  ///
+  /// In en, this message translates to:
+  /// **'New variants are currently off — students take only library variants.'**
+  String get adminPoolFreshOff;
+
+  /// No description provided for @adminPoolTotals.
+  ///
+  /// In en, this message translates to:
+  /// **'per variant: {needed} · in the pool: {eligible}'**
+  String adminPoolTotals(int needed, int eligible);
+
+  /// No description provided for @adminPoolFloorNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted: {status}'**
+  String adminPoolFloorNow(String status);
+
+  /// No description provided for @adminPoolPart.
+  ///
+  /// In en, this message translates to:
+  /// **'Part {part}'**
+  String adminPoolPart(String part);
+
+  /// No description provided for @adminPoolPartVariants.
+  ///
+  /// In en, this message translates to:
+  /// **'variants: {n}'**
+  String adminPoolPartVariants(int n);
+
+  /// No description provided for @adminPoolPartNotCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'short of one variant'**
+  String get adminPoolPartNotCovered;
+
+  /// No description provided for @adminPoolPartCounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Per variant: {needed} · in the pool: {eligible}'**
+  String adminPoolPartCounts(int needed, int eligible);
+
+  /// No description provided for @adminPoolPartMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Per variant: {needed} · in the pool: {eligible} · missing: {missing}'**
+  String adminPoolPartMissing(int needed, int eligible, int missing);
+
+  /// No description provided for @adminPoolByApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'methodologist: {n}'**
+  String adminPoolByApproved(int n);
+
+  /// No description provided for @adminPoolByAi.
+  ///
+  /// In en, this message translates to:
+  /// **'AI solver: {n}'**
+  String adminPoolByAi(int n);
+
+  /// No description provided for @adminPoolByDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'drafts: {n}'**
+  String adminPoolByDraft(int n);
+
+  /// No description provided for @adminPoolPassages.
+  ///
+  /// In en, this message translates to:
+  /// **'texts: standalone {standalone}, paired {paired}'**
+  String adminPoolPassages(int standalone, int paired);
+
+  /// No description provided for @adminPoolPassagesUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'texts without layout: {n}'**
+  String adminPoolPassagesUnknown(int n);
+
+  /// No description provided for @adminPoolShortfallsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What the next variant is missing'**
+  String get adminPoolShortfallsTitle;
+
+  /// No description provided for @adminPoolShortfallsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'By topic and difficulty from the ORT matrix: what to write and approve to assemble one more fully new variant.'**
+  String get adminPoolShortfallsHelp;
+
+  /// No description provided for @adminPoolShortfallsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is missing.'**
+  String get adminPoolShortfallsEmpty;
+
+  /// No description provided for @adminPoolMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'missing: {n}'**
+  String adminPoolMissing(int n);
+
+  /// No description provided for @adminPoolShortfallCell.
+  ///
+  /// In en, this message translates to:
+  /// **'difficulty {difficulty}: need {needed}, have {available}'**
+  String adminPoolShortfallCell(int difficulty, int needed, int available);
+
+  /// No description provided for @adminPoolPassagesStandalone.
+  ///
+  /// In en, this message translates to:
+  /// **'Standalone texts'**
+  String get adminPoolPassagesStandalone;
+
+  /// No description provided for @adminPoolPassagesPaired.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired texts'**
+  String get adminPoolPassagesPaired;
+
+  /// No description provided for @adminPoolShortfallPassages.
+  ///
+  /// In en, this message translates to:
+  /// **'texts needed {needed}, have {available}'**
+  String adminPoolShortfallPassages(int needed, int available);
+
+  /// No description provided for @adminPoolErrMatrix.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no topic matrix for this direction and language — a new variant cannot be assembled.'**
+  String get adminPoolErrMatrix;
+
+  /// No description provided for @adminPoolErrLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsuitable language: this direction has no version in the selected language.'**
+  String get adminPoolErrLanguage;
+
+  /// No description provided for @adminPaymentsTabWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Website orders'**
+  String get adminPaymentsTabWeb;
+
+  /// No description provided for @adminPaymentsTabRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get adminPaymentsTabRevenue;
+
+  /// No description provided for @adminPaymentsTabPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play'**
+  String get adminPaymentsTabPlay;
+
+  /// No description provided for @adminOrderStatusCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get adminOrderStatusCreated;
+
+  /// No description provided for @adminOrderStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment'**
+  String get adminOrderStatusPending;
+
+  /// No description provided for @adminOrderStatusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get adminOrderStatusPaid;
+
+  /// No description provided for @adminOrderStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get adminOrderStatusFailed;
+
+  /// No description provided for @adminOrderStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get adminOrderStatusExpired;
+
+  /// No description provided for @adminOrderStatusRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded'**
+  String get adminOrderStatusRefunded;
+
+  /// No description provided for @adminSom.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} som'**
+  String adminSom(int amount);
+
+  /// No description provided for @adminOrdersReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'View only. The server grants credits after the provider confirms the payment.'**
+  String get adminOrdersReadOnly;
+
+  /// No description provided for @adminOrdersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders.'**
+  String get adminOrdersEmpty;
+
+  /// No description provided for @adminOrdersDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'No access to website orders. Super admins and support can see them; if your role is right, the Firestore rules for payment_orders are not deployed yet.'**
+  String get adminOrdersDenied;
+
+  /// No description provided for @adminOrderRefundPendingPill.
+  ///
+  /// In en, this message translates to:
+  /// **'refund requested'**
+  String get adminOrderRefundPendingPill;
+
+  /// No description provided for @adminOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Website order'**
+  String get adminOrderTitle;
+
+  /// No description provided for @adminOrderId.
+  ///
+  /// In en, this message translates to:
+  /// **'Order id'**
+  String get adminOrderId;
+
+  /// No description provided for @adminOrderUser.
+  ///
+  /// In en, this message translates to:
+  /// **'User (uid)'**
+  String get adminOrderUser;
+
+  /// No description provided for @adminOrderProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get adminOrderProduct;
+
+  /// No description provided for @adminOrderCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits'**
+  String get adminOrderCredits;
+
+  /// No description provided for @adminOrderAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get adminOrderAmount;
+
+  /// No description provided for @adminOrderProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get adminOrderProvider;
+
+  /// No description provided for @adminOrderProviderRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider reference'**
+  String get adminOrderProviderRef;
+
+  /// No description provided for @adminOrderGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits granted'**
+  String get adminOrderGranted;
+
+  /// No description provided for @adminOrderCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get adminOrderCreated;
+
+  /// No description provided for @adminOrderPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get adminOrderPaid;
+
+  /// No description provided for @adminOrderExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get adminOrderExpires;
+
+  /// No description provided for @adminOrderUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get adminOrderUpdated;
+
+  /// No description provided for @adminOrderFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Failure reason'**
+  String get adminOrderFailure;
+
+  /// No description provided for @adminOrderRefundInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded {date} ({source}), credits clawed back: {credits}.'**
+  String adminOrderRefundInfo(String date, String source, int credits);
+
+  /// No description provided for @adminOrderRefundDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'The credits had been spent — debt: {n}.'**
+  String adminOrderRefundDebt(int n);
+
+  /// No description provided for @adminOrderRefundSourceAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'administrator'**
+  String get adminOrderRefundSourceAdmin;
+
+  /// No description provided for @adminOrderRefundSourceProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'provider'**
+  String get adminOrderRefundSourceProvider;
+
+  /// No description provided for @adminOrderRefundRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund requested {date}: «{reason}». The credits are clawed back once the provider confirms the refund.'**
+  String adminOrderRefundRequested(String date, String reason);
+
+  /// No description provided for @adminOrderOpenUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the user'**
+  String get adminOrderOpenUser;
+
+  /// No description provided for @adminOrderRefundAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund the payment'**
+  String get adminOrderRefundAction;
+
+  /// No description provided for @adminOrderRefundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund the payment?'**
+  String get adminOrderRefundTitle;
+
+  /// No description provided for @adminOrderRefundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider returns {amount} to the user, and {credits} credits are clawed back (if already spent, they become debt). Referral rewards for this payment are clawed back too. A refund cannot be undone; the action is recorded in the log.'**
+  String adminOrderRefundBody(String amount, int credits);
+
+  /// No description provided for @adminOrderRefundAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'A refund for this order was already requested and the provider has not confirmed it yet. Requesting again sends it once more.'**
+  String get adminOrderRefundAgain;
+
+  /// No description provided for @adminOrderRefundReasonHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'{min} to {max} characters — recorded in the action log'**
+  String adminOrderRefundReasonHelp(int min, int max);
+
+  /// No description provided for @adminOrderRefundDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment refunded. Credits clawed back: {n}.'**
+  String adminOrderRefundDone(int n);
+
+  /// No description provided for @adminOrderRefundPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund requested from the provider. The credits are clawed back once it confirms.'**
+  String get adminOrderRefundPending;
+
+  /// No description provided for @adminOrderErrNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found.'**
+  String get adminOrderErrNotFound;
+
+  /// No description provided for @adminOrderErrNotRefundable.
+  ///
+  /// In en, this message translates to:
+  /// **'This order cannot be refunded: only a paid order with granted credits can be refunded.'**
+  String get adminOrderErrNotRefundable;
+
+  /// No description provided for @adminOrderErrProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment provider is not connected right now — refunds from the CMS are not possible. Website payments are off.'**
+  String get adminOrderErrProvider;
+
+  /// No description provided for @adminRevenueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Website revenue, last 30 days'**
+  String get adminRevenueTitle;
+
+  /// No description provided for @adminRevenueOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'orders: {n}'**
+  String adminRevenueOrders(int n);
+
+  /// No description provided for @adminRevenueRefunded.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunded: {amount} · orders: {orders}'**
+  String adminRevenueRefunded(String amount, int orders);
+
+  /// No description provided for @adminRevenueNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid website orders by payment day (Bishkek time). Refunded orders are not part of the revenue, nor is Google Play.'**
+  String get adminRevenueNote;
+
+  /// No description provided for @adminRevenueByDay.
+  ///
+  /// In en, this message translates to:
+  /// **'By day'**
+  String get adminRevenueByDay;
+
+  /// No description provided for @adminRevenueEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No website payments in the last 30 days.'**
+  String get adminRevenueEmpty;
+
+  /// No description provided for @adminRevenueTruncated.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the first {n} payments were read — the total may be incomplete.'**
+  String adminRevenueTruncated(int n);
+
+  /// No description provided for @adminPricingTabWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get adminPricingTabWeb;
+
+  /// No description provided for @adminPricingTabPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play'**
+  String get adminPricingTabPlay;
+
+  /// No description provided for @adminWebPricingWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Website (web version) prices come from here — config/pricing.web_products. The Android build shows no prices, pay buttons or links. Base price: 1 credit = 1 full mock exam = 100 som; it is agreed with the owner.'**
+  String get adminWebPricingWarning;
+
+  /// No description provided for @adminWebPricingDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'web_products is not set yet — the defaults are shown: packs stay off until the owner approves their prices.'**
+  String get adminWebPricingDefaults;
+
+  /// No description provided for @adminWebProductEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'On sale'**
+  String get adminWebProductEnabled;
+
+  /// No description provided for @adminWebProductCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits'**
+  String get adminWebProductCredits;
+
+  /// No description provided for @adminWebProductAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Price, som'**
+  String get adminWebProductAmount;
+
+  /// No description provided for @adminWebProductSingleHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'1 credit = 1 full mock exam (fixed)'**
+  String get adminWebProductSingleHelp;
+
+  /// No description provided for @adminWebProductPerCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {n} som per credit'**
+  String adminWebProductPerCredit(int n);
+
+  /// No description provided for @adminWebPricingBaseChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'The base price is agreed with the owner. You are changing the exam_single price from {base} som to {amount} som.'**
+  String adminWebPricingBaseChanged(int base, int amount);
+
+  /// No description provided for @adminWebPricingBaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the base price?'**
+  String get adminWebPricingBaseTitle;
+
+  /// No description provided for @adminWebPricingConfirmType.
+  ///
+  /// In en, this message translates to:
+  /// **'To confirm, type the new price: {amount}'**
+  String adminWebPricingConfirmType(int amount);
+
+  /// No description provided for @adminWebPricingBaseApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the price'**
+  String get adminWebPricingBaseApply;
+
+  /// No description provided for @adminWebPricingConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save the website prices?'**
+  String get adminWebPricingConfirmTitle;
+
+  /// No description provided for @adminWebPricingConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'New prices apply to new orders at once; orders already created are paid at their own price. The change is recorded in the action log.'**
+  String get adminWebPricingConfirmBody;
+
+  /// No description provided for @adminWebPricingNoneEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'No product is on sale — website payments will be unavailable.'**
+  String get adminWebPricingNoneEnabled;
+
+  /// No description provided for @adminWebPricingNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes.'**
+  String get adminWebPricingNoChanges;
+
+  /// No description provided for @adminWebPricingIssueCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'Credits per product must be {min}–{max}.'**
+  String adminWebPricingIssueCredits(int min, int max);
+
+  /// No description provided for @adminWebPricingIssueAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'The price must be {min}–{max} som.'**
+  String adminWebPricingIssueAmount(int min, int max);
+
+  /// No description provided for @adminWebPricingIssueBase.
+  ///
+  /// In en, this message translates to:
+  /// **'The exam_single product is required.'**
+  String get adminWebPricingIssueBase;
+
+  /// No description provided for @adminWebPricingErrBase.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused a base price change without confirmation.'**
+  String get adminWebPricingErrBase;
 }
 
 class _AppLocalizationsDelegate

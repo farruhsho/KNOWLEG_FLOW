@@ -5,17 +5,24 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
+import '../../domain/exam_failure.dart';
 import '../../domain/exam_session.dart';
 import '../controllers/exam_runner_controller.dart';
 import '../providers/exam_providers.dart';
 import '../widgets/exam_common.dart';
 import '../widgets/exam_countdown.dart';
+import '../widgets/exam_style_choice.dart';
 import '../widgets/question_palette.dart';
 import '../widgets/question_view.dart';
 
 /// Full-screen exam runner (RoutePaths.examRun). Minimal chrome: section and
 /// part, a server-anchored countdown, progress, the question, and a bottom
 /// bar with previous / mark / palette / next.
+///
+/// Strict style («Как на ОРТ», §10.2): no flag button, no "Finish section"
+/// (the bar shows «Раздел закончится через …» instead and the section is
+/// sent at its deadline), no clearing, one correction per answer, and an
+/// instruction screen before every section.
 class ExamRunnerPage extends ConsumerStatefulWidget {
   final String attemptId;
 
@@ -103,8 +110,11 @@ class _ExamRunnerPageState extends ConsumerState<ExamRunnerPage>
       ExamRunnerNotice.fiveMinutesLeft => l.examWarningFive,
       ExamRunnerNotice.oneMinuteLeft => l.examWarningOne,
       ExamRunnerNotice.autoSubmitted => l.examAutoSubmitted,
+      ExamRunnerNotice.answerLocked => l.examStrictAnswerLocked,
     };
-    if (notice != ExamRunnerNotice.autoSubmitted) {
+    if (notice == ExamRunnerNotice.answerLocked) {
+      HapticFeedback.selectionClick();
+    } else if (notice != ExamRunnerNotice.autoSubmitted) {
       HapticFeedback.mediumImpact();
     }
     ScaffoldMessenger.of(context)
@@ -219,11 +229,23 @@ class _InSectionView extends ConsumerWidget {
       provider.select((s) => s.session?.hasQuestions ?? false),
     );
     final offline = ref.watch(provider.select((s) => s.offline));
+    // Strict style shows it on the first instruction screen instead.
+    final repeated = ref.watch(provider.select((s) {
+      final session = s.session;
+      final f = session?.freshness;
+      return session != null &&
+              !session.isStrict &&
+              session.sectionIndex == 0 &&
+              f != null
+          ? f.repeated
+          : 0;
+    }));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _RunnerHeader(attemptId: attemptId, onExit: onExit),
         if (offline) const _OfflineStrip(),
+        if (repeated > 0) ExamFreshnessNotice(repeated: repeated),
         Expanded(
           child: hasQuestions
               ? ExamQuestionArea(attemptId: attemptId)
@@ -234,6 +256,58 @@ class _InSectionView extends ConsumerWidget {
         ),
         if (hasQuestions) _RunnerBottomBar(attemptId: attemptId),
       ],
+    );
+  }
+}
+
+/// «N заданий вы уже встречали» (§10.1): shown on the first section of a
+/// fresh variant that had to reuse questions; dismissible.
+class ExamFreshnessNotice extends StatefulWidget {
+  final int repeated;
+
+  const ExamFreshnessNotice({super.key, required this.repeated});
+
+  @override
+  State<ExamFreshnessNotice> createState() => _ExamFreshnessNoticeState();
+}
+
+class _ExamFreshnessNoticeState extends State<ExamFreshnessNotice> {
+  bool _dismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_dismissed) return const SizedBox.shrink();
+    final l = context.l10n;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Container(
+      key: const ValueKey('exam_freshness_notice'),
+      color: scheme.secondaryContainer,
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        AppSpacing.lg,
+        AppSpacing.xs,
+        AppSpacing.xs,
+        AppSpacing.xs,
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.history_rounded, size: 18, color: scheme.onSecondaryContainer),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              '${l.examFreshnessRepeated(widget.repeated)}. ${l.examFreshnessWhy}',
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSecondaryContainer),
+            ),
+          ),
+          IconButton(
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.close_rounded, size: 18),
+            onPressed: () => setState(() => _dismissed = true),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -418,6 +492,10 @@ class _ExamQuestionAreaState extends ConsumerState<ExamQuestionArea> {
     );
     final controller = ref.read(provider.notifier);
     final passage = session.passageFor(question);
+    final strict = session.isStrict;
+    final choices = strict
+        ? ref.watch(provider.select((s) => s.session?.choicesMade(question.id) ?? 0))
+        : 0;
     ref.listen<int?>(provider.select((s) => s.session?.currentIndex), (_, __) {
       if (_scroll.hasClients) _scroll.jumpTo(0);
     });
@@ -434,7 +512,47 @@ class _ExamQuestionAreaState extends ConsumerState<ExamQuestionArea> {
         selected: selected,
         enabled: true,
         onSelect: (o) => controller.selectAnswer(question.id, o),
-        onClear: () => controller.clearAnswer(question.id),
+        // Strict: an answer can be corrected, never erased.
+        onClear: strict ? null : () => controller.clearAnswer(question.id),
+        footer: strict && selected != null
+            ? _StrictAnswerHint(locked: choices >= ExamSession.strictMaxChoices)
+            : null,
+      ),
+    );
+  }
+}
+
+/// Strict style: whether the one correction is still available.
+class _StrictAnswerHint extends StatelessWidget {
+  final bool locked;
+
+  const _StrictAnswerHint({required this.locked});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = context.l10n;
+    final tokens = context.tokens;
+    return Padding(
+      key: const ValueKey('strict_answer_hint'),
+      padding: const EdgeInsets.only(top: AppSpacing.xs),
+      child: Row(
+        children: [
+          Icon(
+            locked ? Icons.lock_outline_rounded : Icons.edit_outlined,
+            size: 16,
+            color: tokens.textTertiary,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              locked ? l.examStrictCorrectionUsed : l.examStrictCorrectionLeft,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: tokens.textSecondary),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -466,6 +584,7 @@ class _RunnerBottomBar extends ConsumerWidget {
     );
     final controller = ref.read(provider.notifier);
     final isLast = index >= total - 1;
+    final strict = ref.watch(provider.select((s) => s.session?.isStrict ?? false));
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -482,14 +601,16 @@ class _RunnerBottomBar extends ConsumerWidget {
             onPressed: index > 0 ? controller.previous : null,
             icon: const Icon(Icons.chevron_left_rounded),
           ),
-          IconButton(
-            key: const ValueKey('flag_button'),
-            tooltip: flagged ? l.examUnflag : l.examFlag,
-            isSelected: flagged,
-            onPressed: qid == null ? null : () => controller.toggleFlag(qid),
-            icon: const Icon(Icons.outlined_flag_rounded),
-            selectedIcon: Icon(Icons.flag_rounded, color: tokens.warning),
-          ),
+          // Strict style: no "come back later" flags (§10.2).
+          if (!strict)
+            IconButton(
+              key: const ValueKey('flag_button'),
+              tooltip: flagged ? l.examUnflag : l.examFlag,
+              isSelected: flagged,
+              onPressed: qid == null ? null : () => controller.toggleFlag(qid),
+              icon: const Icon(Icons.outlined_flag_rounded),
+              selectedIcon: Icon(Icons.flag_rounded, color: tokens.warning),
+            ),
           IconButton(
             key: const ValueKey('palette_button'),
             tooltip: l.examPalette,
@@ -498,7 +619,9 @@ class _RunnerBottomBar extends ConsumerWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
-            child: isLast
+            child: isLast && strict
+                ? _StrictSectionCountdown(attemptId: attemptId)
+                : isLast
                 ? FilledButton(
                     onPressed: () =>
                         confirmFinishSection(context, ref, attemptId),
@@ -527,6 +650,41 @@ class _RunnerBottomBar extends ConsumerWidget {
                   ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Strict style: where "Finish section" would be — the section ends by
+/// itself at its deadline.
+class _StrictSectionCountdown extends ConsumerWidget {
+  final String attemptId;
+
+  const _StrictSectionCountdown({required this.attemptId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = examRunnerControllerProvider(attemptId);
+    final deadline = ref.watch(
+      provider.select((s) => s.session?.localDeadline()),
+    );
+    final clock = ref.watch(examClockProvider);
+    final tokens = context.tokens;
+    if (deadline == null) return const SizedBox.shrink();
+    return Container(
+      key: const ValueKey('strict_section_countdown'),
+      constraints: const BoxConstraints(minHeight: 40),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: tokens.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppRadii.pill),
+      ),
+      child: ExamCountdown(
+        deadline: deadline,
+        clock: clock,
+        style: Theme.of(context).textTheme.labelLarge,
+        labelBuilder: context.l10n.examStrictSectionEndsIn,
       ),
     );
   }
@@ -619,6 +777,7 @@ class _PaletteSheet extends ConsumerWidget {
               child: QuestionPalette(
                 cells: cells,
                 groups: groups,
+                showFlags: session.allowsFlags,
                 onSelect: (i) {
                   ref.read(provider.notifier).goTo(i);
                   Navigator.of(context).pop();
@@ -626,20 +785,34 @@ class _PaletteSheet extends ConsumerWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              0,
-              AppSpacing.xl,
-              AppSpacing.lg,
+          if (session.canFinishEarly)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              child: OutlinedButton.icon(
+                onPressed: () =>
+                    Navigator.of(context).pop(ExamPaletteAction.finishSection),
+                icon: const Icon(Icons.done_all_rounded),
+                label: Text(l.examFinishSection),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              child: Text(
+                l.examStrictRuleNoEarlyFinish,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ),
-            child: OutlinedButton.icon(
-              onPressed: () =>
-                  Navigator.of(context).pop(ExamPaletteAction.finishSection),
-              icon: const Icon(Icons.done_all_rounded),
-              label: Text(l.examFinishSection),
-            ),
-          ),
         ],
       ),
     );
@@ -655,6 +828,8 @@ Future<void> confirmFinishSection(
   final provider = examRunnerControllerProvider(attemptId);
   final session = ref.read(provider).session;
   if (session == null || session.phase != ExamPhase.inSection) return;
+  // Strict style: a section is never finished early.
+  if (!session.canFinishEarly) return;
   final l = context.l10n;
   final tokens = context.tokens;
   final confirmed = await showDialog<bool>(
@@ -715,6 +890,12 @@ class _SubmitPendingView extends ConsumerWidget {
     final provider = examRunnerControllerProvider(attemptId);
     final failure = ref.watch(provider.select((s) => s.submitFailure));
     final l = context.l10n;
+    if (failure?.kind == ExamFailureKind.sectionNotOver) {
+      return ExamLoadingView(
+        key: const ValueKey('strict_waiting_deadline'),
+        message: l.examStrictWaitingDeadline,
+      );
+    }
     final isNetwork = failure == null || failure.kind.isRetryable;
     return ExamMessageView(
       icon: isNetwork ? Icons.wifi_off_rounded : Icons.error_outline_rounded,
@@ -737,6 +918,7 @@ class _SectionIntroView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final provider = examRunnerControllerProvider(attemptId);
     final session = ref.watch(provider.select((s) => s.session))!;
+    if (session.isStrict) return _StrictSectionInstruction(attemptId: attemptId);
     final clock = ref.watch(examClockProvider);
     final l = context.l10n;
     final theme = Theme.of(context);
@@ -871,6 +1053,151 @@ class _SectionIntroView extends ConsumerWidget {
               gutter,
               AppSpacing.md,
             ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    key: const ValueKey('start_section_button'),
+                    onPressed: () => ref.read(provider.notifier).startSection(),
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: Text(l.examStartSection),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Strict style: the instruction screen before every section (§10.2) —
+/// section, questions, minutes, rules, scratch paper only where the
+/// blueprint allows it, and an honest note that the timer already runs.
+class _StrictSectionInstruction extends ConsumerWidget {
+  final String attemptId;
+  const _StrictSectionInstruction({required this.attemptId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = examRunnerControllerProvider(attemptId);
+    final session = ref.watch(provider.select((s) => s.session))!;
+    final clock = ref.watch(examClockProvider);
+    final l = context.l10n;
+    final theme = Theme.of(context);
+    final tokens = context.tokens;
+    final spec = session.sectionSpec;
+    final lang = session.language;
+    final calculators = session.blueprint.rules.calculatorsAllowed;
+    final gutter = AppSpacing.gutter(context);
+    final first = session.submitted.isEmpty;
+    final repeated =
+        first && session.freshness != null ? session.freshness!.repeated : 0;
+    final details = SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: gutter, vertical: AppSpacing.lg),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (!first) ...[
+                Row(
+                  children: [
+                    Icon(Icons.check_circle_rounded, color: tokens.success),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        l.examSectionDone,
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: tokens.success),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+              ],
+              Text(
+                l.examSectionInstructionTitle.toUpperCase(),
+                style: theme.textTheme.labelSmall,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(spec.title.resolve(lang), style: theme.textTheme.headlineSmall),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                [
+                  l.examSectionLabel(session.sectionIndex + 1, session.sectionCount),
+                  l.examQuestionsCount(spec.questionCount),
+                  l.examMinutesCount(spec.durationMinutes),
+                ].join(' · '),
+                style: theme.textTheme.bodyMedium?.copyWith(color: tokens.textSecondary),
+              ),
+              if (spec.parts.length > 1) ...[
+                const SizedBox(height: AppSpacing.md),
+                for (final p in spec.parts)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                    child: Text(
+                      '• ${p.title.resolve(lang)} — ${l.examQuestionsCount(p.questionCount)}',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+              ],
+              if (repeated > 0) ...[
+                const SizedBox(height: AppSpacing.md),
+                ExamFreshnessNotice(repeated: repeated),
+              ],
+              const SizedBox(height: AppSpacing.lg),
+              ExamCard(
+                key: const ValueKey('strict_section_rules'),
+                color: tokens.surfaceMuted,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (session.sectionCount > 1)
+                      ExamRuleLine(Icons.lock_outline_rounded, l.examRuleForwardOnly),
+                    ...strictRuleLines(context, includeInstruction: false),
+                    if (!calculators)
+                      ExamRuleLine(Icons.calculate_outlined, l.examRuleNoCalculator),
+                    if (spec.allowScratchpad)
+                      ExamRuleLine(
+                        Icons.edit_note_rounded,
+                        l.examRuleScratchpad(spec.title.resolve(context.uiLang)),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(l.examStrictTimerRunning, style: theme.textTheme.bodyMedium),
+              const SizedBox(height: AppSpacing.xs),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: ExamCountdown(
+                  key: const ValueKey('strict_instruction_countdown'),
+                  deadline: session.localDeadline(),
+                  clock: clock,
+                  style: theme.textTheme.headlineSmall,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: details),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(top: BorderSide(color: tokens.border)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.md),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 560),

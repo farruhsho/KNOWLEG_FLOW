@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/backend/backend_contract.dart';
 import '../../../../core/backend/callable_platform.dart';
 import '../../../../core/network/firebase_service.dart';
 import '../../../../providers/locale_provider.dart';
@@ -16,6 +17,7 @@ import '../../domain/exam_blueprint.dart';
 import '../../domain/exam_failure.dart';
 import '../../domain/exam_payload.dart';
 import '../../domain/exam_session.dart';
+import '../../domain/exam_start.dart';
 import '../../domain/exam_variant.dart';
 import '../../domain/localized_text.dart';
 import '../controllers/exam_runner_controller.dart';
@@ -85,6 +87,33 @@ final examLanguageProvider = StateProvider<String>((ref) {
   final ui = ref.watch(localeProvider).languageCode;
   return ui == 'ky' ? 'ky' : 'ru';
 });
+
+/// `config/exam_pool` (§10.1): whether «Новый пробный» (mode `fresh`) is
+/// offered. Missing, unreadable or offline means enabled — the server is the
+/// authority and answers POOL_TOO_SMALL when it cannot assemble a variant.
+final examPoolConfigProvider = StreamProvider<ExamPoolConfig>((ref) async* {
+  yield ExamPoolConfig.defaults;
+  final FirebaseFirestore db;
+  try {
+    db = FirebaseFirestore.instance;
+  } catch (_) {
+    return; // Firebase not initialised (tests, offline dev build).
+  }
+  try {
+    await for (final snap in db
+        .collection(Collections.config)
+        .doc(ConfigDocs.examPool)
+        .snapshots()) {
+      yield ExamPoolConfig.fromMap(snap.data());
+    }
+  } catch (_) {
+    // Permission denied / offline: keep the default already emitted.
+  }
+});
+
+/// Whether the catalog offers «Новый пробный» right now.
+final examFreshEnabledProvider = Provider<bool>((ref) =>
+    ref.watch(examPoolConfigProvider).valueOrNull?.freshEnabled ?? true);
 
 typedef VariantQuery = ({String blueprintId, String language});
 

@@ -5848,4 +5848,751 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get yearly => 'Годовая';
+
+  @override
+  String get examFreshStart => 'Новый пробный';
+
+  @override
+  String get examFreshSubtitle =>
+      'Каждый раз — новый вариант по структуре ОРТ из проверенного банка заданий.';
+
+  @override
+  String get examLibraryTitle => 'Готовые варианты';
+
+  @override
+  String get examFreshVariantLine => 'Новый вариант — соберём при старте';
+
+  @override
+  String get examFreshLanguageLabel => 'Язык заданий';
+
+  @override
+  String get examFreshKyOnly =>
+      'Тест по государственному языку проводится только на кыргызском.';
+
+  @override
+  String get examStyleTitle => 'Как проходить';
+
+  @override
+  String get examStyleStandard => 'Тренировка';
+
+  @override
+  String get examStyleStandardBody =>
+      'Можно отмечать задания, менять ответы и завершить раздел раньше времени.';
+
+  @override
+  String get examStyleStrict => 'Как на ОРТ';
+
+  @override
+  String get examStyleStrictBody =>
+      'Раздел заканчивается только по времени, ответ можно исправить один раз, пометок нет, перед каждым разделом — инструкция.';
+
+  @override
+  String get examStyleStrictSource =>
+      'Правила взяты из брошюры ЦООМО для участников ОРТ. Это тренировка: результат учебный, а не официальный балл.';
+
+  @override
+  String get examStrictRuleNoEarlyFinish =>
+      'Раздел нельзя завершить досрочно: он закончится, когда выйдет время, и ответы отправятся автоматически.';
+
+  @override
+  String get examStrictRuleOneCorrection =>
+      'Ответ на задание можно исправить только один раз — как на бланке. Стереть ответ нельзя.';
+
+  @override
+  String get examStrictRuleNoFlags => 'Пометок «вернуться позже» нет.';
+
+  @override
+  String get examStrictRuleInstruction =>
+      'Перед каждым разделом — инструкция. Время раздела идёт с момента, когда он открылся, в том числе пока вы читаете инструкцию.';
+
+  @override
+  String examStrictSectionEndsIn(String time) {
+    return 'Раздел закончится через $time';
+  }
+
+  @override
+  String get examStrictAnswerLocked =>
+      'Ответ уже исправлен. Как на бланке ОРТ, исправить его можно только один раз.';
+
+  @override
+  String get examStrictCorrectionLeft => 'Ответ можно исправить ещё один раз.';
+
+  @override
+  String get examStrictCorrectionUsed =>
+      'Ответ исправлен — больше изменить нельзя.';
+
+  @override
+  String get examStrictWaitingDeadline =>
+      'Время раздела заканчивается — ответы отправятся через несколько секунд.';
+
+  @override
+  String get examSectionInstructionTitle => 'Инструкция к разделу';
+
+  @override
+  String get examStrictTimerRunning =>
+      'Таймер раздела уже идёт: он запустился, когда раздел открылся.';
+
+  @override
+  String examFreshnessRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count задания вы уже встречали в прошлых попытках',
+      many: '$count заданий вы уже встречали в прошлых попытках',
+      few: '$count задания вы уже встречали в прошлых попытках',
+      one: '$count задание вы уже встречали в прошлых попытках',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get examFreshnessWhy =>
+      'В банке пока не хватает новых заданий для этого направления — остальные задания новые.';
+
+  @override
+  String get examPoolTooSmallTitle => 'Новые варианты ещё готовятся';
+
+  @override
+  String examPoolTooSmallBody(String language) {
+    return 'Для этого направления ($language) пока недостаточно проверенных заданий. Кредит не списан. Пока можно пройти готовый вариант.';
+  }
+
+  @override
+  String get examPoolTooSmallAction => 'К готовым вариантам';
+
+  @override
+  String get examErrorSectionNotOver =>
+      'Раздел ещё не закончился — ответы отправятся по окончании времени.';
+
+  @override
+  String billingWebPrice(String amount) {
+    return '$amount сом';
+  }
+
+  @override
+  String get billingPay => 'Оплатить';
+
+  @override
+  String billingPaySemantics(String title, String price) {
+    return 'Оплатить: $title, $price';
+  }
+
+  @override
+  String get billingWebHonestPayment =>
+      'Оплата проходит на защищённой странице платёжного провайдера. Кредиты начисляются после подтверждения оплаты.';
+
+  @override
+  String get billingWebProductsEmpty =>
+      'Оплата пока недоступна. Загляните позже.';
+
+  @override
+  String get billingWebPaymentsDisabled =>
+      'Оплата пока не подключена. Попробуйте позже.';
+
+  @override
+  String get billingWebProductUnavailable =>
+      'Этот пакет сейчас недоступен. Выберите другой.';
+
+  @override
+  String get billingWebRateLimited =>
+      'Слишком много заказов за сегодня. Попробуйте завтра.';
+
+  @override
+  String get billingWebOrderError =>
+      'Не удалось создать заказ. Проверьте интернет и попробуйте ещё раз.';
+
+  @override
+  String get billingWebRedirecting => 'Открываем страницу оплаты…';
+
+  @override
+  String get billingLegalOffer => 'Публичная оферта';
+
+  @override
+  String get billingLegalRefund => 'Правила возврата';
+
+  @override
+  String get billingLegalDraftNote =>
+      'Черновик. Окончательный текст появится после проверки юристом.';
+
+  @override
+  String get billingLegalLoadError => 'Не удалось открыть документ.';
+
+  @override
+  String get billingLegalRuOnly =>
+      'Документ пока доступен только на русском языке.';
+
+  @override
+  String get payReturnTitle => 'Оплата';
+
+  @override
+  String get payReturnChecking => 'Проверяем оплату…';
+
+  @override
+  String get payReturnPaidTitle => 'Оплата прошла';
+
+  @override
+  String payReturnPaidBody(int credits) {
+    String _temp0 = intl.Intl.pluralLogic(
+      credits,
+      locale: localeName,
+      other: 'Начислено $credits кредита.',
+      many: 'Начислено $credits кредитов.',
+      few: 'Начислено $credits кредита.',
+      one: 'Начислен $credits кредит.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String payReturnBalance(String balance) {
+    return 'Баланс: $balance';
+  }
+
+  @override
+  String get payReturnStartExam => 'Начать пробный';
+
+  @override
+  String get payReturnFailedTitle => 'Оплата не прошла';
+
+  @override
+  String get payReturnFailedBody =>
+      'Кредиты не начислены. Если деньги всё же списались, напишите в поддержку — мы проверим заказ.';
+
+  @override
+  String get payReturnExpiredTitle => 'Заказ истёк';
+
+  @override
+  String get payReturnExpiredBody =>
+      'Оплата не поступила вовремя, кредиты не начислены. Можно оформить новый заказ.';
+
+  @override
+  String get payReturnRefundedTitle => 'Оплата возвращена';
+
+  @override
+  String get payReturnRefundedBody => 'Кредиты по этому заказу отозваны.';
+
+  @override
+  String get payReturnPendingTitle => 'Оплата ещё обрабатывается';
+
+  @override
+  String get payReturnPendingBody =>
+      'Провайдер пока не подтвердил оплату. Кредиты начислятся автоматически, как только придёт подтверждение, — проверьте баланс позже.';
+
+  @override
+  String get payReturnCheckAgain => 'Проверить ещё раз';
+
+  @override
+  String get payReturnNotFound =>
+      'Заказ не найден. Если вы оплатили, напишите в поддержку.';
+
+  @override
+  String get payReturnNoOrder =>
+      'Не удалось определить заказ. Проверьте баланс на странице доступа к тестам.';
+
+  @override
+  String get payReturnNetworkError =>
+      'Не удалось проверить оплату. Проверьте интернет.';
+
+  @override
+  String get payReturnToStore => 'К балансу';
+
+  @override
+  String get adminNavExamPool => 'Пул заданий';
+
+  @override
+  String get adminPoolSettingsTitle => 'Новый вариант на каждую попытку';
+
+  @override
+  String get adminPoolSettingsBody =>
+      'Каждый полный пробный собирается заново из проверенного банка по структуре ОРТ. Цена не меняется: первый пробный бесплатно, каждый следующий — 1 кредит.';
+
+  @override
+  String get adminPoolFreshEnabled => 'Собирать новый вариант';
+
+  @override
+  String get adminPoolFreshOnHelp =>
+      'Включено: ученики получают «Новый пробный», собранный для их попытки. Готовые варианты библиотеки тоже доступны.';
+
+  @override
+  String get adminPoolFreshOffHelp =>
+      'Выключено: ученики проходят только готовые варианты из библиотеки.';
+
+  @override
+  String get adminPoolMinStatus => 'Какие задания попадают в новый вариант';
+
+  @override
+  String get adminPoolStatusApproved => 'Только одобренные методистом';
+
+  @override
+  String get adminPoolStatusApprovedHelp =>
+      'methodologist_approved — каждое задание проверил и одобрил методист. Рекомендуется.';
+
+  @override
+  String get adminPoolStatusAi => 'Также проверенные AI-решателем';
+
+  @override
+  String get adminPoolStatusAiHelp =>
+      'ai_verified — задания проверены независимым AI-решателем, но не методистом.';
+
+  @override
+  String get adminPoolAiWarning =>
+      'ai_verified означает: «проверено независимым AI-решателем, но не методистом». Такие задания могут содержать ошибки, которые заметил бы только методист, и ученики будут платить кредитом за пробный с ними. Это осознанное решение владельца для пилота.';
+
+  @override
+  String get adminPoolConfirmAiBody =>
+      'В новые варианты начнут попадать и задания со статусом ai_verified. Начатые попытки не затрагиваются. Изменение попадёт в журнал действий.';
+
+  @override
+  String get adminPoolAiAcknowledge =>
+      'Понимаю: эти задания не проверял методист';
+
+  @override
+  String get adminPoolAiActive =>
+      'Сейчас в новые варианты попадают и задания ai_verified — проверенные независимым AI-решателем, но не методистом.';
+
+  @override
+  String get adminPoolReadOnly =>
+      'Только просмотр. Изменять настройки пула может только супер-админ.';
+
+  @override
+  String get adminPoolNotCreated =>
+      'config/exam_pool ещё не создан — действуют значения по умолчанию: новые варианты включены, только одобренные методистом задания.';
+
+  @override
+  String get adminPoolConfigDenied =>
+      'Не удалось прочитать config/exam_pool: нет доступа. Возможно, правила Firestore для него ещё не развернуты.';
+
+  @override
+  String adminPoolUpdated(String date, String uid) {
+    return 'Изменено: $date · $uid';
+  }
+
+  @override
+  String get adminPoolConfirmFreshOnTitle => 'Включить новые варианты?';
+
+  @override
+  String get adminPoolConfirmFreshOnBody =>
+      'Ученики снова смогут начать «Новый пробный», собранный из банка. Списание кредитов не меняется. Изменение попадёт в журнал действий.';
+
+  @override
+  String get adminPoolConfirmFreshOffTitle => 'Выключить новые варианты?';
+
+  @override
+  String get adminPoolConfirmFreshOffBody =>
+      'Ученики смогут проходить только готовые варианты из библиотеки. Начатые попытки не затрагиваются. Изменение попадёт в журнал действий.';
+
+  @override
+  String get adminPoolConfirmStatusTitle =>
+      'Изменить, какие задания попадают в вариант?';
+
+  @override
+  String get adminPoolConfirmApprovedBody =>
+      'В новые варианты будут попадать только задания, одобренные методистом. Если таких не хватит, ученики увидят «мало заданий» (кредит не списывается). Изменение попадёт в журнал действий.';
+
+  @override
+  String get adminPoolSaved => 'Настройки пула сохранены';
+
+  @override
+  String get adminPoolHealthTitle => 'Наполненность пула';
+
+  @override
+  String get adminPoolHealthBody =>
+      'Сколько заданий есть для каждой части структуры, сколько полностью разных вариантов можно собрать и каких тем не хватает.';
+
+  @override
+  String get adminPoolNoBlueprints => 'Нет активных структур теста.';
+
+  @override
+  String get adminPoolCheck => 'Проверить пул';
+
+  @override
+  String get adminPoolRecheck => 'Пересчитать';
+
+  @override
+  String get adminPoolChecking =>
+      'Считаем пул… Это может занять до двух минут.';
+
+  @override
+  String get adminPoolHealthDenied =>
+      'Отчёт о пуле доступен супер-админу, контент-менеджеру и методисту.';
+
+  @override
+  String adminPoolDisjoint(int n) {
+    return 'Полностью разных вариантов: $n';
+  }
+
+  @override
+  String adminPoolDisjointCapped(int n) {
+    return 'Полностью разных вариантов: не меньше $n';
+  }
+
+  @override
+  String get adminPoolDisjointHelp =>
+      'Столько вариантов можно собрать сейчас так, чтобы ни одно задание не повторилось. Дальше ученики начнут встречать уже виденные задания.';
+
+  @override
+  String get adminPoolDisjointZero =>
+      'Пул не покрывает даже один вариант: ученики получат сообщение «мало заданий» (кредит не списывается).';
+
+  @override
+  String get adminPoolFreshOff =>
+      'Новые варианты сейчас выключены — ученики проходят только библиотеку.';
+
+  @override
+  String adminPoolTotals(int needed, int eligible) {
+    return 'нужно в варианте: $needed · в пуле: $eligible';
+  }
+
+  @override
+  String adminPoolFloorNow(String status) {
+    return 'Учитываются: $status';
+  }
+
+  @override
+  String adminPoolPart(String part) {
+    return 'Часть $part';
+  }
+
+  @override
+  String adminPoolPartVariants(int n) {
+    return 'вариантов: $n';
+  }
+
+  @override
+  String get adminPoolPartNotCovered => 'не хватает на вариант';
+
+  @override
+  String adminPoolPartCounts(int needed, int eligible) {
+    return 'Нужно в варианте: $needed · в пуле: $eligible';
+  }
+
+  @override
+  String adminPoolPartMissing(int needed, int eligible, int missing) {
+    return 'Нужно в варианте: $needed · в пуле: $eligible · не хватает: $missing';
+  }
+
+  @override
+  String adminPoolByApproved(int n) {
+    return 'методист: $n';
+  }
+
+  @override
+  String adminPoolByAi(int n) {
+    return 'AI-решатель: $n';
+  }
+
+  @override
+  String adminPoolByDraft(int n) {
+    return 'черновики: $n';
+  }
+
+  @override
+  String adminPoolPassages(int standalone, int paired) {
+    return 'тексты: отдельные $standalone, парные $paired';
+  }
+
+  @override
+  String adminPoolPassagesUnknown(int n) {
+    return 'тексты без разметки: $n';
+  }
+
+  @override
+  String get adminPoolShortfallsTitle =>
+      'Чего не хватает для следующего варианта';
+
+  @override
+  String get adminPoolShortfallsHelp =>
+      'По темам и уровням сложности из матрицы ОРТ: что написать и одобрить, чтобы собрать ещё один полностью новый вариант.';
+
+  @override
+  String get adminPoolShortfallsEmpty => 'Нехватки нет.';
+
+  @override
+  String adminPoolMissing(int n) {
+    return 'не хватает: $n';
+  }
+
+  @override
+  String adminPoolShortfallCell(int difficulty, int needed, int available) {
+    return 'сложность $difficulty: нужно $needed, есть $available';
+  }
+
+  @override
+  String get adminPoolPassagesStandalone => 'Отдельные тексты';
+
+  @override
+  String get adminPoolPassagesPaired => 'Парные тексты';
+
+  @override
+  String adminPoolShortfallPassages(int needed, int available) {
+    return 'текстов нужно $needed, есть $available';
+  }
+
+  @override
+  String get adminPoolErrMatrix =>
+      'Для этого направления и языка нет матрицы тем — новый вариант собрать нельзя.';
+
+  @override
+  String get adminPoolErrLanguage =>
+      'Неподходящий язык: у этого направления нет версии на выбранном языке.';
+
+  @override
+  String get adminPaymentsTabWeb => 'Заказы на сайте';
+
+  @override
+  String get adminPaymentsTabRevenue => 'Выручка';
+
+  @override
+  String get adminPaymentsTabPlay => 'Google Play';
+
+  @override
+  String get adminOrderStatusCreated => 'Создан';
+
+  @override
+  String get adminOrderStatusPending => 'Ожидает оплаты';
+
+  @override
+  String get adminOrderStatusPaid => 'Оплачен';
+
+  @override
+  String get adminOrderStatusFailed => 'Не прошёл';
+
+  @override
+  String get adminOrderStatusExpired => 'Истёк';
+
+  @override
+  String get adminOrderStatusRefunded => 'Возвращён';
+
+  @override
+  String adminSom(int amount) {
+    return '$amount сом';
+  }
+
+  @override
+  String get adminOrdersReadOnly =>
+      'Только просмотр. Кредиты начисляет сервер после подтверждения оплаты провайдером.';
+
+  @override
+  String get adminOrdersEmpty => 'Заказов нет.';
+
+  @override
+  String get adminOrdersDenied =>
+      'Нет доступа к заказам на сайте. Они видны супер-админу и поддержке; если роль верная, правила Firestore для payment_orders ещё не развернуты.';
+
+  @override
+  String get adminOrderRefundPendingPill => 'возврат запрошен';
+
+  @override
+  String get adminOrderTitle => 'Заказ на сайте';
+
+  @override
+  String get adminOrderId => 'Номер заказа';
+
+  @override
+  String get adminOrderUser => 'Пользователь (uid)';
+
+  @override
+  String get adminOrderProduct => 'Товар';
+
+  @override
+  String get adminOrderCredits => 'Кредиты';
+
+  @override
+  String get adminOrderAmount => 'Сумма';
+
+  @override
+  String get adminOrderProvider => 'Провайдер';
+
+  @override
+  String get adminOrderProviderRef => 'Номер у провайдера';
+
+  @override
+  String get adminOrderGranted => 'Кредиты начислены';
+
+  @override
+  String get adminOrderCreated => 'Создан';
+
+  @override
+  String get adminOrderPaid => 'Оплачен';
+
+  @override
+  String get adminOrderExpires => 'Истекает';
+
+  @override
+  String get adminOrderUpdated => 'Обновлён';
+
+  @override
+  String get adminOrderFailure => 'Причина ошибки';
+
+  @override
+  String adminOrderRefundInfo(String date, String source, int credits) {
+    return 'Возврат $date ($source), отозвано кредитов: $credits.';
+  }
+
+  @override
+  String adminOrderRefundDebt(int n) {
+    return 'Кредиты были потрачены — долг: $n.';
+  }
+
+  @override
+  String get adminOrderRefundSourceAdmin => 'администратор';
+
+  @override
+  String get adminOrderRefundSourceProvider => 'провайдер';
+
+  @override
+  String adminOrderRefundRequested(String date, String reason) {
+    return 'Возврат запрошен $date: «$reason». Кредиты отзовутся, когда провайдер подтвердит возврат.';
+  }
+
+  @override
+  String get adminOrderOpenUser => 'Открыть пользователя';
+
+  @override
+  String get adminOrderRefundAction => 'Вернуть платёж';
+
+  @override
+  String get adminOrderRefundTitle => 'Вернуть платёж?';
+
+  @override
+  String adminOrderRefundBody(String amount, int credits) {
+    return 'Провайдер вернёт пользователю $amount, у него будет отозвано кредитов: $credits (если они уже потрачены — появится долг). Реферальные награды за эту оплату тоже отзываются. Отменить возврат нельзя; действие попадёт в журнал.';
+  }
+
+  @override
+  String get adminOrderRefundAgain =>
+      'Возврат по этому заказу уже запрошен и ещё не подтверждён провайдером. Повторный запрос отправит его снова.';
+
+  @override
+  String adminOrderRefundReasonHelp(int min, int max) {
+    return 'От $min до $max символов — попадёт в журнал действий';
+  }
+
+  @override
+  String adminOrderRefundDone(int n) {
+    return 'Платёж возвращён. Отозвано кредитов: $n.';
+  }
+
+  @override
+  String get adminOrderRefundPending =>
+      'Возврат запрошен у провайдера. Кредиты отзовутся, когда он подтвердит возврат.';
+
+  @override
+  String get adminOrderErrNotFound => 'Заказ не найден.';
+
+  @override
+  String get adminOrderErrNotRefundable =>
+      'Этот заказ нельзя вернуть: вернуть можно только оплаченный заказ с начисленными кредитами.';
+
+  @override
+  String get adminOrderErrProvider =>
+      'Провайдер оплаты сейчас не подключён — возврат из CMS невозможен. Оплата на сайте выключена.';
+
+  @override
+  String get adminRevenueTitle => 'Выручка на сайте за 30 дней';
+
+  @override
+  String adminRevenueOrders(int n) {
+    return 'заказов: $n';
+  }
+
+  @override
+  String adminRevenueRefunded(String amount, int orders) {
+    return 'Возвращено: $amount · заказов: $orders';
+  }
+
+  @override
+  String get adminRevenueNote =>
+      'Оплаченные заказы на сайте по дню оплаты (время Бишкека). Возвращённые заказы в выручку не входят, Google Play — тоже.';
+
+  @override
+  String get adminRevenueByDay => 'По дням';
+
+  @override
+  String get adminRevenueEmpty =>
+      'За последние 30 дней оплат на сайте не было.';
+
+  @override
+  String adminRevenueTruncated(int n) {
+    return 'Прочитаны только первые $n оплат — итог может быть неполным.';
+  }
+
+  @override
+  String get adminPricingTabWeb => 'Сайт';
+
+  @override
+  String get adminPricingTabPlay => 'Google Play';
+
+  @override
+  String get adminWebPricingWarning =>
+      'Цены оплаты на сайте (web-версия) берутся отсюда — config/pricing.web_products. В Android-сборке цен, кнопок оплаты и ссылок нет. Базовая цена: 1 кредит = 1 полный пробный = 100 сом; она согласуется с владельцем.';
+
+  @override
+  String get adminWebPricingDefaults =>
+      'web_products ещё не заданы — показаны значения по умолчанию: пакеты выключены, пока владелец не утвердит их цены.';
+
+  @override
+  String get adminWebProductEnabled => 'Продаётся';
+
+  @override
+  String get adminWebProductCredits => 'Кредитов';
+
+  @override
+  String get adminWebProductAmount => 'Цена, сом';
+
+  @override
+  String get adminWebProductSingleHelp =>
+      '1 кредит = 1 полный пробный (фиксировано)';
+
+  @override
+  String adminWebProductPerCredit(int n) {
+    return '≈ $n сом за кредит';
+  }
+
+  @override
+  String adminWebPricingBaseChanged(int base, int amount) {
+    return 'Базовая цена согласуется с владельцем. Вы меняете цену exam_single с $base сом на $amount сом.';
+  }
+
+  @override
+  String get adminWebPricingBaseTitle => 'Изменить базовую цену?';
+
+  @override
+  String adminWebPricingConfirmType(int amount) {
+    return 'Для подтверждения введите новую цену: $amount';
+  }
+
+  @override
+  String get adminWebPricingBaseApply => 'Изменить цену';
+
+  @override
+  String get adminWebPricingConfirmTitle => 'Сохранить цены на сайте?';
+
+  @override
+  String get adminWebPricingConfirmBody =>
+      'Новые цены сразу применяются к новым заказам; уже созданные заказы оплачиваются по своей цене. Изменение попадёт в журнал действий.';
+
+  @override
+  String get adminWebPricingNoneEnabled =>
+      'Ни один товар не продаётся — оплата на сайте будет недоступна.';
+
+  @override
+  String get adminWebPricingNoChanges => 'Изменений нет.';
+
+  @override
+  String adminWebPricingIssueCredits(int min, int max) {
+    return 'Кредитов в товаре — от $min до $max.';
+  }
+
+  @override
+  String adminWebPricingIssueAmount(int min, int max) {
+    return 'Цена — от $min до $max сом.';
+  }
+
+  @override
+  String get adminWebPricingIssueBase => 'Товар exam_single обязателен.';
+
+  @override
+  String get adminWebPricingErrBase =>
+      'Сервер не принял изменение базовой цены без подтверждения.';
 }

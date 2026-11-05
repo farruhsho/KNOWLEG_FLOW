@@ -3,11 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import 'package:intl/intl.dart';
+
 import '../../../../core/design/tokens.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../legal/presentation/legal_document_page.dart';
 import '../../application/billing_providers.dart';
 import '../../application/billing_service.dart';
+import '../../data/web_payment_gateway.dart';
 import '../../domain/entitlements.dart';
 import '../../domain/pricing_config.dart';
 import '../billing_messages.dart';
@@ -20,6 +24,10 @@ import '../widgets/promo_code_dialog.dart';
 ///   restore, honest copy.
 /// * `external` builds: balance and one neutral sentence — no prices, no
 ///   purchase buttons, no links (Play payments policy).
+/// * `web` builds (§10.3): enabled `config/pricing.web_products` with their
+///   price in som and «Оплатить» (server order → provider checkout in the
+///   same tab → RoutePaths.payReturn), plus the public offer and refund
+///   policy.
 ///
 /// Nothing on this page unlocks content: the balance comes from the
 /// server-written `entitlements/{uid}` document.
@@ -36,7 +44,7 @@ class _StorePageState extends ConsumerState<StorePage> {
   @override
   void initState() {
     super.initState();
-    if (ref.read(billingModeProvider).sellsInApp) {
+    if (ref.read(billingModeProvider).usesPlayBilling) {
       _service = ref.read(billingServiceProvider);
       // Normally already started by the app-level billing listener; this is
       // a no-op then, and a safety net if the listener is not wired.
@@ -53,7 +61,8 @@ class _StorePageState extends ConsumerState<StorePage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final sellsInApp = ref.watch(canSellProvider);
+    final mode = ref.watch(billingModeProvider);
+    final sellsInApp = mode.sellsInApp;
     // Play Billing (and so purchase verification) exists only on Android.
     final playPlatform = ref.watch(playBillingPlatformProvider);
     final gutter = AppSpacing.gutter(context);
@@ -73,7 +82,8 @@ class _StorePageState extends ConsumerState<StorePage> {
       ),
       // The purchase status sits outside the scroll view so it stays visible
       // wherever the user had scrolled to before tapping a product.
-      bottomNavigationBar: sellsInApp && playPlatform ? const _PurchaseStatus() : null,
+      bottomNavigationBar:
+          mode.usesPlayBilling && playPlatform ? const _PurchaseStatus() : null,
       body: ListView(
         padding: EdgeInsets.fromLTRB(gutter, AppSpacing.md, gutter, AppSpacing.xxxl),
         children: [
@@ -81,7 +91,13 @@ class _StorePageState extends ConsumerState<StorePage> {
           // A promo code is not a payment: offered in both billing modes.
           if (signedIn) const _PromoEntry(),
           const SizedBox(height: AppSpacing.xl),
-          if (sellsInApp && playPlatform) ...const [
+          if (mode.sellsOnWeb) ...const [
+            _WebProductsSection(),
+            SizedBox(height: AppSpacing.sm),
+            LegalDocumentLinks(),
+            SizedBox(height: AppSpacing.lg),
+            _WebHonestCopy(),
+          ] else if (sellsInApp && playPlatform) ...const [
             _ProductsSection(),
             SizedBox(height: AppSpacing.sm),
             _RestoreButton(),
@@ -407,6 +423,196 @@ class _HonestCopy extends StatelessWidget {
         _InfoRow(icon: Icons.verified_user_outlined, text: l10n.billingHonestServer),
         _InfoRow(icon: Icons.school_outlined, text: l10n.billingHonestNoGuarantee),
         _InfoRow(icon: Icons.payments_outlined, text: l10n.billingHonestPayment),
+      ],
+    );
+  }
+}
+
+/// Web build: products from `config/pricing.web_products` (no price is ever
+/// hard-coded) and «Оплатить».
+class _WebProductsSection extends ConsumerStatefulWidget {
+  const _WebProductsSection();
+
+  @override
+  ConsumerState<_WebProductsSection> createState() => _WebProductsSectionState();
+}
+
+class _WebProductsSectionState extends ConsumerState<_WebProductsSection> {
+  String? _busyProduct;
+  bool _redirecting = false;
+  WebPaymentIssue? _issue;
+
+  Future<void> _pay(WebProduct product) async {
+    if (_busyProduct != null) return;
+    setState(() {
+      _busyProduct = product.productId;
+      _issue = null;
+      _redirecting = false;
+    });
+    final gateway = ref.read(webPaymentGatewayProvider);
+    try {
+      final order = await gateway.createOrder(
+        productId: product.productId,
+        returnUrl: webPaymentReturnUrl(ref.read(webPageUriProvider)),
+      );
+      // Kept across the redirect in case the return URL loses `?order=`.
+      try {
+        await ref.read(pendingWebOrderStoreProvider).save(order.orderId);
+      } catch (_) {}
+      if (!mounted) return;
+      setState(() => _redirecting = true);
+      await gateway.openCheckout(order.checkoutUrl);
+    } on WebPaymentException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _issue = e.issue;
+        _busyProduct = null;
+        _redirecting = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _issue = WebPaymentIssue.unknown;
+        _busyProduct = null;
+        _redirecting = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final pricing = ref.watch(pricingConfigProvider).valueOrNull ?? PricingConfig.defaults;
+    final available = ref.watch(webPaymentsAvailableProvider);
+    final signedIn = ref.watch(billingUidProvider.select((u) => u.valueOrNull != null));
+    final products = available ? pricing.enabledWebProducts : const <WebProduct>[];
+    final issue = _issue;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.billingProductsTitle, style: theme.textTheme.titleMedium),
+        const SizedBox(height: AppSpacing.md),
+        if (products.isEmpty)
+          BillingMessage(
+            key: const ValueKey('web_products_empty'),
+            icon: Icons.schedule_outlined,
+            message: l10n.billingWebProductsEmpty,
+          )
+        else
+          for (final p in products)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _WebProductCard(
+                product: p,
+                pricing: pricing,
+                busy: _busyProduct == p.productId,
+                onPay: signedIn && _busyProduct == null ? () => _pay(p) : null,
+              ),
+            ),
+        if (_redirecting)
+          BillingStatusLine(text: l10n.billingWebRedirecting, busy: true),
+        if (issue != null)
+          BillingMessage(
+            key: const ValueKey('web_pay_issue'),
+            icon: issue == WebPaymentIssue.paymentsDisabled
+                ? Icons.schedule_outlined
+                : Icons.error_outline,
+            tone: issue == WebPaymentIssue.paymentsDisabled
+                ? BillingTone.warning
+                : BillingTone.danger,
+            message: l10n.billingWebIssueMessage(issue),
+          ),
+      ],
+    );
+  }
+}
+
+class _WebProductCard extends StatelessWidget {
+  const _WebProductCard({
+    required this.product,
+    required this.pricing,
+    required this.busy,
+    required this.onPay,
+  });
+
+  final WebProduct product;
+  final PricingConfig pricing;
+  final bool busy;
+  final VoidCallback? onPay;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final lang = Localizations.localeOf(context).languageCode;
+    final title = l10n.billingWebProductTitle(pricing, product, lang);
+    final price = l10n.billingWebPrice(_formatSom(product.amountSom, lang));
+    return BillingCard(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.md, AppSpacing.md),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: theme.textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(l10n.billingProductSubtitle(product.credits), style: theme.textTheme.bodySmall),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  price,
+                  key: ValueKey('web_price_${product.productId}'),
+                  style: theme.textTheme.titleSmall,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Semantics(
+            button: true,
+            label: l10n.billingPaySemantics(title, price),
+            excludeSemantics: true,
+            child: FilledButton(
+              key: ValueKey('pay_${product.productId}'),
+              onPressed: onPay,
+              child: busy
+                  ? SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    )
+                  : Text(l10n.billingPay),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _formatSom(int amount, String lang) {
+    try {
+      return NumberFormat.decimalPattern(lang).format(amount);
+    } catch (_) {
+      return '$amount';
+    }
+  }
+}
+
+class _WebHonestCopy extends StatelessWidget {
+  const _WebHonestCopy();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _InfoRow(icon: Icons.verified_user_outlined, text: l10n.billingHonestServer),
+        _InfoRow(icon: Icons.lock_outline, text: l10n.billingWebHonestPayment),
+        _InfoRow(icon: Icons.school_outlined, text: l10n.billingHonestNoGuarantee),
       ],
     );
   }

@@ -3818,5 +3818,705 @@
   "tutorYou": "You",
   "weakTopics": "Weak Topics",
   "welcome": "Welcome",
-  "yearly": "Yearly"
+  "yearly": "Yearly",
+  "examFreshStart": "New mock exam",
+  "@examFreshStart": {
+    "description": "Primary action of a direction: a new variant assembled for this attempt"
+  },
+  "examFreshSubtitle": "A new variant every time, built to the ORT structure from a bank of reviewed questions.",
+  "@examFreshSubtitle": {
+    "description": "Fresh mock exam explanation"
+  },
+  "examLibraryTitle": "Ready-made variants",
+  "@examLibraryTitle": {
+    "description": "Secondary list of published library variants"
+  },
+  "examFreshVariantLine": "A new variant, assembled when you start",
+  "@examFreshVariantLine": {
+    "description": "Fresh exam intro"
+  },
+  "examFreshLanguageLabel": "Question language",
+  "@examFreshLanguageLabel": {
+    "description": "Fresh exam intro: language choice"
+  },
+  "examFreshKyOnly": "The state language test is in Kyrgyz only.",
+  "@examFreshKyOnly": {
+    "description": "Fresh exam intro"
+  },
+  "examStyleTitle": "How to take it",
+  "@examStyleTitle": {
+    "description": "Exam style choice title"
+  },
+  "examStyleStandard": "Practice",
+  "@examStyleStandard": {
+    "description": "Exam style: standard"
+  },
+  "examStyleStandardBody": "You can flag questions, change answers and finish a section early.",
+  "@examStyleStandardBody": {
+    "description": "Exam style: standard"
+  },
+  "examStyleStrict": "Like the ORT",
+  "@examStyleStrict": {
+    "description": "Exam style: strict"
+  },
+  "examStyleStrictBody": "A section ends only when its time is up, you can correct an answer once, there are no flags, and every section starts with instructions.",
+  "@examStyleStrictBody": {
+    "description": "Exam style: strict"
+  },
+  "examStyleStrictSource": "The rules follow the official brochure for ORT candidates. This is practice: the result is for study, not an official score.",
+  "@examStyleStrictSource": {
+    "description": "Exam style: strict, honest source note"
+  },
+  "examStrictRuleNoEarlyFinish": "You can't finish a section early: it ends when its time is up and your answers are sent automatically.",
+  "@examStrictRuleNoEarlyFinish": {
+    "description": "Strict rule"
+  },
+  "examStrictRuleOneCorrection": "You can correct an answer only once — like on the answer sheet. An answer can't be erased.",
+  "@examStrictRuleOneCorrection": {
+    "description": "Strict rule"
+  },
+  "examStrictRuleNoFlags": "There are no “come back later” flags.",
+  "@examStrictRuleNoFlags": {
+    "description": "Strict rule"
+  },
+  "examStrictRuleInstruction": "Every section starts with instructions. Its time runs from the moment it opens, including while you read them.",
+  "@examStrictRuleInstruction": {
+    "description": "Strict rule"
+  },
+  "examStrictSectionEndsIn": "Section ends in {time}",
+  "@examStrictSectionEndsIn": {
+    "description": "Strict runner: replaces \"Finish section\"; {time} is mm:ss",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "examStrictAnswerLocked": "This answer was already corrected. As on the ORT answer sheet, it can be corrected only once.",
+  "@examStrictAnswerLocked": {
+    "description": "Strict runner: a third choice was refused"
+  },
+  "examStrictCorrectionLeft": "You can still correct this answer once.",
+  "@examStrictCorrectionLeft": {
+    "description": "Strict runner"
+  },
+  "examStrictCorrectionUsed": "Answer corrected — it can't be changed again.",
+  "@examStrictCorrectionUsed": {
+    "description": "Strict runner"
+  },
+  "examStrictWaitingDeadline": "The section's time is ending — your answers will be sent in a few seconds.",
+  "@examStrictWaitingDeadline": {
+    "description": "Strict runner: SECTION_NOT_OVER, retrying"
+  },
+  "examSectionInstructionTitle": "Section instructions",
+  "@examSectionInstructionTitle": {
+    "description": "Strict pre-section screen"
+  },
+  "examStrictTimerRunning": "The section timer is already running: it started when the section opened.",
+  "@examStrictTimerRunning": {
+    "description": "Strict pre-section screen, honest timer note"
+  },
+  "examFreshnessRepeated": "{count, plural, =1{You've already seen 1 question in earlier attempts} other{You've already seen {count} questions in earlier attempts}}",
+  "@examFreshnessRepeated": {
+    "description": "Fresh variant: repeated questions",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examFreshnessWhy": "The bank doesn't have enough new questions for this direction yet — the rest are new.",
+  "@examFreshnessWhy": {
+    "description": "Fresh variant: repeated questions"
+  },
+  "examPoolTooSmallTitle": "New variants are being prepared",
+  "@examPoolTooSmallTitle": {
+    "description": "POOL_TOO_SMALL"
+  },
+  "examPoolTooSmallBody": "There aren't enough reviewed questions for this direction ({language}) yet. No credit was charged. Meanwhile you can take a ready-made variant.",
+  "@examPoolTooSmallBody": {
+    "description": "POOL_TOO_SMALL",
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "examPoolTooSmallAction": "Ready-made variants",
+  "@examPoolTooSmallAction": {
+    "description": "POOL_TOO_SMALL"
+  },
+  "examErrorSectionNotOver": "The section isn't over yet — your answers will be sent when time is up.",
+  "@examErrorSectionNotOver": {
+    "description": "SECTION_NOT_OVER"
+  },
+  "billingWebPrice": "{amount} som",
+  "@billingWebPrice": {
+    "description": "Price of a web product from config/pricing.web_products",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPay": "Pay",
+  "@billingPay": {
+    "description": "Web store button"
+  },
+  "billingPaySemantics": "Pay: {title}, {price}",
+  "@billingPaySemantics": {
+    "description": "Web store button semantics",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "billingWebHonestPayment": "Payment is made on the payment provider's secure page. Credits are added once the payment is confirmed.",
+  "@billingWebHonestPayment": {
+    "description": "Web store"
+  },
+  "billingWebProductsEmpty": "Payment isn't available yet. Please check back later.",
+  "@billingWebProductsEmpty": {
+    "description": "Web store"
+  },
+  "billingWebPaymentsDisabled": "Payments aren't connected yet. Please try later.",
+  "@billingWebPaymentsDisabled": {
+    "description": "PAYMENTS_DISABLED"
+  },
+  "billingWebProductUnavailable": "This package isn't available right now. Please choose another.",
+  "@billingWebProductUnavailable": {
+    "description": "PRODUCT_UNAVAILABLE"
+  },
+  "billingWebRateLimited": "Too many orders today. Please try again tomorrow.",
+  "@billingWebRateLimited": {
+    "description": "RATE_LIMITED"
+  },
+  "billingWebOrderError": "Couldn't create the order. Check your connection and try again.",
+  "@billingWebOrderError": {
+    "description": "Web store"
+  },
+  "billingWebRedirecting": "Opening the payment page…",
+  "@billingWebRedirecting": {
+    "description": "Web store"
+  },
+  "billingLegalOffer": "Public offer",
+  "@billingLegalOffer": {
+    "description": "Legal document"
+  },
+  "billingLegalRefund": "Refund policy",
+  "@billingLegalRefund": {
+    "description": "Legal document"
+  },
+  "billingLegalDraftNote": "Draft. The final text will be published after legal review.",
+  "@billingLegalDraftNote": {
+    "description": "Legal document"
+  },
+  "billingLegalLoadError": "Couldn't open the document.",
+  "@billingLegalLoadError": {
+    "description": "Legal document"
+  },
+  "billingLegalRuOnly": "This document is available in Russian only for now.",
+  "@billingLegalRuOnly": {
+    "description": "Legal document"
+  },
+  "payReturnTitle": "Payment",
+  "@payReturnTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnChecking": "Checking your payment…",
+  "@payReturnChecking": {
+    "description": "Web payment return page"
+  },
+  "payReturnPaidTitle": "Payment received",
+  "@payReturnPaidTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnPaidBody": "{credits, plural, =1{1 credit added.} other{{credits} credits added.}}",
+  "@payReturnPaidBody": {
+    "description": "Web payment return page",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "payReturnBalance": "Balance: {balance}",
+  "@payReturnBalance": {
+    "description": "Web payment return page; {balance} is e.g. \"3 кредита\"",
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "payReturnStartExam": "Start a mock exam",
+  "@payReturnStartExam": {
+    "description": "Web payment return page"
+  },
+  "payReturnFailedTitle": "Payment didn't go through",
+  "@payReturnFailedTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnFailedBody": "No credits were added. If you were charged anyway, contact support and we'll check the order.",
+  "@payReturnFailedBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnExpiredTitle": "Order expired",
+  "@payReturnExpiredTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnExpiredBody": "The payment didn't arrive in time and no credits were added. You can place a new order.",
+  "@payReturnExpiredBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnRefundedTitle": "Payment refunded",
+  "@payReturnRefundedTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnRefundedBody": "Credits from this order were withdrawn.",
+  "@payReturnRefundedBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnPendingTitle": "Payment is still processing",
+  "@payReturnPendingTitle": {
+    "description": "Web payment return page"
+  },
+  "payReturnPendingBody": "The provider hasn't confirmed the payment yet. Credits are added automatically as soon as it does — check your balance later.",
+  "@payReturnPendingBody": {
+    "description": "Web payment return page"
+  },
+  "payReturnCheckAgain": "Check again",
+  "@payReturnCheckAgain": {
+    "description": "Web payment return page"
+  },
+  "payReturnNotFound": "Order not found. If you paid, please contact support.",
+  "@payReturnNotFound": {
+    "description": "ORDER_NOT_FOUND"
+  },
+  "payReturnNoOrder": "We couldn't tell which order this is. Check your balance on the exam access page.",
+  "@payReturnNoOrder": {
+    "description": "Web payment return page"
+  },
+  "payReturnNetworkError": "Couldn't check the payment. Check your connection.",
+  "@payReturnNetworkError": {
+    "description": "Web payment return page"
+  },
+  "payReturnToStore": "To my balance",
+  "@payReturnToStore": {
+    "description": "Web payment return page"
+  },
+  "adminNavExamPool": "Question pool",
+  "adminPoolSettingsTitle": "A new variant for every attempt",
+  "adminPoolSettingsBody": "Every full mock exam is assembled anew from the verified bank, following the ORT structure. The price does not change: the first mock exam is free, every next one costs 1 credit.",
+  "adminPoolFreshEnabled": "Assemble a new variant",
+  "adminPoolFreshOnHelp": "On: students get a «New mock exam» assembled for their attempt. Ready-made library variants stay available too.",
+  "adminPoolFreshOffHelp": "Off: students take only the ready-made library variants.",
+  "adminPoolMinStatus": "Which questions may enter a new variant",
+  "adminPoolStatusApproved": "Methodologist-approved only",
+  "adminPoolStatusApprovedHelp": "methodologist_approved — every question was reviewed and approved by a methodologist. Recommended.",
+  "adminPoolStatusAi": "Also AI-solver-verified",
+  "adminPoolStatusAiHelp": "ai_verified — questions checked by an independent AI solver, not by a methodologist.",
+  "adminPoolAiWarning": "ai_verified means «checked by an independent AI solver, not by a methodologist». Such questions may contain mistakes only a methodologist would catch, and students pay a credit for a mock exam that includes them. This is a deliberate owner decision for the pilot.",
+  "adminPoolConfirmAiBody": "New variants will also include questions with the ai_verified status. Attempts already started are not affected. The change is recorded in the action log.",
+  "adminPoolAiAcknowledge": "I understand: no methodologist checked these questions",
+  "adminPoolAiActive": "New variants currently also include ai_verified questions — checked by an independent AI solver, not by a methodologist.",
+  "adminPoolReadOnly": "View only. Only a super admin can change the pool settings.",
+  "adminPoolNotCreated": "config/exam_pool does not exist yet — the defaults apply: new variants on, methodologist-approved questions only.",
+  "adminPoolConfigDenied": "Could not read config/exam_pool: access denied. The Firestore rules for it may not be deployed yet.",
+  "adminPoolUpdated": "Changed: {date} · {uid}",
+  "@adminPoolUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "uid": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPoolConfirmFreshOnTitle": "Turn new variants on?",
+  "adminPoolConfirmFreshOnBody": "Students will again be able to start a «New mock exam» assembled from the bank. Credit charging does not change. The change is recorded in the action log.",
+  "adminPoolConfirmFreshOffTitle": "Turn new variants off?",
+  "adminPoolConfirmFreshOffBody": "Students will be able to take only the ready-made library variants. Attempts already started are not affected. The change is recorded in the action log.",
+  "adminPoolConfirmStatusTitle": "Change which questions enter a variant?",
+  "adminPoolConfirmApprovedBody": "New variants will include only methodologist-approved questions. If there are not enough, students see «not enough questions» (no credit is charged). The change is recorded in the action log.",
+  "adminPoolSaved": "Pool settings saved",
+  "adminPoolHealthTitle": "Pool coverage",
+  "adminPoolHealthBody": "How many questions each part of the structure has, how many fully distinct variants can be assembled and which topics are short.",
+  "adminPoolNoBlueprints": "No active test structures.",
+  "adminPoolCheck": "Check the pool",
+  "adminPoolRecheck": "Recalculate",
+  "adminPoolChecking": "Counting the pool… This can take up to two minutes.",
+  "adminPoolHealthDenied": "The pool report is available to super admins, content managers and methodologists.",
+  "adminPoolDisjoint": "Fully distinct variants: {n}",
+  "@adminPoolDisjoint": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolDisjointCapped": "Fully distinct variants: at least {n}",
+  "@adminPoolDisjointCapped": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolDisjointHelp": "This many variants can be assembled now without repeating a single question. After that, students start meeting questions they have already seen.",
+  "adminPoolDisjointZero": "The pool does not cover even one variant: students get «not enough questions» (no credit is charged).",
+  "adminPoolFreshOff": "New variants are currently off — students take only library variants.",
+  "adminPoolTotals": "per variant: {needed} · in the pool: {eligible}",
+  "@adminPoolTotals": {
+    "placeholders": {
+      "needed": {
+        "type": "int"
+      },
+      "eligible": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolFloorNow": "Counted: {status}",
+  "@adminPoolFloorNow": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPoolPart": "Part {part}",
+  "@adminPoolPart": {
+    "placeholders": {
+      "part": {
+        "type": "String"
+      }
+    }
+  },
+  "adminPoolPartVariants": "variants: {n}",
+  "@adminPoolPartVariants": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolPartNotCovered": "short of one variant",
+  "adminPoolPartCounts": "Per variant: {needed} · in the pool: {eligible}",
+  "@adminPoolPartCounts": {
+    "placeholders": {
+      "needed": {
+        "type": "int"
+      },
+      "eligible": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolPartMissing": "Per variant: {needed} · in the pool: {eligible} · missing: {missing}",
+  "@adminPoolPartMissing": {
+    "placeholders": {
+      "needed": {
+        "type": "int"
+      },
+      "eligible": {
+        "type": "int"
+      },
+      "missing": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolByApproved": "methodologist: {n}",
+  "@adminPoolByApproved": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolByAi": "AI solver: {n}",
+  "@adminPoolByAi": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolByDraft": "drafts: {n}",
+  "@adminPoolByDraft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolPassages": "texts: standalone {standalone}, paired {paired}",
+  "@adminPoolPassages": {
+    "placeholders": {
+      "standalone": {
+        "type": "int"
+      },
+      "paired": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolPassagesUnknown": "texts without layout: {n}",
+  "@adminPoolPassagesUnknown": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolShortfallsTitle": "What the next variant is missing",
+  "adminPoolShortfallsHelp": "By topic and difficulty from the ORT matrix: what to write and approve to assemble one more fully new variant.",
+  "adminPoolShortfallsEmpty": "Nothing is missing.",
+  "adminPoolMissing": "missing: {n}",
+  "@adminPoolMissing": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolShortfallCell": "difficulty {difficulty}: need {needed}, have {available}",
+  "@adminPoolShortfallCell": {
+    "placeholders": {
+      "difficulty": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      },
+      "available": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolPassagesStandalone": "Standalone texts",
+  "adminPoolPassagesPaired": "Paired texts",
+  "adminPoolShortfallPassages": "texts needed {needed}, have {available}",
+  "@adminPoolShortfallPassages": {
+    "placeholders": {
+      "needed": {
+        "type": "int"
+      },
+      "available": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPoolErrMatrix": "There is no topic matrix for this direction and language — a new variant cannot be assembled.",
+  "adminPoolErrLanguage": "Unsuitable language: this direction has no version in the selected language.",
+  "adminPaymentsTabWeb": "Website orders",
+  "adminPaymentsTabRevenue": "Revenue",
+  "adminPaymentsTabPlay": "Google Play",
+  "adminOrderStatusCreated": "Created",
+  "adminOrderStatusPending": "Awaiting payment",
+  "adminOrderStatusPaid": "Paid",
+  "adminOrderStatusFailed": "Failed",
+  "adminOrderStatusExpired": "Expired",
+  "adminOrderStatusRefunded": "Refunded",
+  "adminSom": "{amount} som",
+  "@adminSom": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOrdersReadOnly": "View only. The server grants credits after the provider confirms the payment.",
+  "adminOrdersEmpty": "No orders.",
+  "adminOrdersDenied": "No access to website orders. Super admins and support can see them; if your role is right, the Firestore rules for payment_orders are not deployed yet.",
+  "adminOrderRefundPendingPill": "refund requested",
+  "adminOrderTitle": "Website order",
+  "adminOrderId": "Order id",
+  "adminOrderUser": "User (uid)",
+  "adminOrderProduct": "Product",
+  "adminOrderCredits": "Credits",
+  "adminOrderAmount": "Amount",
+  "adminOrderProvider": "Provider",
+  "adminOrderProviderRef": "Provider reference",
+  "adminOrderGranted": "Credits granted",
+  "adminOrderCreated": "Created",
+  "adminOrderPaid": "Paid",
+  "adminOrderExpires": "Expires",
+  "adminOrderUpdated": "Updated",
+  "adminOrderFailure": "Failure reason",
+  "adminOrderRefundInfo": "Refunded {date} ({source}), credits clawed back: {credits}.",
+  "@adminOrderRefundInfo": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      },
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOrderRefundDebt": "The credits had been spent — debt: {n}.",
+  "@adminOrderRefundDebt": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOrderRefundSourceAdmin": "administrator",
+  "adminOrderRefundSourceProvider": "provider",
+  "adminOrderRefundRequested": "Refund requested {date}: «{reason}». The credits are clawed back once the provider confirms the refund.",
+  "@adminOrderRefundRequested": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "adminOrderOpenUser": "Open the user",
+  "adminOrderRefundAction": "Refund the payment",
+  "adminOrderRefundTitle": "Refund the payment?",
+  "adminOrderRefundBody": "The provider returns {amount} to the user, and {credits} credits are clawed back (if already spent, they become debt). Referral rewards for this payment are clawed back too. A refund cannot be undone; the action is recorded in the log.",
+  "@adminOrderRefundBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOrderRefundAgain": "A refund for this order was already requested and the provider has not confirmed it yet. Requesting again sends it once more.",
+  "adminOrderRefundReasonHelp": "{min} to {max} characters — recorded in the action log",
+  "@adminOrderRefundReasonHelp": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOrderRefundDone": "Payment refunded. Credits clawed back: {n}.",
+  "@adminOrderRefundDone": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminOrderRefundPending": "Refund requested from the provider. The credits are clawed back once it confirms.",
+  "adminOrderErrNotFound": "Order not found.",
+  "adminOrderErrNotRefundable": "This order cannot be refunded: only a paid order with granted credits can be refunded.",
+  "adminOrderErrProvider": "The payment provider is not connected right now — refunds from the CMS are not possible. Website payments are off.",
+  "adminRevenueTitle": "Website revenue, last 30 days",
+  "adminRevenueOrders": "orders: {n}",
+  "@adminRevenueOrders": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminRevenueRefunded": "Refunded: {amount} · orders: {orders}",
+  "@adminRevenueRefunded": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "orders": {
+        "type": "int"
+      }
+    }
+  },
+  "adminRevenueNote": "Paid website orders by payment day (Bishkek time). Refunded orders are not part of the revenue, nor is Google Play.",
+  "adminRevenueByDay": "By day",
+  "adminRevenueEmpty": "No website payments in the last 30 days.",
+  "adminRevenueTruncated": "Only the first {n} payments were read — the total may be incomplete.",
+  "@adminRevenueTruncated": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminPricingTabWeb": "Website",
+  "adminPricingTabPlay": "Google Play",
+  "adminWebPricingWarning": "Website (web version) prices come from here — config/pricing.web_products. The Android build shows no prices, pay buttons or links. Base price: 1 credit = 1 full mock exam = 100 som; it is agreed with the owner.",
+  "adminWebPricingDefaults": "web_products is not set yet — the defaults are shown: packs stay off until the owner approves their prices.",
+  "adminWebProductEnabled": "On sale",
+  "adminWebProductCredits": "Credits",
+  "adminWebProductAmount": "Price, som",
+  "adminWebProductSingleHelp": "1 credit = 1 full mock exam (fixed)",
+  "adminWebProductPerCredit": "≈ {n} som per credit",
+  "@adminWebProductPerCredit": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adminWebPricingBaseChanged": "The base price is agreed with the owner. You are changing the exam_single price from {base} som to {amount} som.",
+  "@adminWebPricingBaseChanged": {
+    "placeholders": {
+      "base": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "adminWebPricingBaseTitle": "Change the base price?",
+  "adminWebPricingConfirmType": "To confirm, type the new price: {amount}",
+  "@adminWebPricingConfirmType": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "adminWebPricingBaseApply": "Change the price",
+  "adminWebPricingConfirmTitle": "Save the website prices?",
+  "adminWebPricingConfirmBody": "New prices apply to new orders at once; orders already created are paid at their own price. The change is recorded in the action log.",
+  "adminWebPricingNoneEnabled": "No product is on sale — website payments will be unavailable.",
+  "adminWebPricingNoChanges": "No changes.",
+  "adminWebPricingIssueCredits": "Credits per product must be {min}–{max}.",
+  "@adminWebPricingIssueCredits": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "adminWebPricingIssueAmount": "The price must be {min}–{max} som.",
+  "@adminWebPricingIssueAmount": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "adminWebPricingIssueBase": "The exam_single product is required.",
+  "adminWebPricingErrBase": "The server refused a base price change without confirmation."
 }

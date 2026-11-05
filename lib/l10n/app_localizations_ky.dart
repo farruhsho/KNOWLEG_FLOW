@@ -5766,4 +5766,744 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get yearly => 'Жылдык';
+
+  @override
+  String get examFreshStart => 'Жаңы сынамык экзамен';
+
+  @override
+  String get examFreshSubtitle =>
+      'Ар жолу — ЖРТнын түзүлүшү боюнча текшерилген тапшырмалар банкынан жаңы вариант.';
+
+  @override
+  String get examLibraryTitle => 'Даяр варианттар';
+
+  @override
+  String get examFreshVariantLine => 'Жаңы вариант — баштаганда түзүлөт';
+
+  @override
+  String get examFreshLanguageLabel => 'Тапшырмалардын тили';
+
+  @override
+  String get examFreshKyOnly =>
+      'Мамлекеттик тил боюнча тест кыргыз тилинде гана өтөт.';
+
+  @override
+  String get examStyleTitle => 'Кантип өтүү';
+
+  @override
+  String get examStyleStandard => 'Машыгуу';
+
+  @override
+  String get examStyleStandardBody =>
+      'Тапшырмаларды белгилеп, жоопторду өзгөртүп, бөлүмдү убактысынан мурда бүтүрсөңүз болот.';
+
+  @override
+  String get examStyleStrict => 'ЖРТдагыдай';
+
+  @override
+  String get examStyleStrictBody =>
+      'Бөлүм убакыт бүткөндө гана аяктайт, жоопту бир жолу гана оңдоого болот, белгилер жок, ар бир бөлүмдүн алдында — нускама.';
+
+  @override
+  String get examStyleStrictSource =>
+      'Эрежелер ЖРТ катышуучулары үчүн ЦООМОнун брошюрасынан алынган. Бул машыгуу: жыйынтык окуу үчүн, расмий балл эмес.';
+
+  @override
+  String get examStrictRuleNoEarlyFinish =>
+      'Бөлүмдү мөөнөтүнөн мурда бүтүрүүгө болбойт: убакыт бүткөндө ал аяктайт жана жооптор автоматтык түрдө жөнөтүлөт.';
+
+  @override
+  String get examStrictRuleOneCorrection =>
+      'Тапшырманын жообун бир гана жолу оңдоого болот — бланктагыдай. Жоопту өчүрүүгө болбойт.';
+
+  @override
+  String get examStrictRuleNoFlags => '«Кийин кайтуу» белгилери жок.';
+
+  @override
+  String get examStrictRuleInstruction =>
+      'Ар бир бөлүмдүн алдында — нускама. Бөлүмдүн убактысы ал ачылган учурдан тартып жүрөт, нускаманы окуп жатканда да.';
+
+  @override
+  String examStrictSectionEndsIn(String time) {
+    return 'Бөлүм $time кийин аяктайт';
+  }
+
+  @override
+  String get examStrictAnswerLocked =>
+      'Жооп оңдолгон. ЖРТнын бланкындагыдай, аны бир гана жолу оңдоого болот.';
+
+  @override
+  String get examStrictCorrectionLeft => 'Жоопту дагы бир жолу оңдоого болот.';
+
+  @override
+  String get examStrictCorrectionUsed =>
+      'Жооп оңдолду — мындан ары өзгөртүүгө болбойт.';
+
+  @override
+  String get examStrictWaitingDeadline =>
+      'Бөлүмдүн убактысы бүтүп жатат — жооптор бир нече секунддан кийин жөнөтүлөт.';
+
+  @override
+  String get examSectionInstructionTitle => 'Бөлүмгө нускама';
+
+  @override
+  String get examStrictTimerRunning =>
+      'Бөлүмдүн таймери жүрүп жатат: ал бөлүм ачылганда башталган.';
+
+  @override
+  String examFreshnessRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count тапшырманы мурунку аракеттерде көргөнсүз',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get examFreshnessWhy =>
+      'Банкта бул багыт боюнча жаңы тапшырмалар азырынча жетишсиз — калган тапшырмалар жаңы.';
+
+  @override
+  String get examPoolTooSmallTitle => 'Жаңы варианттар даярдалып жатат';
+
+  @override
+  String examPoolTooSmallBody(String language) {
+    return 'Бул багыт боюнча ($language) текшерилген тапшырмалар азырынча жетишсиз. Кредит алынган жок. Азырынча даяр вариантты өтсөңүз болот.';
+  }
+
+  @override
+  String get examPoolTooSmallAction => 'Даяр варианттарга';
+
+  @override
+  String get examErrorSectionNotOver =>
+      'Бөлүм али аяктай элек — жооптор убакыт бүткөндө жөнөтүлөт.';
+
+  @override
+  String billingWebPrice(String amount) {
+    return '$amount сом';
+  }
+
+  @override
+  String get billingPay => 'Төлөө';
+
+  @override
+  String billingPaySemantics(String title, String price) {
+    return 'Төлөө: $title, $price';
+  }
+
+  @override
+  String get billingWebHonestPayment =>
+      'Төлөм төлөм провайдеринин корголгон барагында өтөт. Кредиттер төлөм ырасталгандан кийин кошулат.';
+
+  @override
+  String get billingWebProductsEmpty =>
+      'Төлөө азырынча жеткиликсиз. Кийинчерээк кириңиз.';
+
+  @override
+  String get billingWebPaymentsDisabled =>
+      'Төлөм азырынча туташтырыла элек. Кийинчерээк аракет кылыңыз.';
+
+  @override
+  String get billingWebProductUnavailable =>
+      'Бул пакет азыр жеткиликсиз. Башкасын тандаңыз.';
+
+  @override
+  String get billingWebRateLimited =>
+      'Бүгүн заказ өтө көп болду. Эртең кайталап көрүңүз.';
+
+  @override
+  String get billingWebOrderError =>
+      'Заказ түзүлгөн жок. Интернетти текшерип, кайра аракет кылыңыз.';
+
+  @override
+  String get billingWebRedirecting => 'Төлөм барагы ачылып жатат…';
+
+  @override
+  String get billingLegalOffer => 'Коомдук оферта';
+
+  @override
+  String get billingLegalRefund => 'Кайтаруу эрежелери';
+
+  @override
+  String get billingLegalDraftNote =>
+      'Долбоор. Акыркы текст юрист текшергенден кийин жарыяланат.';
+
+  @override
+  String get billingLegalLoadError => 'Документ ачылган жок.';
+
+  @override
+  String get billingLegalRuOnly =>
+      'Документ азырынча орус тилинде гана жеткиликтүү.';
+
+  @override
+  String get payReturnTitle => 'Төлөм';
+
+  @override
+  String get payReturnChecking => 'Төлөм текшерилип жатат…';
+
+  @override
+  String get payReturnPaidTitle => 'Төлөм өттү';
+
+  @override
+  String payReturnPaidBody(int credits) {
+    String _temp0 = intl.Intl.pluralLogic(
+      credits,
+      locale: localeName,
+      other: '$credits кредит кошулду.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String payReturnBalance(String balance) {
+    return 'Баланс: $balance';
+  }
+
+  @override
+  String get payReturnStartExam => 'Сынамык экзаменди баштоо';
+
+  @override
+  String get payReturnFailedTitle => 'Төлөм өткөн жок';
+
+  @override
+  String get payReturnFailedBody =>
+      'Кредиттер кошулган жок. Эгер акча алынып калса, колдоо кызматына жазыңыз — заказды текшеребиз.';
+
+  @override
+  String get payReturnExpiredTitle => 'Заказдын мөөнөтү бүттү';
+
+  @override
+  String get payReturnExpiredBody =>
+      'Төлөм өз убагында келген жок, кредиттер кошулган жок. Жаңы заказ берсеңиз болот.';
+
+  @override
+  String get payReturnRefundedTitle => 'Төлөм кайтарылды';
+
+  @override
+  String get payReturnRefundedBody =>
+      'Бул заказ боюнча кредиттер кайтарылып алынды.';
+
+  @override
+  String get payReturnPendingTitle => 'Төлөм дагы эле иштетилүүдө';
+
+  @override
+  String get payReturnPendingBody =>
+      'Провайдер төлөмдү азырынча ырастай элек. Ырастоо келери менен кредиттер автоматтык түрдө кошулат — балансты кийинчерээк текшериңиз.';
+
+  @override
+  String get payReturnCheckAgain => 'Кайра текшерүү';
+
+  @override
+  String get payReturnNotFound =>
+      'Заказ табылган жок. Эгер төлөсөңүз, колдоо кызматына жазыңыз.';
+
+  @override
+  String get payReturnNoOrder =>
+      'Заказ аныкталган жок. Балансты тесттерге жеткиликтүүлүк барагынан текшериңиз.';
+
+  @override
+  String get payReturnNetworkError =>
+      'Төлөмдү текшерүү мүмкүн болгон жок. Интернетти текшериңиз.';
+
+  @override
+  String get payReturnToStore => 'Баланска';
+
+  @override
+  String get adminNavExamPool => 'Тапшырмалар пулу';
+
+  @override
+  String get adminPoolSettingsTitle => 'Ар бир аракетке жаңы вариант';
+
+  @override
+  String get adminPoolSettingsBody =>
+      'Ар бир толук сынак тест ЖРТнын түзүлүшү боюнча текшерилген банктан кайра түзүлөт. Баасы өзгөрбөйт: биринчи сынак тест акысыз, ар бир кийинкиси — 1 кредит.';
+
+  @override
+  String get adminPoolFreshEnabled => 'Жаңы вариант түзүү';
+
+  @override
+  String get adminPoolFreshOnHelp =>
+      'Күйгүзүлгөн: окуучулар өз аракети үчүн түзүлгөн «Жаңы сынак тестти» алышат. Китепканадагы даяр варианттар да жеткиликтүү.';
+
+  @override
+  String get adminPoolFreshOffHelp =>
+      'Өчүрүлгөн: окуучулар китепканадагы даяр варианттарды гана тапшырышат.';
+
+  @override
+  String get adminPoolMinStatus => 'Жаңы вариантка кайсы тапшырмалар кирет';
+
+  @override
+  String get adminPoolStatusApproved => 'Методист жактыргандар гана';
+
+  @override
+  String get adminPoolStatusApprovedHelp =>
+      'methodologist_approved — ар бир тапшырманы методист текшерип, жактырган. Сунушталат.';
+
+  @override
+  String get adminPoolStatusAi => 'ЖИ-чечүүчү текшергендер да';
+
+  @override
+  String get adminPoolStatusAiHelp =>
+      'ai_verified — тапшырмаларды көз карандысыз ЖИ-чечүүчү текшерген, бирок методист текшерген эмес.';
+
+  @override
+  String get adminPoolAiWarning =>
+      'ai_verified мындай дегенди билдирет: «көз карандысыз ЖИ-чечүүчү текшерген, бирок методист текшерген эмес». Мындай тапшырмаларда методист гана байкай турган каталар болушу мүмкүн, ал эми окуучулар алар бар сынак тест үчүн кредит менен төлөшөт. Бул — пилот үчүн ээсинин аң-сезимдүү чечими.';
+
+  @override
+  String get adminPoolConfirmAiBody =>
+      'Жаңы варианттарга ai_verified статусундагы тапшырмалар да кире баштайт. Башталган аракеттерге таасир этпейт. Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String get adminPoolAiAcknowledge =>
+      'Түшүнөм: бул тапшырмаларды методист текшерген эмес';
+
+  @override
+  String get adminPoolAiActive =>
+      'Азыр жаңы варианттарга ai_verified тапшырмалары да кирет — аларды көз карандысыз ЖИ-чечүүчү текшерген, бирок методист текшерген эмес.';
+
+  @override
+  String get adminPoolReadOnly =>
+      'Көрүү гана. Пулдун жөндөөлөрүн супер-админ гана өзгөртө алат.';
+
+  @override
+  String get adminPoolNotCreated =>
+      'config/exam_pool али түзүлө элек — демейки маанилер иштейт: жаңы варианттар күйгүзүлгөн, методист жактырган тапшырмалар гана.';
+
+  @override
+  String get adminPoolConfigDenied =>
+      'config/exam_pool окулган жок: уруксат жок. Балким, ал үчүн Firestore эрежелери али орнотула элек.';
+
+  @override
+  String adminPoolUpdated(String date, String uid) {
+    return 'Өзгөртүлдү: $date · $uid';
+  }
+
+  @override
+  String get adminPoolConfirmFreshOnTitle => 'Жаңы варианттарды күйгүзөсүзбү?';
+
+  @override
+  String get adminPoolConfirmFreshOnBody =>
+      'Окуучулар банктан түзүлгөн «Жаңы сынак тестти» кайра баштай алышат. Кредит алуу тартиби өзгөрбөйт. Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String get adminPoolConfirmFreshOffTitle => 'Жаңы варианттарды өчүрөсүзбү?';
+
+  @override
+  String get adminPoolConfirmFreshOffBody =>
+      'Окуучулар китепканадагы даяр варианттарды гана тапшыра алышат. Башталган аракеттерге таасир этпейт. Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String get adminPoolConfirmStatusTitle =>
+      'Вариантка кайсы тапшырмалар кирерин өзгөртөсүзбү?';
+
+  @override
+  String get adminPoolConfirmApprovedBody =>
+      'Жаңы варианттарга методист жактырган тапшырмалар гана кирет. Алар жетишпесе, окуучулар «тапшырмалар аз» деген билдирүүнү көрүшөт (кредит алынбайт). Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String get adminPoolSaved => 'Пулдун жөндөөлөрү сакталды';
+
+  @override
+  String get adminPoolHealthTitle => 'Пулдун толуктугу';
+
+  @override
+  String get adminPoolHealthBody =>
+      'Түзүлүштүн ар бир бөлүгү үчүн канча тапшырма бар, канча толугу менен башка вариант түзсө болот жана кайсы темалар жетишпейт.';
+
+  @override
+  String get adminPoolNoBlueprints => 'Тесттин активдүү түзүлүштөрү жок.';
+
+  @override
+  String get adminPoolCheck => 'Пулду текшерүү';
+
+  @override
+  String get adminPoolRecheck => 'Кайра эсептөө';
+
+  @override
+  String get adminPoolChecking =>
+      'Пул эсептелүүдө… Бул эки мүнөткө чейин созулушу мүмкүн.';
+
+  @override
+  String get adminPoolHealthDenied =>
+      'Пул боюнча отчет супер-админге, контент-менеджерге жана методистке жеткиликтүү.';
+
+  @override
+  String adminPoolDisjoint(int n) {
+    return 'Толугу менен башка варианттар: $n';
+  }
+
+  @override
+  String adminPoolDisjointCapped(int n) {
+    return 'Толугу менен башка варианттар: кеминде $n';
+  }
+
+  @override
+  String get adminPoolDisjointHelp =>
+      'Азыр бир да тапшырма кайталанбагыдай ушунча вариант түзсө болот. Андан кийин окуучулар мурда көргөн тапшырмаларга жолуга баштайт.';
+
+  @override
+  String get adminPoolDisjointZero =>
+      'Пул бир вариантты да камтыбайт: окуучулар «тапшырмалар аз» деген билдирүүнү алышат (кредит алынбайт).';
+
+  @override
+  String get adminPoolFreshOff =>
+      'Жаңы варианттар азыр өчүрүлгөн — окуучулар китепкананы гана тапшырышат.';
+
+  @override
+  String adminPoolTotals(int needed, int eligible) {
+    return 'вариантка керек: $needed · пулда: $eligible';
+  }
+
+  @override
+  String adminPoolFloorNow(String status) {
+    return 'Эсепке алынат: $status';
+  }
+
+  @override
+  String adminPoolPart(String part) {
+    return '$part-бөлүк';
+  }
+
+  @override
+  String adminPoolPartVariants(int n) {
+    return 'варианттар: $n';
+  }
+
+  @override
+  String get adminPoolPartNotCovered => 'вариантка жетишпейт';
+
+  @override
+  String adminPoolPartCounts(int needed, int eligible) {
+    return 'Вариантка керек: $needed · пулда: $eligible';
+  }
+
+  @override
+  String adminPoolPartMissing(int needed, int eligible, int missing) {
+    return 'Вариантка керек: $needed · пулда: $eligible · жетишпейт: $missing';
+  }
+
+  @override
+  String adminPoolByApproved(int n) {
+    return 'методист: $n';
+  }
+
+  @override
+  String adminPoolByAi(int n) {
+    return 'ЖИ-чечүүчү: $n';
+  }
+
+  @override
+  String adminPoolByDraft(int n) {
+    return 'долбоорлор: $n';
+  }
+
+  @override
+  String adminPoolPassages(int standalone, int paired) {
+    return 'тексттер: өзүнчө $standalone, жуп $paired';
+  }
+
+  @override
+  String adminPoolPassagesUnknown(int n) {
+    return 'белгиси жок тексттер: $n';
+  }
+
+  @override
+  String get adminPoolShortfallsTitle => 'Кийинки вариант үчүн эмне жетишпейт';
+
+  @override
+  String get adminPoolShortfallsHelp =>
+      'ЖРТ матрицасындагы темалар жана татаалдык деңгээлдери боюнча: дагы бир толугу менен жаңы вариант түзүү үчүн эмнени жазып, жактыруу керек.';
+
+  @override
+  String get adminPoolShortfallsEmpty => 'Жетишсиздик жок.';
+
+  @override
+  String adminPoolMissing(int n) {
+    return 'жетишпейт: $n';
+  }
+
+  @override
+  String adminPoolShortfallCell(int difficulty, int needed, int available) {
+    return 'татаалдык $difficulty: керек $needed, бар $available';
+  }
+
+  @override
+  String get adminPoolPassagesStandalone => 'Өзүнчө тексттер';
+
+  @override
+  String get adminPoolPassagesPaired => 'Жуп тексттер';
+
+  @override
+  String adminPoolShortfallPassages(int needed, int available) {
+    return 'тексттер керек $needed, бар $available';
+  }
+
+  @override
+  String get adminPoolErrMatrix =>
+      'Бул багыт жана тил үчүн темалар матрицасы жок — жаңы вариант түзүүгө болбойт.';
+
+  @override
+  String get adminPoolErrLanguage =>
+      'Тил туура келбейт: бул багыттын тандалган тилде версиясы жок.';
+
+  @override
+  String get adminPaymentsTabWeb => 'Сайттагы буюртмалар';
+
+  @override
+  String get adminPaymentsTabRevenue => 'Киреше';
+
+  @override
+  String get adminPaymentsTabPlay => 'Google Play';
+
+  @override
+  String get adminOrderStatusCreated => 'Түзүлдү';
+
+  @override
+  String get adminOrderStatusPending => 'Төлөм күтүлүүдө';
+
+  @override
+  String get adminOrderStatusPaid => 'Төлөндү';
+
+  @override
+  String get adminOrderStatusFailed => 'Өткөн жок';
+
+  @override
+  String get adminOrderStatusExpired => 'Мөөнөтү өттү';
+
+  @override
+  String get adminOrderStatusRefunded => 'Кайтарылды';
+
+  @override
+  String adminSom(int amount) {
+    return '$amount сом';
+  }
+
+  @override
+  String get adminOrdersReadOnly =>
+      'Көрүү гана. Кредиттерди провайдер төлөмдү ырастагандан кийин сервер берет.';
+
+  @override
+  String get adminOrdersEmpty => 'Буюртмалар жок.';
+
+  @override
+  String get adminOrdersDenied =>
+      'Сайттагы буюртмаларга уруксат жок. Аларды супер-админ жана колдоо кызматы көрөт; эгер роль туура болсо, payment_orders үчүн Firestore эрежелери али орнотула элек.';
+
+  @override
+  String get adminOrderRefundPendingPill => 'кайтаруу суралды';
+
+  @override
+  String get adminOrderTitle => 'Сайттагы буюртма';
+
+  @override
+  String get adminOrderId => 'Буюртманын номери';
+
+  @override
+  String get adminOrderUser => 'Колдонуучу (uid)';
+
+  @override
+  String get adminOrderProduct => 'Товар';
+
+  @override
+  String get adminOrderCredits => 'Кредиттер';
+
+  @override
+  String get adminOrderAmount => 'Сумма';
+
+  @override
+  String get adminOrderProvider => 'Провайдер';
+
+  @override
+  String get adminOrderProviderRef => 'Провайдердеги номери';
+
+  @override
+  String get adminOrderGranted => 'Кредиттер берилди';
+
+  @override
+  String get adminOrderCreated => 'Түзүлгөн';
+
+  @override
+  String get adminOrderPaid => 'Төлөнгөн';
+
+  @override
+  String get adminOrderExpires => 'Мөөнөтү бүтөт';
+
+  @override
+  String get adminOrderUpdated => 'Жаңыланган';
+
+  @override
+  String get adminOrderFailure => 'Катанын себеби';
+
+  @override
+  String adminOrderRefundInfo(String date, String source, int credits) {
+    return 'Кайтаруу $date ($source), кайра алынган кредиттер: $credits.';
+  }
+
+  @override
+  String adminOrderRefundDebt(int n) {
+    return 'Кредиттер сарпталган — карыз: $n.';
+  }
+
+  @override
+  String get adminOrderRefundSourceAdmin => 'администратор';
+
+  @override
+  String get adminOrderRefundSourceProvider => 'провайдер';
+
+  @override
+  String adminOrderRefundRequested(String date, String reason) {
+    return 'Кайтаруу $date суралган: «$reason». Провайдер кайтарууну ырастаганда кредиттер кайра алынат.';
+  }
+
+  @override
+  String get adminOrderOpenUser => 'Колдонуучуну ачуу';
+
+  @override
+  String get adminOrderRefundAction => 'Төлөмдү кайтаруу';
+
+  @override
+  String get adminOrderRefundTitle => 'Төлөмдү кайтарасызбы?';
+
+  @override
+  String adminOrderRefundBody(String amount, int credits) {
+    return 'Провайдер колдонуучуга $amount кайтарат, андан кредиттер кайра алынат: $credits (эгер алар сарпталган болсо — карыз пайда болот). Бул төлөм үчүн берилген реферал сыйлыктары да кайра алынат. Кайтарууну жокко чыгарууга болбойт; аракет журналга жазылат.';
+  }
+
+  @override
+  String get adminOrderRefundAgain =>
+      'Бул буюртма боюнча кайтаруу мурда суралган, провайдер али ырастай элек. Кайра суроо аны дагы бир жолу жөнөтөт.';
+
+  @override
+  String adminOrderRefundReasonHelp(int min, int max) {
+    return '$min белгиден $max белгиге чейин — аракеттер журналына жазылат';
+  }
+
+  @override
+  String adminOrderRefundDone(int n) {
+    return 'Төлөм кайтарылды. Кайра алынган кредиттер: $n.';
+  }
+
+  @override
+  String get adminOrderRefundPending =>
+      'Кайтаруу провайдерден суралды. Ал ырастаганда кредиттер кайра алынат.';
+
+  @override
+  String get adminOrderErrNotFound => 'Буюртма табылган жок.';
+
+  @override
+  String get adminOrderErrNotRefundable =>
+      'Бул буюртманы кайтарууга болбойт: кредиттери берилген төлөнгөн буюртманы гана кайтарса болот.';
+
+  @override
+  String get adminOrderErrProvider =>
+      'Төлөм провайдери азыр туташтырылган эмес — CMSтен кайтарууга болбойт. Сайтта төлөө өчүрүлгөн.';
+
+  @override
+  String get adminRevenueTitle => 'Сайттагы 30 күндүк киреше';
+
+  @override
+  String adminRevenueOrders(int n) {
+    return 'буюртмалар: $n';
+  }
+
+  @override
+  String adminRevenueRefunded(String amount, int orders) {
+    return 'Кайтарылды: $amount · буюртмалар: $orders';
+  }
+
+  @override
+  String get adminRevenueNote =>
+      'Сайттагы төлөнгөн буюртмалар төлөнгөн күнү боюнча (Бишкек убактысы). Кайтарылган буюртмалар кирешеге кирбейт, Google Play да кирбейт.';
+
+  @override
+  String get adminRevenueByDay => 'Күндөр боюнча';
+
+  @override
+  String get adminRevenueEmpty => 'Акыркы 30 күндө сайтта төлөмдөр болгон жок.';
+
+  @override
+  String adminRevenueTruncated(int n) {
+    return 'Алгачкы $n төлөм гана окулду — жыйынтык толук эмес болушу мүмкүн.';
+  }
+
+  @override
+  String get adminPricingTabWeb => 'Сайт';
+
+  @override
+  String get adminPricingTabPlay => 'Google Play';
+
+  @override
+  String get adminWebPricingWarning =>
+      'Сайтта (web-версияда) төлөө баалары ушул жерден алынат — config/pricing.web_products. Android-версияда баалар, төлөө баскычтары жана шилтемелер жок. Негизги баа: 1 кредит = 1 толук сынак тест = 100 сом; ал ээси менен макулдашылат.';
+
+  @override
+  String get adminWebPricingDefaults =>
+      'web_products али коюла элек — демейки маанилер көрсөтүлдү: ээси бааларын бекитмейинче пакеттер өчүрүлгөн.';
+
+  @override
+  String get adminWebProductEnabled => 'Сатылууда';
+
+  @override
+  String get adminWebProductCredits => 'Кредиттер';
+
+  @override
+  String get adminWebProductAmount => 'Баасы, сом';
+
+  @override
+  String get adminWebProductSingleHelp =>
+      '1 кредит = 1 толук сынак тест (өзгөрбөйт)';
+
+  @override
+  String adminWebProductPerCredit(int n) {
+    return '≈ бир кредитке $n сом';
+  }
+
+  @override
+  String adminWebPricingBaseChanged(int base, int amount) {
+    return 'Негизги баа ээси менен макулдашылат. Сиз exam_single баасын $base сомдон $amount сомго өзгөртүп жатасыз.';
+  }
+
+  @override
+  String get adminWebPricingBaseTitle => 'Негизги бааны өзгөртөсүзбү?';
+
+  @override
+  String adminWebPricingConfirmType(int amount) {
+    return 'Ырастоо үчүн жаңы бааны жазыңыз: $amount';
+  }
+
+  @override
+  String get adminWebPricingBaseApply => 'Бааны өзгөртүү';
+
+  @override
+  String get adminWebPricingConfirmTitle => 'Сайттагы бааларды сактайсызбы?';
+
+  @override
+  String get adminWebPricingConfirmBody =>
+      'Жаңы баалар жаңы буюртмаларга дароо колдонулат; мурда түзүлгөн буюртмалар өз баасы менен төлөнөт. Өзгөртүү аракеттер журналына жазылат.';
+
+  @override
+  String get adminWebPricingNoneEnabled =>
+      'Бир да товар сатылбайт — сайтта төлөө жеткиликсиз болот.';
+
+  @override
+  String get adminWebPricingNoChanges => 'Өзгөртүүлөр жок.';
+
+  @override
+  String adminWebPricingIssueCredits(int min, int max) {
+    return 'Товардагы кредиттердин саны $min–$max аралыгында болушу керек.';
+  }
+
+  @override
+  String adminWebPricingIssueAmount(int min, int max) {
+    return 'Баасы $min–$max сом аралыгында болушу керек.';
+  }
+
+  @override
+  String get adminWebPricingIssueBase => 'exam_single товары милдеттүү.';
+
+  @override
+  String get adminWebPricingErrBase =>
+      'Сервер негизги бааны ырастоосуз өзгөртүүнү кабыл алган жок.';
 }

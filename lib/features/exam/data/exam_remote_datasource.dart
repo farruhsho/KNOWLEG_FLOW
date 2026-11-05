@@ -6,15 +6,15 @@ import '../../../core/backend/backend_contract.dart';
 import '../domain/exam_failure.dart';
 import '../domain/exam_payload.dart';
 import '../domain/exam_session.dart';
+import '../domain/exam_start.dart';
 import '../domain/json_utils.dart';
 
 /// Exam callables (ARCHITECTURE §3). Every method throws [ExamFailure] on
 /// error, never a raw platform exception.
 abstract interface class ExamRemoteDataSource {
-  Future<ExamSessionPayload> start({
-    required String variantId,
-    required String clientAppVersion,
-  });
+  /// `examStart` in library mode (a published variant) or fresh mode (a new
+  /// variant assembled for this attempt), standard or strict style (§10).
+  Future<ExamSessionPayload> start(ExamStartRequest request);
 
   Future<ExamSessionPayload> getState(String attemptId);
 
@@ -53,7 +53,7 @@ class FirebaseExamRemoteDataSource implements ExamRemoteDataSource {
       final kind = reason != null
           ? ExamFailureKind.fromReason(reason)
           : ExamFailureKind.fromCode(e.code);
-      throw ExamFailure(kind, e.message);
+      throw ExamFailure(kind, e.message, BackendReasons.detailsOf(e));
     } on TimeoutException {
       throw const ExamFailure(ExamFailureKind.network, 'timeout');
     } on ExamFailure {
@@ -65,14 +65,16 @@ class FirebaseExamRemoteDataSource implements ExamRemoteDataSource {
   }
 
   @override
-  Future<ExamSessionPayload> start({
-    required String variantId,
-    required String clientAppVersion,
-  }) async {
-    final data = await _call(BackendFunctions.examStart, {
-      'variantId': variantId,
-      'clientAppVersion': clientAppVersion,
-    });
+  Future<ExamSessionPayload> start(ExamStartRequest request) async {
+    // A fresh variant is assembled server-side before the attempt is
+    // created, so this call may take longer than the others.
+    final data = await _call(
+      BackendFunctions.examStart,
+      request.toCallableData(),
+      timeout: request.mode == ExamMode.fresh
+          ? const Duration(seconds: 60)
+          : const Duration(seconds: 30),
+    );
     return _payload(data);
   }
 

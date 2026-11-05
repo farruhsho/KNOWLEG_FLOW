@@ -5780,4 +5780,744 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yearly => 'Yearly';
+
+  @override
+  String get examFreshStart => 'New mock exam';
+
+  @override
+  String get examFreshSubtitle =>
+      'A new variant every time, built to the ORT structure from a bank of reviewed questions.';
+
+  @override
+  String get examLibraryTitle => 'Ready-made variants';
+
+  @override
+  String get examFreshVariantLine => 'A new variant, assembled when you start';
+
+  @override
+  String get examFreshLanguageLabel => 'Question language';
+
+  @override
+  String get examFreshKyOnly => 'The state language test is in Kyrgyz only.';
+
+  @override
+  String get examStyleTitle => 'How to take it';
+
+  @override
+  String get examStyleStandard => 'Practice';
+
+  @override
+  String get examStyleStandardBody =>
+      'You can flag questions, change answers and finish a section early.';
+
+  @override
+  String get examStyleStrict => 'Like the ORT';
+
+  @override
+  String get examStyleStrictBody =>
+      'A section ends only when its time is up, you can correct an answer once, there are no flags, and every section starts with instructions.';
+
+  @override
+  String get examStyleStrictSource =>
+      'The rules follow the official brochure for ORT candidates. This is practice: the result is for study, not an official score.';
+
+  @override
+  String get examStrictRuleNoEarlyFinish =>
+      'You can\'t finish a section early: it ends when its time is up and your answers are sent automatically.';
+
+  @override
+  String get examStrictRuleOneCorrection =>
+      'You can correct an answer only once — like on the answer sheet. An answer can\'t be erased.';
+
+  @override
+  String get examStrictRuleNoFlags => 'There are no “come back later” flags.';
+
+  @override
+  String get examStrictRuleInstruction =>
+      'Every section starts with instructions. Its time runs from the moment it opens, including while you read them.';
+
+  @override
+  String examStrictSectionEndsIn(String time) {
+    return 'Section ends in $time';
+  }
+
+  @override
+  String get examStrictAnswerLocked =>
+      'This answer was already corrected. As on the ORT answer sheet, it can be corrected only once.';
+
+  @override
+  String get examStrictCorrectionLeft =>
+      'You can still correct this answer once.';
+
+  @override
+  String get examStrictCorrectionUsed =>
+      'Answer corrected — it can\'t be changed again.';
+
+  @override
+  String get examStrictWaitingDeadline =>
+      'The section\'s time is ending — your answers will be sent in a few seconds.';
+
+  @override
+  String get examSectionInstructionTitle => 'Section instructions';
+
+  @override
+  String get examStrictTimerRunning =>
+      'The section timer is already running: it started when the section opened.';
+
+  @override
+  String examFreshnessRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You\'ve already seen $count questions in earlier attempts',
+      one: 'You\'ve already seen 1 question in earlier attempts',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get examFreshnessWhy =>
+      'The bank doesn\'t have enough new questions for this direction yet — the rest are new.';
+
+  @override
+  String get examPoolTooSmallTitle => 'New variants are being prepared';
+
+  @override
+  String examPoolTooSmallBody(String language) {
+    return 'There aren\'t enough reviewed questions for this direction ($language) yet. No credit was charged. Meanwhile you can take a ready-made variant.';
+  }
+
+  @override
+  String get examPoolTooSmallAction => 'Ready-made variants';
+
+  @override
+  String get examErrorSectionNotOver =>
+      'The section isn\'t over yet — your answers will be sent when time is up.';
+
+  @override
+  String billingWebPrice(String amount) {
+    return '$amount som';
+  }
+
+  @override
+  String get billingPay => 'Pay';
+
+  @override
+  String billingPaySemantics(String title, String price) {
+    return 'Pay: $title, $price';
+  }
+
+  @override
+  String get billingWebHonestPayment =>
+      'Payment is made on the payment provider\'s secure page. Credits are added once the payment is confirmed.';
+
+  @override
+  String get billingWebProductsEmpty =>
+      'Payment isn\'t available yet. Please check back later.';
+
+  @override
+  String get billingWebPaymentsDisabled =>
+      'Payments aren\'t connected yet. Please try later.';
+
+  @override
+  String get billingWebProductUnavailable =>
+      'This package isn\'t available right now. Please choose another.';
+
+  @override
+  String get billingWebRateLimited =>
+      'Too many orders today. Please try again tomorrow.';
+
+  @override
+  String get billingWebOrderError =>
+      'Couldn\'t create the order. Check your connection and try again.';
+
+  @override
+  String get billingWebRedirecting => 'Opening the payment page…';
+
+  @override
+  String get billingLegalOffer => 'Public offer';
+
+  @override
+  String get billingLegalRefund => 'Refund policy';
+
+  @override
+  String get billingLegalDraftNote =>
+      'Draft. The final text will be published after legal review.';
+
+  @override
+  String get billingLegalLoadError => 'Couldn\'t open the document.';
+
+  @override
+  String get billingLegalRuOnly =>
+      'This document is available in Russian only for now.';
+
+  @override
+  String get payReturnTitle => 'Payment';
+
+  @override
+  String get payReturnChecking => 'Checking your payment…';
+
+  @override
+  String get payReturnPaidTitle => 'Payment received';
+
+  @override
+  String payReturnPaidBody(int credits) {
+    String _temp0 = intl.Intl.pluralLogic(
+      credits,
+      locale: localeName,
+      other: '$credits credits added.',
+      one: '1 credit added.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String payReturnBalance(String balance) {
+    return 'Balance: $balance';
+  }
+
+  @override
+  String get payReturnStartExam => 'Start a mock exam';
+
+  @override
+  String get payReturnFailedTitle => 'Payment didn\'t go through';
+
+  @override
+  String get payReturnFailedBody =>
+      'No credits were added. If you were charged anyway, contact support and we\'ll check the order.';
+
+  @override
+  String get payReturnExpiredTitle => 'Order expired';
+
+  @override
+  String get payReturnExpiredBody =>
+      'The payment didn\'t arrive in time and no credits were added. You can place a new order.';
+
+  @override
+  String get payReturnRefundedTitle => 'Payment refunded';
+
+  @override
+  String get payReturnRefundedBody => 'Credits from this order were withdrawn.';
+
+  @override
+  String get payReturnPendingTitle => 'Payment is still processing';
+
+  @override
+  String get payReturnPendingBody =>
+      'The provider hasn\'t confirmed the payment yet. Credits are added automatically as soon as it does — check your balance later.';
+
+  @override
+  String get payReturnCheckAgain => 'Check again';
+
+  @override
+  String get payReturnNotFound =>
+      'Order not found. If you paid, please contact support.';
+
+  @override
+  String get payReturnNoOrder =>
+      'We couldn\'t tell which order this is. Check your balance on the exam access page.';
+
+  @override
+  String get payReturnNetworkError =>
+      'Couldn\'t check the payment. Check your connection.';
+
+  @override
+  String get payReturnToStore => 'To my balance';
+
+  @override
+  String get adminNavExamPool => 'Question pool';
+
+  @override
+  String get adminPoolSettingsTitle => 'A new variant for every attempt';
+
+  @override
+  String get adminPoolSettingsBody =>
+      'Every full mock exam is assembled anew from the verified bank, following the ORT structure. The price does not change: the first mock exam is free, every next one costs 1 credit.';
+
+  @override
+  String get adminPoolFreshEnabled => 'Assemble a new variant';
+
+  @override
+  String get adminPoolFreshOnHelp =>
+      'On: students get a «New mock exam» assembled for their attempt. Ready-made library variants stay available too.';
+
+  @override
+  String get adminPoolFreshOffHelp =>
+      'Off: students take only the ready-made library variants.';
+
+  @override
+  String get adminPoolMinStatus => 'Which questions may enter a new variant';
+
+  @override
+  String get adminPoolStatusApproved => 'Methodologist-approved only';
+
+  @override
+  String get adminPoolStatusApprovedHelp =>
+      'methodologist_approved — every question was reviewed and approved by a methodologist. Recommended.';
+
+  @override
+  String get adminPoolStatusAi => 'Also AI-solver-verified';
+
+  @override
+  String get adminPoolStatusAiHelp =>
+      'ai_verified — questions checked by an independent AI solver, not by a methodologist.';
+
+  @override
+  String get adminPoolAiWarning =>
+      'ai_verified means «checked by an independent AI solver, not by a methodologist». Such questions may contain mistakes only a methodologist would catch, and students pay a credit for a mock exam that includes them. This is a deliberate owner decision for the pilot.';
+
+  @override
+  String get adminPoolConfirmAiBody =>
+      'New variants will also include questions with the ai_verified status. Attempts already started are not affected. The change is recorded in the action log.';
+
+  @override
+  String get adminPoolAiAcknowledge =>
+      'I understand: no methodologist checked these questions';
+
+  @override
+  String get adminPoolAiActive =>
+      'New variants currently also include ai_verified questions — checked by an independent AI solver, not by a methodologist.';
+
+  @override
+  String get adminPoolReadOnly =>
+      'View only. Only a super admin can change the pool settings.';
+
+  @override
+  String get adminPoolNotCreated =>
+      'config/exam_pool does not exist yet — the defaults apply: new variants on, methodologist-approved questions only.';
+
+  @override
+  String get adminPoolConfigDenied =>
+      'Could not read config/exam_pool: access denied. The Firestore rules for it may not be deployed yet.';
+
+  @override
+  String adminPoolUpdated(String date, String uid) {
+    return 'Changed: $date · $uid';
+  }
+
+  @override
+  String get adminPoolConfirmFreshOnTitle => 'Turn new variants on?';
+
+  @override
+  String get adminPoolConfirmFreshOnBody =>
+      'Students will again be able to start a «New mock exam» assembled from the bank. Credit charging does not change. The change is recorded in the action log.';
+
+  @override
+  String get adminPoolConfirmFreshOffTitle => 'Turn new variants off?';
+
+  @override
+  String get adminPoolConfirmFreshOffBody =>
+      'Students will be able to take only the ready-made library variants. Attempts already started are not affected. The change is recorded in the action log.';
+
+  @override
+  String get adminPoolConfirmStatusTitle =>
+      'Change which questions enter a variant?';
+
+  @override
+  String get adminPoolConfirmApprovedBody =>
+      'New variants will include only methodologist-approved questions. If there are not enough, students see «not enough questions» (no credit is charged). The change is recorded in the action log.';
+
+  @override
+  String get adminPoolSaved => 'Pool settings saved';
+
+  @override
+  String get adminPoolHealthTitle => 'Pool coverage';
+
+  @override
+  String get adminPoolHealthBody =>
+      'How many questions each part of the structure has, how many fully distinct variants can be assembled and which topics are short.';
+
+  @override
+  String get adminPoolNoBlueprints => 'No active test structures.';
+
+  @override
+  String get adminPoolCheck => 'Check the pool';
+
+  @override
+  String get adminPoolRecheck => 'Recalculate';
+
+  @override
+  String get adminPoolChecking =>
+      'Counting the pool… This can take up to two minutes.';
+
+  @override
+  String get adminPoolHealthDenied =>
+      'The pool report is available to super admins, content managers and methodologists.';
+
+  @override
+  String adminPoolDisjoint(int n) {
+    return 'Fully distinct variants: $n';
+  }
+
+  @override
+  String adminPoolDisjointCapped(int n) {
+    return 'Fully distinct variants: at least $n';
+  }
+
+  @override
+  String get adminPoolDisjointHelp =>
+      'This many variants can be assembled now without repeating a single question. After that, students start meeting questions they have already seen.';
+
+  @override
+  String get adminPoolDisjointZero =>
+      'The pool does not cover even one variant: students get «not enough questions» (no credit is charged).';
+
+  @override
+  String get adminPoolFreshOff =>
+      'New variants are currently off — students take only library variants.';
+
+  @override
+  String adminPoolTotals(int needed, int eligible) {
+    return 'per variant: $needed · in the pool: $eligible';
+  }
+
+  @override
+  String adminPoolFloorNow(String status) {
+    return 'Counted: $status';
+  }
+
+  @override
+  String adminPoolPart(String part) {
+    return 'Part $part';
+  }
+
+  @override
+  String adminPoolPartVariants(int n) {
+    return 'variants: $n';
+  }
+
+  @override
+  String get adminPoolPartNotCovered => 'short of one variant';
+
+  @override
+  String adminPoolPartCounts(int needed, int eligible) {
+    return 'Per variant: $needed · in the pool: $eligible';
+  }
+
+  @override
+  String adminPoolPartMissing(int needed, int eligible, int missing) {
+    return 'Per variant: $needed · in the pool: $eligible · missing: $missing';
+  }
+
+  @override
+  String adminPoolByApproved(int n) {
+    return 'methodologist: $n';
+  }
+
+  @override
+  String adminPoolByAi(int n) {
+    return 'AI solver: $n';
+  }
+
+  @override
+  String adminPoolByDraft(int n) {
+    return 'drafts: $n';
+  }
+
+  @override
+  String adminPoolPassages(int standalone, int paired) {
+    return 'texts: standalone $standalone, paired $paired';
+  }
+
+  @override
+  String adminPoolPassagesUnknown(int n) {
+    return 'texts without layout: $n';
+  }
+
+  @override
+  String get adminPoolShortfallsTitle => 'What the next variant is missing';
+
+  @override
+  String get adminPoolShortfallsHelp =>
+      'By topic and difficulty from the ORT matrix: what to write and approve to assemble one more fully new variant.';
+
+  @override
+  String get adminPoolShortfallsEmpty => 'Nothing is missing.';
+
+  @override
+  String adminPoolMissing(int n) {
+    return 'missing: $n';
+  }
+
+  @override
+  String adminPoolShortfallCell(int difficulty, int needed, int available) {
+    return 'difficulty $difficulty: need $needed, have $available';
+  }
+
+  @override
+  String get adminPoolPassagesStandalone => 'Standalone texts';
+
+  @override
+  String get adminPoolPassagesPaired => 'Paired texts';
+
+  @override
+  String adminPoolShortfallPassages(int needed, int available) {
+    return 'texts needed $needed, have $available';
+  }
+
+  @override
+  String get adminPoolErrMatrix =>
+      'There is no topic matrix for this direction and language — a new variant cannot be assembled.';
+
+  @override
+  String get adminPoolErrLanguage =>
+      'Unsuitable language: this direction has no version in the selected language.';
+
+  @override
+  String get adminPaymentsTabWeb => 'Website orders';
+
+  @override
+  String get adminPaymentsTabRevenue => 'Revenue';
+
+  @override
+  String get adminPaymentsTabPlay => 'Google Play';
+
+  @override
+  String get adminOrderStatusCreated => 'Created';
+
+  @override
+  String get adminOrderStatusPending => 'Awaiting payment';
+
+  @override
+  String get adminOrderStatusPaid => 'Paid';
+
+  @override
+  String get adminOrderStatusFailed => 'Failed';
+
+  @override
+  String get adminOrderStatusExpired => 'Expired';
+
+  @override
+  String get adminOrderStatusRefunded => 'Refunded';
+
+  @override
+  String adminSom(int amount) {
+    return '$amount som';
+  }
+
+  @override
+  String get adminOrdersReadOnly =>
+      'View only. The server grants credits after the provider confirms the payment.';
+
+  @override
+  String get adminOrdersEmpty => 'No orders.';
+
+  @override
+  String get adminOrdersDenied =>
+      'No access to website orders. Super admins and support can see them; if your role is right, the Firestore rules for payment_orders are not deployed yet.';
+
+  @override
+  String get adminOrderRefundPendingPill => 'refund requested';
+
+  @override
+  String get adminOrderTitle => 'Website order';
+
+  @override
+  String get adminOrderId => 'Order id';
+
+  @override
+  String get adminOrderUser => 'User (uid)';
+
+  @override
+  String get adminOrderProduct => 'Product';
+
+  @override
+  String get adminOrderCredits => 'Credits';
+
+  @override
+  String get adminOrderAmount => 'Amount';
+
+  @override
+  String get adminOrderProvider => 'Provider';
+
+  @override
+  String get adminOrderProviderRef => 'Provider reference';
+
+  @override
+  String get adminOrderGranted => 'Credits granted';
+
+  @override
+  String get adminOrderCreated => 'Created';
+
+  @override
+  String get adminOrderPaid => 'Paid';
+
+  @override
+  String get adminOrderExpires => 'Expires';
+
+  @override
+  String get adminOrderUpdated => 'Updated';
+
+  @override
+  String get adminOrderFailure => 'Failure reason';
+
+  @override
+  String adminOrderRefundInfo(String date, String source, int credits) {
+    return 'Refunded $date ($source), credits clawed back: $credits.';
+  }
+
+  @override
+  String adminOrderRefundDebt(int n) {
+    return 'The credits had been spent — debt: $n.';
+  }
+
+  @override
+  String get adminOrderRefundSourceAdmin => 'administrator';
+
+  @override
+  String get adminOrderRefundSourceProvider => 'provider';
+
+  @override
+  String adminOrderRefundRequested(String date, String reason) {
+    return 'Refund requested $date: «$reason». The credits are clawed back once the provider confirms the refund.';
+  }
+
+  @override
+  String get adminOrderOpenUser => 'Open the user';
+
+  @override
+  String get adminOrderRefundAction => 'Refund the payment';
+
+  @override
+  String get adminOrderRefundTitle => 'Refund the payment?';
+
+  @override
+  String adminOrderRefundBody(String amount, int credits) {
+    return 'The provider returns $amount to the user, and $credits credits are clawed back (if already spent, they become debt). Referral rewards for this payment are clawed back too. A refund cannot be undone; the action is recorded in the log.';
+  }
+
+  @override
+  String get adminOrderRefundAgain =>
+      'A refund for this order was already requested and the provider has not confirmed it yet. Requesting again sends it once more.';
+
+  @override
+  String adminOrderRefundReasonHelp(int min, int max) {
+    return '$min to $max characters — recorded in the action log';
+  }
+
+  @override
+  String adminOrderRefundDone(int n) {
+    return 'Payment refunded. Credits clawed back: $n.';
+  }
+
+  @override
+  String get adminOrderRefundPending =>
+      'Refund requested from the provider. The credits are clawed back once it confirms.';
+
+  @override
+  String get adminOrderErrNotFound => 'Order not found.';
+
+  @override
+  String get adminOrderErrNotRefundable =>
+      'This order cannot be refunded: only a paid order with granted credits can be refunded.';
+
+  @override
+  String get adminOrderErrProvider =>
+      'The payment provider is not connected right now — refunds from the CMS are not possible. Website payments are off.';
+
+  @override
+  String get adminRevenueTitle => 'Website revenue, last 30 days';
+
+  @override
+  String adminRevenueOrders(int n) {
+    return 'orders: $n';
+  }
+
+  @override
+  String adminRevenueRefunded(String amount, int orders) {
+    return 'Refunded: $amount · orders: $orders';
+  }
+
+  @override
+  String get adminRevenueNote =>
+      'Paid website orders by payment day (Bishkek time). Refunded orders are not part of the revenue, nor is Google Play.';
+
+  @override
+  String get adminRevenueByDay => 'By day';
+
+  @override
+  String get adminRevenueEmpty => 'No website payments in the last 30 days.';
+
+  @override
+  String adminRevenueTruncated(int n) {
+    return 'Only the first $n payments were read — the total may be incomplete.';
+  }
+
+  @override
+  String get adminPricingTabWeb => 'Website';
+
+  @override
+  String get adminPricingTabPlay => 'Google Play';
+
+  @override
+  String get adminWebPricingWarning =>
+      'Website (web version) prices come from here — config/pricing.web_products. The Android build shows no prices, pay buttons or links. Base price: 1 credit = 1 full mock exam = 100 som; it is agreed with the owner.';
+
+  @override
+  String get adminWebPricingDefaults =>
+      'web_products is not set yet — the defaults are shown: packs stay off until the owner approves their prices.';
+
+  @override
+  String get adminWebProductEnabled => 'On sale';
+
+  @override
+  String get adminWebProductCredits => 'Credits';
+
+  @override
+  String get adminWebProductAmount => 'Price, som';
+
+  @override
+  String get adminWebProductSingleHelp => '1 credit = 1 full mock exam (fixed)';
+
+  @override
+  String adminWebProductPerCredit(int n) {
+    return '≈ $n som per credit';
+  }
+
+  @override
+  String adminWebPricingBaseChanged(int base, int amount) {
+    return 'The base price is agreed with the owner. You are changing the exam_single price from $base som to $amount som.';
+  }
+
+  @override
+  String get adminWebPricingBaseTitle => 'Change the base price?';
+
+  @override
+  String adminWebPricingConfirmType(int amount) {
+    return 'To confirm, type the new price: $amount';
+  }
+
+  @override
+  String get adminWebPricingBaseApply => 'Change the price';
+
+  @override
+  String get adminWebPricingConfirmTitle => 'Save the website prices?';
+
+  @override
+  String get adminWebPricingConfirmBody =>
+      'New prices apply to new orders at once; orders already created are paid at their own price. The change is recorded in the action log.';
+
+  @override
+  String get adminWebPricingNoneEnabled =>
+      'No product is on sale — website payments will be unavailable.';
+
+  @override
+  String get adminWebPricingNoChanges => 'No changes.';
+
+  @override
+  String adminWebPricingIssueCredits(int min, int max) {
+    return 'Credits per product must be $min–$max.';
+  }
+
+  @override
+  String adminWebPricingIssueAmount(int min, int max) {
+    return 'The price must be $min–$max som.';
+  }
+
+  @override
+  String get adminWebPricingIssueBase => 'The exam_single product is required.';
+
+  @override
+  String get adminWebPricingErrBase =>
+      'The server refused a base price change without confirmation.';
 }

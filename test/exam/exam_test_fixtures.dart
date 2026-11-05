@@ -118,11 +118,20 @@ Map<String, dynamic> verbalSection({required int deadlineMs}) => {
 
 /// Payload as `examStart` would return it. The server clock is [skewMs]
 /// ahead of the device clock [t0].
-ExamSessionPayload startPayload({int skewMs = 0, Duration timeLeft = const Duration(minutes: 10)}) {
+///
+/// [examStyle] / [freshness] add the phase 4 fields (§10); without them the
+/// payload is exactly what an older backend returns.
+ExamSessionPayload startPayload({
+  int skewMs = 0,
+  Duration timeLeft = const Duration(minutes: 10),
+  String? examStyle,
+  Map<String, dynamic>? freshness,
+  String variantId = 'var1',
+}) {
   final serverNow = t0.millisecondsSinceEpoch + skewMs;
   return ExamSessionPayload.fromJson({
     'attemptId': 'att1',
-    'variantId': 'var1',
+    'variantId': variantId,
     'blueprint': twoSectionBlueprint,
     'status': 'in_progress',
     'currentSectionIndex': 0,
@@ -130,10 +139,12 @@ ExamSessionPayload startPayload({int skewMs = 0, Duration timeLeft = const Durat
     'serverNow': serverNow,
     'entitlementSource': 'free_first',
     'language': 'ru',
+    if (examStyle != null) 'examStyle': examStyle,
+    if (freshness != null) 'freshness': freshness,
   });
 }
 
-ExamSessionPayload nextPayload({required DateTime deviceNow, int skewMs = 0}) {
+ExamSessionPayload nextPayload({required DateTime deviceNow, int skewMs = 0, String? examStyle}) {
   final serverNow = deviceNow.millisecondsSinceEpoch + skewMs;
   return ExamSessionPayload.fromJson({
     'attemptId': 'att1',
@@ -143,6 +154,7 @@ ExamSessionPayload nextPayload({required DateTime deviceNow, int skewMs = 0}) {
     'currentSectionIndex': 1,
     'section': verbalSection(deadlineMs: serverNow + 5 * 60 * 1000),
     'serverNow': serverNow,
+    if (examStyle != null) 'examStyle': examStyle,
   });
 }
 

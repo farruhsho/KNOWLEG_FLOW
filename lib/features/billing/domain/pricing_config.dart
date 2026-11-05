@@ -26,9 +26,45 @@ class ProductPresentation {
   }
 }
 
+/// One product sold on the website (`config/pricing.web_products`, §10.3).
+/// The amount is whatever the owner configured; the app never hard-codes a
+/// price.
+class WebProduct {
+  final String productId;
+  final int credits;
+
+  /// Price in som (KGS), whole units.
+  final int amountSom;
+  final bool enabled;
+
+  const WebProduct({
+    required this.productId,
+    required this.credits,
+    required this.amountSom,
+    required this.enabled,
+  });
+
+  /// Null for malformed entries (no credits or no positive price).
+  static WebProduct? tryParse(String? id, Object? raw) {
+    final m = FirestoreValues.readMap(raw);
+    if (id == null || id.isEmpty || m == null) return null;
+    final credits = FirestoreValues.readInt(m['credits'], fallback: 0);
+    final amount =
+        FirestoreValues.readInt(m['amount_som'] ?? m['amountSom'], fallback: 0);
+    if (credits <= 0 || amount <= 0) return null;
+    return WebProduct(
+      productId: id,
+      credits: credits,
+      amountSom: amount,
+      enabled: FirestoreValues.readBool(m['enabled']),
+    );
+  }
+}
+
 /// Client-side view of `config/pricing`. The server is the authority for how
 /// many credits a purchase grants; this only drives the labels on the store
-/// page. Prices are never read from here — they always come from Google Play.
+/// page. Google Play prices are never read from here — they always come from
+/// Google Play; web prices come only from [webProducts].
 class PricingConfig {
   final Map<String, ProductPresentation> products;
 
@@ -36,7 +72,25 @@ class PricingConfig {
   /// the server applies the same value in `examStart`.
   final int freeExamsPerUser;
 
-  const PricingConfig(this.products, {this.freeExamsPerUser = defaultFreeExamsPerUser});
+  /// Products sold on the website, keyed by product id (no defaults: with
+  /// nothing configured the web store offers nothing).
+  final Map<String, WebProduct> webProducts;
+
+  const PricingConfig(
+    this.products, {
+    this.freeExamsPerUser = defaultFreeExamsPerUser,
+    this.webProducts = const {},
+  });
+
+  /// Enabled web products, smallest pack first.
+  List<WebProduct> get enabledWebProducts {
+    final list = webProducts.values.where((p) => p.enabled).toList()
+      ..sort((a, b) {
+        final c = a.credits.compareTo(b.credits);
+        return c != 0 ? c : a.productId.compareTo(b.productId);
+      });
+    return List.unmodifiable(list);
+  }
 
   /// Server default when `config/pricing.free_exams_per_user` is missing or
   /// invalid (functions/src/handlers/exam.ts `readPricingFreeExams`).
@@ -132,6 +186,26 @@ class PricingConfig {
     }
     // Same lookup as the server: snake_case first, camelCase as a fallback.
     final Object? free = data?['free_exams_per_user'] ?? data?['freeExamsPerUser'];
-    return PricingConfig(result, freeExamsPerUser: parseFreeExamsPerUser(free));
+    final web = <String, WebProduct>{};
+    final rawWeb = data?['web_products'] ?? data?['webProducts'];
+    if (rawWeb is Map) {
+      rawWeb.forEach((k, v) {
+        final p = WebProduct.tryParse(k.toString(), v);
+        if (p != null) web[p.productId] = p;
+      });
+    } else if (rawWeb is List) {
+      for (final item in rawWeb) {
+        final m = FirestoreValues.readMap(item);
+        if (m == null) continue;
+        final p = WebProduct.tryParse(
+            FirestoreValues.readString(m['product_id'] ?? m['productId'] ?? m['id']), m);
+        if (p != null) web[p.productId] = p;
+      }
+    }
+    return PricingConfig(
+      result,
+      freeExamsPerUser: parseFreeExamsPerUser(free),
+      webProducts: Map.unmodifiable(web),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/design/tokens.dart';
@@ -9,6 +10,7 @@ import '../../../../core/theme/theme_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../providers/locale_provider.dart';
 import '../../../../shared/widgets/language_toggle_widget.dart';
+import '../../../billing/application/billing_providers.dart' show billingModeProvider;
 import '../../../dashboard/presentation/widgets/dashboard_cards.dart'
     show reminderResultText;
 import '../../data/reminder_settings.dart';
@@ -23,6 +25,9 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context)!;
     final gutter = AppSpacing.gutter(context);
+    // Payment terms are shown only where the build takes payments on the
+    // site (BILLING_MODE=web): never in the consumption-only Android build.
+    final webPayments = ref.watch(billingModeProvider.select((m) => m.sellsOnWeb));
 
     return Scaffold(
       appBar: AppBar(
@@ -61,6 +66,24 @@ class SettingsPage extends ConsumerWidget {
                   trailing: const Icon(Icons.open_in_new_rounded, size: 20),
                   onTap: () => _openUrl(context, LegalLinks.termsOfService),
                 ),
+                if (webPayments) ...[
+                  const Divider(height: 1),
+                  ListTile(
+                    key: const ValueKey('settings_legal_offer'),
+                    leading: const Icon(Icons.gavel_outlined),
+                    title: Text(l.billingLegalOffer),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push(RoutePaths.legalOffer),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    key: const ValueKey('settings_legal_refund'),
+                    leading: const Icon(Icons.assignment_return_outlined),
+                    title: Text(l.billingLegalRefund),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.push(RoutePaths.legalRefund),
+                  ),
+                ],
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.info_outline_rounded),

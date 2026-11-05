@@ -3,18 +3,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/firebase_service.dart';
 import '../../../providers/admin_access_provider.dart';
 import '../data/admin_firebase.dart';
+import '../data/admin_functions.dart';
 import '../data/models/admin_records.dart';
 import '../data/models/subject_doc.dart';
 import '../data/repositories/content_repositories.dart';
 import '../data/repositories/exam_repositories.dart';
 import '../data/repositories/growth_repositories.dart';
 import '../data/repositories/people_repositories.dart';
+import '../data/repositories/phase4_repositories.dart';
 import '../domain/achievements_config.dart';
 import '../domain/blueprint_spec.dart';
 import '../domain/callable_errors.dart' show kAdminAppCheckEnforced;
+import '../domain/exam_pool.dart';
 import '../domain/exam_question.dart';
 import '../domain/lesson_doc.dart';
 import '../domain/notification_draft.dart';
+import '../domain/payment_order.dart';
 import '../domain/practice_question_codec.dart';
 import '../domain/pricing_config.dart';
 import '../domain/promo_code.dart';
@@ -118,6 +122,36 @@ final adminGroupNameProvider = FutureProvider.autoDispose.family<String?, String
 /// `config/achievements` (§9.4).
 final achievementsConfigProvider = FutureProvider.autoDispose<AchievementsConfig>(
     (ref) => ref.watch(achievementsConfigRepoProvider).load());
+
+// --- Phase 4: fresh-variant pool, web payments (ARCHITECTURE §10) ----------
+
+final paymentOrdersRepoProvider =
+    Provider((ref) => PaymentOrdersRepository(ref.watch(adminFirestoreProvider)));
+final examPoolRepoProvider =
+    Provider((ref) => ExamPoolRepository(ref.watch(adminFirestoreProvider)));
+
+/// `config/exam_pool` (§10.1).
+final examPoolConfigProvider = FutureProvider.autoDispose<ExamPoolConfig>(
+    (ref) => ref.watch(examPoolRepoProvider).config());
+
+/// `adminExamPoolHealth` for one blueprint × language (§10.1).
+final examPoolHealthProvider = FutureProvider.autoDispose
+    .family<PoolHealth, ({String blueprintId, String language})>(
+  (ref, k) => ref.watch(adminFunctionsServiceProvider).examPoolHealth(k.blueprintId, k.language),
+);
+
+/// Paid web orders per Bishkek day for the last 30 days (§10.3).
+final revenueProvider = FutureProvider.autoDispose<RevenueSummary>(
+    (ref) => ref.watch(paymentOrdersRepoProvider).revenue(now: DateTime.now()));
+
+/// Web orders, newest first, optionally filtered by status (§10.3).
+final paymentOrdersPageProvider = StateNotifierProvider.autoDispose
+    .family<PagedListNotifier<PaymentOrder>, PagedState<PaymentOrder>, String?>(
+  (ref, status) {
+    final repo = ref.watch(paymentOrdersRepoProvider);
+    return PagedListNotifier((after) => repo.page(status, after: after));
+  },
+);
 
 // --- Paginated lists (FB-17) -------------------------------------------------
 

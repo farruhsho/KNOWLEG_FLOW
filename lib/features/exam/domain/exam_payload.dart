@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'exam_blueprint.dart';
 import 'exam_question.dart';
+import 'exam_start.dart';
 import 'json_utils.dart';
 import 'localized_text.dart';
 
@@ -71,6 +72,13 @@ class ExamSessionPayload {
   /// Present when `examGetState` is called for an already completed attempt.
   final ExamResult? result;
 
+  /// `exam_style` of the attempt (§10.2); null when the server did not say
+  /// (older backend) — the caller then falls back to what it asked for.
+  final ExamStyle? examStyle;
+
+  /// `examStart.freshness` of a fresh variant (§10.1); null otherwise.
+  final ExamFreshness? freshness;
+
   const ExamSessionPayload({
     required this.attemptId,
     required this.variantId,
@@ -84,6 +92,8 @@ class ExamSessionPayload {
     this.language,
     this.variantTitle = LocalizedText.empty,
     this.result,
+    this.examStyle,
+    this.freshness,
   });
 
   bool get isCompleted => status == 'completed' || status == 'expired';
@@ -113,6 +123,8 @@ class ExamSessionPayload {
       variantTitle:
           LocalizedText.fromJson(pick(m, const ['variantTitle', 'variant_title'])),
       result: res is Map ? ExamResult.fromJson(res) : null,
+      examStyle: ExamStyle.tryParse(pick(m, const ['examStyle', 'exam_style'])),
+      freshness: ExamFreshness.fromJson(m['freshness']),
     );
   }
 }

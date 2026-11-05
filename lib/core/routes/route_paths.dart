@@ -39,9 +39,25 @@ abstract final class RoutePaths {
   static String examReviewFor(String attemptId) => '/exams/attempt/$attemptId/review';
   static const examHistory = '/exams/history';
 
+  /// Rules / style / language screen of a fresh variant (§10.1). `lang` is
+  /// the preselected content language.
+  static const examFresh = '/exams/new/:blueprintId';
+  static String examFreshFor(String blueprintId, {String? language}) => Uri(
+        path: '/exams/new/$blueprintId',
+        queryParameters: language == null ? null : {'lang': language},
+      ).toString();
+
   // Billing (lib/features/billing)
   static const store = '/store';
   static const transactions = '/store/transactions';
+
+  /// Web payments (BILLING_MODE=web, §10.3): the payment provider returns
+  /// here with `?order={orderId}`.
+  static const payReturn = '/pay/return';
+
+  // Legal documents (lib/features/legal), shown next to the web pay button.
+  static const legalOffer = '/legal/offer';
+  static const legalRefund = '/legal/refund';
 
   // AI tutor (lib/features/tutor)
   static const tutor = '/tutor';

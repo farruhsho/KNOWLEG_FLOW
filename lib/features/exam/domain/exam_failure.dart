@@ -24,6 +24,14 @@ enum ExamFailureKind {
   /// `APP_CHECK_WEB_SITE_KEY`; contract D7). Not retryable.
   platformUnsupported,
 
+  /// `examStart` mode `fresh`: the verified bank does not cover this
+  /// direction / language yet (`POOL_TOO_SMALL`). No credit was charged.
+  poolTooSmall,
+
+  /// A strict («Как на ОРТ») section was sent before its deadline
+  /// (`SECTION_NOT_OVER`): wait a moment and send again.
+  sectionNotOver,
+
   /// No connection / timeout / backend unavailable — safe to retry.
   network,
   unknown;
@@ -37,6 +45,8 @@ enum ExamFailureKind {
         BackendReasons.wrongSection => ExamFailureKind.wrongSection,
         BackendReasons.validationFailed => ExamFailureKind.validationFailed,
         examReasonUserBanned => ExamFailureKind.userBanned,
+        BackendReasons.poolTooSmall => ExamFailureKind.poolTooSmall,
+        BackendReasons.sectionNotOver => ExamFailureKind.sectionNotOver,
         _ => ExamFailureKind.unknown,
       };
 
@@ -64,7 +74,10 @@ class ExamFailure implements Exception {
   final ExamFailureKind kind;
   final String? message;
 
-  const ExamFailure(this.kind, [this.message]);
+  /// `HttpsError.details` (e.g. `{section_id, part_id}` of POOL_TOO_SMALL).
+  final Map<String, Object?> details;
+
+  const ExamFailure(this.kind, [this.message, this.details = const {}]);
 
   @override
   String toString() => 'ExamFailure($kind${message == null ? '' : ': $message'})';

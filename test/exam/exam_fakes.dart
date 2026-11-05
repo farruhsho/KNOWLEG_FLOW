@@ -4,6 +4,7 @@ import 'package:knowledge_flow/features/exam/data/exam_remote_datasource.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_failure.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_payload.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_session.dart';
+import 'package:knowledge_flow/features/exam/domain/exam_start.dart';
 import 'package:knowledge_flow/features/exam/domain/question_timing.dart';
 
 import 'exam_test_fixtures.dart';
@@ -37,10 +38,13 @@ class FakeExamRemote implements ExamRemoteDataSource {
   ExamSessionPayload Function()? onStart;
   int startCalls = 0;
 
+  /// Every `examStart` request, in order.
+  final startRequests = <ExamStartRequest>[];
+
   @override
-  Future<ExamSessionPayload> start(
-      {required String variantId, required String clientAppVersion}) async {
+  Future<ExamSessionPayload> start(ExamStartRequest request) async {
     startCalls++;
+    startRequests.add(request);
     return (onStart ?? startPayload)();
   }
 

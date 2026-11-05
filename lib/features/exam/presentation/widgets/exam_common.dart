@@ -26,6 +26,8 @@ String examFailureMessage(AppLocalizations l, Object? error) {
     ExamFailureKind.noEntitlement => l.examCostNeedCredit,
     ExamFailureKind.userBanned => l.examErrorBanned,
     ExamFailureKind.platformUnsupported => l.examErrorPlatformUnsupported,
+    ExamFailureKind.poolTooSmall => l.examPoolTooSmallTitle,
+    ExamFailureKind.sectionNotOver => l.examErrorSectionNotOver,
     _ => l.examErrorGeneric,
   };
 }

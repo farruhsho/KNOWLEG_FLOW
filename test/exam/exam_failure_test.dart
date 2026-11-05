@@ -7,6 +7,7 @@ import 'package:knowledge_flow/core/backend/callable_platform.dart';
 import 'package:knowledge_flow/core/design/tokens.dart';
 import 'package:knowledge_flow/features/exam/data/exam_remote_datasource.dart';
 import 'package:knowledge_flow/features/exam/domain/exam_failure.dart';
+import 'package:knowledge_flow/features/exam/domain/exam_start.dart';
 import 'package:knowledge_flow/features/exam/presentation/providers/exam_providers.dart';
 import 'package:knowledge_flow/features/exam/presentation/widgets/exam_common.dart';
 import 'package:knowledge_flow/l10n/app_localizations.dart';
@@ -106,7 +107,7 @@ void main() {
     test('the data source fails fast without touching Firebase', () async {
       const remote = FirebaseExamRemoteDataSource(platformSupported: false);
       await expectLater(
-        remote.start(variantId: 'v1', clientAppVersion: '1'),
+        remote.start(const ExamStartRequest.library(variantId: 'v1', clientAppVersion: '1')),
         throwsA(isA<ExamFailure>()
             .having((f) => f.kind, 'kind', ExamFailureKind.platformUnsupported)),
       );
