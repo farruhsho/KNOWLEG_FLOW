@@ -75,3 +75,14 @@ export function assertNoLiveExam(inProgressAttempts: number): void {
 export function dailyQuestIdRange(uid: string): { start: string; end: string } {
   return { start: `${uid}_`, end: uid + String.fromCharCode(0x60) };
 }
+
+/**
+ * accountDelete (§9.7): true only for `friends/{owner}/list/{uid}` — an entry
+ * another user keeps about `uid` — so the collection-group query on `list`
+ * can never delete documents of some other `list` sub-collection (or the
+ * user's own list entries, which go with the friends/{uid} tree).
+ */
+export function isFriendEntryAbout(path: string, uid: string): boolean {
+  const parts = path.split('/');
+  return parts.length === 4 && parts[0] === 'friends' && parts[2] === 'list' && parts[3] === uid && parts[1] !== uid && parts[1] !== '';
+}

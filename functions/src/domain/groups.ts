@@ -48,10 +48,20 @@ export interface JoinInput {
   groupId: string;
   isMember: boolean;
   memberCount: number;
+  /** groups/{gid}/removed/{uid} exists: the owner removed this user (ARCHITECTURE §9.7). */
+  removed?: boolean;
 }
 
+/**
+ * groupJoin: idempotent for a member; a user the owner removed cannot come
+ * back with the code (VALIDATION_FAILED, `why: removed_from_group`); then
+ * the membership (≤ 5) and group size (≤ 500) limits.
+ */
 export function decideGroupJoin(input: JoinInput): JoinDecision {
   if (input.isMember) return { kind: 'already_member' };
+  if (input.removed) {
+    throw new DomainError(Reasons.VALIDATION_FAILED, 'you were removed from this group', { why: 'removed_from_group' }, 'failed-precondition');
+  }
   const ids = leagueGroupIds(input.groupIds).filter((g) => g !== input.groupId);
   if (ids.length >= MAX_MEMBERSHIPS) throw limitReached('memberships', MAX_MEMBERSHIPS);
   if (input.memberCount >= MAX_GROUP_MEMBERS) throw limitReached('group_members', MAX_GROUP_MEMBERS);
@@ -95,6 +105,34 @@ export function decideRemoveMember(input: RemoveInput): RemoveDecision {
   if (input.callerUid !== input.ownerUid) throw new DomainError(Reasons.NOT_GROUP_OWNER, 'only the group owner can remove members');
   if (input.targetUid === input.ownerUid) throw validationError('the owner cannot remove themself; use groupLeave', { field: 'uid' });
   return input.targetIsMember ? { kind: 'remove' } : { kind: 'not_member' };
+}
+
+export type MembershipCleanup =
+  /** The user owns the group: the whole group is deleted. */
+  | { kind: 'owned' }
+  /** Delete the members doc; decrement member_count only when it still existed in a live group. */
+  | { kind: 'drop_member'; decrement: boolean }
+  /** Nothing left to do (a concurrent leave / removal / earlier run already dropped it). */
+  | { kind: 'none' };
+
+export interface MembershipCleanupInput {
+  uid: string;
+  groupExists: boolean;
+  ownerUid: string | null;
+  /** groups/{gid}/members/{uid} re-read inside the transaction. */
+  memberExists: boolean;
+}
+
+/**
+ * accountDelete group cleanup for one membership (ARCHITECTURE §9.7). The
+ * member doc is re-read in the transaction, so a concurrent groupLeave /
+ * groupRemoveMember or an overlapping accountDelete retry never decrements
+ * member_count twice.
+ */
+export function decideMembershipCleanup(input: MembershipCleanupInput): MembershipCleanup {
+  if (!input.groupExists) return input.memberExists ? { kind: 'drop_member', decrement: false } : { kind: 'none' };
+  if (input.ownerUid !== null && input.ownerUid === input.uid) return { kind: 'owned' };
+  return input.memberExists ? { kind: 'drop_member', decrement: true } : { kind: 'none' };
 }
 
 export type FriendDecision = { kind: 'add' } | { kind: 'already_friend' };

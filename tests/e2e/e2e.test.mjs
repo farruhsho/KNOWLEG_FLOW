@@ -326,6 +326,14 @@ let friendUid;
 let newbieUid;
 let friendCode;
 let groupId;
+let assignmentId;
+const INTRUDER = { email: 'intruder.e2e@example.test', password: 'e2e-Intr0der-Passw0rd!' };
+
+/** Sum of the code_attempts counters of `uid` (groupJoin + friendAdd, §9.7). */
+async function codeAttempts(uid) {
+  const snap = await db.collection('code_attempts').where('uid', '==', uid).get();
+  return snap.docs.reduce((n, d) => n + (d.get('count') ?? 0), 0);
+}
 
 async function signInAs(user) {
   await signOut(cAuth);
@@ -346,11 +354,19 @@ async function signUp(user, name, language) {
 
 test('promo codes: the admin creates one, a student redeems it once (ALREADY_REDEEMED after)', async () => {
   await signInAs(ADMIN);
-  const up = await call('adminUpsertPromoCode')({ code: 'e2e-welcome', credits: 2, maxRedemptions: 10, expiresAt: null, active: true, note: 'e2e' });
+  const up = await call('adminUpsertPromoCode')({ code: 'e2e-welcome', credits: 2, maxRedemptions: 10, expiresAt: null, active: true, note: 'e2e', createOnly: true });
   assert.equal(up.ok, true);
   assert.equal(up.code, 'E2EWELCOME');
+  assert.equal(up.created, true);
   const promo = (await getDoc(doc(cDb, 'promo_codes', 'E2EWELCOME'))).data();
   assert.deepEqual([promo.credits, promo.redemptions, promo.active, promo.max_redemptions], [2, 0, true, 10]);
+  // §9.7: "create" never overwrites an existing code; the edit path (no createOnly) still updates.
+  const exists = await expectReason(call('adminUpsertPromoCode')({ code: 'E2EWELCOME', credits: 5, active: true, createOnly: true }), 'VALIDATION_FAILED');
+  assert.equal(exists.details?.why, 'exists');
+  assert.equal((await getDoc(doc(cDb, 'promo_codes', 'E2EWELCOME'))).data().credits, 2, 'existing code untouched');
+  const edit = await call('adminUpsertPromoCode')({ code: 'E2EWELCOME', credits: 2, maxRedemptions: 10, expiresAt: null, active: true, note: 'e2e edited' });
+  assert.equal(edit.created, false);
+  assert.equal((await getDoc(doc(cDb, 'promo_codes', 'E2EWELCOME'))).data().note, 'e2e edited');
   await expectReason(call('adminUpsertPromoCode')({ code: 'AB', credits: 1, active: true }), 'VALIDATION_FAILED');
   const logs = await getDocs(query(collection(cDb, 'admin_logs'), where('action', '==', 'create_promo_code')));
   assert.equal(logs.size, 1, 'admin action is logged');
@@ -404,7 +420,7 @@ test('friendAdd: by the friend\'s referral code, idempotent, never yourself', as
   assert.equal(r.friendUid, friendUid);
   await call('friendAdd')({ code: friendCode });
   const list = await getDocs(collection(cDb, 'friends', studentUid, 'list'));
-  assert.deepEqual(list.docs.map((d) => [d.id, d.data().display_name]), [[friendUid, 'E2E Friend']]);
+  assert.deepEqual(list.docs.map((d) => [d.id, d.data().display_name, d.data().uid]), [[friendUid, 'E2E Friend', friendUid]]);
   await expectDenied(setDoc(doc(cDb, 'friends', studentUid, 'list', newbieUid), { display_name: 'x', added_at: serverTimestamp() }));
   const own = (await call('referralGetCode')({})).code;
   await expectReason(call('friendAdd')({ code: own }), 'VALIDATION_FAILED');
@@ -420,6 +436,7 @@ test('groups: create, join, owner assignment, member submission, leagues, leave'
   assert.deepEqual([group.name, group.owner_uid, group.member_count, group.join_code], ['11 «А» класс', friendUid, 1, g.joinCode]);
   // The owner publishes homework with the exact §9.3 map.
   const aRef = doc(collection(cDb, 'groups', groupId, 'assignments'));
+  assignmentId = aRef.id;
   await setDoc(aRef, {
     title: 'Вариант 1: математика', kind: 'exam_variant', ref_id: 'e2e_main_ru_1',
     due_at: Timestamp.fromMillis(Date.now() + 7 * 864e5), created_by: friendUid, created_at: serverTimestamp(),
@@ -455,6 +472,13 @@ test('groups: create, join, owner assignment, member submission, leagues, leave'
   const stats = (await getDoc(doc(cDb, 'user_stats', studentUid))).data();
   assert.deepEqual([stats.study_seconds_total, stats.study_seconds_today], [300, 300]);
   await expectReason(call('recordActivity')({ kind: 'lesson_completed', refId: 'e2e_lesson_1', seconds: 4000 }), 'VALIDATION_FAILED');
+  // §9.7: a retried report (same reportId, e.g. after a lost response) adds its seconds once.
+  const report = { kind: 'lesson_completed', refId: 'e2e_lesson_1', seconds: 120, reportId: 'e2e_report_0001' };
+  assert.equal((await call('recordActivity')(report)).stats.study_seconds_total, 420);
+  assert.equal((await call('recordActivity')(report)).stats.study_seconds_total, 420, 'a retry adds no time');
+  assert.equal((await call('recordActivity')({ ...report, reportId: 'e2e_report_0002' })).stats.study_seconds_total, 540);
+  await expectReason(call('recordActivity')({ ...report, reportId: 'bad id' }), 'VALIDATION_FAILED');
+  assert.deepEqual((await getDoc(doc(cDb, 'user_stats', studentUid))).data().study_report_ids, ['e2e_report_0001', 'e2e_report_0002']);
   const boards = (await db.collectionGroup('entries').where('uid', '==', studentUid).get()).docs.map((d) => d.ref.parent.parent.id);
   assert.ok(boards.some((b) => b.startsWith('region_chuy_weekly_')), boards.join());
   assert.ok(boards.some((b) => b.startsWith(`group_${groupId}_weekly_`)), boards.join());
@@ -470,6 +494,33 @@ test('groups: create, join, owner assignment, member submission, leagues, leave'
   await expectDenied(getDoc(doc(cDb, 'groups', groupId)));
   assert.deepEqual((await getDoc(doc(cDb, 'users', studentUid))).data().group_ids, []);
   assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 1);
+});
+
+test('groupRemoveMember: a removed member cannot rejoin with the code; a member who left can (§9.7)', async () => {
+  await signInAs(FRIEND);
+  const joinCode = (await getDoc(doc(cDb, 'groups', groupId))).data().join_code;
+  const intruderUid = await signUp(INTRUDER, 'E2E Intruder', 'ru');
+  assert.equal((await call('groupJoin')({ code: joinCode })).groupId, groupId);
+
+  await signInAs(FRIEND);
+  assert.deepEqual(await call('groupRemoveMember')({ groupId, uid: intruderUid }), { ok: true });
+  assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 1);
+  assert.equal((await db.doc(`groups/${groupId}/removed/${intruderUid}`).get()).get('by'), friendUid);
+  await expectDenied(getDoc(doc(cDb, 'groups', groupId, 'removed', intruderUid)));
+
+  await signInAs(INTRUDER);
+  const e = await expectReason(call('groupJoin')({ code: joinCode }), 'VALIDATION_FAILED');
+  assert.equal(e.details?.why, 'removed_from_group');
+  assert.deepEqual((await getDoc(doc(cDb, 'users', intruderUid))).data().group_ids ?? [], []);
+  assert.equal((await db.doc(`groups/${groupId}/members/${intruderUid}`).get()).exists, false);
+
+  // The student left voluntarily and may come back (stays a member until accountDelete).
+  await signInAs(STUDENT);
+  assert.equal((await call('groupJoin')({ code: joinCode })).groupId, groupId);
+  assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 2);
+  // Every groupJoin / friendAdd call is counted, failed ones too (4 friendAdd + 3 groupJoin).
+  assert.equal(await codeAttempts(studentUid), 7);
+  assert.equal(await codeAttempts(intruderUid), 2);
 });
 
 test('adminSendNotification: dry run counts recipients per audience (send_notifications only)', async () => {
@@ -488,7 +539,7 @@ test('adminSendNotification: dry run counts recipients per audience (send_notifi
   assert.equal((await send({ kind: 'language', value: 'ru' })).recipients, 1);
   assert.equal((await send({ kind: 'region', value: 'chuy' })).recipients, 1);
   assert.equal((await send({ kind: 'region', value: 'naryn' })).recipients, 0);
-  assert.equal((await send({ kind: 'group', value: groupId })).recipients, 0, 'only the owner (no device) is left in the group');
+  assert.equal((await send({ kind: 'group', value: groupId })).recipients, 1, 'the student (with a device) rejoined; the owner has none');
   await expectReason(send({ kind: 'planet', value: 'mars' }), 'VALIDATION_FAILED');
   await expectReason(call('adminSendNotification')({ title: { ru: '' }, body: msg.body, audience: { kind: 'all' }, dryRun: true }), 'VALIDATION_FAILED');
   assert.equal((await getDocs(collection(cDb, 'notifications'))).size, 0, 'dry runs leave no history');
@@ -508,6 +559,10 @@ test('practice XP is server-awarded and capped (recordActivity)', async () => {
 });
 
 test('account deletion removes the account and its data (Google Play requirement)', async () => {
+  // The student is a member of FRIEND's group with a homework submission (§9.7 cleanup).
+  const submissionPath = `groups/${groupId}/assignments/${assignmentId}/submissions/${studentUid}`;
+  assert.equal((await db.doc(submissionPath).get()).exists, true, 'submission seeded by the groups test');
+  assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 2);
   // Fresh sign-in satisfies the recent-login requirement (D9).
   await signOut(cAuth);
   await signInWithEmailAndPassword(cAuth, STUDENT.email, STUDENT.password);
@@ -523,6 +578,11 @@ test('account deletion removes the account and its data (Google Play requirement
   assert.equal((await db.collection(`friends/${studentUid}/list`).get()).size, 0, 'friend list deleted');
   assert.equal((await db.collection('referral_codes').where('uid', '==', studentUid).get()).size, 0, 'referral code released');
   assert.equal((await db.collection('promo_attempts').where('uid', '==', studentUid).get()).size, 0, 'promo attempts deleted');
+  assert.equal((await db.collection('code_attempts').where('uid', '==', studentUid).get()).size, 0, 'code attempts deleted');
+  // Membership in someone else's group: submission and member doc gone, member_count decremented once.
+  assert.equal((await db.doc(submissionPath).get()).exists, false, 'own submission deleted');
+  assert.equal((await db.doc(`groups/${groupId}/members/${studentUid}`).get()).exists, false, 'membership deleted');
+  assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 1);
   // The still-valid ID token can no longer claim anything.
   await assert.rejects(call('examStart')({ variantId: 'e2e_main_ru_1' }));
 });
@@ -534,9 +594,13 @@ test('deleting a group owner deletes the group, its join code, referral data and
   await signInAs(NEWBIE);
   await call('groupJoin')({ code: joinCode });
   assert.deepEqual((await getDoc(doc(cDb, 'users', newbieUid))).data().group_ids, [groupId]);
+  // NEWBIE keeps FRIEND in their friend list (entry carries uid, §9.7).
+  await call('friendAdd')({ code: friendCode });
+  assert.equal((await getDoc(doc(cDb, 'friends', newbieUid, 'list', friendUid))).data().uid, friendUid);
 
   await signInAs(FRIEND);
   assert.equal((await call('accountDelete')({})).ok, true);
+  assert.equal((await db.doc(`friends/${newbieUid}/list/${friendUid}`).get()).exists, false, "others' friend entries about the user deleted");
   assert.equal((await db.doc(`groups/${groupId}`).get()).exists, false, 'owned group deleted');
   assert.equal((await db.collection(`groups/${groupId}/assignments`).get()).size, 0, 'assignments deleted');
   assert.equal((await db.doc(`group_join_codes/${joinCode}`).get()).exists, false, 'join code released');

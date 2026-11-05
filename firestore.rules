@@ -469,6 +469,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // groupJoin + friendAdd attempt counter (§9.7): server only.
+    match /code_attempts/{attemptId} {
+      allow read, write: if false;
+    }
+
     match /notification_quota/{day} {
       allow read, write: if false;
     }
@@ -484,13 +489,14 @@ service cloud.firestore {
       }
     }
 
-    // Referrals: the referrer reads their counters and the people they invited.
+    // Referrals: the referrer reads their counters and the people they invited;
+    // view_users roles read them too (D6, CMS user card, §9.7).
     match /referrals/{referrerUid} {
-      allow read: if isOwner(referrerUid);
+      allow read: if isOwner(referrerUid) || canViewUsers();
       allow write: if false;
 
       match /items/{itemUid} {
-        allow read: if isOwner(referrerUid);
+        allow read: if isOwner(referrerUid) || canViewUsers();
         allow write: if false;
       }
     }
@@ -515,14 +521,16 @@ service cloud.firestore {
     }
 
     // groups/{gid}/assignments/{aid} = {title, kind, ref_id, due_at, created_by, created_at}
-    // (+ optional description, updated_at).
+    // (+ optional description, updated_at). ref_id '' only for kind 'practice'
+    // ("quick practice", §9.7); other kinds need a non-empty ref_id.
     function validAssignment() {
       let d = request.resource.data;
       return d.keys().hasOnly(['title', 'kind', 'ref_id', 'due_at', 'created_by', 'created_at', 'description', 'updated_at'])
         && d.keys().hasAll(['title', 'kind', 'ref_id', 'created_by', 'created_at'])
         && d.title is string && d.title.size() >= 1 && d.title.size() <= 120
         && d.kind in ['lesson', 'practice', 'exam_variant']
-        && d.ref_id is string && d.ref_id.size() >= 1 && d.ref_id.size() <= 150
+        && d.ref_id is string && d.ref_id.size() <= 150
+        && (d.ref_id.size() >= 1 || d.kind == 'practice')
         && (d.get('due_at', null) == null || d.due_at is timestamp)
         && d.created_at is timestamp
         && (d.get('description', null) == null || (d.description is string && d.description.size() <= 1000))
@@ -540,14 +548,20 @@ service cloud.firestore {
 
     // Groups: membership (members/{uid}), member_count and users.group_ids
     // change only through groupCreate / groupJoin / groupLeave /
-    // groupRemoveMember. Members read the group and its member list.
+    // groupRemoveMember. Members read the group and its member list;
+    // view_users roles read the group document only (CMS user card, §9.7).
     match /groups/{gid} {
-      allow read: if isGroupMember(gid);
+      allow read: if isGroupMember(gid) || canViewUsers();
       allow write: if false;
 
       match /members/{memberUid} {
         allow read: if isGroupMember(gid);
         allow write: if false;
+      }
+
+      // Users the owner removed (groupRemoveMember, §9.7): server only.
+      match /removed/{removedUid} {
+        allow read, write: if false;
       }
 
       // Homework (FR-LRN-6): the group owner creates, edits and deletes;

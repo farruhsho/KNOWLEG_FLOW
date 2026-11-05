@@ -8,6 +8,7 @@ import {
   dailyQuestIdRange,
   decideAccess,
   isBannedProfile,
+  isFriendEntryAbout,
   isRecentLogin,
   RECENT_LOGIN_MAX_AGE_SEC,
 } from '../src/domain/access';
@@ -67,6 +68,27 @@ describe('dailyQuestIdRange (ACC-DQ-01)', () => {
     assert.notEqual(r.start, r.end, 'the range must not be empty');
     for (const id of ['alice_2026-11-2', 'alice_2026-11-02', 'alice_', 'alice_zzz', 'alice_~x']) assert.ok(inRange(id, r), id);
     for (const id of ['alice', 'alicea_2026-11-02', 'alice0_x', 'bob_2026-11-02', 'alicf']) assert.ok(!inRange(id, r), id);
+  });
+});
+
+describe('isFriendEntryAbout (accountDelete, §9.7 P3-BE-06)', () => {
+  it('matches only friends/{other}/list/{uid}', () => {
+    assert.ok(isFriendEntryAbout('friends/bob/list/alice', 'alice'));
+    assert.ok(isFriendEntryAbout('friends/carol/list/alice', 'alice'));
+  });
+
+  it('never touches other `list` collections, other entries or the user\'s own list', () => {
+    for (const p of [
+      'friends/bob/list/carol', // an entry about someone else
+      'friends/alice/list/alice', // own tree (deleted with friends/{uid})
+      'groups/g1/list/alice', // some other `list` sub-collection
+      'users/bob/list/alice',
+      'a/friends/bob/list/alice', // nested deeper
+      'friends/bob/lists/alice',
+      'friends//list/alice',
+    ]) {
+      assert.equal(isFriendEntryAbout(p, 'alice'), false, p);
+    }
   });
 });
 

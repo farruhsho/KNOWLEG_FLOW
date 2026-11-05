@@ -17,11 +17,11 @@
  */
 import '../config';
 import { getAuth } from 'firebase-admin/auth';
-import { FieldPath, type DocumentReference, type Query } from 'firebase-admin/firestore';
+import { FieldPath, type DocumentReference, type Query, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
-import { assertRecentLogin, dailyQuestIdRange } from '../domain/access';
+import { assertRecentLogin, dailyQuestIdRange, isFriendEntryAbout } from '../domain/access';
 import { sha256Hex } from '../domain/hash';
 import { anonymizedUid } from '../domain/purchase';
 import { callableOptions, db, FieldValue, findAuthUser, requireAuth, wrap } from './common';
@@ -63,6 +63,32 @@ async function deleteQueryTrees(q: Query): Promise<number> {
       n++;
     }
     if (snap.size < 200) return n;
+  }
+}
+
+/**
+ * Deletes friends/{other}/list/{uid} — the entries other users keep about
+ * `uid` (friendAdd writes `uid` = friendUid, ARCHITECTURE §9.7). Only docs of
+ * a `list` sub-collection directly under `friends/{other}` whose id is `uid`
+ * are touched, so no other `list` collection can be hit. Pages with a cursor
+ * (a skipped doc never stalls the loop).
+ */
+async function deleteFriendEntriesAbout(uid: string): Promise<number> {
+  let n = 0;
+  let last: QueryDocumentSnapshot | undefined;
+  for (;;) {
+    let q = db().collectionGroup('list').where('uid', '==', uid).limit(200);
+    if (last) q = q.startAfter(last);
+    const snap = await q.get();
+    const docs = snap.docs.filter((d) => isFriendEntryAbout(d.ref.path, uid));
+    if (docs.length > 0) {
+      const batch = db().batch();
+      for (const d of docs) batch.delete(d.ref);
+      await batch.commit();
+      n += docs.length;
+    }
+    if (snap.size < 200) return n;
+    last = snap.docs[snap.docs.length - 1];
   }
 }
 
@@ -108,18 +134,24 @@ export async function deleteUserData(uid: string): Promise<Record<string, number
   );
   counts['leaderboard_entries'] = await deleteQueryTrees(db().collectionGroup('entries').where('uid', '==', uid));
 
-  // Phase 3 (ARCHITECTURE §9): codes, referral item, promo attempt counters, groups.
+  // Phase 3 (ARCHITECTURE §9, §9.7): codes, referral item, promo / code attempt
+  // counters, others' friend entries, groups and homework submissions.
   counts['referral_codes'] = await deleteQueryTrees(db().collection('referral_codes').where('uid', '==', uid));
   if (typeof referredBy === 'string' && referredBy && !referredBy.includes('/')) {
     await db().doc(`referrals/${referredBy}/items/${uid}`).delete();
   }
   const attemptRange = dailyQuestIdRange(uid); // same `${uid}_${day}` id scheme
-  counts['promo_attempts'] = await deleteQueryTrees(
-    db()
-      .collection('promo_attempts')
-      .where(FieldPath.documentId(), '>=', attemptRange.start)
-      .where(FieldPath.documentId(), '<', attemptRange.end),
-  );
+  for (const counter of ['promo_attempts', 'code_attempts']) {
+    counts[counter] = await deleteQueryTrees(
+      db()
+        .collection(counter)
+        .where(FieldPath.documentId(), '>=', attemptRange.start)
+        .where(FieldPath.documentId(), '<', attemptRange.end),
+    );
+  }
+  // §9.7: entries other users keep about this user in their friend lists.
+  counts['friend_entries'] = await deleteFriendEntriesAbout(uid);
+  // Memberships, own groups, and homework submissions in other owners' groups.
   counts['groups'] = await removeUserFromGroups(uid);
 
   counts['purchases_anonymized'] = await anonymize('purchases', 'uid', uid);

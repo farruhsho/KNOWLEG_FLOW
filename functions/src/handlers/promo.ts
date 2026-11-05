@@ -1,7 +1,12 @@
 /**
  * Promo codes (ARCHITECTURE §9.2):
  *   promoRedeem {code}  -> {credits, balance}
- *   adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt? (ms), active, note} -> {ok, code}
+ *   adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt? (ms), active, note, createOnly?}
+ *     -> {ok, code, created}
+ *
+ * adminUpsertPromoCode updates an existing code unless `createOnly: true`
+ * (the CMS create dialog, ARCHITECTURE §9.7): then an existing code is
+ * refused with VALIDATION_FAILED `why: 'exists'` and left untouched.
  *
  * promoRedeem runs one transaction that always counts the attempt in
  * promo_attempts/{uid}_{yyyy-mm-dd} (Bishkek day, ≤ 10/day) and, when the
@@ -15,7 +20,7 @@ import { logger } from 'firebase-functions';
 import { onCall } from 'firebase-functions/v2/https';
 import { isPromoCode, normalizeCode } from '../domain/codes';
 import { applyBonusCredits, parseEntitlement } from '../domain/entitlements';
-import { decidePromoRedeem, parsePromoCode, parsePromoUpsert, promoAttemptsId, promoRejection } from '../domain/promo';
+import { decidePromoRedeem, decidePromoUpsert, parsePromoCode, parsePromoUpsert, promoAttemptsId, promoRejection } from '../domain/promo';
 import { bishkekDayKey } from '../domain/time';
 import { int } from '../domain/types';
 import { adminCallableOptions, callableOptions, db, FieldValue, msToTs, payload, requireActiveUser, requirePermission, wrap, writeAdminLog } from './common';
@@ -72,7 +77,7 @@ export const promoRedeem = onCall(
 );
 
 // ---------------------------------------------------------------------------
-// adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt?, active, note} -> {ok, code}
+// adminUpsertPromoCode {code, credits, maxRedemptions?, expiresAt?, active, note, createOnly?} -> {ok, code, created}
 
 export const adminUpsertPromoCode = onCall(
   adminCallableOptions(),
@@ -82,6 +87,8 @@ export const adminUpsertPromoCode = onCall(
     const ref = db().doc(`promo_codes/${p.code}`);
     const created = await db().runTransaction(async (tx) => {
       const snap = await tx.get(ref);
+      // createOnly (§9.7): an existing code is refused (VALIDATION_FAILED, why 'exists'), nothing is written.
+      const action = decidePromoUpsert(snap.exists, p.createOnly);
       const fields = {
         credits: p.credits,
         max_redemptions: p.maxRedemptions,
@@ -91,7 +98,7 @@ export const adminUpsertPromoCode = onCall(
         updated_at: FieldValue.serverTimestamp(),
         updated_by: actor.uid,
       };
-      if (snap.exists) {
+      if (action === 'update') {
         tx.update(ref, fields);
         return false;
       }

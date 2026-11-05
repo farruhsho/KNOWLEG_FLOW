@@ -10,9 +10,11 @@ import { logger } from 'firebase-functions';
 import { HttpsError, type CallableOptions, type CallableRequest } from 'firebase-functions/v2/https';
 import { APP_CHECK_ENFORCE, APP_CHECK_ENFORCE_ADMIN } from '../config';
 import { decideAccess, isBannedProfile } from '../domain/access';
+import { codeAttemptsId, nextCodeAttemptCount } from '../domain/codes';
 import { DomainError, Reasons, type ErrorCode, type Reason } from '../domain/reasons';
 import { hasPermission, resolveRole, type Permission, type Role } from '../domain/roles';
-import { isRecord } from '../domain/types';
+import { bishkekDayKey } from '../domain/time';
+import { int, isRecord } from '../domain/types';
 
 if (getApps().length === 0) initializeApp();
 
@@ -103,6 +105,22 @@ export async function requireActiveUser(req: CallableRequest<unknown>, opts: { a
     throw httpsError(Reasons.USER_BANNED, 'This account is blocked.');
   }
   return { uid, profile };
+}
+
+/**
+ * Brute-force guard for typed group / friend codes (ARCHITECTURE §9.7):
+ * counts this groupJoin / friendAdd call in code_attempts/{uid}_{day}
+ * (Bishkek day) BEFORE the code is resolved, so failed guesses count too.
+ * RATE_LIMITED (`details.what = 'code_attempts'`) past 30 calls a day.
+ */
+export async function consumeCodeAttempt(uid: string, nowMs = Date.now()): Promise<void> {
+  const day = bishkekDayKey(nowMs);
+  const ref = db().doc(`code_attempts/${codeAttemptsId(uid, day)}`);
+  await db().runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const count = nextCodeAttemptCount(int(snap.get('count')));
+    tx.set(ref, { uid, day, count, updated_at: FieldValue.serverTimestamp() }, { merge: true });
+  });
 }
 
 // ---------------------------------------------------------------------------

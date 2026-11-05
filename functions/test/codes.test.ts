@@ -1,6 +1,47 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { CODE_ALPHABET, generateShortCode, isPromoCode, isShortCode, normalizeCode, SHORT_CODE_LENGTH } from '../src/domain/codes';
+import {
+  CODE_ALPHABET,
+  CODE_DAILY_ATTEMPTS,
+  codeAttemptsId,
+  generateShortCode,
+  isPromoCode,
+  isShortCode,
+  nextCodeAttemptCount,
+  normalizeCode,
+  SHORT_CODE_LENGTH,
+} from '../src/domain/codes';
+import { DomainError } from '../src/domain/reasons';
+import { bishkekDayKey } from '../src/domain/time';
+
+describe('code_attempts limiter for groupJoin + friendAdd (§9.7, P3-BE-03)', () => {
+  it('allows 30 calls a day (failed ones included), the 31st is RATE_LIMITED with what=code_attempts', () => {
+    assert.equal(CODE_DAILY_ATTEMPTS, 30);
+    let count = 0;
+    for (let i = 0; i < CODE_DAILY_ATTEMPTS; i++) count = nextCodeAttemptCount(count);
+    assert.equal(count, 30);
+    let err: unknown;
+    try {
+      nextCodeAttemptCount(count);
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(err instanceof DomainError);
+    assert.equal(err.reason, 'RATE_LIMITED');
+    assert.equal(err.code, 'resource-exhausted');
+    assert.deepEqual(err.extra, { what: 'code_attempts', limit: 30 });
+    assert.throws(() => nextCodeAttemptCount(500), DomainError);
+  });
+
+  it('tolerates a missing / broken counter and keys it per uid and Bishkek day', () => {
+    assert.equal(nextCodeAttemptCount(0), 1);
+    assert.equal(nextCodeAttemptCount(-3), 1);
+    assert.equal(nextCodeAttemptCount(Number.NaN), 1);
+    assert.equal(nextCodeAttemptCount(4.7), 5);
+    // 23:30 UTC on Nov 4 is already Nov 5 in Bishkek (UTC+6): a new day, a new counter.
+    assert.equal(codeAttemptsId('alice', bishkekDayKey(Date.UTC(2026, 10, 4, 23, 30))), 'alice_2026-11-05');
+  });
+});
 
 describe('codes (ARCHITECTURE §9)', () => {
   it('alphabet has 32 unambiguous characters (no 0/O, 1/I)', () => {

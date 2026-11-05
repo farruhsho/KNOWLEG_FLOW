@@ -10,6 +10,7 @@
  * - Promo codes: 4–20 characters `A-Z0-9`, stored upper-case as the
  *   `promo_codes/{CODE}` document id.
  */
+import { DomainError, Reasons } from './reasons';
 
 export const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const SHORT_CODE_LENGTH = 6;
@@ -50,3 +51,30 @@ export function generateShortCode(randomInt: (n: number) => number): string {
 
 /** Attempts at finding a free code before giving up (collisions are ~1e-9 each). */
 export const MAX_CODE_ATTEMPTS = 8;
+
+/**
+ * Brute-force guard for typed 6-character codes (ARCHITECTURE §9.7):
+ * groupJoin and friendAdd together allow CODE_DAILY_ATTEMPTS calls per user
+ * per Bishkek day, failed ones included. Counter:
+ * `code_attempts/{uid}_{yyyy-mm-dd}` = {uid, day, count} (server only).
+ */
+export const CODE_DAILY_ATTEMPTS = 30;
+
+/** code_attempts document id for `uid` on Bishkek day `dayKey`. */
+export function codeAttemptsId(uid: string, dayKey: string): string {
+  return `${uid}_${dayKey}`;
+}
+
+/**
+ * Checks the daily counter (`attemptsToday` = calls already counted today)
+ * and returns the value to store for this call; RATE_LIMITED with
+ * `details.what = 'code_attempts'` once the cap is reached (that call is
+ * not counted).
+ */
+export function nextCodeAttemptCount(attemptsToday: number): number {
+  const used = Math.max(0, Math.trunc(Number.isFinite(attemptsToday) ? attemptsToday : 0));
+  if (used >= CODE_DAILY_ATTEMPTS) {
+    throw new DomainError(Reasons.RATE_LIMITED, 'too many code attempts today', { what: 'code_attempts', limit: CODE_DAILY_ATTEMPTS });
+  }
+  return used + 1;
+}

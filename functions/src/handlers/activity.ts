@@ -1,5 +1,5 @@
 /**
- * recordActivity {kind: lesson_completed|practice_answered, refId, correct?, count?, seconds?}
+ * recordActivity {kind: lesson_completed|practice_answered, refId, correct?, count?, seconds?, reportId?}
  *   -> {xpAwarded, stats}
  *
  * XP is computed and stored only here (ARCHITECTURE §1.7), idempotently via
@@ -13,12 +13,23 @@
  * `seconds` (0..3600, ARCHITECTURE §9.5) is study time spent on the lesson /
  * practice: it is added to user_stats.study_seconds_total and
  * study_seconds_today (Bishkek day, ≤ 24 h) on every valid call, including
- * duplicates and capped calls, because time spent is real even when no XP is
- * due. It never affects XP or leaderboards.
+ * duplicate events and capped calls, because time spent is real even when no
+ * XP is due. It never affects XP or leaderboards. With the optional
+ * `reportId` (ARCHITECTURE §9.7) the seconds of one report are credited at
+ * most once: a retry of the same report (lost response, offline queue)
+ * adds no time; the last 50 ids are kept in user_stats.study_report_ids.
  */
 import '../config';
 import { onCall } from 'firebase-functions/v2/https';
-import { activityEventId, dailyLessonTarget, isActivityKind, practiceCorrectCount, shouldPersistAward } from '../domain/activity';
+import {
+  activityEventId,
+  dailyLessonTarget,
+  decideStudyCredit,
+  isActivityKind,
+  parseReportId,
+  practiceCorrectCount,
+  shouldPersistAward,
+} from '../domain/activity';
 import { DomainError, Reasons } from '../domain/reasons';
 import { parseActivitySeconds } from '../domain/timings';
 import { applyLessonCompleted, applyPracticeCorrect, applyStudySeconds, parseStats, statsView, type UserStats } from '../domain/xp';
@@ -50,6 +61,7 @@ export const recordActivity = onCall(
     }
     const refId = reqId(data['refId'], 'refId', true);
     const seconds = parseActivitySeconds(data['seconds']);
+    const reportId = parseReportId(data['reportId']);
     const nowMs = Date.now();
 
     let ref = refId;
@@ -65,9 +77,12 @@ export const recordActivity = onCall(
     return db().runTransaction(async (tx) => {
       const [eventSnap, statsSnap] = await tx.getAll(xpEventRef(uid, eventId), statsRef(uid));
       const stats = parseStats(statsSnap!.data());
-      /** Study time only (no XP): writes the three study fields when seconds > 0. */
+      // Seconds count once per reportId (a retried report adds no time again).
+      const study = decideStudyCredit(seconds, reportId, statsSnap!.get('study_report_ids'));
+      const reportIdsField = study.reportIds ? { study_report_ids: study.reportIds } : {};
+      /** Study time only (no XP): writes the study fields when the seconds are credited. */
       const studyOnly = (): UserStats => {
-        if (seconds <= 0) return stats;
+        if (!study.credit) return stats;
         const studied = applyStudySeconds(stats, seconds, nowMs).stats;
         tx.set(
           statsRef(uid),
@@ -75,6 +90,7 @@ export const recordActivity = onCall(
             study_seconds_total: studied.study_seconds_total,
             study_seconds_today: studied.study_seconds_today,
             study_day: studied.study_day,
+            ...reportIdsField,
             updated_at: FieldValue.serverTimestamp(),
           },
           { merge: true },
@@ -87,7 +103,7 @@ export const recordActivity = onCall(
         // Daily practice cap reached (or nothing correct): no event, no XP write.
         return { xpAwarded: 0, stats: statsView(studyOnly()), capped: kind === 'practice_answered' && correctCount > 0 };
       }
-      if (seconds > 0) award.stats = applyStudySeconds(award.stats, seconds, nowMs).stats;
+      if (study.credit) award.stats = applyStudySeconds(award.stats, seconds, nowMs).stats;
       const toLeaderboard = !leaderboardProfile.banned;
       tx.set(xpEventRef(uid, eventId), {
         kind,
@@ -98,7 +114,7 @@ export const recordActivity = onCall(
         leaderboard_xp: toLeaderboard ? award.total : 0,
         at: FieldValue.serverTimestamp(),
       });
-      tx.set(statsRef(uid), statsToDoc(award.stats), { merge: true });
+      tx.set(statsRef(uid), { ...statsToDoc(award.stats), ...reportIdsField }, { merge: true });
       if (toLeaderboard) addLeaderboardXp(tx, uid, leaderboardProfile, award.total, nowMs, null);
       return { xpAwarded: award.total, stats: statsView(award.stats), newAchievements: award.newAchievements };
     });

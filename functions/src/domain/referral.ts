@@ -13,6 +13,9 @@
  *   Bishkek calendar month; past the cap only the referred user is rewarded.
  *   Idempotent per referred uid (the item status), test purchases never
  *   reward, and a deleted referrer is skipped.
+ * - Refund / void of the rewarding purchase (§9.7): both bonuses are clawed
+ *   back with the purchase (ledger reason 'refund', debt when spent) and the
+ *   item becomes 'revoked' — terminal, the referee is never rewarded again.
  */
 import { DomainError, Reasons } from './reasons';
 import { int, isRecord, str } from './types';
@@ -93,7 +96,8 @@ export type RewardDecision =
 export function decideReferralReward(input: RewardInput): RewardDecision {
   const referrer = input.referredBy;
   if (!referrer || referrer === input.refereeUid || input.isTestPurchase) return { kind: 'none' };
-  if (input.itemStatus === 'rewarded') return { kind: 'none' };
+  // One reward per referee: a reward clawed back after a refund ('revoked') is not paid again.
+  if (input.itemStatus === 'rewarded' || input.itemStatus === 'revoked') return { kind: 'none' };
   const sameMonth = input.counter.month_key === input.monthKey;
   const used = sameMonth ? input.counter.month_rewarded : 0;
   const capped = input.referrerExists && used >= REFERRAL_MONTHLY_CAP;
@@ -104,5 +108,42 @@ export function decideReferralReward(input: RewardInput): RewardDecision {
     rewardReferrer,
     capped,
     counter: { month_key: input.monthKey, month_rewarded: rewardReferrer ? used + 1 : used },
+  };
+}
+
+export interface ReferralClawbackInput {
+  /** purchases/{id}.referral_referrer_uid: set when this purchase paid out the reward. */
+  referrerUid: string | null;
+  /** purchases/{id}.referral_referrer_rewarded: the referrer got +1 (not capped / not deleted). */
+  referrerRewarded: boolean;
+  /** The purchase owner (referee) still has an account (purchase uid not anonymized). */
+  refereeLive: boolean;
+  /** entitlements/{referrer} exists (the reward wrote it; missing = the referrer deleted the account). */
+  referrerEntitlementExists: boolean;
+  /** referrals/{referrer}/items/{referee}.status, null when missing. */
+  itemStatus: string | null;
+}
+
+export interface ReferralClawback {
+  /** Take back the referee's +1. */
+  referee: boolean;
+  /** Take back the referrer's +1. */
+  referrer: boolean;
+  /** Set the item to status 'revoked'. */
+  markItem: boolean;
+}
+
+/**
+ * Refund / void of the purchase that paid the referral reward (ARCHITECTURE
+ * §9.7): both bonuses are clawed back like the purchase itself (debt when
+ * already spent), the item becomes 'revoked'. Null when the purchase paid
+ * no reward. Deleted accounts are skipped (their entitlements are gone).
+ */
+export function decideReferralClawback(input: ReferralClawbackInput): ReferralClawback | null {
+  if (!input.referrerUid) return null;
+  return {
+    referee: input.refereeLive,
+    referrer: input.referrerRewarded && input.referrerEntitlementExists,
+    markItem: input.refereeLive && input.itemStatus !== null && input.itemStatus !== 'revoked',
   };
 }
