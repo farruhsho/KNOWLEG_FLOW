@@ -17,9 +17,23 @@ import { isRecord } from './types';
 export const LATE_GRACE_MS = 120_000;
 export const STALE_AFTER_MS = 15 * 60_000;
 export const MAX_ANSWER_ID_LENGTH = 8;
+/**
+ * Strict ORT style (ARCHITECTURE §10.2): a section closes only when its time
+ * is over; the client submits it itself at the deadline, so a submit up to
+ * this much before the deadline is accepted.
+ */
+export const STRICT_EARLY_SUBMIT_MS = 5_000;
 
 export type AttemptStatus = 'in_progress' | 'completed' | 'expired';
 export type EntitlementSource = 'free_first' | 'credit' | 'admin_grant' | 'resume';
+export type ExamStyle = 'standard' | 'strict';
+/** library = a published variant; fresh = a variant assembled for this attempt (§10.1). */
+export type AttemptSource = 'library' | 'fresh';
+
+export interface AttemptFreshness {
+  total: number;
+  repeated: number;
+}
 
 export interface AttemptSectionState {
   section_id: string;
@@ -38,6 +52,10 @@ export interface AttemptState {
   language: string;
   status: AttemptStatus;
   entitlement_source: EntitlementSource;
+  exam_style: ExamStyle;
+  source: AttemptSource;
+  /** Fresh attempts: questions in the variant and how many the user had seen before. */
+  freshness: AttemptFreshness | null;
   current_section_index: number;
   current_section_id: string | null;
   current_deadline_at: number | null;
@@ -68,6 +86,9 @@ export interface NewAttemptInput {
   nowMs: number;
   entitlementSource: EntitlementSource;
   clientAppVersion: string;
+  examStyle?: ExamStyle;
+  source?: AttemptSource;
+  freshness?: AttemptFreshness | null;
 }
 
 /** Fresh attempt with the first section started now. */
@@ -95,6 +116,9 @@ export function buildInitialAttempt(input: NewAttemptInput): AttemptState {
     language: variant.language,
     status: 'in_progress',
     entitlement_source: input.entitlementSource,
+    exam_style: input.examStyle ?? 'standard',
+    source: input.source ?? 'library',
+    freshness: input.freshness ? { ...input.freshness } : null,
     current_section_index: 0,
     current_section_id: first.section_id,
     current_deadline_at: first.deadline_at,
@@ -150,7 +174,31 @@ export function sanitizeFlags(raw: unknown, questionIds: readonly string[]): str
 }
 
 function cloneAttempt(a: AttemptState): AttemptState {
-  return { ...a, sections: a.sections.map((s) => ({ ...s, question_ids: [...s.question_ids] })), integrity: { ...a.integrity } };
+  return {
+    ...a,
+    sections: a.sections.map((s) => ({ ...s, question_ids: [...s.question_ids] })),
+    integrity: { ...a.integrity },
+    freshness: a.freshness ? { ...a.freshness } : null,
+  };
+}
+
+/**
+ * Strict style (§10.2): the current section may be submitted only from
+ * `deadline_at − 5 s` on, otherwise SECTION_NOT_OVER (with the deadline so
+ * the client can resync its countdown). Standard attempts are never blocked.
+ */
+export function assertSectionOver(attempt: AttemptState, nowMs: number): void {
+  if (attempt.exam_style !== 'strict') return;
+  const sec = attempt.sections[attempt.current_section_index];
+  const deadline = sec?.deadline_at ?? attempt.current_deadline_at;
+  if (deadline !== null && nowMs < deadline - STRICT_EARLY_SUBMIT_MS) {
+    throw new DomainError(Reasons.SECTION_NOT_OVER, 'the section time is not over yet', { deadlineAt: deadline, serverNow: nowMs });
+  }
+}
+
+/** Flags stored for a section: none in strict style (no marks in the booklet, §10.2). */
+export function flagsForStyle(style: ExamStyle, flags: string[]): string[] {
+  return style === 'strict' ? [] : flags;
 }
 
 export interface SectionClosure {

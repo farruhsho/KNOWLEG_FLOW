@@ -792,3 +792,88 @@ describe('phase 3: groups, assignments, submissions', () => {
     await assertSucceeds(deleteDoc(doc(db('alice'), 'groups/g1/assignments/a1/submissions/alice')));
   });
 });
+
+describe('phase 4 (ARCHITECTURE §10): generated variants, exam pool config, web payments', () => {
+  const generated = {
+    status: 'generated', source: 'fresh', generated_for: 'alice', attempt_id: 'att1', blueprint_id: 'ort_main_2026',
+    language: 'ru', number: 0, sections: [{ section_id: 'math', question_ids: ['q1'] }], seed: 'abc',
+  };
+
+  beforeEach(async () => {
+    await seed('exam_variants/fresh_att1', generated);
+    await seed('exam_variants/pub', { status: 'published', blueprint_id: 'ort_main_2026', number: 1, language: 'ru' });
+  });
+
+  it('students never read a generated variant, not even the one assembled for them', async () => {
+    await assertFails(getDoc(doc(db('alice'), 'exam_variants/fresh_att1')));
+    await assertFails(getDoc(doc(db('bob'), 'exam_variants/fresh_att1')));
+    await assertFails(getDoc(doc(db(null), 'exam_variants/fresh_att1')));
+    // The library query (published only) keeps working and never returns it.
+    const lib = await assertSucceeds(getDocs(query(collection(db('alice'), 'exam_variants'), where('status', '==', 'published'))));
+    if (lib.docs.map((d) => d.id).join() !== 'pub') throw new Error(`library returned ${lib.docs.map((d) => d.id).join()}`);
+    await assertFails(getDocs(query(collection(db('alice'), 'exam_variants'), where('generated_for', '==', 'alice'))));
+  });
+
+  it('content roles read generated variants (CMS / support), but nobody creates, edits or deletes them', async () => {
+    const cm = db('cm', { role: 'content_manager' });
+    const sa = db('sa', { role: 'super_admin' });
+    await assertSucceeds(getDoc(doc(cm, 'exam_variants/fresh_att1')));
+    await assertSucceeds(getDocs(query(collection(cm, 'exam_variants'), where('blueprint_id', '==', 'ort_main_2026'))));
+    await assertFails(updateDoc(doc(cm, 'exam_variants/fresh_att1'), { status: 'draft' }));
+    await assertFails(updateDoc(doc(sa, 'exam_variants/fresh_att1'), { status: 'archived' }));
+    await assertFails(deleteDoc(doc(sa, 'exam_variants/fresh_att1')));
+    await assertFails(setDoc(doc(cm, 'exam_variants/fresh_forged'), { ...generated }));
+    await assertFails(setDoc(doc(sa, 'exam_variants/fresh_forged'), { ...generated }));
+    // Drafts stay editable and deletable as before.
+    await assertSucceeds(setDoc(doc(cm, 'exam_variants/d1'), { status: 'draft', blueprint_id: 'ort_main_2026' }));
+    await assertSucceeds(deleteDoc(doc(sa, 'exam_variants/d1')));
+  });
+
+  it('config/exam_pool: signed-in read, never written by a client', async () => {
+    await seed('config/exam_pool', { fresh_enabled: true, min_review_status: 'methodologist_approved' });
+    await assertSucceeds(getDoc(doc(db('alice'), 'config/exam_pool')));
+    await assertFails(getDoc(doc(db(null), 'config/exam_pool')));
+    await assertFails(setDoc(doc(db('alice'), 'config/exam_pool'), { fresh_enabled: false }));
+    await assertFails(setDoc(doc(db('sa', { role: 'super_admin' }), 'config/exam_pool'), { min_review_status: 'ai_verified' }));
+    await assertFails(deleteDoc(doc(db('sa', { role: 'super_admin' }), 'config/exam_pool')));
+  });
+
+  it('payment_orders: the owner reads own orders, super_admin and support read all; nobody writes', async () => {
+    const order = (uid) => ({
+      uid, product_id: 'exam_single', credits: 1, amount_som: 100, currency: 'KGS', provider: 'sandbox',
+      status: 'pending', granted: false, created_at: Timestamp.now(),
+    });
+    await seed('payment_orders/o_alice', order('alice'));
+    await seed('payment_orders/o_bob', order('bob'));
+    const a = db('alice');
+    await assertSucceeds(getDoc(doc(a, 'payment_orders/o_alice')));
+    await assertFails(getDoc(doc(a, 'payment_orders/o_bob')));
+    await assertSucceeds(getDocs(query(collection(a, 'payment_orders'), where('uid', '==', 'alice'))));
+    await assertFails(getDocs(collection(a, 'payment_orders')));
+    await assertFails(getDoc(doc(db(null), 'payment_orders/o_alice')));
+    for (const role of ['super_admin', 'support']) {
+      const staff = db(`staff_${role}`, { role });
+      await assertSucceeds(getDoc(doc(staff, 'payment_orders/o_bob')));
+      await assertSucceeds(getDocs(query(collection(staff, 'payment_orders'), where('status', '==', 'pending'))));
+    }
+    for (const role of ['moderator', 'content_manager', 'methodologist']) {
+      await assertFails(getDoc(doc(db(`staff_${role}`, { role }), 'payment_orders/o_bob')));
+    }
+    // No client writes: not the owner, not the staff.
+    await assertFails(setDoc(doc(a, 'payment_orders/o_new'), order('alice')));
+    await assertFails(updateDoc(doc(a, 'payment_orders/o_alice'), { status: 'paid', granted: true }));
+    await assertFails(deleteDoc(doc(a, 'payment_orders/o_alice')));
+    await assertFails(updateDoc(doc(db('sa', { role: 'super_admin' }), 'payment_orders/o_alice'), { status: 'refunded' }));
+  });
+
+  it('payment_events and payment_attempts are server only', async () => {
+    await seed('payment_events/sandbox_evt1', { provider: 'sandbox', order_id: 'o_alice', status: 'paid', result: 'granted' });
+    await seed('payment_attempts/alice_2026-11-05', { uid: 'alice', day: '2026-11-05', count: 1 });
+    for (const who of [db('alice'), db('sa', { role: 'super_admin' }), db('sup', { role: 'support' })]) {
+      await assertFails(getDoc(doc(who, 'payment_events/sandbox_evt1')));
+      await assertFails(setDoc(doc(who, 'payment_events/sandbox_evt2'), { status: 'paid' }));
+      await assertFails(getDoc(doc(who, 'payment_attempts/alice_2026-11-05')));
+      await assertFails(setDoc(doc(who, 'payment_attempts/alice_2026-11-05'), { count: 0 }));
+    }
+  });
+});

@@ -47,3 +47,30 @@ export const AI_TUTOR_MODEL = defineString('AI_TUTOR_MODEL', {
 
 /** Anthropic API key (Secret Manager). Never shipped to the client. */
 export const ANTHROPIC_API_KEY = defineSecret('ANTHROPIC_API_KEY');
+
+/**
+ * Web payment provider (ARCHITECTURE §10.3): `none` (no sales; the default
+ * until the owner signs a provider contract) | `sandbox` (Functions emulator
+ * with a demo-* project ONLY — anywhere else it acts as `none`) | the name of
+ * a provider adapter in src/payments/registry.ts.
+ */
+export const PAYMENT_PROVIDER = defineString('PAYMENT_PROVIDER', {
+  default: 'none',
+  description: 'Web payment provider adapter: none | sandbox (emulator only) | provider name.',
+});
+
+/** Comma-separated origins paymentCreateOrder accepts in returnUrl (the web app). */
+export const PAYMENT_RETURN_ORIGINS = defineString('PAYMENT_RETURN_ORIGINS', {
+  default: 'https://knowleg-33f36.web.app,https://knowleg-33f36.firebaseapp.com',
+  description: 'Allowed origins of the web app pages the payment provider returns to.',
+});
+
+/**
+ * Signing / API secret of the real payment provider, mounted by
+ * paymentCreateOrder, paymentWebhook and adminRefundOrder for the provider
+ * adapter. Deploy requires it to exist (`firebase functions:secrets:set
+ * PAYMENT_PROVIDER_SECRET`; any placeholder while PAYMENT_PROVIDER=none).
+ * The `none` and `sandbox` adapters never read it (the sandbox signs with a
+ * fixed emulator-only key).
+ */
+export const PAYMENT_PROVIDER_SECRET = defineSecret('PAYMENT_PROVIDER_SECRET');

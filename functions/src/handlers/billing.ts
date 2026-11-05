@@ -22,7 +22,7 @@ import { onCall } from 'firebase-functions/v2/https';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { ALLOW_TEST_PURCHASES, PLAY_PACKAGE_NAME } from '../config';
-import { applyClawback, applyPurchaseGrant, parseEntitlement } from '../domain/entitlements';
+import { parseEntitlement } from '../domain/entitlements';
 import {
   creditsToClawBack,
   decidePurchase,
@@ -35,8 +35,8 @@ import {
 import { DomainError, Reasons } from '../domain/reasons';
 import { int, str } from '../domain/types';
 import { callableOptions, db, FieldValue, mapLimit, optString, payload, requireActiveUser, Timestamp, wrap } from './common';
+import { liveOwner, readPaidClawback, readPaidGrant, writePaidClawback, writePaidGrant } from './credit_grants';
 import { consumePurchase, fetchPurchase, listVoided } from './play';
-import { readReferralClawback, readReferralReward, referralPurchaseFields, writeReferralClawback, writeReferralReward } from './referral';
 
 export type VerifyStatus = 'granted' | 'already_processed' | 'pending' | 'invalid';
 
@@ -161,21 +161,25 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
   // pre.kind === 'grant'
   const entRef = db().doc(`entitlements/${uid}`);
   const granted = await db().runTransaction(async (tx) => {
-    const [snap, entSnap, userSnap] = await tx.getAll(purchaseRef(tokenId), entRef, db().doc(`users/${uid}`));
+    const snap = await tx.get(purchaseRef(tokenId));
     const decision = decidePurchase({
       purchase: fetched.purchase,
       productId,
       uid,
       allowTestPurchases: ALLOW_TEST_PURCHASES.value(),
       creditsPerProduct: products,
-      existing: existingRecord(snap!.data()),
+      existing: existingRecord(snap.data()),
     });
-    const ent = parseEntitlement(entSnap!.data());
-    if (decision.kind !== 'grant') return { status: 'already_processed' as const, credits: ent.credits, consumed: true };
-    // All reads (referral item, referrer counter/profile/entitlement) before the first write.
-    const referral = await readReferralReward(tx, uid, str(userSnap!.get('referred_by')) || null, decision.isTest, Date.now());
-    const applied = applyPurchaseGrant(ent, decision.credits);
-    const finalEnt = writeReferralReward(tx, uid, applied.entitlement, referral, tokenId);
+    if (decision.kind !== 'grant') {
+      const entSnap = await tx.get(entRef);
+      return { status: 'already_processed' as const, credits: parseEntitlement(entSnap.data()).credits, consumed: true };
+    }
+    // All reads (entitlement, referral item, referrer counter/profile/entitlement) before the first write.
+    const reads = await readPaidGrant(tx, uid, { isTest: decision.isTest, nowMs: Date.now() });
+    // Shared with web payments (credit_grants.ts): purchase ledger line + referral reward.
+    const grant = writePaidGrant(tx, reads, decision.credits, { ref: tokenId, actorUid: uid, extra: { product_id: productId } });
+    const applied = grant.applied;
+    const referral = reads.referral;
     tx.set(purchaseRef(tokenId), {
       uid,
       platform: 'google_play',
@@ -198,32 +202,15 @@ export async function processPurchase(input: ProcessInput): Promise<ProcessOutpu
       refund: null,
       invalid_reason: null,
       // §9.7: which referral reward this purchase paid out, so a refund can claw it back.
-      ...referralPurchaseFields(referral),
-      created_at: snap!.exists ? (snap!.get('created_at') ?? FieldValue.serverTimestamp()) : FieldValue.serverTimestamp(),
+      ...grant.recordFields,
+      created_at: snap.exists ? (snap.get('created_at') ?? FieldValue.serverTimestamp()) : FieldValue.serverTimestamp(),
       updated_at: FieldValue.serverTimestamp(),
     });
     tx.set(tokenRef(tokenId), { purchase_token: purchaseToken, product_id: productId });
-    tx.set(
-      entRef,
-      {
-        credits: finalEnt.credits,
-        lifetime_credits_purchased: applied.entitlement.lifetime_credits_purchased,
-        debt_credits: applied.entitlement.debt_credits,
-        updated_at: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
-    tx.set(entRef.collection('ledger').doc(), {
-      ...applied.ledger,
-      ref: tokenId,
-      product_id: productId,
-      actor_uid: uid,
-      at: FieldValue.serverTimestamp(),
-    });
     if (referral.decision.kind === 'reward') {
       logger.info('referral rewarded', { uid, referrer: referral.decision.referrerUid, referrerRewarded: referral.decision.rewardReferrer });
     }
-    return { status: 'granted' as const, credits: finalEnt.credits, consumed: decision.consumed };
+    return { status: 'granted' as const, credits: grant.entitlement.credits, consumed: decision.consumed };
   });
 
   if (granted.status === 'granted' && !granted.consumed) await consumeAndMark(tokenId, productId, purchaseToken);
@@ -294,36 +281,15 @@ export async function revokePurchase(
     }
     const rec = existingRecord(snap.data())!;
     if (rec.state === 'refunded' || rec.state === 'revoked') return 'noop' as const;
-    const actor = { actorUid: source === 'admin' ? 'admin' : 'system', source };
-    const refereeLive = rec.state === 'granted' && !!rec.uid && !rec.uid.startsWith('deleted:');
+    const actorUid = source === 'admin' ? 'admin' : 'system';
+    const granted = rec.state === 'granted';
     // All reads before the first write: the referral reward this purchase paid (§9.7), then the entitlement.
-    const referral = rec.state === 'granted' ? await readReferralClawback(tx, snap, refereeLive ? rec.uid : null) : null;
-    if (!refereeLive) {
-      // Nothing of the owner's to take back (never granted, or the account was
-      // deleted); a referrer rewarded for this purchase still loses the bonus.
-      const r = referral ? writeReferralClawback(tx, referral, null, tokenId, actor) : null;
-      tx.set(
-        purchaseRef(tokenId),
-        {
-          state: newState,
-          refund: {
-            at: FieldValue.serverTimestamp(),
-            source,
-            credits_clawed_back: 0,
-            ...(r ? { referral_clawed_back: { referee: 0, referrer: r.referrerClawedBack } } : {}),
-          },
-          updated_at: FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
-      return 'noop' as const;
-    }
-    const entRef = db().doc(`entitlements/${rec.uid}`);
-    const entSnap = await tx.get(entRef);
+    // Shared with web payments (credit_grants.ts).
+    const reads = await readPaidClawback(tx, snap, liveOwner(rec.uid, granted), granted);
     const want = creditsToClawBack(rec.credits_granted, int(snap.get('quantity'), 1), opts.voidedQuantity ?? null);
-    const applied = applyClawback(parseEntitlement(entSnap.data()), want);
-    const r = referral ? writeReferralClawback(tx, referral, applied.entitlement, tokenId, actor) : null;
-    const finalEnt = r?.refereeEntitlement ?? applied.entitlement;
+    // Without a live owner (never granted, or the account was deleted) only a
+    // referrer rewarded for this purchase still loses the bonus.
+    const out = writePaidClawback(tx, reads, want, { ref: tokenId, actorUid, source });
     tx.set(
       purchaseRef(tokenId),
       {
@@ -331,34 +297,22 @@ export async function revokePurchase(
         refund: {
           at: FieldValue.serverTimestamp(),
           source,
-          credits_clawed_back: applied.clawedBack,
-          debt_added: applied.newDebt,
-          ...(r ? { referral_clawed_back: { referee: r.refereeClawedBack, referrer: r.referrerClawedBack } } : {}),
+          credits_clawed_back: out.clawedBack,
+          ...(reads.ownerUid ? { debt_added: out.newDebt } : {}),
+          ...(out.referralClawedBack ? { referral_clawed_back: out.referralClawedBack } : {}),
         },
         updated_at: FieldValue.serverTimestamp(),
       },
       { merge: true },
     );
-    tx.set(
-      entRef,
-      { credits: finalEnt.credits, debt_credits: finalEnt.debt_credits, updated_at: FieldValue.serverTimestamp() },
-      { merge: true },
-    );
-    tx.set(entRef.collection('ledger').doc(), {
-      ...applied.ledger,
-      ref: tokenId,
-      debt_added: applied.newDebt,
-      actor_uid: actor.actorUid,
-      source,
-      at: FieldValue.serverTimestamp(),
-    });
+    if (!reads.ownerUid) return 'noop' as const;
     logger.info('purchase revoked', {
       tokenId,
       uid: rec.uid,
       source,
-      clawedBack: applied.clawedBack,
-      debt: applied.newDebt,
-      ...(r ? { referralReferee: r.refereeClawedBack, referralReferrer: r.referrerClawedBack } : {}),
+      clawedBack: out.clawedBack,
+      debt: out.newDebt,
+      ...(out.referralClawedBack ? { referralReferee: out.referralClawedBack.referee, referralReferrer: out.referralClawedBack.referrer } : {}),
     });
     return 'revoked' as const;
   });

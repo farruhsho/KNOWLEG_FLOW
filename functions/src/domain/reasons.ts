@@ -38,6 +38,17 @@ export const Reasons = {
   LIMIT_REACHED: 'LIMIT_REACHED',
   /** Group action reserved for the group owner. */
   NOT_GROUP_OWNER: 'NOT_GROUP_OWNER',
+  // Phase 4 (ARCHITECTURE §10).
+  /** The verified bank cannot fill a blueprint part even with repeats (details: section_id, part_id); nothing is charged. */
+  POOL_TOO_SMALL: 'POOL_TOO_SMALL',
+  /** Strict ORT style: the section can be submitted only when its time is over (details: deadlineAt, serverNow). */
+  SECTION_NOT_OVER: 'SECTION_NOT_OVER',
+  /** No payment provider is configured (PAYMENT_PROVIDER=none, or sandbox outside the emulator). */
+  PAYMENTS_DISABLED: 'PAYMENTS_DISABLED',
+  /** Unknown payment order, or an order of another account. */
+  ORDER_NOT_FOUND: 'ORDER_NOT_FOUND',
+  /** Unknown or disabled web product (config/pricing.web_products). */
+  PRODUCT_UNAVAILABLE: 'PRODUCT_UNAVAILABLE',
 } as const;
 
 export type Reason = (typeof Reasons)[keyof typeof Reasons];
@@ -79,6 +90,11 @@ export const defaultCodeFor: Record<Reason, ErrorCode> = {
   REFERRAL_NOT_ALLOWED: 'failed-precondition',
   LIMIT_REACHED: 'resource-exhausted',
   NOT_GROUP_OWNER: 'permission-denied',
+  POOL_TOO_SMALL: 'failed-precondition',
+  SECTION_NOT_OVER: 'failed-precondition',
+  PAYMENTS_DISABLED: 'failed-precondition',
+  ORDER_NOT_FOUND: 'not-found',
+  PRODUCT_UNAVAILABLE: 'failed-precondition',
 };
 
 /**

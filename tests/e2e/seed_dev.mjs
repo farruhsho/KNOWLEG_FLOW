@@ -3,9 +3,11 @@
 //   firebase emulators:start --project demo-ort-e2e   (Java 21)
 //   node seed_dev.mjs
 //   flutter run -d chrome --dart-define=USE_FIREBASE_EMULATORS=true --dart-define=BILLING_MODE=external
+//   (web payments with the emulator-only sandbox provider:
+//    flutter run -d chrome --web-port 8088 --dart-define=USE_FIREBASE_EMULATORS=true --dart-define=BILLING_MODE=web)
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { blueprints, seedExamBase, seedGrowth, seedLearning, seedVariant } from './seed_lib.mjs';
+import { blueprints, seedExamBase, seedGrowth, seedLearning, seedPilotBank, seedVariant } from './seed_lib.mjs';
 
 process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8080';
 process.env.FIREBASE_AUTH_EMULATOR_HOST ??= '127.0.0.1:9099';
@@ -20,4 +22,7 @@ await seedVariant(db, bp('ort_subject_chemistry_2026'), 'dev_chem_ru_1', 'ru', 1
 await seedVariant(db, bp('ort_state_language_2026'), 'dev_state_ky_1', 'ky', 1);
 await seedLearning(db);
 await seedGrowth(db);
-console.log('seeded: blueprints, 4 published variants, pricing, subjects, a lesson, practice questions, promo code DEMO2026');
+// Phase 4 (§10.1): the pilot bank -> fresh ort_main_2026 ru variants ("Новый вариант").
+const pilot = await seedPilotBank(db);
+console.log('seeded: blueprints, 4 published variants, pricing (+ web products), config/exam_pool (emulator-only ai_verified pilot),');
+console.log(`        pilot bank ${pilot.items} questions + ${pilot.passages} passages, subjects, a lesson, practice questions, promo code DEMO2026`);
