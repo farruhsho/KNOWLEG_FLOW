@@ -134,6 +134,17 @@ enum AdminRole {
   /// to `publish_variants` holders (super_admin, content_manager).
   /// Methodologists may open variants read-only (AUTH-ADM-05).
   bool get canWriteVariants => can(AdminPermission.publishVariants);
+
+  /// `adminExamPoolHealth` (§10.1): super_admin, content_manager,
+  /// methodologist — the server checks `edit_questions`.
+  bool get canViewExamPool => can(AdminPermission.editQuestions);
+
+  /// `adminUpdateExamPool` (§10.1): super_admin only — the server checks
+  /// `manage_pricing` (what a paid mock exam is made of).
+  bool get canManageExamPool => can(AdminPermission.managePricing);
+
+  /// `adminRefundOrder` (§10.3): super_admin only (`refund`).
+  bool get canRefundOrders => can(AdminPermission.refund);
 }
 
 /// Resolves the effective admin role after sign-in.

@@ -13,6 +13,8 @@ import '../../data/json_safe.dart';
 import '../../data/models/admin_records.dart';
 import '../../domain/pricing_config.dart';
 import '../widgets/admin_widgets.dart';
+import 'web_payments_page.dart';
+import 'web_pricing_form.dart';
 
 String purchaseStateLabel(AppLocalizations l, String s) => switch (s) {
       'pending' => l.adminPurchasePending,
@@ -31,16 +33,50 @@ AdminTone purchaseStateTone(String s) => switch (s) {
       _ => AdminTone.neutral,
     };
 
-/// Read-only purchases (`purchases`, ARCHITECTURE.md §1.6) for support and
-/// super_admin. Refunds and grants are server-side only.
-class PaymentsPage extends ConsumerStatefulWidget {
+/// «Платежи» (support and super_admin): website orders (`payment_orders`,
+/// ARCHITECTURE.md §10.3) with refunds for super_admin, the revenue per
+/// Bishkek day, and the read-only Google Play purchases (`purchases`, §1.6).
+class PaymentsPage extends StatelessWidget {
   const PaymentsPage({super.key});
 
   @override
-  ConsumerState<PaymentsPage> createState() => _PaymentsPageState();
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return DefaultTabController(
+      length: 3,
+      child: Column(
+        children: [
+          Material(
+            color: Theme.of(context).colorScheme.surface,
+            child: TabBar(
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              tabs: [
+                Tab(text: l.adminPaymentsTabWeb),
+                Tab(text: l.adminPaymentsTabRevenue),
+                Tab(text: l.adminPaymentsTabPlay),
+              ],
+            ),
+          ),
+          const Expanded(
+            child: TabBarView(children: [WebOrdersTab(), RevenueTab(), PlayPurchasesTab()]),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _PaymentsPageState extends ConsumerState<PaymentsPage> {
+/// Read-only Google Play purchases (`purchases`, ARCHITECTURE.md §1.6).
+/// Refunds and grants are server-side only.
+class PlayPurchasesTab extends ConsumerStatefulWidget {
+  const PlayPurchasesTab({super.key});
+
+  @override
+  ConsumerState<PlayPurchasesTab> createState() => _PlayPurchasesTabState();
+}
+
+class _PlayPurchasesTabState extends ConsumerState<PlayPurchasesTab> {
   String? _state;
 
   @override
@@ -87,17 +123,39 @@ class _PaymentsPageState extends ConsumerState<PaymentsPage> {
   }
 }
 
-/// `config/pricing` editor (super_admin) via `adminUpdatePricing`.
+/// `config/pricing` editor (super_admin) via `adminUpdatePricing`: the
+/// website products and prices (`web_products`, §10.3) and the Google Play
+/// product → credits map with the free exams per account.
 class PricingPage extends ConsumerWidget {
   const PricingPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
     final pricing = ref.watch(pricingProvider);
-    return AsyncBody<PricingConfig>(
-      value: pricing,
-      onRetry: () => ref.invalidate(pricingProvider),
-      data: (p) => _PricingForm(initial: p),
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          Material(
+            color: Theme.of(context).colorScheme.surface,
+            child: TabBar(tabs: [
+              Tab(text: l.adminPricingTabWeb),
+              Tab(text: l.adminPricingTabPlay),
+            ]),
+          ),
+          Expanded(
+            child: AsyncBody<PricingConfig>(
+              value: pricing,
+              onRetry: () => ref.invalidate(pricingProvider),
+              data: (p) => TabBarView(children: [
+                WebPricingForm(initial: p),
+                _PricingForm(initial: p),
+              ]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

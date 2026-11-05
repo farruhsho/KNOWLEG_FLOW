@@ -2,7 +2,8 @@
 
 Role-based content and operations console for ORT Master KG. Contract:
 `docs/modernization/ARCHITECTURE.md` (§1 collections, §2 roles, §3 callables,
-§9 phase 3: promo codes, broadcasts, achievements, referrals and groups).
+§9 phase 3: promo codes, broadcasts, achievements, referrals and groups;
+§10 phase 4: fresh-variant pool, website orders and prices).
 
 ## Access
 
@@ -30,8 +31,9 @@ Role-based content and operations console for ORT Master KG. Contract:
 | `/admin/variants`, `/admin/variants/:id` | Variant builder, publish via `adminPublishVariant` | view: edit_questions; create/edit/publish: publish_variants |
 | `/admin/ai-drafts` | `adminAiDraftQuestions` → drafts | super_admin, content_manager, methodologist |
 | `/admin/users`, `/admin/users/:uid` | Users, entitlements, ledger; ban (moderate_users: only `is_banned`, `ban_reason`, `banned_at`, `banned_by`, `updated_at`); premium, `adminSetRole`, `adminGrantCredits` (super_admin); read-only referral code, `referred_by`, invited count (`count()` of `referrals/{uid}/items`) and groups (`group_ids` → `groups/{gid}.name`) | view_users / moderate_users / super_admin |
-| `/admin/payments` | Read-only `purchases` | view_payments |
-| `/admin/pricing` | `config/pricing` via `adminUpdatePricing` | manage_pricing |
+| `/admin/exam-pool` | Fresh-variant pool (§10.1): `config/exam_pool` settings (`adminUpdateExamPool`, super_admin) and `adminExamPoolHealth` per blueprint × language | super_admin, content_manager, methodologist (settings: super_admin) |
+| `/admin/payments` | Tabs: website orders (`payment_orders`, refund via `adminRefundOrder` — super_admin), revenue per Bishkek day (30 days), read-only Google Play `purchases` | view_payments (refund: super_admin) |
+| `/admin/pricing` | Tabs: website products (`web_products` via `adminUpdatePricing({webProducts})`) and Google Play credits + free exams (`adminUpdatePricing`) | manage_pricing |
 | `/admin/logs` | `admin_logs` | super_admin, support |
 | `/admin/notifications` | Push broadcasts via `adminSendNotification`: ru + ky title/body, audience (all / language / region / group), reach check (dry run) required before a confirmed send; paginated `notifications` history | send_notifications |
 | `/admin/promo-codes` | `promo_codes` list (paginated) and create / edit / deactivate via `adminUpsertPromoCode` | grant_credits (super_admin) |
@@ -101,5 +103,34 @@ presentation/  shell (sidebar ↔ drawer), pages, widgets (Markdown+LaTeX, l10n 
   `descriptions`, `disabled`; only the nine server ids, only ru/ky, trimmed,
   empty values dropped (empty = the app's built-in text); a text is
   overridden in both languages or neither.
+
+## Phase 4 (ARCHITECTURE §10)
+
+* Pool (`domain/exam_pool.dart`, `presentation/pages/exam_pool_page.dart`):
+  `config/exam_pool` is read directly (signed-in users may read it) and
+  changed only through `adminUpdateExamPool` with just the changed field.
+  Switching `min_review_status` to `ai_verified` shows that such questions
+  were checked by an independent AI solver, **not** by a methodologist, and
+  needs an explicit acknowledgement. The health report is requested with
+  «Проверить пул» (the callable may run up to 120 s; client timeout 150 s):
+  needed vs eligible per part, counts by review status, passages, disjoint
+  variants (with «не меньше» when the server capped the count) and the
+  shortfalls of the next variant grouped by topic, largest gap first.
+* Website orders (`domain/payment_order.dart`,
+  `presentation/pages/web_payments_page.dart`): newest first, status filter
+  (`(status, created_at DESC)` index), order card with every field, refund
+  for super_admin only on paid + granted orders (the server rule), reason
+  3–200 characters after trimming, `refunded` vs `pending` (provider confirms
+  later) reported separately. Revenue: one `paid_at >=` range query (single
+  field, ≤ 3000 orders) summed per Bishkek day; refunded orders are listed
+  apart, not as revenue; Google Play is not included.
+* Website prices (`domain/pricing_config.dart`,
+  `presentation/pages/web_pricing_form.dart`): the whole `web_products` map
+  is sent (the server replaces it); defaults from §10.3 are shown when it is
+  missing. `exam_single` always grants 1 credit; a price other than 100 som
+  shows «Базовая цена согласуется с владельцем», needs the new price typed
+  again and sends `confirmBasePriceChange: true`.
+* Permission-denied reads (rules not deployed yet, wrong role) show a
+  no-access state instead of a raw error (`isAdminAccessDenied`).
 
 Tests: `flutter test test/admin`.

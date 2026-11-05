@@ -11,6 +11,9 @@ enum AdminSection {
   practiceQuestions('/admin/questions'),
   examBank('/admin/exam-bank'),
   variants('/admin/variants'),
+
+  /// Fresh-variant pool health and settings (ARCHITECTURE §10.1).
+  examPool('/admin/exam-pool'),
   aiDrafts('/admin/ai-drafts'),
   users('/admin/users'),
   payments('/admin/payments'),
@@ -43,6 +46,9 @@ enum AdminSection {
         // publish_variants (checked on the button and by the callable).
         return role.can(AdminPermission.publishVariants) ||
             role.can(AdminPermission.editQuestions);
+      case AdminSection.examPool:
+        // adminExamPoolHealth: super_admin, content_manager, methodologist.
+        return role.canViewExamPool;
       case AdminSection.aiDrafts:
         return role.canDraftWithAi;
       case AdminSection.users:

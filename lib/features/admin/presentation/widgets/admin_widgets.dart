@@ -49,7 +49,18 @@ String adminErrorMessage(
     // Phase 3 (ARCHITECTURE §9): daily broadcast limit and rate limits.
     if (reason == BackendReasons.limitReached) return l.adminErrLimitReached;
     if (reason == BackendReasons.rateLimited) return l.adminErrRateLimited;
+    // Phase 4 (ARCHITECTURE §10): pool health, refunds, web pricing.
+    final details = BackendReasons.detailsOf(error);
+    final why = callableDetailsWhy(error.details);
+    if (reason == BackendReasons.orderNotFound) return l.adminOrderErrNotFound;
+    if (reason == BackendReasons.paymentsDisabled) return l.adminOrderErrProvider;
+    if (reason == BackendReasons.variantNotAvailable && why == 'matrix_missing') {
+      return l.adminPoolErrMatrix;
+    }
     if (reason == BackendReasons.validationFailed) {
+      if (why == 'not_refundable') return l.adminOrderErrNotRefundable;
+      if (why == 'base_price_change_unconfirmed') return l.adminWebPricingErrBase;
+      if (details['field'] == 'language') return l.adminPoolErrLanguage;
       return l.adminErrValidation(error.message ?? '');
     }
     switch (error.code) {
@@ -125,6 +136,44 @@ String adminErrorMessage(
 /// e.g. one that older deployed rules do not allow for this role yet.
 bool isAdminPermissionDenied(Object error) =>
     error is FirebaseException && error.code == 'permission-denied';
+
+/// Whether [error] means "this role may not do / read this": a Firestore
+/// `permission-denied` (rules) or a callable refused for the role
+/// (`FORBIDDEN_ROLE` / `permission-denied`), but not a banned account.
+bool isAdminAccessDenied(Object error) {
+  if (error is FirebaseFunctionsException) {
+    final reason = BackendReasons.of(error);
+    if (reason == kUserBannedReason) return false;
+    return reason == BackendReasons.forbiddenRole ||
+        (reason == null && error.code == 'permission-denied');
+  }
+  return isAdminPermissionDenied(error);
+}
+
+/// Graceful "no access" state for a read the role (or the deployed rules)
+/// does not allow: lock icon, an explanation and a retry.
+class AdminAccessDeniedView extends StatelessWidget {
+  const AdminAccessDeniedView({super.key, required this.message, this.onRetry});
+  final String message;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return AdminMessageView(
+      icon: Icons.lock_outline,
+      title: l.adminForbiddenTitle,
+      message: message,
+      action: onRetry == null
+          ? null
+          : OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: Text(l.adminRetry),
+            ),
+    );
+  }
+}
 
 void showAdminSnack(BuildContext context, String message, {bool error = false}) {
   final scheme = Theme.of(context).colorScheme;

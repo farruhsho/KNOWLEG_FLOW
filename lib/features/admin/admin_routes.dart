@@ -12,6 +12,7 @@ import 'presentation/pages/admin_login_page.dart';
 import 'presentation/pages/admin_notifications_page.dart';
 import 'presentation/pages/ai_drafts_page.dart';
 import 'presentation/pages/exam_bank_page.dart';
+import 'presentation/pages/exam_pool_page.dart';
 import 'presentation/pages/exam_question_editor_page.dart';
 import 'presentation/pages/lesson_editor_page.dart';
 import 'presentation/pages/lessons_page.dart';
@@ -39,6 +40,7 @@ Widget _sectionPage(AdminSection section) => switch (section) {
       AdminSection.practiceQuestions => const PracticeQuestionsPage(),
       AdminSection.examBank => const ExamBankPage(),
       AdminSection.variants => const VariantsPage(),
+      AdminSection.examPool => const ExamPoolPage(),
       AdminSection.aiDrafts => const AiDraftsPage(),
       AdminSection.users => const UsersPage(),
       AdminSection.payments => const PaymentsPage(),

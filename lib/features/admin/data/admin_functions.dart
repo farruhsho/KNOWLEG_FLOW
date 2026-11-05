@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/backend/backend_contract.dart';
 import '../domain/callable_errors.dart';
+import '../domain/exam_pool.dart';
 import '../domain/notification_draft.dart';
+import '../domain/pricing_config.dart';
 import '../domain/promo_code.dart';
 import 'admin_firebase.dart';
 
@@ -12,6 +14,16 @@ class PublishVariantResult {
   final String status;
   final List<String> problems;
   const PublishVariantResult(this.status, this.problems);
+}
+
+/// Result of `adminRefundOrder` (ARCHITECTURE.md §10.3).
+class RefundOrderResult {
+  /// `refunded` | `pending`.
+  final String status;
+  final int creditsClawedBack;
+  const RefundOrderResult({required this.status, this.creditsClawedBack = 0});
+
+  bool get refunded => status == 'refunded';
 }
 
 /// Typed wrappers for the admin callables (ARCHITECTURE.md §3). Secrets (the
@@ -64,6 +76,47 @@ class AdminFunctions {
   Future<void> updatePricing(Map<String, int> products, int freeExamsPerUser) =>
       _call(BackendFunctions.adminUpdatePricing,
           {'products': products, 'freeExamsPerUser': freeExamsPerUser});
+
+  /// `adminUpdatePricing({webProducts, confirmBasePriceChange?})` (§10.3,
+  /// super_admin): replaces `config/pricing.web_products` as a whole; Google
+  /// Play products and free exams are left as they are.
+  Future<void> updateWebPricing(Map<String, WebProductConfig> products) =>
+      _call(BackendFunctions.adminUpdatePricing, webPricingPayload(products));
+
+  /// Client timeout of `adminExamPoolHealth`: the function may run 120 s
+  /// (one query per blueprint part plus key / passage reads).
+  static const Duration examPoolHealthTimeout = Duration(seconds: 150);
+
+  /// `adminExamPoolHealth({blueprintId, language})` (§10.1; super_admin,
+  /// content_manager, methodologist).
+  Future<PoolHealth> examPoolHealth(String blueprintId, String language) async {
+    final r = await _call(
+      BackendFunctions.adminExamPoolHealth,
+      {'blueprintId': blueprintId, 'language': language},
+      timeout: examPoolHealthTimeout,
+    );
+    return PoolHealth.fromMap(r);
+  }
+
+  /// `adminUpdateExamPool({freshEnabled?, minReviewStatus?})` (§10.1,
+  /// super_admin). [update] comes from [examPoolUpdatePayload] and must not
+  /// be empty.
+  Future<void> updateExamPool(Map<String, Object> update) {
+    if (update.isEmpty) throw ArgumentError.value(update, 'update', 'nothing to update');
+    return _call(BackendFunctions.adminUpdateExamPool, update);
+  }
+
+  /// `adminRefundOrder({orderId, reason})` (§10.3, super_admin). `refunded`:
+  /// the provider refunded at once and the credits were clawed back;
+  /// `pending`: the provider confirms later (its webhook claws back).
+  Future<RefundOrderResult> refundOrder(String orderId, String reason) async {
+    final r = await _call(BackendFunctions.adminRefundOrder, {'orderId': orderId, 'reason': reason});
+    final clawed = r['creditsClawedBack'];
+    return RefundOrderResult(
+      status: (r['status'] ?? '').toString(),
+      creditsClawedBack: clawed is num ? clawed.toInt() : 0,
+    );
+  }
 
   Future<List<Map<String, dynamic>>> aiDraftQuestions({
     required String subjectId,
