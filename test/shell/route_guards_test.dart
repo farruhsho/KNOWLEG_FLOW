@@ -152,4 +152,19 @@ void main() {
       );
     });
   });
+
+  // Found in the web walkthrough: the boot screen wiped `#/pay/return`, so the
+  // return from the payment provider (and any reload) landed on home.
+  group('cold start deep link', () {
+    test('a safe in-app route is carried through the splash as ?from=', () {
+      expect(RouteGuards.coldStartLocation('/pay/return'), '${RoutePaths.splash}?from=%2Fpay%2Freturn');
+      expect(RouteGuards.coldStartLocation('/exams'), '${RoutePaths.splash}?from=%2Fexams');
+    });
+
+    test('root, entry, admin and foreign locations start at the plain splash', () {
+      for (final r in [null, '', '/', RoutePaths.login, RoutePaths.splash, '/admin/dashboard', '//evil.example', 'https://evil.example/x']) {
+        expect(RouteGuards.coldStartLocation(r), RoutePaths.splash, reason: '$r');
+      }
+    });
+  });
 }

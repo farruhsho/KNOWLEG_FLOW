@@ -140,6 +140,23 @@ abstract final class RouteGuards {
     return RoutePaths.home;
   }
 
+  /// Where a cold start begins. On web the boot screen (shown while Firebase
+  /// initializes, before the router exists) reports '/' to the browser and so
+  /// wipes the `#/…` deep link — e.g. the return from the payment provider
+  /// (`/#/pay/return`) or any page reload. main() captures the platform's
+  /// initial route first; a safe in-app location is carried through the
+  /// splash as `?from=`, so the session is still restored before it opens.
+  static String coldStartLocation(String? initialRoute) {
+    if (initialRoute == null || initialRoute.isEmpty || initialRoute == '/') {
+      return RoutePaths.splash;
+    }
+    if (!isSafeReturnLocation(initialRoute)) return RoutePaths.splash;
+    return Uri(
+      path: RoutePaths.splash,
+      queryParameters: {fromParam: initialRoute},
+    ).toString();
+  }
+
   /// The complete top-level redirect.
   static String? resolveRedirect(
     Uri uri, {

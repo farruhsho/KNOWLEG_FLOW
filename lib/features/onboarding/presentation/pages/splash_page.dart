@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/design/tokens.dart';
 import '../../../../core/navigation/boot_screens.dart';
+import '../../../../core/navigation/route_guards.dart';
 import '../../../../core/network/firebase_service.dart';
 import '../../../../core/routes/route_paths.dart';
 import '../../../../providers/auth_provider.dart';
@@ -43,6 +44,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   Future<void> _route() async {
+    // A deep link carried through the cold start (RouteGuards.coldStartLocation).
+    final from = GoRouterState.of(context).uri.queryParameters[RouteGuards.fromParam];
+    final returnTo = RouteGuards.isSafeReturnLocation(from) ? from : null;
     User? user;
     try {
       user = await _restoredUser();
@@ -55,11 +59,16 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       // Existing session: make sure the profile exists, then save pending
       // onboarding answers — in the background, in that order.
       unawaited(ref.read(authServiceProvider).bootstrapSession(user));
-      context.go(RoutePaths.home);
+      context.go(returnTo ?? RoutePaths.home);
       return;
     }
 
     final onboardingDone = ref.read(onboardingServiceProvider).isCompleted;
+    if (returnTo != null && onboardingDone) {
+      // Signed out: log in, then continue to the deep link.
+      context.go(Uri(path: RoutePaths.login, queryParameters: {RouteGuards.fromParam: returnTo}).toString());
+      return;
+    }
     context.go(onboardingDone ? RoutePaths.login : RoutePaths.onboarding);
   }
 

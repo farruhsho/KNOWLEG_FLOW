@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/navigation/boot_screens.dart';
+import 'core/navigation/route_guards.dart';
 import 'core/navigation/router_refresh.dart';
 import 'core/network/firebase_service.dart';
 import 'core/routes/admin_session.dart';
@@ -21,6 +22,10 @@ import 'providers/locale_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Read before anything renders: the boot screen's MaterialApp reports '/'
+  // to the browser and would wipe a `#/…` deep link (RouteGuards.coldStartLocation).
+  final initialRoute =
+      WidgetsBinding.instance.platformDispatcher.defaultRouteName;
 
   // Both are local and fast; everything that touches the network runs after
   // the first frame (BOOT-01).
@@ -37,6 +42,7 @@ Future<void> main() async {
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        initialRouteProvider.overrideWithValue(initialRoute),
       ],
       child: const OrtMasterApp(),
     ),
@@ -58,10 +64,14 @@ final firebaseBootstrapProvider = FutureProvider<void>((ref) async {
 /// (as before) reset the whole navigation stack to the splash screen every
 /// time the locale or theme changed. It is first read only after Firebase is
 /// initialized, so the auth guard can use FirebaseAuth safely.
+/// The platform's initial route, captured in main() before the boot screen.
+final initialRouteProvider = Provider<String?>((ref) => null);
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authChanges = StreamListenable(FirebaseService.auth.authStateChanges());
   final router = AppRouter.createRouter(
     refreshListenable: Listenable.merge([authChanges, adminVerified]),
+    initialLocation: RouteGuards.coldStartLocation(ref.read(initialRouteProvider)),
   );
   ref.onDispose(() {
     router.dispose();
