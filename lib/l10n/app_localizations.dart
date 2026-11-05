@@ -8638,6 +8638,12 @@ abstract class AppLocalizations {
   /// **'A group code is 4 to 12 Latin letters and digits.'**
   String get socialErrorGroupCodeFormat;
 
+  /// No description provided for @socialErrorGroupFull.
+  ///
+  /// In en, this message translates to:
+  /// **'This group is full: it already has 500 members, the maximum.'**
+  String get socialErrorGroupFull;
+
   /// No description provided for @socialErrorGroupLimit.
   ///
   /// In en, this message translates to:
@@ -8692,6 +8698,12 @@ abstract class AppLocalizations {
   /// **'Not available on this platform. Use the Android app.'**
   String get socialErrorPlatform;
 
+  /// No description provided for @socialErrorProfileMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile is still being set up. Try again in a minute.'**
+  String get socialErrorProfileMissing;
+
   /// No description provided for @socialErrorPromoAlreadyRedeemed.
   ///
   /// In en, this message translates to:
@@ -8727,6 +8739,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A friend\'s code can only be entered by a new account: before your first completed mock exam or credits being added.'**
   String get socialErrorReferralNotAllowed;
+
+  /// No description provided for @socialErrorRemovedFromGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'The owner removed you from this group, so you cannot join it again.'**
+  String get socialErrorRemovedFromGroup;
 
   /// No description provided for @socialErrorValidation.
   ///
@@ -8895,6 +8913,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Group name'**
   String get socialGroupNameLabel;
+
+  /// No description provided for @socialGroupNameLength.
+  ///
+  /// In en, this message translates to:
+  /// **'The name must be 2 to 60 characters long.'**
+  String get socialGroupNameLength;
 
   /// No description provided for @socialGroupNotFound.
   ///

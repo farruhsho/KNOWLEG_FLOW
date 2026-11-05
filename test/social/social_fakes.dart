@@ -48,6 +48,11 @@ class FakeSocialRepository implements SocialRepository {
   Object? promoError;
   PromoRedeemResult promoResult = const PromoRedeemResult(credits: 2, balance: 5);
   Object? groupJoinError;
+  Object? friendAddError;
+  Object? groupLeaveError;
+
+  /// Thrown by referralGetCode when set (the own code cannot be loaded).
+  Object? referralGetCodeError;
   String groupJoinResult = 'g2';
   GroupCreated groupCreateResult = const GroupCreated(groupId: 'g9', joinCode: 'JOIN99');
 
@@ -55,6 +60,7 @@ class FakeSocialRepository implements SocialRepository {
   final appliedCodes = <String>[];
   final promoCodes = <String>[];
   final joinCodes = <String>[];
+  final friendCodes = <String>[];
   final createdGroups = <String>[];
   final doneMarks = <(String, String, String)>[];
   final createdAssignments = <(String, AssignmentDraft)>[];
@@ -83,6 +89,8 @@ class FakeSocialRepository implements SocialRepository {
   @override
   Future<String> referralGetCode() async {
     referralGetCodeCalls++;
+    final e = referralGetCodeError;
+    if (e != null) throw e;
     return referralCode;
   }
 
@@ -108,7 +116,12 @@ class FakeSocialRepository implements SocialRepository {
   Stream<List<FriendEntry>> watchFriends(String uid) => _live(() => List.of(friends));
 
   @override
-  Future<FriendAdded> friendAdd(String code) async => const FriendAdded(friendUid: 'f9', displayName: 'Айбек');
+  Future<FriendAdded> friendAdd(String code) async {
+    friendCodes.add(code);
+    final e = friendAddError;
+    if (e != null) throw e;
+    return const FriendAdded(friendUid: 'f9', displayName: 'Айбек');
+  }
 
   @override
   Future<void> removeFriend(String uid, String friendUid) async {
@@ -149,7 +162,11 @@ class FakeSocialRepository implements SocialRepository {
   }
 
   @override
-  Future<void> groupLeave(String groupId) async => leftGroups.add(groupId);
+  Future<void> groupLeave(String groupId) async {
+    final e = groupLeaveError;
+    if (e != null) throw e;
+    leftGroups.add(groupId);
+  }
 
   @override
   Future<void> groupRemoveMember(String groupId, String uid) async {

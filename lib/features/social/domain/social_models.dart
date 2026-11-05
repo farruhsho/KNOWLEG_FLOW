@@ -109,6 +109,10 @@ class FriendEntry {
 /// `groups/{gid}` (a class or a learning centre).
 @immutable
 class StudyGroup {
+  /// Most members a group can have (server `MAX_GROUP_MEMBERS`, §9.6). The
+  /// member and submission lists are read up to this many (§9.7).
+  static const maxMembers = 500;
+
   final String id;
   final String name;
   final String ownerUid;

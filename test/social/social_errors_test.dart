@@ -114,6 +114,114 @@ void main() {
     });
   });
 
+  group('details.why / details.what (ARCHITECTURE §9.7)', () {
+    FirebaseFunctionsException withDetails(String code, Map<String, Object> details) =>
+        FirebaseFunctionsException(message: 'x', code: code, details: details);
+    SocialFailureKind kindOf(String code, Map<String, Object> details) =>
+        SocialFailure.from(withDetails(code, details)).kind;
+
+    test('why is read before the reason', () {
+      expect(kindOf('invalid-argument', {'reason': 'VALIDATION_FAILED', 'why': 'self', 'field': 'code'}),
+          SocialFailureKind.ownCode);
+      expect(kindOf('failed-precondition', {'reason': 'REFERRAL_NOT_ALLOWED', 'why': 'own_code'}),
+          SocialFailureKind.ownCode);
+      expect(kindOf('failed-precondition', {'reason': 'REFERRAL_NOT_ALLOWED', 'why': 'already_referred'}),
+          SocialFailureKind.alreadyRedeemed);
+      expect(kindOf('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': 'owner_has_members'}),
+          SocialFailureKind.ownerHasMembers);
+      expect(kindOf('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': 'removed_from_group'}),
+          SocialFailureKind.removedFromGroup);
+      expect(kindOf('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': 'profile_missing'}),
+          SocialFailureKind.profileMissing);
+    });
+
+    test('a why with nothing more specific falls back to the reason', () {
+      expect(kindOf('failed-precondition', {'reason': 'REFERRAL_NOT_ALLOWED', 'why': 'has_exams'}),
+          SocialFailureKind.referralNotAllowed);
+      expect(kindOf('failed-precondition', {'reason': 'REFERRAL_NOT_ALLOWED', 'why': 'has_purchases'}),
+          SocialFailureKind.referralNotAllowed);
+      expect(kindOf('invalid-argument', {'reason': 'VALIDATION_FAILED', 'why': 'something_new'}),
+          SocialFailureKind.validation);
+    });
+
+    test('friendAdd with my own code: "this is your code", not the generic validation text', () {
+      final e = withDetails('invalid-argument', {'reason': 'VALIDATION_FAILED', 'why': 'self', 'field': 'code'});
+      expect(ru.socialErrorMessage(e, SocialAction.friendAdd), 'Это ваш собственный код. Введите код друга.');
+      expect(en.socialErrorMessage(e, SocialAction.friendAdd), contains('your own code'));
+    });
+
+    test('referralApply: own code and already referred have their own messages', () {
+      String msg(String why, [AppLocalizations? l]) => (l ?? ru).socialErrorMessage(
+          withDetails('failed-precondition', {'reason': 'REFERRAL_NOT_ALLOWED', 'why': why}), SocialAction.referral);
+      expect(msg('own_code'), 'Это ваш собственный код. Введите код друга.');
+      expect(msg('already_referred'), 'Вы уже вводили код друга. Это можно сделать только один раз.');
+      expect(msg('already_referred', ky), contains('бир гана жолу'));
+      expect(msg('has_exams'), contains('только в новом аккаунте'));
+    });
+
+    test('groups: owner cannot leave, removed member, profile not ready', () {
+      String msg(String why, SocialAction action, [AppLocalizations? l]) => (l ?? ru).socialErrorMessage(
+          withDetails('failed-precondition', {'reason': 'VALIDATION_FAILED', 'why': why}), action);
+      expect(msg('owner_has_members', SocialAction.other), ru.socialGroupOwnerCannotLeave);
+      expect(msg('removed_from_group', SocialAction.groupJoin), contains('исключил вас из этой группы'));
+      expect(msg('removed_from_group', SocialAction.groupJoin, ky), contains('чыгарып салган'));
+      expect(msg('removed_from_group', SocialAction.groupJoin, en), contains('removed you from this group'));
+      expect(msg('profile_missing', SocialAction.groupCreate), contains('через минуту'));
+      expect(msg('profile_missing', SocialAction.friendAdd, en), contains('in a minute'));
+    });
+
+    test('LIMIT_REACHED: a full group is not "at most 5 groups"', () {
+      String msg(String what, SocialAction action, [AppLocalizations? l]) => (l ?? ru).socialErrorMessage(
+          withDetails('resource-exhausted', {'reason': 'LIMIT_REACHED', 'what': what, 'limit': 5}), action);
+      expect(kindOf('resource-exhausted', {'reason': 'LIMIT_REACHED', 'what': 'group_members', 'limit': 500}),
+          SocialFailureKind.groupFull);
+      expect(msg('group_members', SocialAction.groupJoin), contains('500 участников'));
+      expect(msg('group_members', SocialAction.groupJoin), isNot(contains('5 групп')));
+      expect(msg('group_members', SocialAction.groupJoin, ky), contains('500'));
+      expect(msg('group_members', SocialAction.groupJoin, en), contains('500 members'));
+      expect(msg('memberships', SocialAction.groupJoin), 'Достигнут лимит: не больше 5 групп.');
+      expect(msg('memberships', SocialAction.groupCreate), 'Достигнут лимит: не больше 5 групп.');
+      expect(msg('owned_groups', SocialAction.groupCreate), 'Достигнут лимит: не больше 5 групп.');
+      expect(msg('friends', SocialAction.friendAdd), contains('50'));
+    });
+
+    test('what only narrows LIMIT_REACHED', () {
+      expect(kindOf('invalid-argument', {'reason': 'VALIDATION_FAILED', 'what': 'group_members'}),
+          SocialFailureKind.validation);
+    });
+
+    test('RATE_LIMITED on friend/group codes: "too many attempts, try tomorrow", nothing about promo codes', () {
+      final e = withDetails('resource-exhausted', {'reason': 'RATE_LIMITED', 'what': 'code_attempts'});
+      for (final action in [SocialAction.friendAdd, SocialAction.groupJoin]) {
+        expect(ru.socialErrorMessage(e, action), 'Слишком много попыток за сегодня. Попробуйте завтра.');
+        expect(ky.socialErrorMessage(e, action), contains('Эртең'));
+        expect(en.socialErrorMessage(e, action), 'Too many attempts today. Try again tomorrow.');
+        for (final l in [ru, ky, en]) {
+          expect(l.socialErrorMessage(e, action).toLowerCase(), isNot(contains('промокод')));
+          expect(l.socialErrorMessage(e, action).toLowerCase(), isNot(contains('promo')));
+        }
+      }
+    });
+
+    test('the new texts are translated, not copied from Russian', () {
+      for (final kind in [
+        SocialFailureKind.groupFull,
+        SocialFailureKind.removedFromGroup,
+        SocialFailureKind.profileMissing,
+        SocialFailureKind.ownerHasMembers,
+      ]) {
+        final texts = {
+          for (final l in [ru, ky, en]) l.socialFailureKindMessage(kind, SocialAction.groupJoin),
+        };
+        expect(texts, hasLength(3), reason: '$kind');
+      }
+      expect({ru.socialGroupNameLength, ky.socialGroupNameLength, en.socialGroupNameLength}, hasLength(3));
+      for (final l in [ru, ky, en]) {
+        expect(l.socialGroupNameLength, allOf(contains('2'), contains('60')));
+      }
+    });
+  });
+
   group('codes', () {
     test('normalises case, separators and Cyrillic look-alikes', () {
       expect(SocialCodes.normalize(' k7m-2qx '), 'K7M2QX');

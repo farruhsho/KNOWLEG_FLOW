@@ -5016,6 +5016,10 @@ class AppLocalizationsKy extends AppLocalizations {
       'Топтун коду — 4төн 12ге чейин латын тамгасы жана сан.';
 
   @override
+  String get socialErrorGroupFull =>
+      'Топто 500 мүчө бар — бул эң көп сан. Кошулууга болбойт.';
+
+  @override
   String get socialErrorGroupLimit =>
       'Чекке жеттиңиз: 5тен ашык топто болууга болбойт.';
 
@@ -5047,6 +5051,10 @@ class AppLocalizationsKy extends AppLocalizations {
       'Бул платформада жеткиликсиз. Android тиркемесин колдонуңуз.';
 
   @override
+  String get socialErrorProfileMissing =>
+      'Профилиңиз али түзүлүп жатат. Бир мүнөттөн кийин кайталаңыз.';
+
+  @override
   String get socialErrorPromoAlreadyRedeemed =>
       'Бул промокодду мурун колдонгонсуз.';
 
@@ -5069,6 +5077,10 @@ class AppLocalizationsKy extends AppLocalizations {
   @override
   String get socialErrorReferralNotAllowed =>
       'Досуңуздун кодун жаңы аккаунтта гана киргизүүгө болот: биринчи сынамык экзамен аяктаганга же кредит түшкөнгө чейин.';
+
+  @override
+  String get socialErrorRemovedFromGroup =>
+      'Топтун ээси сизди бул топтон чыгарып салган, ошондуктан ага кайра кошула албайсыз.';
 
   @override
   String get socialErrorValidation =>
@@ -5167,6 +5179,10 @@ class AppLocalizationsKy extends AppLocalizations {
 
   @override
   String get socialGroupNameLabel => 'Топтун аталышы';
+
+  @override
+  String get socialGroupNameLength =>
+      'Аталыш 2ден 60 белгиге чейин болушу керек.';
 
   @override
   String get socialGroupNotFound => 'Бул топ сиз үчүн мындан ары жеткиликсиз.';

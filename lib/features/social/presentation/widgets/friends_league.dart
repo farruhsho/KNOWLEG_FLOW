@@ -20,9 +20,15 @@ import 'social_widgets.dart';
 class FriendsLeagueView extends ConsumerWidget {
   const FriendsLeagueView({super.key});
 
+  /// How long the own-code check waits for the student's code before letting
+  /// the server decide (it rejects the own code too, `why: 'self'`).
+  static const _myCodeWait = Duration(seconds: 5);
+
   Future<void> _add(BuildContext context, WidgetRef ref) async {
     final l = AppLocalizations.of(context)!;
-    final myCode = ref.read(myReferralCodeProvider).valueOrNull;
+    // Start loading the own code now (usually cached), so it is known by the
+    // time the student submits, even on the first visit (§9.7).
+    final myCode = ref.read(myReferralCodeProvider.future).then<String?>((c) => c, onError: (Object _) => null);
     final added = await showCodeEntryDialog<FriendAdded>(
       context,
       title: l.socialFriendsAddTitle,
@@ -32,9 +38,10 @@ class FriendsLeagueView extends ConsumerWidget {
       maxLength: SocialCodes.referralLength,
       fieldKey: const ValueKey('friend_add_field'),
       actionKey: const ValueKey('friend_add_submit'),
-      validate: (c) {
+      validate: (c) async {
         if (!SocialCodes.isReferralCode(c)) return l.socialErrorReferralFormat;
-        if (myCode != null && c == myCode) {
+        final mine = await myCode.timeout(_myCodeWait, onTimeout: () => null);
+        if (mine != null && SocialCodes.normalize(mine) == c) {
           return l.socialFailureKindMessage(SocialFailureKind.ownCode, SocialAction.friendAdd);
         }
         return null;

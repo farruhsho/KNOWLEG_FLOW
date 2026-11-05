@@ -14,8 +14,18 @@ import '../social_messages.dart';
 import '../widgets/code_entry_dialog.dart';
 import '../widgets/social_widgets.dart';
 
+/// Shortest group name `groupCreate` accepts (ARCHITECTURE §9.7, as on the
+/// server: counted after trimming and collapsing whitespace).
+const int kGroupNameMinLength = 2;
+
 /// Longest group name the client sends to `groupCreate`.
 const int kGroupNameMaxLength = 60;
+
+/// The group name as the server stores it: control characters become
+/// spaces, runs of whitespace collapse to one space, the ends are trimmed.
+/// Its `length` (UTF-16 code units) is what the server checks.
+String normalizeGroupName(String raw) =>
+    raw.replaceAll(RegExp(r'[\u0000-\u001f\u007f]'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
 
 /// "Группы" (RoutePaths.groups, ARCHITECTURE §9.3): the student's groups
 /// (`users/{uid}.group_ids`), join by code and create. Membership changes go
@@ -218,9 +228,9 @@ class _CreateGroupDialogState extends ConsumerState<_CreateGroupDialog> {
   Future<void> _submit() async {
     if (_busy) return;
     final l = AppLocalizations.of(context)!;
-    final name = _controller.text.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (name.isEmpty || name.length > kGroupNameMaxLength) {
-      setState(() => _error = l.socialGroupNameInvalid);
+    final name = normalizeGroupName(_controller.text);
+    if (name.length < kGroupNameMinLength || name.length > kGroupNameMaxLength) {
+      setState(() => _error = l.socialGroupNameLength);
       return;
     }
     setState(() {
