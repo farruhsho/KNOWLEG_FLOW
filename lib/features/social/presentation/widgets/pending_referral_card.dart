@@ -34,7 +34,9 @@ class _PendingReferralCardState extends ConsumerState<PendingReferralCard> {
   /// The student's own code when it is already known on this device (no
   /// server call just for this check; the server rejects it too).
   String? _knownOwnCode() {
-    final loaded = ref.read(myReferralCodeProvider).valueOrNull;
+    // Only a code that is already loaded: reading a provider that does not
+    // exist yet would create it and call referralGetCode just for this check.
+    final loaded = ref.exists(myReferralCodeProvider) ? ref.read(myReferralCodeProvider).valueOrNull : null;
     if (loaded != null && loaded.isNotEmpty) return loaded;
     final uid = ref.read(socialUidProvider);
     return uid == null ? null : ref.read(referralLocalStoreProvider).cachedCode(uid);

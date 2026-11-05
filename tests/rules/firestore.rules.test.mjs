@@ -695,6 +695,9 @@ describe('phase 3: groups, assignments, submissions', () => {
       await assertFails(getDoc(doc(s, 'groups/g1/assignments/a1')));
       await assertFails(getDoc(doc(s, 'groups/g1/assignments/a1/submissions/alice')));
       await assertFails(updateDoc(doc(s, 'groups/g1'), { name: 'Renamed' }));
+      // Listing every group would expose every join_code.
+      await assertFails(getDocs(collection(s, 'groups')));
+      await assertFails(getDocs(collection(s, 'referrals')));
     }
     for (const role of ['content_manager', 'methodologist']) {
       await assertFails(getDoc(doc(db(`u_${role}`, { role }), 'groups/g1')));

@@ -274,6 +274,9 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
     if (_isNew && codeExists != null) {
       // Read promo_codes/{CODE} first (§9.7): never upsert over an existing
       // code from the Create form. A failed read blocks too (retry).
+      // The form is frozen while the read runs (AbsorbPointer + no focus),
+      // so the checked draft is exactly what gets saved.
+      FocusScope.of(context).unfocus();
       setState(() {
         _issues = const [];
         _codeError = null;
@@ -320,7 +323,9 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
       title: Text(_isNew ? l.adminPromoCreate : l.adminPromoEditTitle(existing!.code)),
       content: SizedBox(
         width: 480,
-        child: SingleChildScrollView(
+        child: AbsorbPointer(
+          absorbing: _checking,
+          child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -441,6 +446,7 @@ class _PromoCodeEditorDialogState extends State<PromoCodeEditorDialog> {
               ),
             ],
           ),
+        ),
         ),
       ),
       actions: [

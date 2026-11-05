@@ -182,6 +182,9 @@ export const groupLeave = onCall(
       // Assignments + submissions (sub-collections survive a document delete).
       await db().recursiveDelete(groupRef(gid));
       logger.info('group deleted by its last member (owner)', { uid, groupId: gid });
+    } else if (outcome === 'leave') {
+      // The former member's homework marks stay with them, not with the group.
+      await deleteOwnSubmissions(groupRef(gid), uid);
     }
     return { ok: true };
   }),
@@ -220,6 +223,9 @@ export const groupRemoveMember = onCall(
       tx.delete(groupBoardEntryRef(gid, target, nowMs));
       tx.update(groupRef(gid), { member_count: Math.max(1, int(groupSnap!.get('member_count')) - 1) });
     });
+    // Only the owner gets here. The removed user's homework marks leave the
+    // group with them (§9.7); a retry (member already gone) cleans them too.
+    await deleteOwnSubmissions(groupRef(gid), target);
     logger.info('group member removed', { owner: uid, groupId: gid, target });
     return { ok: true };
   }),

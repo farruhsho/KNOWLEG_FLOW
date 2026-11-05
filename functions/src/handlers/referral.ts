@@ -107,6 +107,10 @@ export const referralApply = onCall(
   wrap('referralApply', async (req) => {
     const { uid, profile } = await requireActiveUser(req);
     if (!profile.exists) throw profileRequired();
+    // Shares the daily code_attempts budget with groupJoin / friendAdd
+    // (ARCHITECTURE §9.7): otherwise referralApply would be an unlimited
+    // oracle for which 6-character codes exist.
+    await consumeCodeAttempt(uid);
     const referrer = await resolveReferralCode(payload(req)['code']);
     // Any purchase record that ever granted credits blocks the referral.
     const purchases = await db().collection('purchases').where('uid', '==', uid).limit(20).get();

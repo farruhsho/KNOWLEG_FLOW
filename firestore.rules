@@ -492,7 +492,8 @@ service cloud.firestore {
     // Referrals: the referrer reads their counters and the people they invited;
     // view_users roles read them too (D6, CMS user card, §9.7).
     match /referrals/{referrerUid} {
-      allow read: if isOwner(referrerUid) || canViewUsers();
+      allow get: if isOwner(referrerUid) || canViewUsers();
+      allow list: if isOwner(referrerUid);
       allow write: if false;
 
       match /items/{itemUid} {
@@ -551,7 +552,10 @@ service cloud.firestore {
     // groupRemoveMember. Members read the group and its member list;
     // view_users roles read the group document only (CMS user card, §9.7).
     match /groups/{gid} {
-      allow read: if isGroupMember(gid) || canViewUsers();
+      // Staff may open one group (CMS user card, D6) but never list them all:
+      // a listing would hand out every join_code (ARCHITECTURE §9.7).
+      allow get: if isGroupMember(gid) || canViewUsers();
+      allow list: if isGroupMember(gid);
       allow write: if false;
 
       match /members/{memberUid} {

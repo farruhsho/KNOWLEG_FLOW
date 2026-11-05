@@ -491,6 +491,8 @@ test('groups: create, join, owner assignment, member submission, leagues, leave'
 
   await signInAs(STUDENT);
   assert.deepEqual(await call('groupLeave')({ groupId }), { ok: true });
+  assert.equal((await db.doc(`groups/${groupId}/assignments/${aRef.id}/submissions/${studentUid}`).get()).exists, false,
+    'a member who leaves takes their homework marks along (§9.7)');
   await expectDenied(getDoc(doc(cDb, 'groups', groupId)));
   assert.deepEqual((await getDoc(doc(cDb, 'users', studentUid))).data().group_ids, []);
   assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 1);
@@ -518,8 +520,12 @@ test('groupRemoveMember: a removed member cannot rejoin with the code; a member 
   await signInAs(STUDENT);
   assert.equal((await call('groupJoin')({ code: joinCode })).groupId, groupId);
   assert.equal((await db.doc(`groups/${groupId}`).get()).get('member_count'), 2);
-  // Every groupJoin / friendAdd call is counted, failed ones too (4 friendAdd + 3 groupJoin).
-  assert.equal(await codeAttempts(studentUid), 7);
+  // Every groupJoin / friendAdd / referralApply call is counted, failed ones too
+  // (4 friendAdd + 3 groupJoin + 2 rejected referralApply).
+  assert.equal(await codeAttempts(studentUid), 9);
+  // Back in the group: a fresh homework mark for the account-deletion test
+  // (the earlier one left with the student, §9.7).
+  await setDoc(doc(cDb, 'groups', groupId, 'assignments', assignmentId, 'submissions', studentUid), { done_at: serverTimestamp() });
   assert.equal(await codeAttempts(intruderUid), 2);
 });
 

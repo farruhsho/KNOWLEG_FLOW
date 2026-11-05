@@ -153,8 +153,13 @@ export async function deleteUserData(uid: string): Promise<Record<string, number
   counts['friend_entries'] = await deleteFriendEntriesAbout(uid);
   // Memberships, own groups, and homework submissions in other owners' groups.
   counts['groups'] = await removeUserFromGroups(uid);
+  // §9.7: "removed by the owner" markers about this user in other groups
+  // (their submissions there were already deleted at removal time).
+  counts['removed_markers'] = await deleteQueryTrees(db().collectionGroup('removed').where('uid', '==', uid));
 
   counts['purchases_anonymized'] = await anonymize('purchases', 'uid', uid);
+  // Other users' purchases that paid this user a referral bonus keep no raw uid.
+  counts['purchases_referrer_anonymized'] = await anonymize('purchases', 'referral_referrer_uid', uid);
   counts['payments_anonymized'] = await anonymize('payments', 'uid', uid);
 
   try {
